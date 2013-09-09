@@ -1599,6 +1599,11 @@ int mutt_body_handler (BODY *b, STATE *s)
   size_t tmplength = 0;
   int rc = 0;
 
+#ifdef HAVE_FMEMOPEN
+  char *temp;
+  size_t tempsize;
+#endif
+
   int oflags = s->flags;
   
   /* first determine which handler to use to process this part */
@@ -1711,6 +1716,14 @@ int mutt_body_handler (BODY *b, STATE *s)
       {
 	/* decode to a tempfile, saving the original destination */
 	fp = s->fpout;
+#ifdef HAVE_FMEMOPEN
+	if ((s->fpout = open_memstream(&temp, &tempsize)) == NULL)
+	{
+	  mutt_error _("Unable to open memory stream!");
+	  dprint (1, (debugfile, "Can't open memory stream.\n"));
+	  goto bail;
+	}
+#else
 	mutt_mktemp (tempfile, sizeof (tempfile));
 	if ((s->fpout = safe_fopen (tempfile, "w")) == NULL)
 	{
@@ -1718,6 +1731,7 @@ int mutt_body_handler (BODY *b, STATE *s)
 	  dprint (1, (debugfile, "Can't open %s.\n", tempfile));
 	  goto bail;
 	}
+#endif
 	/* decoding the attachment changes the size and offset, so save a copy
 	 * of the "real" values now, and restore them after processing
 	 */
@@ -1746,8 +1760,19 @@ int mutt_body_handler (BODY *b, STATE *s)
 	/* restore final destination and substitute the tempfile for input */
 	s->fpout = fp;
 	fp = s->fpin;
+#ifdef HAVE_FMEMOPEN
+	if(tempsize)
+		s->fpin = fmemopen(temp, tempsize, "r");
+	else /* fmemopen cannot handle zero-length buffers */
+		s->fpin = safe_fopen ("/dev/null", "r");
+	if(s->fpin == NULL) {
+		mutt_perror("failed to re-open memstream!");
+		return (-1);
+	}
+#else
 	s->fpin = fopen (tempfile, "r");
 	unlink (tempfile);
+#endif
 
 	/* restore the prefix */
 	s->prefix = savePrefix;
@@ -1773,6 +1798,10 @@ int mutt_body_handler (BODY *b, STATE *s)
 
 	/* restore the original source stream */
 	safe_fclose (&s->fpin);
+#ifdef HAVE_FMEMOPEN
+	if(tempsize)
+	    FREE(&temp);
+#endif
 	s->fpin = fp;
       }
     }
