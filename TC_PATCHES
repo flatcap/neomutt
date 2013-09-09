@@ -251,3 +251,18 @@ crypt_confirmhook (bool)
 If set, then you will be prompted for confirmation of keys when using the
 crypt-hook command.  If unset, no such confirmation prompt will be presented.
 This is generally considered unsafe, especially where typos are concerned.
+
+==========================
+ignore-thread-1.5.20.patch
+==========================
+
+Commit 711ad3e1f4c198c93fee5d3087cd31c47bdddd5b
+Written by: Gerhard Oettl
+Updated for mutt-hg by The-Compiler <mutt-tc@the-compiler.org>
+
+Adds the ability to ignore threads.
+
+New settings
+------------
+
+Bind a key to ignore-thread, like this: bind \Ci ignore-thread
