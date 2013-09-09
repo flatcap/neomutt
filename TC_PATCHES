@@ -173,3 +173,19 @@ Settings example
 
 ifdef  imap-fetch-mail  'source ~/.mutt/imap_setup'
 ifdef  trash  set trash=~/Mail/trash
+
+===============================
+patch-1.5.1.cd.pattern_broken.1
+===============================
+
+Commit a96620ba31701741bc2a7b0d09dd488eb9f4b922
+Written by: Cedric Duval <cedricduval@free.fr>
+Source: http://cedricduval.free.fr/mutt/patches/#pattbroken
+
+Adds a search pattern ~# to search for broken threads.
+
+Requires
+--------
+
+set sort=threads
+unset strict_threads
