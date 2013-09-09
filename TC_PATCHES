@@ -266,3 +266,24 @@ New settings
 ------------
 
 Bind a key to ignore-thread, like this: bind \Ci ignore-thread
+
+===============================
+patch-1.5.4.vk.pgp_verbose_mime
+===============================
+
+Commit 466d113044f5536a3821d7061ef68caa0c2a29d7
+Written by: vk ?
+
+Adds settings to change the filename and content description for PGP
+signatures.
+
+New settings
+------------
+
+pgp_mime_signature_filename (string)
+This option sets the filename used for signature parts in PGP/MIME
+signed messages.
+
+pgp_mime_signature_description (string)
+This option sets the Content-Description used for signature parts in
+PGP/MIME signed messages.
