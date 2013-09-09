@@ -400,7 +400,7 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
   char path[_POSIX_PATH_MAX];
   char *pc;
   long bytes;
-  progress_t progressbar;
+  progress_t progressbar, *pbar;
   int uid;
   int cacheno;
   IMAP_CACHE *cache;
@@ -497,9 +497,15 @@ int imap_fetch_message (MESSAGE *msg, CONTEXT *ctx, int msgno)
 	    imap_error ("imap_fetch_message()", buf);
 	    goto bail;
 	  }
-	  mutt_progress_init (&progressbar, _("Fetching message..."),
-			      M_PROGRESS_SIZE, NetInc, bytes);
-	  if (imap_read_literal (msg->fp, idata, bytes, &progressbar) < 0)
+	  if (!isendwin())
+	  {
+	    mutt_progress_init (&progressbar, _("Fetching message..."),
+	   		      M_PROGRESS_SIZE, NetInc, bytes);
+	    pbar = &progressbar;
+	  }
+	  else
+	    pbar = NULL;
+	  if (imap_read_literal (msg->fp, idata, bytes, pbar) < 0)
 	    goto bail;
 	  /* pick up trailing line */
 	  if ((rc = imap_cmd_step (idata)) != IMAP_CMD_CONTINUE)
