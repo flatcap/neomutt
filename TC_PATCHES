@@ -205,3 +205,13 @@ Settings example
 
 source ~/.mutt/aliases ~/.mutt/hooks ~/.mutt/colors
 source `echo ~/.mutt/*`
+
+======================
+patch-1.5.21.as.echo.2
+======================
+
+Commit 5d95e14b868224bfc5f94a0539dab8e788b42d5
+Written by: Adam Spiers
+Source: http://permalink.gmane.org/gmane.mail.mutt.devel/10320
+
+Adds an echo function to provide feedback from macros.
