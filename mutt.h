@@ -199,6 +199,7 @@ enum
   M_OR,
   M_THREAD,
   M_TO,
+  M_BROKEN,
   M_CC,
   M_COLLAPSED,
   M_SUBJECT,

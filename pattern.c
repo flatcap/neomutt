@@ -97,6 +97,7 @@ Flags[] =
   { 'y', M_XLABEL,		0,		eat_regexp },
   { 'z', M_SIZE,		0,		eat_range },
   { '=', M_DUPLICATED,		0,		NULL },
+  { '#', M_BROKEN,		0,		NULL },
   { '$', M_UNREFERENCED,	0,		NULL },
   { 0,   0,			0,		NULL }
 };
@@ -1243,6 +1244,8 @@ mutt_pattern_exec (struct pattern_t *pat, pattern_exec_flag flags, CONTEXT *ctx,
       return (pat->not ^ (h->env->spam && h->env->spam->data && patmatch (pat, h->env->spam->data) == 0));
     case M_DUPLICATED:
       return (pat->not ^ (h->thread && h->thread->duplicate_thread));
+    case M_BROKEN:
+      return (pat->not ^ (h->thread && h->thread->fake_thread));
     case M_MIMEATTACH:
       {
       int count = mutt_count_body_parts (ctx, h);
