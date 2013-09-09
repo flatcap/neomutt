@@ -2028,6 +2028,18 @@ struct option_t MuttVars[] = {
   ** .pp
   ** Should folders be indented in the sidebar.
   */
+  { "pgp_mime_signature_filename", DT_STR, R_NONE, UL &PgpMimeSignatureFilename, UL "signature.asc"},
+  /*
+  ** .pp
+  ** This option sets the filename used for signature parts in PGP/MIME
+  ** signed messages.
+  */
+  { "pgp_mime_signature_description", DT_STR, R_NONE, UL &PgpMimeSignatureDescription, UL "Digital signature"},
+  /*
+  ** .pp
+  ** This option sets the Content-Description used for signature parts in
+  ** PGP/MIME signed messages.
+  */
 
   { "pgp_use_gpg_agent", DT_BOOL, R_NONE, OPTUSEGPGAGENT, 0},
   /*
