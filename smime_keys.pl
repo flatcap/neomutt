@@ -946,6 +946,7 @@ sub newfile ($;$$) {
 	$option = "notemp" if (not defined($option));
 	if (! $tmpdir and $option eq "temp") {
 		$tmpdir = mutt_Q 'tmpdir';
+                $tmpdir = '/tmp' if ($tmpdir =~ m/=/); # if the tmpdir contains '=', use the default
 		$tmpdir = newfile("$tmpdir/smime");
 		mkdir $tmpdir, 0700 || die "Can't create $tmpdir: $!\n";
 	}
