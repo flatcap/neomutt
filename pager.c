@@ -1777,14 +1777,6 @@ mutt_pager (const char *banner, const char *fname, int flags, pager_t *extra)
 	lines++;
   	move(lines + bodyoffset, SidebarWidth);
       }
-      NORMAL_COLOR;
-      if(option(OPTSTATUSONTOP) && PagerIndexLines > 0) {
-          CLEARLINE_WIN (statusoffset);
-      } else {
-          CLEARLINE (statusoffset);
-          DrawFullLine = 1; /* for mutt_make_string_info */
-      }
-
       /* We are going to update the pager status bar, so it isn't
        * necessary to reset to normal color now. */
 
@@ -1809,6 +1801,13 @@ mutt_pager (const char *banner, const char *fname, int flags, pager_t *extra)
       /* print out the pager status bar */
       move (statusoffset, 0);
       SETCOLOR (MT_COLOR_STATUS);
+      NORMAL_COLOR;
+      if(option(OPTSTATUSONTOP) && PagerIndexLines > 0) {
+          CLEARLINE_WIN (statusoffset);
+      } else {
+          CLEARLINE (statusoffset);
+          DrawFullLine = 1; /* for mutt_make_string_info */
+      }
 
       if (IsHeader (extra) || IsMsgAttach (extra))
       {
