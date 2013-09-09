@@ -1129,7 +1129,7 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
   THREAD *thread, *top;
   HEADER *roothdr = NULL;
   int final, reverse = (Sort & SORT_REVERSE), minmsgno;
-  int num_hidden = 0, new = 0, old = 0;
+  int num_hidden = 0, new = 0, old = 0, flagged = 0;
   int min_unread_msgno = INT_MAX, min_unread = cur->virtual;
 #define CHECK_LIMIT (!ctx->pattern || cur->limited)
 
@@ -1162,6 +1162,11 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
     }
   }
 
+  if (cur->flagged && CHECK_LIMIT)
+  {
+    flagged = 1;
+  }
+
   if (cur->virtual == -1 && CHECK_LIMIT)
     num_hidden++;
 
@@ -1188,6 +1193,8 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
       return (num_hidden);
     else if (flag & M_THREAD_NEXT_UNREAD)
       return (min_unread);
+    else if (flag & M_THREAD_FLAGGED)
+      return (flagged);
   }
   
   FOREVER
@@ -1239,6 +1246,11 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
 	}
       }
 
+      if (cur->flagged && CHECK_LIMIT)
+      {
+        flagged = 1;
+      }
+
       if (cur->virtual == -1 && CHECK_LIMIT)
 	num_hidden++;
     }
@@ -1274,6 +1286,8 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
     return (num_hidden+1);
   else if (flag & M_THREAD_NEXT_UNREAD)
     return (min_unread);
+  else if (flag & M_THREAD_FLAGGED)
+    return (flagged);
 
   return (0);
 #undef CHECK_LIMIT

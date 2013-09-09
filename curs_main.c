@@ -109,6 +109,11 @@ static const char *No_visible = N_("No visible messages.");
 #define CURHDR Context->hdrs[Context->v2r[menu->current]]
 #define OLDHDR Context->hdrs[Context->v2r[menu->oldcurrent]]
 #define UNREAD(h) mutt_thread_contains_unread (Context, h)
+#define FLAGGED(h) mutt_thread_contains_flagged (Context, h)
+
+#define CHECK_IF_TO_COLLAPSE(header) \
+  ((option (OPTCOLLAPSEUNREAD)  || !UNREAD (header)) && \
+   (option (OPTCOLLAPSEFLAGGED) || FLAGGED(header) == 0))
 
 extern size_t UngetCount;
 
@@ -1750,14 +1755,14 @@ int mutt_index_menu (void)
 	  if (option (OPTUNCOLLAPSEJUMP))
 	    menu->current = mutt_thread_next_unread (Context, CURHDR);
 	}
-	else if (option (OPTCOLLAPSEUNREAD) || !UNREAD (CURHDR))
+        else if CHECK_IF_TO_COLLAPSE(CURHDR)
 	{
 	  menu->current = mutt_collapse_thread (Context, CURHDR);
 	  mutt_set_virtual (Context);
 	}
 	else
 	{
-	  mutt_error _("Thread contains unread messages.");
+          mutt_error _("Thread contains unread or flagged messages.");
 	  break;
 	}
 
@@ -1782,8 +1787,10 @@ int mutt_index_menu (void)
 
 	  if (CURHDR->collapsed)
 	    final = mutt_uncollapse_thread (Context, CURHDR);
-	  else if (option (OPTCOLLAPSEUNREAD) || !UNREAD (CURHDR))
+          else if CHECK_IF_TO_COLLAPSE(CURHDR)
+          {
 	    final = mutt_collapse_thread (Context, CURHDR);
+          }
 	  else
 	    final = CURHDR->virtual;
 
@@ -1801,9 +1808,11 @@ int mutt_index_menu (void)
 	    {
 	      if (h->collapsed)
 		mutt_uncollapse_thread (Context, h);
-	      else if (option (OPTCOLLAPSEUNREAD) || !UNREAD (h))
+              else if CHECK_IF_TO_COLLAPSE(h)
+              {
 		mutt_collapse_thread (Context, h);
 	    }
+            }
 	    top = top->next;
 	  }
 
