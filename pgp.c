@@ -1192,7 +1192,7 @@ char *pgp_findKeys (ADDRESS *to, ADDRESS *cc, ADDRESS *bcc)
     {
       int r;
       snprintf (buf, sizeof (buf), _("Use keyID = \"%s\" for %s?"), keyID, p->mailbox);
-      if ((r = mutt_yesorno (buf, M_YES)) == M_YES)
+      if (!option(OPTCRYPTCONFIRMHOOK) || (r = mutt_yesorno (buf, M_YES)) == M_YES)
       {
 	if (is_numerical_keyid (keyID))
 	{

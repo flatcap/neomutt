@@ -1812,6 +1812,15 @@ struct option_t MuttVars[] = {
   ** even for bad signatures.
   ** (PGP only)
   */
+  { "pgp_confirmhook",		DT_SYN, R_NONE, UL "crypt_confirmhook", 1 },
+  { "crypt_confirmhook",	DT_BOOL, R_NONE, OPTCRYPTCONFIRMHOOK, 1 },
+  /*
+  ** .pp
+  ** If set, then you will be prompted for confirmation of keys when using
+  ** the \fIcrypt-hook\fP command.  If unset, no such confirmation prompt will
+  ** be presented.  This is generally considered unsafe, especially where
+  ** typos are concerned.
+  */
   { "pgp_ignore_subkeys", DT_BOOL, R_NONE, OPTPGPIGNORESUB, 1},
   /*
   ** .pp
