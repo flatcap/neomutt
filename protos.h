@@ -71,6 +71,8 @@ int _mutt_aside_thread (HEADER *, short, short);
 #define mutt_thread_contains_unread(x,y) _mutt_traverse_thread (x,y,M_THREAD_UNREAD)
 #define mutt_thread_contains_flagged(x,y) _mutt_traverse_thread (x,y,M_THREAD_FLAGGED)
 #define mutt_thread_next_unread(x,y) _mutt_traverse_thread(x,y,M_THREAD_NEXT_UNREAD)
+#define mutt_ignore_thread(x,y) _mutt_traverse_thread (x,y,M_THREAD_IGNORE)
+#define mutt_unignore_thread(x,y) _mutt_traverse_thread (x,y,M_THREAD_UNIGNORE)
 int _mutt_traverse_thread (CONTEXT *ctx, HEADER *hdr, int flag);
 
 

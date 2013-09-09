@@ -1221,6 +1221,7 @@ int mutt_reopen_mailbox (CONTEXT *ctx, int *index_hint)
 	   */
 	  mutt_set_flag (ctx, ctx->hdrs[i], M_FLAG, old_hdrs[j]->flagged);
 	  mutt_set_flag (ctx, ctx->hdrs[i], M_REPLIED, old_hdrs[j]->replied);
+	  mutt_set_flag (ctx, ctx->hdrs[i], M_IGNORE_THREAD, old_hdrs[j]->ignore_thread);
 	  mutt_set_flag (ctx, ctx->hdrs[i], M_OLD, old_hdrs[j]->old);
 	  mutt_set_flag (ctx, ctx->hdrs[i], M_READ, old_hdrs[j]->read);
 	}

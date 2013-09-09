@@ -2315,6 +2315,19 @@ search_next:
 	km_error_key (MENU_PAGER);
 	break;
 
+      case OP_MAIN_COLLAPSE_THREAD:
+	CHECK_MODE(IsHeader (extra));
+	rc = OP_MAIN_COLLAPSE_THREAD;
+	ch = -1;
+	break;
+
+      case OP_MAIN_IGNORE_THREAD:
+	CHECK_MODE(IsHeader (extra));
+	CHECK_READONLY;
+	rc = OP_MAIN_IGNORE_THREAD;
+	ch = -1;
+	break;
+
 	/* --------------------------------------------------------------------
 	 * The following are operations on the current message rather than
 	 * adjusting the view of the message.

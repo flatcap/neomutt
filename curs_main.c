@@ -328,6 +328,7 @@ static void update_index (MUTTMENU *menu, CONTEXT *ctx, int check,
   mutt_sort_headers (ctx, (check == M_REOPENED));
 
   /* uncollapse threads with new mail */
+  /* let threads collapsed if they have the ignore-thread flag */
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
     if (check == M_REOPENED)
@@ -340,7 +341,8 @@ static void update_index (MUTTMENU *menu, CONTEXT *ctx, int check,
       {
 	for (j = h; !j->message; j = j->child)
 	  ;
-	mutt_uncollapse_thread (ctx, j->message);
+	if (!(j->message)->ignore_thread)
+	  mutt_uncollapse_thread (ctx, j->message);
       }
       mutt_set_virtual (ctx);
     }
@@ -353,7 +355,8 @@ static void update_index (MUTTMENU *menu, CONTEXT *ctx, int check,
 	for (k = 0; k < ctx->msgcount; k++)
 	{
 	  HEADER *h = ctx->hdrs[k];
-	  if (h == save_new[j] && (!ctx->pattern || h->limited))
+	  if (h == save_new[j] && (!ctx->pattern || h->limited) &&
+	  !h->ignore_thread)
 	    mutt_uncollapse_thread (ctx, h);
 	}
       }
@@ -427,6 +430,7 @@ int mutt_index_menu (void)
 {
   char buf[LONG_STRING], helpstr[LONG_STRING];
   int op = OP_NULL;
+  int prev_op = OP_NULL;
   int done = 0;                /* controls when to exit the "event" loop */
   int i = 0, j;
   int tag = 0;                 /* has the tag-prefix command been pressed? */
@@ -1216,13 +1220,15 @@ int mutt_index_menu (void)
 
 	unset_option (OPTNEEDRESORT);
 
-	if ((Sort & SORT_MASK) == SORT_THREADS && CURHDR->collapsed)
+	if ((Sort & SORT_MASK) == SORT_THREADS && CURHDR->collapsed &&
+	    !CURHDR->ignore_thread && prev_op != OP_MAIN_COLLAPSE_THREAD)
 	{
 	  mutt_uncollapse_thread (Context, CURHDR);
 	  mutt_set_virtual (Context);
 	  if (option (OPTUNCOLLAPSEJUMP))
 	    menu->current = mutt_thread_next_unread (Context, CURHDR);
 	}
+	prev_op = OP_NULL;
 
 	if (option (OPTPGPAUTODEC) && (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
 	  mutt_check_traditional_pgp (tag ? NULL : CURHDR, &menu->redraw);
@@ -1514,10 +1520,14 @@ int mutt_index_menu (void)
 
 	  if (CURHDRi->collapsed && (Sort & SORT_MASK) == SORT_THREADS)
 	  {
-	    if (UNREAD (CURHDRi) && first_unread == -1)
-	      first_unread = i;
-	    if (UNREAD (CURHDRi) == 1 && first_new == -1)
-	      first_new = i;
+	    /* include collapsed threads only if they dont have the ignore-thread flag */
+	    if (!CURHDRi->ignore_thread)
+	    {
+	      if (UNREAD (CURHDRi) && first_unread == -1)
+		first_unread = i;
+	      if (UNREAD (CURHDRi) == 1 && first_new == -1)
+		first_new = i;
+	    }
 	  }
 	  else if ((!CURHDRi->deleted && !CURHDRi->read))
 	  {
@@ -1766,6 +1776,51 @@ int mutt_index_menu (void)
 	  break;
 	}
 
+	if (menu->menu == MENU_PAGER)
+	{
+	  prev_op = op;
+	  op = OP_DISPLAY_MESSAGE;
+	  continue;
+	}
+
+	menu->redraw = REDRAW_INDEX | REDRAW_STATUS;
+
+       break;
+
+      case OP_MAIN_IGNORE_THREAD:
+	CHECK_MSGCOUNT;
+        CHECK_VISIBLE;
+	CHECK_READONLY;
+
+        if ((Sort & SORT_MASK) != SORT_THREADS)
+        {
+	  mutt_error _("Threading is not enabled.");
+	  break;
+	}
+      
+	if (CURHDR->ignore_thread)
+	{
+	  mutt_unignore_thread (Context, CURHDR);
+          if (CURHDR->collapsed) 
+ 	    menu->current = mutt_uncollapse_thread (Context, CURHDR);
+	  mutt_set_virtual (Context);
+	  if (option (OPTUNCOLLAPSEJUMP))
+	    menu->current = mutt_thread_next_unread (Context, CURHDR);
+	}
+	else 
+	{
+	  mutt_ignore_thread (Context, CURHDR);
+          if (!CURHDR->collapsed)
+	    menu->current = mutt_collapse_thread (Context, CURHDR);
+	  mutt_set_virtual (Context);
+	}
+
+	if (menu->menu == MENU_PAGER)
+	{
+	  op = OP_DISPLAY_MESSAGE;
+	  continue;
+	}
+
 	menu->redraw = REDRAW_INDEX | REDRAW_STATUS;
 
        break;
@@ -1777,6 +1832,12 @@ int mutt_index_menu (void)
         if ((Sort & SORT_MASK) != SORT_THREADS)
         {
 	  mutt_error _("Threading is not enabled.");
+	  break;
+	}
+
+        if (CURHDR->ignore_thread)
+        {
+	  mutt_error _("'un/collapse-all' cannot start from a ignored thread.");
 	  break;
 	}
 
@@ -1807,7 +1868,10 @@ int mutt_index_menu (void)
 	    if (h->collapsed != Context->collapsed)
 	    {
 	      if (h->collapsed)
-		mutt_uncollapse_thread (Context, h);
+          {
+            if (!h->ignore_thread)
+              mutt_uncollapse_thread (Context, h);
+          }
               else if CHECK_IF_TO_COLLAPSE(h)
               {
 		mutt_collapse_thread (Context, h);

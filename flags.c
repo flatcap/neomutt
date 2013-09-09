@@ -281,6 +281,30 @@ void _mutt_set_flag (CONTEXT *ctx, HEADER *h, int flag, int bf, int upd_ctx)
 	if (upd_ctx) ctx->tagged--;
       }
       break;
+
+    case M_IGNORE_THREAD:
+
+      if (!mutt_bit_isset(ctx->rights,M_ACL_WRITE))
+        return;
+
+      if (bf)
+      {
+	if (!h->ignore_thread)
+	{
+	  h->ignore_thread = 1;
+	  h->changed = 1;
+	  if (upd_ctx) ctx->changed = 1;
+	  update = 1;
+	}
+      }
+      else if (h->ignore_thread)
+      {
+        update = 1;
+	h->ignore_thread = 0;
+	h->changed = 1;
+	if (upd_ctx) ctx->changed = 1;
+      }
+      break;
   }
 
   if (update)

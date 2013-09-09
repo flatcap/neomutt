@@ -890,6 +890,9 @@ static int imap_make_msg_set (IMAP_DATA* idata, BUFFER* buf, int flag,
           if (hdrs[n]->flagged != HEADER_DATA(hdrs[n])->flagged)
             match = invert ^ hdrs[n]->flagged;
 	  break;
+	case M_IGNORE_THREAD:
+	  if (hdrs[n]->ignore_thread != HEADER_DATA(hdrs[n])->ignore_thread)
+	    match = invert ^ hdrs[n]->ignore_thread;
         case M_OLD:
           if (hdrs[n]->old != HEADER_DATA(hdrs[n])->old)
             match = invert ^ hdrs[n]->old;
@@ -1032,6 +1035,8 @@ static int compare_flags (HEADER* h)
     return 1;
   if (h->deleted != hd->deleted)
     return 1;
+  if (h->ignore_thread != hd->ignore_thread)
+      return 1;
 
   return 0;
 }
@@ -1064,6 +1069,8 @@ int imap_sync_message (IMAP_DATA *idata, HEADER *hdr, BUFFER *cmd,
                  "Old ", flags, sizeof (flags));
   imap_set_flag (idata, M_ACL_WRITE, hdr->flagged,
 		 "\\Flagged ", flags, sizeof (flags));
+  imap_set_flag (idata, M_ACL_WRITE, hdr->ignore_thread,
+                 "ignoreThread ", flags, sizeof (flags));
   imap_set_flag (idata, M_ACL_WRITE, hdr->replied,
 		 "\\Answered ", flags, sizeof (flags));
   imap_set_flag (idata, M_ACL_DELETE, hdr->deleted,
@@ -1082,6 +1089,8 @@ int imap_sync_message (IMAP_DATA *idata, HEADER *hdr, BUFFER *cmd,
     imap_set_flag (idata, M_ACL_SEEN, 1, "\\Seen ", flags, sizeof (flags));
     imap_set_flag (idata, M_ACL_WRITE, 1, "Old ", flags, sizeof (flags));
     imap_set_flag (idata, M_ACL_WRITE, 1, "\\Flagged ", flags, sizeof (flags));
+    imap_set_flag (idata, M_ACL_WRITE, 1, "ignoreThread ", flags, sizeof
+    (flags));
     imap_set_flag (idata, M_ACL_WRITE, 1, "\\Answered ", flags, sizeof (flags));
     imap_set_flag (idata, M_ACL_DELETE, 1, "\\Deleted ", flags, sizeof (flags));
 
@@ -1257,6 +1266,7 @@ int imap_sync_mailbox (CONTEXT* ctx, int expunge, int* index_hint)
   rc += sync_helper (idata, M_ACL_WRITE, M_OLD, "Old");
   rc += sync_helper (idata, M_ACL_SEEN, M_READ, "\\Seen");
   rc += sync_helper (idata, M_ACL_WRITE, M_REPLIED, "\\Answered");
+  rc += sync_helper (idata, M_ACL_WRITE, M_IGNORE_THREAD, "ignoreThread");
 
   if (oldsort != Sort)
   {

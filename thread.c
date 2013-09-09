@@ -116,6 +116,69 @@ static void linearize_tree (CONTEXT *ctx)
   }
 }
 
+/* check if all messages in a ignored thread have the ignore-tread status */
+static void mutt_check_ignore_thread (CONTEXT *ctx)
+{
+  THREAD *thread, *top;
+  HEADER *roothdr;
+  int ignore_thread, missing_count;
+      
+  thread = ctx->tree; 
+  while (thread)
+  {
+    ignore_thread = 0;
+    missing_count = 0;
+    roothdr = NULL;
+
+    top = thread;
+    while (!thread->message)
+      thread = thread->child;
+ 
+    FOREVER
+    {
+      if (thread->message)
+      {
+	if (!roothdr)
+	  roothdr = thread->message;
+
+	if ((thread->message)->ignore_thread)
+	  ignore_thread = 1;
+	else
+	  missing_count++;
+      }
+
+      if (thread->child)
+	thread = thread->child;
+      else if (thread == top)
+	break;
+      else if (thread->next)
+	thread = thread->next;
+      else
+      {
+	int done = 0;
+	while (!thread->next)
+	{
+	  thread = thread->parent;
+	  if (thread == top)
+	  {
+	    done = 1;
+	    break;
+	  }
+	}
+	if (done)
+	  break;
+	thread = thread->next;
+      }
+    }
+    if (ignore_thread && missing_count)
+    {
+      mutt_ignore_thread(ctx, roothdr);
+    }
+    thread = thread->next;
+  }
+}
+
+
 /* this calculates whether a node is the root of a subtree that has visible
  * nodes, whether a node itself is visible, whether, if invisible, it has
  * depth anyway, and whether any of its later siblings are roots of visible
@@ -970,6 +1033,10 @@ void mutt_sort_threads (CONTEXT *ctx, int init)
 
     /* Draw the thread tree. */
     mutt_draw_tree (ctx);
+ 
+    /* check if all messages in a ignored tree have the ignore-thread status */
+    mutt_check_ignore_thread(ctx);
+ 
   }
 }
 
@@ -1182,6 +1249,13 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
     }
   }
 
+  if (flag & (M_THREAD_IGNORE | M_THREAD_UNIGNORE))
+  {
+    cur->pair = 0; /* force index entry's color to be re-evaluated */
+    mutt_set_flag (ctx, cur, M_IGNORE_THREAD, flag & M_THREAD_IGNORE);
+  }
+
+
   if (thread == top && (thread = thread->child) == NULL)
   {
     /* return value depends on action requested */
@@ -1193,6 +1267,8 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
       return (num_hidden);
     else if (flag & M_THREAD_NEXT_UNREAD)
       return (min_unread);
+    else if (flag & (M_THREAD_IGNORE | M_THREAD_UNIGNORE))
+      return (1);
     else if (flag & M_THREAD_FLAGGED)
       return (flagged);
   }
@@ -1230,6 +1306,13 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
 	  if (CHECK_LIMIT)
 	    cur->virtual = cur->msgno;
 	}
+      }
+
+
+      if (flag & (M_THREAD_IGNORE | M_THREAD_UNIGNORE))
+      {
+	cur->pair = 0; /* force index entry's color to be re-evaluated */
+	mutt_set_flag (ctx, cur, M_IGNORE_THREAD, flag & M_THREAD_IGNORE);
       }
 
 
@@ -1286,6 +1369,8 @@ int _mutt_traverse_thread (CONTEXT *ctx, HEADER *cur, int flag)
     return (num_hidden+1);
   else if (flag & M_THREAD_NEXT_UNREAD)
     return (min_unread);
+  else if (flag & (M_THREAD_IGNORE | M_THREAD_UNIGNORE))
+    return (1);
   else if (flag & M_THREAD_FLAGGED)
     return (flagged);
 

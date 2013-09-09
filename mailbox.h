@@ -29,6 +29,9 @@
 				*/
 #define M_PEEK		(1<<5) /* revert atime back after taking a look (if applicable) */
 
+#define M_XSTATUS_IGNORE_THREAD  'I'  /* char for saving ignore-thread to X-Status */
+
+
 /* mx_open_new_message() */
 #define M_ADD_FROM	1	/* add a From_ line */
 

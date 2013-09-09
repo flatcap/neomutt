@@ -33,6 +33,7 @@ typedef struct imap_header_data
   unsigned int flagged : 1;
   unsigned int replied : 1;
   unsigned int changed : 1;
+  unsigned int ignore_thread : 1;
 
   unsigned int parsed : 1;
 

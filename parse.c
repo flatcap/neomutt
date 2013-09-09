@@ -1252,6 +1252,9 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
 	    case 'F':
 	    hdr->flagged = 1;
 	    break;
+	    case M_XSTATUS_IGNORE_THREAD:
+	    hdr->ignore_thread = 1;
+	    break;
 	    default:
 	    break;
 	  }

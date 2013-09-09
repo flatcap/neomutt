@@ -321,6 +321,7 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
   }
 
   /* re-collapse threads marked as collapsed */
+  /* and threads marked for ignoring if it is a "init-sort" */
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
     top = ctx->tree;
@@ -330,7 +331,7 @@ void mutt_sort_headers (CONTEXT *ctx, int init)
 	thread = thread->child;
       h = thread->message;
 
-      if (h->collapsed)
+      if (h->collapsed || (h->ignore_thread && init))
 	mutt_collapse_thread (ctx, h);
       top = top->next;
     }

@@ -195,6 +195,7 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
           ctx->hdrs[idx]->old = h.data->old;
           ctx->hdrs[idx]->deleted = h.data->deleted;
           ctx->hdrs[idx]->flagged = h.data->flagged;
+	  ctx->hdrs[idx]->ignore_thread = h.data->ignore_thread;
           ctx->hdrs[idx]->replied = h.data->replied;
           ctx->hdrs[idx]->changed = h.data->changed;
           /*  ctx->hdrs[msgno]->received is restored from mutt_hcache_restore */
@@ -306,6 +307,7 @@ int imap_read_headers (IMAP_DATA* idata, int msgbegin, int msgend)
       ctx->hdrs[idx]->old = h.data->old;
       ctx->hdrs[idx]->deleted = h.data->deleted;
       ctx->hdrs[idx]->flagged = h.data->flagged;
+      ctx->hdrs[idx]->ignore_thread = h.data->ignore_thread;
       ctx->hdrs[idx]->replied = h.data->replied;
       ctx->hdrs[idx]->changed = h.data->changed;
       ctx->hdrs[idx]->received = h.received;
@@ -1056,6 +1058,7 @@ char* imap_set_flags (IMAP_DATA* idata, HEADER* h, char* s)
   mutt_set_flag (ctx, h, M_READ, hd->read);
   mutt_set_flag (ctx, h, M_DELETE, hd->deleted);
   mutt_set_flag (ctx, h, M_FLAG, hd->flagged);
+  mutt_set_flag (ctx, h, M_IGNORE_THREAD, hd->ignore_thread);
   mutt_set_flag (ctx, h, M_REPLIED, hd->replied);
 
   /* this message is now definitively *not* changed (mutt_set_flag
@@ -1225,7 +1228,7 @@ static char* msg_parse_flags (IMAP_HEADER* h, char* s)
   s++;
 
   mutt_free_list (&hd->keywords);
-  hd->deleted = hd->flagged = hd->replied = hd->read = hd->old = 0;
+  hd->deleted = hd->flagged = hd->replied = hd->read = hd->old = hd->ignore_thread = 0;
 
   /* start parsing */
   while (*s && *s != ')')
@@ -1239,6 +1242,11 @@ static char* msg_parse_flags (IMAP_HEADER* h, char* s)
     {
       s += 8;
       hd->flagged = 1;
+    }
+    else if (ascii_strncasecmp ("ignorethread", s, 12) == 0)
+    {
+      s += 12;
+      hd->ignore_thread = 1;
     }
     else if (ascii_strncasecmp ("\\answered", s, 9) == 0)
     {

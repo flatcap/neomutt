@@ -252,6 +252,8 @@ hdr_format_str (char *dest,
   int is_index = (flags & M_FORMAT_INDEX);
 #define THREAD_NEW (threads && hdr->collapsed && hdr->num_hidden > 1 && mutt_thread_contains_unread (ctx, hdr) == 1)
 #define THREAD_OLD (threads && hdr->collapsed && hdr->num_hidden > 1 && mutt_thread_contains_unread (ctx, hdr) == 2)
+#define THREAD_IGNORE_NEW (THREAD_NEW && hdr->ignore_thread)
+#define THREAD_IGNORE_UNREAD (THREAD_OLD && hdr->ignore_thread)
   size_t len;
 
   hdr = hfi->hdr;
@@ -574,6 +576,11 @@ hdr_format_str (char *dest,
 	ch = '*';
       else if (hdr->flagged)
 	ch = '!';
+      else if (hdr->ignore_thread)
+        if (hdr->read)
+	  ch = 'i';
+	else
+	  ch = 'I';
       else if (hdr->replied)
 	ch = 'r';
       else if (hdr->read && (ctx && ctx->msgnotreadyet != hdr->msgno))
@@ -651,9 +658,12 @@ hdr_format_str (char *dest,
         ch = 'K';
 
       snprintf (buf2, sizeof (buf2),
-		"%c%c%c", (THREAD_NEW ? 'n' : (THREAD_OLD ? 'o' : 
+		"%c%c%c", ((THREAD_IGNORE_NEW || THREAD_IGNORE_UNREAD ||
+		(threads && hdr->ignore_thread && !hdr->read)) ? 'I' :
+		(threads && hdr->ignore_thread ? 'i' : (
+		THREAD_NEW ? 'n' : (THREAD_OLD ? 'o' :
 		((hdr->read && (ctx && ctx->msgnotreadyet != hdr->msgno))
-		? (hdr->replied ? 'r' : ' ') : (hdr->old ? 'O' : 'N')))),
+		? (hdr->replied ? 'r' : ' ') : (hdr->old ? 'O' : 'N')))))),
 		hdr->deleted ? 'D' : (hdr->attach_del ? 'd' : ch),
 		hdr->tagged ? '*' :
 		(hdr->flagged ? '!' :
@@ -724,6 +734,8 @@ hdr_format_str (char *dest,
   return (src);
 #undef THREAD_NEW
 #undef THREAD_OLD
+#undef THREAD_IGNORE_NEW
+#undef THREAD_IGNORE_UNREAD
 }
 
 void

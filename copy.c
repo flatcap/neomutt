@@ -393,7 +393,7 @@ mutt_copy_header (FILE *in, HEADER *h, FILE *out, int flags, const char *prefix)
       fputc ('\n', out);
     }
 
-    if (h->flagged || h->replied)
+    if (h->flagged || h->replied || h->ignore_thread)
     {
       fputs ("X-Status: ", out);
       if (h->replied)
@@ -402,6 +402,11 @@ mutt_copy_header (FILE *in, HEADER *h, FILE *out, int flags, const char *prefix)
 	fputc ('F', out);
       fputc ('\n', out);
     }
+  }
+
+  if (h->ignore_thread)
+  {
+    fputc (M_XSTATUS_IGNORE_THREAD, out);
   }
 
   if (flags & CH_UPDATE_LEN &&

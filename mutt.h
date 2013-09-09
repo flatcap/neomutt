@@ -167,6 +167,8 @@ typedef enum
 #define M_THREAD_UNREAD		(1<<3)
 #define M_THREAD_NEXT_UNREAD	(1<<4)
 #define M_THREAD_FLAGGED	(1<<5)
+#define M_THREAD_IGNORE  	(1<<6)
+#define M_THREAD_UNIGNORE  	(1<<7)
 
 enum
 {
@@ -194,6 +196,7 @@ enum
   M_LIMIT,
   M_EXPIRED,
   M_SUPERSEDED,
+  M_IGNORE_THREAD,
 
   /* actions for mutt_pattern_comp/mutt_pattern_exec */
   M_AND,
@@ -752,6 +755,7 @@ typedef struct header
   /* the following are used to support collapsing threads  */
   unsigned int collapsed : 1; 	/* is this message part of a collapsed thread? */
   unsigned int limited : 1;   	/* is this message in a limited view?  */
+  unsigned int ignore_thread : 1;   /* is this message part of a ignored thread?  */
   size_t num_hidden;          	/* number of hidden messages in this view */
 
   short recipient;		/* user_is_recipient()'s return value, cached */
