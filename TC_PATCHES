@@ -1,5 +1,6 @@
 The following patches were added by me (The-Compiler) for the mutt-tc version:
 
+=================
 crypt-gpgme.patch
 =================
 
@@ -9,3 +10,116 @@ Written by Roman Kagan <rkagan@mail.ru>
 Source: https://www.archlinux.org/packages/extra/x86_64/mutt/
 
 Correctly initialize the GPGME library, so mutt doesn't quit immediately
+
+=================================
+patch-1.5.12.sidebar.20060720.txt
+=================================
+
+Commit 4eb72e171ecfadd1f4206d612895f645c2a00e22
+Written by:
+Terry P. Chan <tchan@lunar-linux.org>, Justin Hibbits and Thomer M. Gil
+Updated for mutt-hg by The-Compiler <mutt-tc@the-compiler.org>
+Source: http://www.lunar-linux.org/mutt-sidebar/
+
+Add a sidebar for mutt with a folder-view.
+
+Settings example
+----------------
+
+# set up the sidebar, default not visible
+set sidebar_width=12
+set sidebar_visible=no
+set sidebar_delim='|'
+set sidebar_sort=yes
+
+# which mailboxes to list in the sidebar
+mailboxes =inbox =ml
+
+# color of folders with new mail
+color sidebar_new yellow default
+
+# ctrl-n, ctrl-p to select next, prev folder
+# ctrl-o to open selected folder
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CO sidebar-open
+
+# I don’t need these. just for documentation purposes. See below.
+# sidebar-scroll-up
+# sidebar-scroll-down
+
+# b toggles sidebar visibility
+macro index b ‘<enter-command>toggle sidebar_visible<enter>’
+macro pager b ‘<enter-command>toggle sidebar_visible<enter>’
+
+# Remap bounce-message function to “B”
+bind index B bounce-message
+
+#
+# Mario Holbe suggests:
+# macro index b ‘<enter-command>toggle sidebar_visible<enter><refresh>’
+# macro pager b ‘<enter-command>toggle sidebar_visible<enter><redraw-screen>’
+#
+
+Settings documentation
+----------------------
+
+sidebar_width (number)
+Width of the sidebar.
+
+sidebar_visible (boolean)
+Whether or not the sidebar is visible.
+
+sidebar_delim (string)
+Specifies the delimiter between the sidebar and other screens
+
+sidebar_sort
+This specifies whether or not to sort the folders in the sidebar alphabetically, mainly for IMAP user.
+
+color sidebar_new [fg] [bg]
+The foreground (fg) and background (bg) color of folders that contain new mail.
+
+sidebar-prev
+Mutt’s name for the operation that selects the previous folder.
+
+sidebar-next
+Mutt’s name for the operation that selects the next folder.
+
+sidebar-open
+Mutt’s name for the operation that opens the currently selected folder.
+
+sidebar-scroll-up
+Only useful if you have more folders than lines in your terminal: scrolls one
+page up through the list of folders.
+
+sidebar-scroll-down
+Only useful if you have more folders than lines in your terminal: scrolls one
+page down through the list of folders.
+
+sidebar_format (string)
+Format string for the sidebar. The sequences `%N’, `%F’ and `%S’ will
+be replaced by the number of new or flagged messages or the total size
+of them mailbox. `%B’ will be replaced with the name of the mailbox.
+The `%!’ sequence will be expanded to `!’ if there is one flagged
+message; to `!!’ if there are two flagged messages; and to `n!’ for n
+flagged messages, n>2.
+
+sidebar_folderindent (boolean)
+Should folders be indented in the sidebar.
+
+sidebar_indentstr (string)
+This specifies the string that is used to indent items with
+sidebar_folderindent= yes.
+
+sidebar_shortpath (boolean)
+Should the sidebar shorten the path showed.
+
+=============================
+sidebar-corrected-by-jf.patch
+=============================
+
+Commit 66a3d85a94870dc937b6b81e13ecb928bae118f8
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-sidebar/
+
+Fix an off-by-one error in the sidebar naming.
