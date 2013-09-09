@@ -307,8 +307,44 @@ $attach_keyword (default is "attach") and no attachments are given, composition
 will be aborted. If set to no, composing messages as such will never be
 aborted.
 
-attach_keywordA (string)
+attach_keyword (string)
 
 If $abort_attach is not set to no, then the body of the message will be scanned
 for this keyword, and if found, you will be prompted if there are no
 attachments. This is case insensitive.
+
+================================
+228671-pipe-mime.patch
+383769-score-match.patch
+528233-readonly-open.patch
+542817-smimekeys-tmpdir.patch
+543467-thread-segfault.patch
+547980-smime_keys-chaining.patch
+================================
+
+Debian upstream patches, small bugfixes.
+
+---
+Don't draw imap fetch progress if we aren't in visual mode.
+Drawing progress leaves terminal in confusing state when piping a message
+from pager to less(1). See http://bugs.mutt.org/1771
+
+Updated in #569279.
+---
+better matching for ~f, same as mutt-ng did, see upstream
+http://bugs.mutt.org/2179
+---
+Open attachments as read-only so the editor won't be able to modify it;
+otherwise the user can believe that he/she can edit it and risk to lose his/her
+work (see upstream bug http://bugs.mutt.org/3261)
+
+#528233, updated in #572203
+---
+skip the configured tmpdir if it contains '=', that convention is used only by
+mutt, see upstream http://bugs.mutt.org/3324
+---
+added a patch to prevent segfault when Ctrl+R is hit on a malformed group of
+messages (see upstream bug http://bugs.mutt.org/3335)
+---
+To suppose (support?) certificate chaining in smime_keys, see upstream
+http://bugs.mutt.org/3339
