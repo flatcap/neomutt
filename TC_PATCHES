@@ -215,3 +215,20 @@ Written by: Adam Spiers
 Source: http://permalink.gmane.org/gmane.mail.mutt.devel/10320
 
 Adds an echo function to provide feedback from macros.
+
+======================
+collapse-flagged.patch
+======================
+
+Commit 418faccafccccea4266372aea5654433652fd37a
+Written by: Lukas P. Ruf
+Source: http://debian.lpr.ch/Mutt/ (down)
+
+Don't collapse threads if they contain flagged messages
+
+New settings
+------------
+
+collapse_flagged (bool)
+When unset, Mutt will not collapse a thread if it contains any flagged
+messages.
