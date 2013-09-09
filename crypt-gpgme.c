@@ -4380,6 +4380,12 @@ static void init_gpgme (void)
       if (mutt_any_key_to_continue (NULL) == -1)
 	mutt_exit(1);
     }
+
+  gpgme_check_version (NULL);
+  gpgme_set_locale (NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
+#ifdef LC_MESSAGES
+  gpgme_set_locale (NULL, LC_MESSAGES, setlocale (LC_MESSAGES, NULL));
+#endif
 }
 
 void pgp_gpgme_init (void)
