@@ -1110,6 +1110,22 @@ int mutt_parse_exec (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
   return 0;
 }
 
+/* echo some text in the status line */
+int mutt_parse_echo (BUFFER *buf, BUFFER *s, unsigned long data, BUFFER *err)
+{
+  int r = 0;
+
+  mutt_extract_token (buf, s, 0);
+  if (MoreArgs (s))
+  {
+    strfcpy (err->data, _("echo: too many arguments"), err->dsize);
+    r = -1;
+  }
+  else
+    mutt_message (buf->data);
+  return (r);
+}
+
 /*
  * prompts the user to enter a keystroke, and displays the octal value back
  * to the user.

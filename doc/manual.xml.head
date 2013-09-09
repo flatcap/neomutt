@@ -3691,6 +3691,27 @@ binding of <literal>&lt;collapse-all&gt;</literal>).
 
 </sect1>
 
+<sect1 id="echo">
+<title>Echoing text in the message line</title>
+
+<para>Usage:</para>
+
+<cmdsynopsis>
+<command>echo</command>
+<arg choice="plain">
+<replaceable class="parameter">text</replaceable>
+</arg>
+</cmdsynopsis>
+
+<para>
+This command can be used to display a line of text in the same way
+that warning or informational messages are displayed.  This is useful
+within macros to provide visual feedback that an operation has been
+completed.
+</para>
+
+</sect1>
+
 <sect1 id="exec">
 <title>Executing Functions</title>
 

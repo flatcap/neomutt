@@ -332,6 +332,7 @@ int mutt_multi_choice (char *prompt, char *letters);
 int mutt_needs_mailcap (BODY *);
 int mutt_num_postponed (int);
 int mutt_parse_bind (BUFFER *, BUFFER *, unsigned long, BUFFER *);
+int mutt_parse_echo (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 int mutt_parse_exec (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 int mutt_parse_color (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 int mutt_parse_uncolor (BUFFER *, BUFFER *, unsigned long, BUFFER *);
