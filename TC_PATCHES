@@ -157,3 +157,19 @@ Settings example
 
 bind index \eD purge-message
 bind pager \eD purge-message
+
+======================
+patch-1.5.4.cd.ifdef.1
+======================
+
+Commit d64abf2b35dfb76c2e1098a57c948bc6463c11e8
+Written by: Cedric Duval <cedricduval@free.fr>
+Source: http://cedricduval.free.fr/mutt/patches/#ifdef
+
+Add an ifdef function.
+
+Settings example
+----------------
+
+ifdef  imap-fetch-mail  'source ~/.mutt/imap_setup'
+ifdef  trash  set trash=~/Mail/trash
