@@ -189,3 +189,19 @@ Requires
 
 set sort=threads
 unset strict_threads
+
+================================
+patch-1.5.4.cd.source_multiple.2
+================================
+
+Commit c556b4aba8e1e1754cd96aa57e095efcbdd5af06
+Written by: Cedric Duval <cedricduval@free.fr>
+Source: http://cedricduval.free.fr/mutt/patches/#sourcemul
+
+Makes it possible to source multiple files with the source command.
+
+Settings example
+----------------
+
+source ~/.mutt/aliases ~/.mutt/hooks ~/.mutt/colors
+source `echo ~/.mutt/*`
