@@ -1,0 +1,11 @@
+The following patches were added by me (The-Compiler) for the mutt-tc version:
+
+crypt-gpgme.patch
+=================
+
+Commit 3aa7956d4cafbdecf93d0619dbf8592076bf6bd4
+"crypt-gpgme: actually init gpgme"
+Written by Roman Kagan <rkagan@mail.ru>
+Source: https://www.archlinux.org/packages/extra/x86_64/mutt/
+
+Correctly initialize the GPGME library, so mutt doesn't quit immediately
