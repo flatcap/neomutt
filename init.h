@@ -2169,6 +2169,16 @@ struct option_t MuttVars[] = {
   ** .pp
   ** Also see the $$postpone variable.
   */
+  { "trash",		DT_PATH, R_NONE, UL &TrashPath, 0 },
+  /*
+  ** .pp
+  ** If set, this variable specifies the path of the trash folder where the
+  ** mails marked for deletion will be moved, instead of being irremediably
+  ** purged.
+  ** .pp
+  ** NOTE: When you delete a message in the trash folder, it is really
+  ** deleted, so that you have a way to clean the trash.
+  */
 #ifdef USE_SOCKET
   { "preconnect",	DT_STR, R_NONE, UL &Preconnect, UL 0},
   /*
