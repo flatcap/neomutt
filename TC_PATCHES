@@ -232,3 +232,22 @@ New settings
 collapse_flagged (bool)
 When unset, Mutt will not collapse a thread if it contains any flagged
 messages.
+
+===================================
+patch-1.5.6.dw.confirm-crypt-hook.1
+===================================
+
+Commit eec3a0c16c2a31fa184b046427c7ed2635e1b612
+Written by: Dale Woolridge
+Source: http://www.woolridge.org/mutt/confirm-crypt-hook.html
+
+Adds a new option to skop the "Use keyID" prompt.
+
+New settings
+------------
+
+crypt_confirmhook (bool)
+
+If set, then you will be prompted for confirmation of keys when using the
+crypt-hook command.  If unset, no such confirmation prompt will be presented.
+This is generally considered unsafe, especially where typos are concerned.
