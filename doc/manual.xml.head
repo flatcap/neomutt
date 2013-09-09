@@ -4351,6 +4351,9 @@ distinct mailboxes.
 <arg choice="plain">
 <replaceable class="parameter">filename</replaceable>
 </arg>
+<arg choice="opt" rep="repeat">
+<replaceable>filename</replaceable>
+</arg>
 </cmdsynopsis>
 
 <para>
