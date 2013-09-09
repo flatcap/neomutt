@@ -310,7 +310,7 @@ int draw_sidebar(int menu) {
 		/* calculate depth of current folder and generate its display name with indented spaces */
 		int sidebar_folder_depth = 0;
 		char *sidebar_folder_name;
-		sidebar_folder_name = option(OPTSIDEBARSHORTPATH) ? mutt_basename(tmp->path) : tmp->path + maildir_is_prefix*(strlen(Maildir) + 1);
+		sidebar_folder_name = option(OPTSIDEBARSHORTPATH) ? mutt_basename(tmp->path) : tmp->path + maildir_is_prefix*(strlen(Maildir));
 		if ( maildir_is_prefix && option(OPTSIDEBARFOLDERINDENT) ) {
 			char *tmp_folder_name;
 			int i;
