@@ -34,6 +34,7 @@ WHERE ADDRESS *From;
 WHERE char *AliasFile;
 WHERE char *AliasFmt;
 WHERE char *AssumedCharset;
+WHERE char *AttachKeyword;
 WHERE char *AttachSep;
 WHERE char *Attribution;
 WHERE char *AttachCharset;

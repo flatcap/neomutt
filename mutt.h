@@ -291,6 +291,8 @@ enum
   OPT_SUBJECT,
   OPT_VERIFYSIG,      /* verify PGP signatures */
     
+  OPT_ATTACH, /* forgotten attachment detector */
+
   /* THIS MUST BE THE LAST VALUE. */
   OPT_MAX
 };

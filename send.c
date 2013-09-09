@@ -1113,6 +1113,34 @@ static int has_recips (ADDRESS *a)
 }
 
 int
+mutt_search_attach_keyword(char* filename)
+{
+  /* searches for the magic keyword "attach" within a file */
+  int found = 0;
+  char* inputline = malloc(1024);
+  char* lowerKeyword = malloc(strlen(AttachKeyword)+1);
+  FILE *attf = fopen(filename, "r");
+  int i;
+  for (i=0; i <= strlen(AttachKeyword); i++) {
+    lowerKeyword[i] = tolower(AttachKeyword[i]);
+  }
+  while (!feof(attf)) {
+    fgets(inputline, 1024, attf);
+    for (i=0; i < strlen(inputline); i++) {
+      inputline[i] = tolower(inputline[i]);
+    }
+    if (strstr(inputline, lowerKeyword)) {
+        found = 1;
+        break;
+    }
+  }
+  free(inputline);
+  free(lowerKeyword);
+  fclose(attf);
+  return found;
+}
+
+int
 ci_send_message (int flags,		/* send mode */
 		 HEADER *msg,		/* template to use for new message */
 		 char *tempfile,	/* file specified by -i or -H */
@@ -1609,6 +1637,21 @@ main_loop:
     /* if the abort is automatic, print an error message */
     if (quadoption (OPT_SUBJECT) == M_YES)
       mutt_error _("No subject specified.");
+    goto main_loop;
+  }
+
+  if (mutt_search_attach_keyword(msg->content->filename) && 
+         !msg->content->next && 
+         query_quadoption(OPT_ATTACH, _("No attachments, cancel sending?")) != M_NO)
+  {
+    /* if the abort is automatic, print an error message */
+    if (quadoption (OPT_ATTACH) == M_YES) {
+         char errorstr[512];
+         if (snprintf(errorstr, 512, 
+                       "Message contains magic keyword \"%s\", but no attachments. Not sending.", AttachKeyword)==-1)
+               errorstr[511] = 0; // terminate if need be. our string shouldnt be this long.
+      mutt_error _(errorstr);
+    }
     goto main_loop;
   }
 
