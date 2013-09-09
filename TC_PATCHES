@@ -123,3 +123,21 @@ Written by: ?
 Source: https://aur.archlinux.org/packages/mutt-sidebar/
 
 Fix an off-by-one error in the sidebar naming.
+
+=================================
+patch-1.5.5.1.cd.trash_folder.3.4
+=================================
+
+Commit 3644b810b72a903b5c54ab0e959f8b11a039ef8b
+Written by: Cedric Duval <cedricduval@free.fr>
+Source: http://cedricduval.free.fr/mutt/patches/#trash
+
+Add trash folder for mutt.
+
+New settings
+------------
+
+trash (string)
+If set, this variable specifies the path of the trash folder where the
+mails marked for deletion will be moved, instead of being irremediably
+purged.
