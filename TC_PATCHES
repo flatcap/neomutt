@@ -608,3 +608,13 @@ Specify the path to `w3mimgdisplay' program.
 
 xface_w3mimgdisplay_options (string)
 Specify options for ``w3mimgdisplay'' program.
+
+==================================
+patch-1.5.21.csev.ask_passphrase.1
+==================================
+
+Commit bf27eaea30f0d9233a73e94b36c6afeb3bcf4f97
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-great-dane/
+
+Fix passphrase asking error
