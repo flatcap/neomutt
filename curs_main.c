@@ -342,7 +342,7 @@ static void update_index (MUTTMENU *menu, CONTEXT *ctx, int check,
 
   /* uncollapse threads with new mail */
   /* let threads collapsed if they have the ignore-thread flag */
-  if ((Sort & SORT_MASK) == SORT_THREADS)
+  if (option(OPTUNCOLLAPSENEW) && ((Sort & SORT_MASK) == SORT_THREADS))
   {
     if (check == M_REOPENED)
     {
