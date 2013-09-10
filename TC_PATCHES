@@ -350,25 +350,6 @@ messages (see upstream bug http://bugs.mutt.org/3335)
 To suppose (support?) certificate chaining in smime_keys, see upstream
 http://bugs.mutt.org/3339
 
-=========================
-patch-1.5.21.dgc.deepif.2
-=========================
-
-Commit 55bfab77fa8c4800933e3466994ff76593e0c924
-Written by: David Champion
-Source: http://home.uchicago.edu/~dgc/mutt/#deepif
-
-Allow nesting of conditionals.
-
-This permits nested if-else sequences like this:
-
-%?M?<%2M>&%\?X\?{%2X}\&%4c\??
-
-This means: "If the thread is collapsed and there are hidden messages, show the
-number of hidden messages in angle brackets. Otherwise, if there are
-attachments on this message, show the number of attachments in curly braces. If
-neither is true, then just show the message's size."
-
 ==================
 compressed-folders
 ==================
