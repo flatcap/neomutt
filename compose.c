@@ -208,6 +208,8 @@ check_attachments(ATTACHPTR **idx, short idxlen)
 
   for (i = 0; i < idxlen; i++)
   {
+    if (idx[i]->content->type == TYPEMULTIPART)
+      continue;
     strfcpy(pretty, idx[i]->content->filename, sizeof(pretty));
     if(stat(idx[i]->content->filename, &st) != 0)
     {
@@ -349,6 +351,43 @@ static void update_idx (MUTTMENU *menu, ATTACHPTR **idx, short idxlen)
   menu->current = idxlen++;
   mutt_update_tree (idx, idxlen);
   menu->max = idxlen;
+  return;
+}
+
+
+/*
+ * compose_attach_swap: swap two adjacent entries in the attachment list.
+ */
+static void compose_attach_swap (BODY *msg, ATTACHPTR **idx, short first)
+{
+  int i;
+  void *saved;
+  BODY *part;
+
+  /* Reorder BODY pointers.
+   * Must traverse msg from top since BODY * has no previous ptr.
+   */
+  for (part = msg; part; part = part->next)
+  {
+    if (part->next == idx[first]->content)
+    {
+      idx[first]->content->next = idx[first+1]->content->next;
+      idx[first+1]->content->next = idx[first]->content;
+      part->next = idx[first+1]->content;
+      break;
+    }
+  }
+
+  /* Reorder index */
+  saved        = idx[first];
+  idx[first]   = idx[first+1];
+  idx[first+1] = saved;
+
+  /* Swap ptr->num */
+  i = idx[first]->num;
+  idx[first]->num = idx[first+1]->num;
+  idx[first+1]->num = i;
+
   return;
 }
 
@@ -650,6 +689,132 @@ int mutt_compose_menu (HEADER *msg,   /* structure for new message */
         mutt_message_hook (NULL, msg, M_SEND2HOOK);
         break;
 
+
+      case OP_COMPOSE_MOVE_UP:
+	if (menu->current == 0)
+	{
+	  mutt_error(_("Attachment is already at top."));
+	  break;
+	}
+	if (menu->current == 1)
+	{
+	  mutt_error(_("The fundamental part cannot be moved."));
+	  break;
+	}
+	compose_attach_swap(msg->content, idx, menu->current - 1);
+	menu->redraw = 1;
+	menu->current--;
+	break;
+
+
+      case OP_COMPOSE_MOVE_DOWN:
+	if (menu->current == idxlen-1)
+	{
+	  mutt_error(_("Attachment is already at bottom."));
+	  break;
+	}
+	if (menu->current == 0)
+	{
+	  mutt_error(_("The fundamental part cannot be moved."));
+	  break;
+	}
+	compose_attach_swap(msg->content, idx, menu->current);
+	menu->redraw = 1;
+	menu->current++;
+	break;
+
+      case OP_COMPOSE_GROUP_ALTS:
+	{
+	  BODY *group, *bptr, *alts;
+	  ATTACHPTR *gptr;
+	  int i, j;
+	  char *p;
+
+	  if (menu->tagged < 2)
+	  {
+	    mutt_error(_("Grouping alternatives requires at least 2 tagged messages."));
+	    break;
+	  }
+
+/* need to redo using mutt_gen_attach_list() */
+
+	  group = safe_calloc(1, sizeof(BODY));
+	  group->type = TYPEMULTIPART;
+	  group->subtype = "alternative";
+
+	  alts = NULL;
+	  for (i = 0, bptr = msg->content; bptr && bptr->next;)
+	  {
+	    /* always look at bptr->next, not bptr itself */
+	    if (bptr->next->tagged)
+	    {
+	      /* untag */
+	      bptr->next->tagged = 0;
+
+	      /* for first match, set group desc according to match */
+#             define ALTS_TAG "Alternatives for \"%s\""
+	      if (!group->description)
+	      {
+		p = bptr->next->description;
+		if (!p)
+		  p = bptr->next->filename;
+		if (p)
+		{
+		  group->description = safe_calloc(1,
+					strlen(p) + strlen(ALTS_TAG) + 1);
+		  sprintf(group->description, ALTS_TAG, p);
+		}
+	      }
+
+	      /* append bptr->next to the alts list,
+	       * and remove from the msg->content list */
+	      if (alts == NULL)
+	      {
+		group->parts = alts = bptr->next;
+		bptr->next = bptr->next->next;
+		alts->next = NULL;
+	      }
+	      else
+	      {
+		alts->next = bptr->next;
+		bptr->next = bptr->next->next;
+		alts = alts->next;
+		alts->next = NULL;
+	      }
+
+	      /* now delink the idx entry */
+	      for (j = i+1; j < idxlen-1; ++j)
+	      {
+		idx[j] = idx[j+1];
+	      }
+	      --idxlen;
+	    }
+	    else
+	    {
+	      bptr = bptr->next;
+	      ++i;
+	    }
+	  }
+
+	  /* add group to attachment list */
+	  for (bptr = msg->content; bptr->next; bptr = bptr->next);
+	  bptr->next = group;
+	  group->next = NULL;
+
+	  gptr = safe_calloc(1, sizeof(ATTACHPTR));
+	  gptr->content = group;
+	  idx[idxlen] = gptr;
+	  update_idx(menu, idx, idxlen++);
+
+	  /* add a boundary */
+	  mutt_generate_boundary(&group->parameter);
+
+	  /* if no group desc yet, make one up */
+	  if (!group->description)
+	    group->description = strdup("unknown alternative group");
+	}
+	menu->redraw = 1;
+	break;
 
       case OP_COMPOSE_ATTACH_FILE:
 	{
