@@ -548,3 +548,33 @@ name="=?iso-2022-jp?B?GyRCO244MxsoQi50eHQ=?="
 Note: this use of RFC 2047's encoding is explicitly prohibited
 by the standard. You may set this variable only if a mailer
 of recipients can not parse RFC 2231 parameters.
+
+========
+xtitles
+========
+
+Commit 548db65293b8cd48b6edb1cabd6b53600b85c012
+Written by: ?
+Source: mutt Debian package
+Debian version
+
+Adds the ability to set xterm window title from mutt
+
+New settings
+------------
+
+xterm_icon (string)
+Controls the format of the icon title, as long as xterm_set_titles
+is enabled. This string is identical in formatting to the one used by
+`$$status_format'.
+
+xterm_set_titles (bool)
+The default must be off to force in the validity checking.
+
+Controls whether mutt sets the xterm title bar and icon name
+(as long as you are in an appropriate terminal).
+
+xterm_title (string)
+Controls the format of the title bar of the xterm provided that
+xterm_set_titles has been set. This string is identical in formatting
+to the one used by ``$$status_format''.
