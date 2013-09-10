@@ -689,3 +689,18 @@ Adds the '@' pattern modifier to limit matches to known aliases.
 
 Example: ~f joe matches messages from joe. @~f joe matches messages from
 any joe who is defined as an alias.
+
+===========
+dgc.markmsg
+===========
+
+Commit 93891e6729102e4705b3fdb87a05dcd2991dbe68
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+Adds <mark-message> binding to create "hotkeys" for messages.
+
+<mark-message>foo<enter> will create a new macro "'foo" which will
+return to the current message by searching for that message's
+message id.  The initial character of the macro is defined by
+$mark_macro_prefix, and defaults to "'" for verisimilitude vs. vi.
