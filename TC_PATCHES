@@ -158,13 +158,14 @@ Settings example
 bind index \eD purge-message
 bind pager \eD purge-message
 
-======================
-patch-1.5.4.cd.ifdef.1
-======================
+=====
+ifdef
+=====
 
-Commit d64abf2b35dfb76c2e1098a57c948bc6463c11e8
+Commit 49f6e351b0c1e0ee2bda0d073032edde874b1a52
 Written by: Cedric Duval <cedricduval@free.fr>
-Source: http://cedricduval.free.fr/mutt/patches/#ifdef
+Debian version
+Source: http://cedricduval.free.fr/mutt/patches/#ifdef (non-debian)
 
 Add an ifdef function.
 
