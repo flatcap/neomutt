@@ -721,7 +721,6 @@ void mutt_free_envelope (ENVELOPE **p)
   FREE (&(*p)->message_id);
   FREE (&(*p)->supersedes);
   FREE (&(*p)->date);
-  FREE (&(*p)->x_face);
   FREE (&(*p)->x_label);
 
   mutt_buffer_free (&(*p)->spam);

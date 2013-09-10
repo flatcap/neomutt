@@ -2121,31 +2121,6 @@ struct option_t MuttVars[] = {
   ** In both cases the messages are piped in the current sorted order,
   ** and the $$pipe_sep separator is added after each message.
   */
-  { "xface",		DT_BOOL, R_NONE, OPTXFACE, 0 },
-  /*
-  ** .pp
-  ** Controls whether mutt displays X-Faces.
-  */
-  { "xface_icontopbm",	DT_PATH, R_NONE, UL &IconToPbm, UL "icontopbm" },
-  /*
-  ** .pp
-  ** Specify the path to ``icontopbm'' program.
-  */
-  { "xface_uncompface",	DT_PATH, R_NONE, UL &UncompFace, UL "uncompface" },
-  /*
-  ** .pp
-  ** Specify the path to ``uncompface'' program.
-  */
-  { "xface_w3mimgdisplay",DT_PATH, R_NONE, UL &W3mImgDisplay, UL "/usr/lib/w3m/w3mimgdisplay" },
-  /*
-  ** .pp
-  ** Specify the path to ``w3mimgdisplay'' program.
-  */
-  { "xface_w3mimgdisplay_options",DT_STR, R_NONE, UL &W3mOpt, UL "-x 5 -y 5" },
-  /*
-  ** .pp
-  ** Specify options for ``w3mimgdisplay'' program.
-  */
 #ifdef USE_POP
   { "pop_auth_try_all",	DT_BOOL, R_NONE, OPTPOPAUTHTRYALL, 1 },
   /*

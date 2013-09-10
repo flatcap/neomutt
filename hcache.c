@@ -439,7 +439,6 @@ dump_envelope(ENVELOPE * e, unsigned char *d, int *off, int convert)
   d = dump_char(e->message_id, d, off, 0);
   d = dump_char(e->supersedes, d, off, 0);
   d = dump_char(e->date, d, off, 0);
-  d = dump_char(e->x_face, d, off, convert);
   d = dump_char(e->x_label, d, off, convert);
 
   d = dump_buffer(e->spam, d, off, convert);
@@ -477,7 +476,6 @@ restore_envelope(ENVELOPE * e, const unsigned char *d, int *off, int convert)
   restore_char(&e->message_id, d, off, 0);
   restore_char(&e->supersedes, d, off, 0);
   restore_char(&e->date, d, off, 0);
-  restore_char(&e->x_face, d, off, convert);
   restore_char(&e->x_label, d, off, convert);
 
   restore_buffer(&e->spam, d, off, convert);

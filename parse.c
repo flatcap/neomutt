@@ -43,7 +43,6 @@ char *mutt_read_rfc822_line (FILE *f, char *line, size_t *linelen)
   char *buf = line;
   int ch;
   size_t offset = 0;
-  int xface = 0;
 
   FOREVER
   {
@@ -53,9 +52,6 @@ char *mutt_read_rfc822_line (FILE *f, char *line, size_t *linelen)
       *line = 0;
       return (line);
     }
-
-    if (ascii_strcasecmp (buf, "x-face:") == 0)
-      xface = 1;
 
     buf += strlen (buf) - 1;
     if (*buf == '\n')
@@ -75,12 +71,9 @@ char *mutt_read_rfc822_line (FILE *f, char *line, size_t *linelen)
       /* eat tabs and spaces from the beginning of the continuation line */
       while ((ch = fgetc (f)) == ' ' || ch == '\t')
 	;
-      if (!xface)
-      {
-	ungetc (ch, f);
-	*++buf = ' '; /* string is still terminated because we removed
-			 at least one whitespace char above */
-      }
+      ungetc (ch, f);
+      *++buf = ' '; /* string is still terminated because we removed
+		       at least one whitespace char above */
     }
 
     buf++;
@@ -1276,11 +1269,7 @@ int mutt_parse_rfc822_line (ENVELOPE *e, HEADER *hdr, char *line, char *p, short
       e->x_label = safe_strdup(p);
       matched = 1;
     }
-    else if (ascii_strcasecmp (line+1, "-face") == 0)
-    {
-      e->x_face = safe_strdup (p);
-      matched = 1;
-    }
+    
     default:
     break;
   }

@@ -2083,9 +2083,6 @@ int mutt_write_rfc822_header (FILE *fp, ENVELOPE *env, BODY *attach,
     }
   }
 
-  if (env->x_face)
-    fprintf (fp, "X-Face: %s\n", env->x_face);
-
   if (mode == 0 && !privacy && option (OPTXMAILER) && !has_agent)
   {
     /* Add a vanity header */

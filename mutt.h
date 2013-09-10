@@ -469,7 +469,6 @@ enum
   OPTWRAP,
   OPTWRAPSEARCH,
   OPTWRITEBCC,		/* write out a bcc header? */
-  OPTXFACE,
   OPTXMAILER,
   OPTXTERMSETTITLES,
 
@@ -614,7 +613,6 @@ typedef struct envelope
   char *message_id;
   char *supersedes;
   char *date;
-  char *x_face;			/* X-Face header content */
   char *x_label;
   BUFFER *spam;
   LIST *references;		/* message references (in reverse order) */
