@@ -618,3 +618,13 @@ Written by: ?
 Source: https://aur.archlinux.org/packages/mutt-great-dane/
 
 Fix passphrase asking error
+
+===============
+imap_fast_trash
+===============
+
+Commit ab72bf20336b24eae99302633497cbe48fb8604e
+Written by: Paul Miller
+Source: Debian mutt package
+
+Make "move to trash folder" use IMAP COPY.
