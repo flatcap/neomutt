@@ -418,3 +418,13 @@ Written by: Omen Wild
 Source: https://www.mandarb.com/mutt/
 
 Adds support for multiple, comma-separated FCCs
+
+=========================
+patch-1.5.21.vvv.initials
+=========================
+
+Commit 530365ff0ccb227c9b76abab1b3942287e2e6d3e
+Written by: Vsevolod Volkov
+Source: http://mutt.org.ua/download/mutt-1.5.21/
+
+Adds %I for index_format to show author initials
