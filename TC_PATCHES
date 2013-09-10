@@ -628,3 +628,15 @@ Written by: Paul Miller
 Source: Debian mutt package
 
 Make "move to trash folder" use IMAP COPY.
+
+=========================
+sensible_browser_position
+=========================
+
+Commit c32dbc8f11243523b66b009d9dd261edf9604624
+Written by: Haakon Riiser
+Source: http://lists.df7cb.de/mutt/message/20050309.162127.a244a894.en.html
+        Debian package
+
+Sets the cursor position to the entered directory if returning from a
+subdirectory.
