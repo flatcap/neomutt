@@ -581,12 +581,13 @@ to the one used by ``$$status_format''.
 
 ================================
 patch-1.5.21.csev.fix_pager_face
-patch-1.5.21.tamo.w3mface.3
+w3mface
 ================================
 
-Commit e5f1861325040d41267a0da1c59239ef4c0e2be1
+Commit 48fa5067f118f2317f3fafa36c1863795ebba397
 Written by: ?
 Source: https://aur.archlinux.org/packages/mutt-great-dane/
+        Mutt debian package
 
 Adds the ability to display X-Faces via w3m
 
