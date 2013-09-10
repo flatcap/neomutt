@@ -659,3 +659,20 @@ New settings
 
 flag_safe (bool)
 If set, flagged messages cannot be deleted.
+
+=============
+dgc.groupalts
+=============
+
+Commit b24b26bcb54253cb39854e3c44fa727b848e81fa
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+Adds keybindings to manage alternative/multipart attachments when composing.
+
+New keybindings
+---------------
+
+group-alternatives    combine tagged items into a multipart/alternative group
+move-up               move the current attachment up in the list
+move-down             move the current attachment down in the list
