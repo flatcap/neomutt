@@ -1135,7 +1135,7 @@ mutt_hcache_open(const char *path, const char *folder, hcache_namer_t namer)
   if (hcachever == 0x0) {
     unsigned char digest[16];
     struct md5_ctx ctx;
-    SPAM_LIST *spam;
+    REPLACE_LIST *spam;
     RX_LIST *nospam;
 
     hcachever = HCACHEVER;
