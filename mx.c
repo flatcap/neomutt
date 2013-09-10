@@ -392,6 +392,11 @@ int mx_get_magic (const char *path)
   else if ((f = fopen (path, "r")) != NULL)
   {
     struct utimbuf times;
+    int ch = 0;
+
+    while ((ch = fgetc(f)) && (ch == '\n' || ch == '\r'));
+    if (!feof(f) && ch)
+      ungetc(ch, f);
 
     fgets (tmp, sizeof (tmp), f);
     if (mutt_strncmp ("From ", tmp, 5) == 0)
