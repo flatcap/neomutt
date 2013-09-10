@@ -1377,6 +1377,14 @@ struct option_t MuttVars[] = {
   ** The locale used by \fCstrftime(3)\fP to format dates. Legal values are
   ** the strings your system accepts for the locale environment variable \fC$$$LC_TIME\fP.
   */
+  /* this absurd location avoids conflict with ats.mark_old patch */
+  { "mark_macro_prefix",DT_STR, R_NONE, UL &MarkMacroPrefix, UL "'" },
+  /*
+  ** .pp
+  ** Prefix for macros created using mark-message.  A new macro
+  ** automatically generated with \fI<mark-message>a\fP will be composed
+  ** from this prefix and the letter \fIa\fP.
+  */
   { "mail_check",	DT_NUM,  R_NONE, UL &BuffyTimeout, 5 },
   /*
   ** .pp
