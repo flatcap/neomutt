@@ -408,3 +408,13 @@ Settings:
 sidebar_newmail_only (bool)
 
 Show only new mail in the sidebar.
+
+=============================
+patch-1.5.4-ow.multiple-fcc.2
+=============================
+
+Commit 0ee10e5d20f4995848c41f945f066b8d14a7dcf3
+Written by: Omen Wild
+Source: https://www.mandarb.com/mutt/
+
+Adds support for multiple, comma-separated FCCs
