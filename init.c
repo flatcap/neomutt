@@ -76,6 +76,8 @@ static void myvar_set (const char* var, const char* val);
 static const char* myvar_get (const char* var);
 static void myvar_del (const char* var);
 
+extern char **envlist;
+
 static void toggle_quadoption (int opt)
 {
   int n = opt/4;
@@ -1747,6 +1749,91 @@ static int check_charset (struct option_t *opt, const char *val)
 
   FREE(&s);
   return rc;
+}
+
+static int parse_setenv(BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)
+{
+  int query, unset, len;
+  char work[LONG_STRING];
+  char **save, **envp = envlist;
+
+  query = 0;
+  unset = data & M_SET_UNSET;
+
+  if (MoreArgs (s))
+  {
+    if (*s->dptr == '?')
+    {
+      query = 1;
+      s->dptr++;
+    }
+
+    /* get variable name */
+    mutt_extract_token (tmp, s, M_TOKEN_EQUAL);
+    len = strlen(tmp->data);
+
+    if (query)
+    {
+      while (envp && *envp)
+      {
+        if (!strncmp(tmp->data, *envp, len))
+        {
+          snprintf(err->data, err->dsize, "%s", *envp);
+          return 0;
+        }
+        envp++;
+      }
+      snprintf (err->data, err->dsize, _("%s is unset"), tmp->data);
+      return -1;
+    }
+
+    if (unset)
+    {
+      while (envp && *envp)
+      {
+        if (!strncmp(tmp->data, *envp, len) && (*envp)[len] == '=')
+        {
+	  /* shuffle down */
+	  save = envp++;
+	  while (*envp)
+	    *save++ = *envp++;
+	  *save = NULL;
+          return 0;
+        }
+        envp++;
+      }
+      return -1;
+    }
+
+    while (envp && *envp)
+    {
+      if (!strncmp(tmp->data, *envp, len) && (*envp)[len] == '=')
+      {
+        /* shuffle down */
+        save = envp++;
+        while (*envp)
+          *save++ = *envp++;
+        *save = NULL;
+        envp = save;
+        break;
+      }
+      envp++;
+    }
+
+    strncpy(work, tmp->data, sizeof(work));
+    len = strlen(work);
+    
+    mutt_extract_token (tmp, s, 0);
+
+    strncpy(&work[len], tmp->data, sizeof(work)-len);
+
+    *envp++ = strdup(work);
+    *envp = NULL;
+
+    return 0;
+  }
+
+  return -1;
 }
 
 static int parse_set (BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)

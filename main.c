@@ -102,6 +102,8 @@ static const char *Obtaining = N_("\
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\n\
 ");
 
+char **envlist;
+
 void mutt_exit (int code)
 {
   mutt_endwin (NULL);
@@ -560,7 +562,7 @@ init_extended_keys();
 #define M_RO      (1<<3)	/* -R */
 #define M_SELECT  (1<<4)	/* -y */
 
-int main (int argc, char **argv)
+int main (int argc, char **argv, char **env)
 {
   char folder[PATH_MAX] = "";
   char *subject = NULL;
@@ -581,6 +583,8 @@ int main (int argc, char **argv)
   extern char *optarg;
   extern int optind;
   int double_dash = argc, nargc = 1;
+
+  envlist = env;
 
   /* sanity check against stupid administrators */
   

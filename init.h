@@ -3692,6 +3692,7 @@ static int parse_ignore (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_unignore (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_source (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_set (BUFFER *, BUFFER *, unsigned long, BUFFER *);
+static int parse_setenv (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_my_hdr (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_unmy_hdr (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_subscribe (BUFFER *, BUFFER *, unsigned long, BUFFER *);
@@ -3769,6 +3770,7 @@ const struct command_t Commands[] = {
   { "send-hook",	mutt_parse_hook,	M_SENDHOOK },
   { "send2-hook",	mutt_parse_hook,	M_SEND2HOOK },
   { "set",		parse_set,		0 },
+  { "setenv",		parse_setenv,		0 },
   { "source",		parse_source,		0 },
   { "spam",		parse_spam_list,	M_SPAM },
   { "nospam",		parse_spam_list,	M_NOSPAM },
@@ -3785,6 +3787,7 @@ const struct command_t Commands[] = {
   { "unmy_hdr",		parse_unmy_hdr,		0 },
   { "unscore",		mutt_parse_unscore,	0 },
   { "unset",		parse_set,		M_SET_UNSET },
+  { "unsetenv",		parse_setenv,		M_SET_UNSET },
   { "unsubscribe",	parse_unsubscribe,	0 },
   { NULL,		NULL,			0 }
 };
