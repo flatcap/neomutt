@@ -50,6 +50,7 @@ typedef struct menu_t
   int offset;	/* which screen row to start the index */
   int pagelen;	/* number of entries per screen */
   int tagprefix;
+  int is_mailbox_list;
 
   /* Setting dialog != NULL overrides normal menu behaviour. 
    * In dialog mode menubar is hidden and prompt keys are checked before
