@@ -469,3 +469,50 @@ in the index format will produce a display like:
    1   F 97.12 To mutt-users@c (   40) Re: rfc934 compliance
    2   F 10/02 To Mutt Develop (   15) Re: tiny mkstemp patch
    3   L 12:17 Michael Elkins  (   16) Re: Replying with the appropriate address
+
+================================
+mutt-resent-header-weeding.patch
+mutt-sendbox-bounce.patch
+mutt-sendbox.patch
+================================
+
+Commit 48c8fc10eb0c4977dfe843d712d96a274d7e8df3
+Commit 036bb68db0d50efd927d38a8f3070de741c10867
+Commit db344adea5cb43263e8f2ea20c29b7995b088705
+Written by: Aron Griffis
+Source: http://n01senet.blogspot.com/2006/10/scratching-mutt-part-1-introducing.html
+        http://n01senet.blogspot.com/2007/02/scratching-mutt-part-2-patch-and.html
+
+resent-header-weeding
+---------------------
+
+Add resent header weeding, used by sendbox
+
+sendbox-bounce
+--------------
+
+Add support for sendbox (bounce path)
+
+This patch adds support for "sendbox" to the bounce path.
+Additionally a bug is fixed: previously there would be no warning or error
+emitted if mutt failed to create the temporary file when bouncing a message.
+
+sendbox
+-------
+
+Add support for sendbox (primary send path)
+
+This patch adds support for Courier IMAP's Outbox feature. It adds the setting
+"sendbox" which specifies a mailbox to which sent messages should be saved,
+overriding the sendmail and smtp_url settings.  This patch only affects the
+primary send path, bounce is handled in a follow-on patch.
+
+New settings
+------------
+
+sendbox (path)
+
+Specifies a special mailbox that will send mail when written. When set, this
+variable overrides smtp_url and sendmail.
+To make use of this, you probably want a Courier IMAP server configured for
+sending, see http://www.inter7.com/courierimap/INSTALL.html#imapsend
