@@ -428,3 +428,27 @@ Written by: Vsevolod Volkov
 Source: http://mutt.org.ua/download/mutt-1.5.21/
 
 Adds %I for index_format to show author initials
+
+======================
+patch-1.5.21.vvv.quote
+======================
+
+Commit cc42c50aef5d672e6082be58cfbff3d4d8ab9973
+Written by: Vsevolod Volkov
+Source: http://mutt.org.ua/download/mutt-1.5.21/
+
+Adds options to fine-tune quoting.
+
+New settings
+------------
+
+quote_empty (bool)
+
+Controls whether or not empty lines will be quoted using
+`$indent_string'.
+
+quote_quoted (bool)
+
+Controls how quoted lines will be quoted. If set, one quote
+character will be added to the end of existing prefix.  Otherwise,
+quoted lines will be prepended by `$indent_string'.
