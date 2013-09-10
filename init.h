@@ -2616,6 +2616,18 @@ struct option_t MuttVars[] = {
   ** In case the text cannot be converted into one of these exactly,
   ** mutt uses $$charset as a fallback.
   */
+#ifdef USE_SENDBOX
+  { "sendbox",         DT_PATH,  R_NONE, UL &Sendbox, 0 },
+  /*
+  ** .pp
+  ** Specifies a special mailbox that will
+  ** \fBsend\fP mail when written. When \fIset\fP, this variable overrides
+  ** \fIsmtp_url\fP and \fIsendmail\fP.
+  ** To make use of this, you probably want a Courier IMAP server configured for
+  ** sending, see 
+  ** http://www.inter7.com/courierimap/INSTALL.html#imapsend
+  */
+#endif
   { "sendmail",		DT_PATH, R_NONE, UL &Sendmail, UL SENDMAIL " -oem -oi" },
   /*
   ** .pp

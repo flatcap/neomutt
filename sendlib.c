@@ -2903,3 +2903,30 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
 
   return r;
 }
+
+#ifdef USE_SENDBOX
+int mutt_sendbox_send (HEADER *hdr)
+{
+  struct mutt_message_handle *mh;
+  CONTEXT ctx;
+  MESSAGE *msg;
+  short old_write_bcc;
+
+  hdr->read = 0; /* make sure to put it in the `new' directory (maildir) */
+
+  mh = mutt_start_message (Sendbox, hdr, &ctx, &msg, 0);
+  if (!mh)
+    return -1;
+
+  /* need to write the bcc in the headers */
+  old_write_bcc = option (OPTWRITEBCC);
+  set_option (OPTWRITEBCC);
+
+  mutt_write_rfc822_header (msg->fp, hdr->env, hdr->content, 0, 0);
+
+  if (!old_write_bcc)
+    unset_option (OPTWRITEBCC);
+
+  return mutt_finish_message (mh, Sendbox, hdr, &ctx, &msg, 1);
+}
+#endif

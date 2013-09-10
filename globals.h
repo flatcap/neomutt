@@ -115,6 +115,9 @@ WHERE char *QueryCmd;
 WHERE char *QueryFormat;
 WHERE char *Realname;
 WHERE short SearchContext;
+#ifdef USE_SENDBOX
+WHERE char *Sendbox;
+#endif
 WHERE char *SendCharset;
 WHERE char *Sendmail;
 WHERE char *Shell;

@@ -983,6 +983,15 @@ static int send_message (HEADER *msg)
   short old_write_bcc;
 #endif
   
+#ifdef USE_SENDBOX
+  /* Some imap servers can send mail by saving to a special folder.
+   * In this case, there's no need for the intermediate tempfile because
+   * we'll write directly to the folder.
+   */
+  if (Sendbox)
+    return mutt_sendbox_send (msg);
+#endif
+
   /* Write out the message in MIME form. */
   mutt_mktemp (tempfile, sizeof (tempfile));
   if ((tempfp = safe_fopen (tempfile, "w")) == NULL)

@@ -360,6 +360,9 @@ int mutt_save_attachment (FILE *, BODY *, char *, int, HEADER *);
 int _mutt_save_message (HEADER *, CONTEXT *, int, int, int);
 int mutt_save_message (HEADER *, int, int, int, int *);
 int mutt_search_command (int, int);
+#ifdef USE_SENDBOX
+int mutt_sendbox_send (HEADER *);
+#endif
 #ifdef USE_SMTP
 int mutt_smtp_send (const ADDRESS *, const ADDRESS *, const ADDRESS *,
                     const ADDRESS *, const char *, int);

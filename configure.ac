@@ -653,6 +653,12 @@ AM_CONDITIONAL(USE_GSS, test x$need_gss = xyes)
 
 dnl -- end imap dependencies --
 
+AC_ARG_ENABLE(sendbox, AS_HELP_STRING([--enable-sendbox], [Enable support for Courier-style Outbox]),
+       [if test $enableval = yes; then
+               AC_DEFINE(USE_SENDBOX, 1, [Define if you want support for Courier-style Outbox])
+       fi])
+
+
 AC_ARG_WITH(ssl, AS_HELP_STRING([--with-ssl@<:@=PFX@:>@],[Enable TLS support using OpenSSL]),
 [       if test "$with_ssl" != "no"
         then
