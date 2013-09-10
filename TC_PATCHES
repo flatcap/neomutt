@@ -366,3 +366,20 @@ This means: "If the thread is collapsed and there are hidden messages, show the
 number of hidden messages in angle brackets. Otherwise, if there are
 attachments on this message, show the number of attachments in curly braces. If
 neither is true, then just show the message's size."
+
+==========================
+patch-1.5.21.rr.compressed
+==========================
+
+Commit b5a777a7cbb927b966b4c10651ab56440913fed2
+Written by: Roland Rosenfeld
+
+Adds the ability to use compressed/encrypted archive folders.
+The documentation is too long for this document; see the manpage for muttrc.
+
+New settings
+------------
+
+open-hook regexp "command"
+close-hook regexp "command"
+append-hook regexp "command"
