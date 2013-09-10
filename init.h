@@ -577,6 +577,17 @@ struct option_t MuttVars[] = {
   ** If \fI``no''\fP, never attempt to verify cryptographic signatures.
   ** (Crypto only)
   */
+  { "create_rfc2047_parameters", DT_BOOL, R_NONE, OPTCREATERFC2047PARAMS, 0 },
+  /*
+  ** .pp
+  ** When this variable is set, Mutt will add the following RFC-2047-encoded
+  ** MIME parameter to Content-Type header field as filename for attachment:
+  ** name="=?iso-2022-jp?B?GyRCO244MxsoQi50eHQ=?="
+  ** .pp
+  ** Note: this use of RFC 2047's encoding is explicitly prohibited
+  ** by the standard. You may set this variable only if a mailer
+  ** of recipients can not parse RFC 2231 parameters.
+  */
   { "date_format",	DT_STR,	 R_BOTH, UL &DateFmt, UL "!%a, %b %d, %Y at %I:%M:%S%p %Z" },
   /*
   ** .pp

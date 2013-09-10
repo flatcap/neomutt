@@ -348,6 +348,30 @@ int mutt_write_mime_header (BODY *a, FILE *f)
     }
   }
 
+  if (a->use_disp && option (OPTCREATERFC2047PARAMS))
+  {
+    if(!(fn = a->d_filename))
+      fn = a->filename;
+
+    if (fn)
+    {
+      char *tmp;
+
+      /* Strip off the leading path... */
+      if ((t = strrchr (fn, '/')))
+	t++;
+      else
+        t = fn;
+
+      buffer[0] = 0;
+      tmp = safe_strdup (t);
+      rfc2047_encode_string (&tmp);
+      rfc822_cat (buffer, sizeof (buffer), tmp, MimeSpecials);
+      FREE (&tmp);
+      fprintf (f, ";\n\tname=%s", buffer);
+    }
+  }
+
   fputc ('\n', f);
 
   if (a->description)
