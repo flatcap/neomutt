@@ -761,3 +761,15 @@ versions of Mailman do this, making archive files that cannot be read by
 mutt.
 
 This patch causes mutt to skip leading NLs and CRs when detecting magic.
+
+========
+obfuscat
+========
+
+Commit 245c0531ed01db037d0434a5940973f14aafd69d
+Written by: David Champion <dgc@uchicago.edu>
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+Allow mutt to parse mailboxes with s/@/ at / obfuscations.
+
+This handles mbox From_ separators and rfc822 address parsing.
