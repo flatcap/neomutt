@@ -355,6 +355,7 @@ patch-1.5.21.dgc.deepif.2
 
 Commit 55bfab77fa8c4800933e3466994ff76593e0c924
 Written by: David Champion
+Source: http://home.uchicago.edu/~dgc/mutt/#deepif
 
 Allow nesting of conditionals.
 
@@ -367,12 +368,14 @@ number of hidden messages in angle brackets. Otherwise, if there are
 attachments on this message, show the number of attachments in curly braces. If
 neither is true, then just show the message's size."
 
-==========================
-patch-1.5.21.rr.compressed
-==========================
+==================
+compressed-folders
+==================
 
-Commit b5a777a7cbb927b966b4c10651ab56440913fed2
-Written by: Roland Rosenfeld
+Commit e5d5f605a7254b4d461235199964571fd298543e
+Written by: Roland Rosenfeld and others
+Version from Debian package.
+Source: http://www.spinnaker.de/mutt/compressed/ (non-debian version)
 
 Adds the ability to use compressed/encrypted archive folders.
 The documentation is too long for this document; see the manpage for muttrc.
