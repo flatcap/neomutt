@@ -743,3 +743,21 @@ uncollapse_new (bool)
 When set, Mutt will automatically uncollapse any collapsed thread that receives
 a new message. When unset, collapsed threads will remain collapsed. the
 presence of the new message will still affect index sorting, though.
+
+============
+whitespaceok
+============
+
+Commit 1818759ee0a9a818edcbcc41bfd5cd59ce79f641
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+allow initial blank lines in local mailboxes
+
+Some mailbox-creation tools erroneously append a blank line to a file
+before appending a UNIXv7-format mail message, resulting in mailboxes
+that are intended to me valid "mbox" folders but are not.  Notably old
+versions of Mailman do this, making archive files that cannot be read by
+mutt.
+
+This patch causes mutt to skip leading NLs and CRs when detecting magic.
