@@ -242,6 +242,12 @@ parse_mailboxdomain (const char *s, const char *nonspecial,
       ps = next_token (s, mailbox, mailboxlen, mailboxmax);
     if (!ps)
       return NULL;
+    if (!strncasecmp(ps, " at ", 4))
+    {
+      if (*mailboxlen < mailboxmax)
+        mailbox[(*mailboxlen)++] = '@';
+      ps += 4;
+    }
     s = ps;
   }
 

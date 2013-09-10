@@ -83,19 +83,31 @@ int is_from (const char *s, char *path, size_t pathlen, time_t *tp)
     const char *p;
     size_t len;
     short q = 0;
+    short at = 0;
 
-    for (p = s; *p && (q || !ISSPACE (*p)); p++)
+    p = s;
+    do
     {
-      if (*p == '\\')
+      for ( ; *p && (q || !ISSPACE (*p)); p++)
       {
-	if (*++p == '\0') 
-	  return 0;
+        if (*p == '\\')
+        {
+            if (*++p == '\0') 
+	        return 0;
+        }
+        else if (*p == '"')
+        {
+	  q = !q;
+        }
       }
-      else if (*p == '"')
+
+      at = 0;
+      if (!strncasecmp(p, " at ", 4))
       {
-	q = !q;
+        at = 1;
+        p += 4;
       }
-    }
+    } while (at);
 
     if (q || !*p) return 0;
 
