@@ -2332,6 +2332,19 @@ struct option_t MuttVars[] = {
   ** have no effect, and if it is set to \fIask-yes\fP or \fIask-no\fP, you are
   ** prompted for confirmation when you try to quit.
   */
+  { "quote_empty",	DT_BOOL, R_NONE, OPTQUOTEEMPTY, 1 },
+  /*
+  ** .pp
+  ** Controls whether or not empty lines will be quoted using
+  ** ``$indent_string''.
+  */
+  { "quote_quoted",	DT_BOOL, R_NONE, OPTQUOTEQUOTED, 0 },
+  /*
+  ** .pp
+  ** Controls how quoted lines will be quoted. If set, one quote
+  ** character will be added to the end of existing prefix.  Otherwise,
+  ** quoted lines will be prepended by ``$indent_string''.
+  */
   { "quote_regexp",	DT_RX,	 R_PAGER, UL &QuoteRegexp, UL "^([ \t]*[|>:}#])+" },
   /*
   ** .pp

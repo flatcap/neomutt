@@ -1579,7 +1579,31 @@ static int text_plain_handler (BODY *b, STATE *s)
 	buf[--l] = 0;
     }
     if (s->prefix)
-      state_puts (s->prefix, s);
+    {
+      int i;
+      char qbuf[2 * LONG_STRING];
+      int j = 0, offset = 0;
+      regmatch_t pmatch[1];
+
+      while (regexec ((regex_t *) QuoteRegexp.rx, &buf[offset], 1, pmatch, 0) == 0)
+	offset += pmatch->rm_eo;
+
+      if (!option (OPTQUOTEEMPTY) && !*buf)
+	strcpy (qbuf, buf);
+      else if (option (OPTQUOTEQUOTED) && offset)
+      {
+	for (i = 0; i < offset; i++)
+	  if (buf[i] != ' ')
+	    j = i;
+	strncpy (qbuf, buf, j + 1);
+	strcpy (qbuf + j + 1, buf + j);
+      }
+      else
+	snprintf (qbuf, sizeof (qbuf), "%s%s", NONULL(s->prefix), buf);
+
+      state_puts (qbuf, s);
+    }
+    else
     state_puts (buf, s);
     state_putc ('\n', s);
   }
@@ -1622,7 +1646,7 @@ int mutt_body_handler (BODY *b, STATE *s)
        */
       if ((WithCrypto & APPLICATION_PGP) && mutt_is_application_pgp (b))
 	handler = crypt_pgp_application_pgp_handler;
-      else if (option(OPTREFLOWTEXT) && ascii_strcasecmp ("flowed", mutt_get_parameter ("format", b->parameter)) == 0)
+      else if (option(OPTREFLOWTEXT) && ascii_strcasecmp ("flowed", mutt_get_parameter ("format", b->parameter)) == 0 && !s->prefix)
 	handler = rfc3676_handler;
       else
 	handler = text_plain_handler;
