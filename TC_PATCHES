@@ -527,3 +527,24 @@ Source: http://www.mail-archive.com/mutt-dev@mutt.org/msg04922.html
 
 This patch breaks the postponement code out of mutt_write_fcc.
 (Cleanup/Bugfixes)
+
+=======================================
+patch-1.5.21.tt.create_rfc2047_params.1
+=======================================
+
+Commit 7dc7ca9b98c4c271e0e55a0dd3e76aa0d17c435e
+Written by: TAKIZAWA, Takashi
+Source: http://www.emaillab.org/mutt/download1521.html
+
+New settings
+------------
+
+create_rfc2047_parameters (bool)
+
+When this variable is set, Mutt will add the following RFC-2047-encoded
+MIME parameter to Content-Type header field as filename for attachment:
+name="=?iso-2022-jp?B?GyRCO244MxsoQi50eHQ=?="
+
+Note: this use of RFC 2047's encoding is explicitly prohibited
+by the standard. You may set this variable only if a mailer
+of recipients can not parse RFC 2231 parameters.
