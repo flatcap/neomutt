@@ -3708,7 +3708,10 @@ static int parse_unsubscribe (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_attachments (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_unattachments (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 
-
+static int parse_replace_list (BUFFER *, BUFFER *, unsigned long, BUFFER *);
+static int parse_unreplace_list (BUFFER *, BUFFER *, unsigned long, BUFFER *);
+static int parse_subjectrx_list (BUFFER *, BUFFER *, unsigned long, BUFFER *);
+static int parse_unsubjectrx_list (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_alternates (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 static int parse_unalternates (BUFFER *, BUFFER *, unsigned long, BUFFER *);
 
@@ -3783,6 +3786,8 @@ const struct command_t Commands[] = {
   { "spam",		parse_spam_list,	M_SPAM },
   { "nospam",		parse_spam_list,	M_NOSPAM },
   { "subscribe",	parse_subscribe,	0 },
+  { "subjectrx",    parse_subjectrx_list, UL &SubjectRxList },
+  { "unsubjectrx",  parse_unsubjectrx_list, UL &SubjectRxList },
   { "toggle",		parse_set,		M_SET_INV },
   { "unalias",		parse_unalias,		0 },
   { "unalternative_order",parse_unlist,		UL &AlternativeOrderList },
