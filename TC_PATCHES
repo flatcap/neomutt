@@ -712,3 +712,13 @@ local time could be rather out of date.
 Notation, then, is: %<x?true&false>, where 'x' is the test character
 (analogous to '%x').  Now you can use %<x?%<y?%<z?xyz&xy>&x>&none> to
 get a triple-depth expression with no backslashing.
+
+==========
+dgc.setenv
+==========
+
+Commit 4badceb0dd8d978cb359be7bc35d620ed9d6fe72
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+setenv/unsetenv for altering process environment (to affect children).
