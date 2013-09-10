@@ -2517,6 +2517,13 @@ static int _mutt_bounce_message (FILE *fp, HEADER *h, ADDRESS *to, const char *r
   FILE *f;
   char date[SHORT_STRING], tempfile[_POSIX_PATH_MAX];
   MESSAGE *msg = NULL;
+  int ch_flags;
+  char *msgid_str;
+#ifdef USE_SENDBOX
+  struct mutt_message_handle *mh = NULL;
+  CONTEXT sctx;
+  MESSAGE *smsg = NULL;
+#endif
 
   if (!h)
   {
@@ -2533,28 +2540,65 @@ static int _mutt_bounce_message (FILE *fp, HEADER *h, ADDRESS *to, const char *r
 
   if (!fp) fp = msg->fp;
 
-  mutt_mktemp (tempfile, sizeof (tempfile));
-  if ((f = safe_fopen (tempfile, "w")) != NULL)
+  ch_flags = CH_XMIT | CH_NONEWLINE | CH_NOQFROM;
+  if (!option (OPTBOUNCEDELIVERED))
+    ch_flags |= CH_WEED_DELIVERED;
+
+  /* create a message which is the original message with Resent
+   * header fields prepended.  For sendmail and smtp, the message is
+   * a tempfile.  For sendbox, it's a newly created message in the
+   * Sendbox folder.
+   */
+#ifdef USE_SENDBOX
+  if (Sendbox)
   {
-    int ch_flags = CH_XMIT | CH_NONEWLINE | CH_NOQFROM;
-    char* msgid_str;
+    mh = mutt_start_message (Sendbox, h, &sctx, &smsg, 1);
+    if (!mh)
+    {
+      ret = -1;
+      goto close_msg;
+    }
+    f = smsg->fp;
 
-    if (!option (OPTBOUNCEDELIVERED))
-      ch_flags |= CH_WEED_DELIVERED;
+    /* Resent-To: headers will be unioned by the MTA to
+     * determine the recipient, so weed any old ones
+     */
+    ch_flags |= CH_WEED_RESENT;
+  }
+  else
+#endif
+  {
+    mutt_mktemp (tempfile, sizeof(tempfile));
+    if ((f = safe_fopen (tempfile, "w")) == NULL) 
+    {
+      mutt_perror (tempfile);
+      ret = -1;
+      goto close_msg;
+    }
+  }
 
-    fseeko (fp, h->offset, 0);
-    fprintf (f, "Resent-From: %s", resent_from);
-    fprintf (f, "\nResent-%s", mutt_make_date (date, sizeof(date)));
-    msgid_str = mutt_gen_msgid();
-    fprintf (f, "Resent-Message-ID: %s\n", msgid_str);
-    fputs ("Resent-To: ", f);
-    mutt_write_address_list (to, f, 11, 0);
-    mutt_copy_header (fp, h, f, ch_flags, NULL);
-    fputc ('\n', f);
-    mutt_copy_bytes (fp, f, h->content->length);
+  /* prepend the Resent header fields */
+  fprintf (f, "Resent-From: %s", resent_from);
+  fprintf (f, "\nResent-%s", mutt_make_date (date, sizeof(date)));
+  msgid_str = mutt_gen_msgid();
+  fprintf (f, "Resent-Message-ID: %s\n", msgid_str);
+  FREE (&msgid_str);
+  fputs ("Resent-To: ", f);
+  mutt_write_address_list (to, f, 11, 0);
+
+  /* copy original message */
+  fseeko (fp, h->offset, 0);
+  mutt_copy_header (fp, h, f, ch_flags, NULL);
+  fputc ('\n', f);
+  mutt_copy_bytes (fp, f, h->content->length);
+
+#ifdef USE_SENDBOX
+  if (Sendbox)
+    ret = mutt_finish_message (mh, Sendbox, h, &sctx, &smsg, 1);
+  else
+#endif
+  {
     safe_fclose (&f);
-    FREE (&msgid_str);
-
 #if USE_SMTP
     if (SmtpUrl)
       ret = mutt_smtp_send (env_from, to, NULL, NULL, tempfile,
@@ -2565,6 +2609,7 @@ static int _mutt_bounce_message (FILE *fp, HEADER *h, ADDRESS *to, const char *r
 			  	h->content->encoding == ENC8BIT);
   }
 
+close_msg:
   if (msg)
     mx_close_message (&msg);
 
