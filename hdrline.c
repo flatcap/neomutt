@@ -328,6 +328,53 @@ hdr_format_str (char *dest,
 	const char *cp;
 	struct tm *tm; 
 	time_t T;
+	int i = 0, invert = 0;
+
+	if (optional && (op == '[' || op == '(')) {
+	  char *is;
+	  T = time(NULL);
+	  T -= (op == '(') ? hdr->received : hdr->date_sent;
+
+	  is = (char *)prefix;
+	  if( *is == '>' ) {
+	    invert = 1;
+	    ++is;
+	  }
+
+	  while( *is && *is != '?' ) {
+	    int t = strtol (is, &is, 10);
+	    switch (*(is++)) {
+	      case '?':
+		break;
+	      case 'y':
+		t *= 365 * 24 * 60 * 60;
+		break;
+	      case 'M':
+		t *= 30 * 24 * 60 * 60;
+		break;
+	      case 'w':
+		t *= 7 * 24 * 60 * 60;
+		break;
+	      case 'd':
+		t *= 24 * 60 * 60;
+		break;
+	      case 'h':
+		t *= 60 * 60;
+		break;
+	      case 'm':
+		t *= 60;
+		break;
+	    }
+	    i += t;
+	  }
+
+	  if (i < 0)
+	    i *= -1;
+
+	  if( (T > i || T < -1*i) ^ invert )
+	    optional = 0;
+	  break;
+	}
 
 	p = dest;
 

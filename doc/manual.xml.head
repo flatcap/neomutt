@@ -4673,6 +4673,26 @@ set index_format="%4C %Z %{%b %d} %-15.15L (%?l?%4l&amp;%4c?)%*  %s"</screen>
 
 </sect2>
 
+<sect2 id="formatstrings-conditional-dates">
+<title>Conditional Dates</title>
+<para>
+This patch allows the format of dates in the index to vary based on how recent
+the message is. This is especially useful in combination with David Champion's
+patch to allow if-else sequences to be nested.
+</para>
+
+<para>
+For example, using <literal>%?[1y?%\?[1d\?%[%H:%M]\&amp;%[%m/%d]\?&amp;%[%y.%m]?
+</literal> for the date in the index format will produce a display like:
+
+<screen>
+   1   F 97.12 To mutt-users@c (   40) Re: rfc934 compliance
+   2   F 10/02 To Mutt Develop (   15) Re: tiny mkstemp patch
+   3   L 12:17 Michael Elkins  (   16) Re: Replying with the appropriate address
+</screen>
+</para>
+</sect2>
+
 </sect1>
 
 </chapter>
