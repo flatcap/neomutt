@@ -722,3 +722,24 @@ Written by: ?
 Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
 
 setenv/unsetenv for altering process environment (to affect children).
+
+=================
+dgc.uncollapsenew
+=================
+
+Commit fc9f7fb94d18ef93c569a89c7c98df62029ebefc
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+Uncollapse threads when new mail arrives.
+
+Adds $uncollapse_new: when set, a collapsed thread into which a new
+message arrives will be uncollapsed to reveal the new message.
+
+new settings
+------------
+
+uncollapse_new (bool)
+When set, Mutt will automatically uncollapse any collapsed thread that receives
+a new message. When unset, collapsed threads will remain collapsed. the
+presence of the new message will still affect index sorting, though.
