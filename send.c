@@ -370,7 +370,8 @@ static int include_forward (CONTEXT *ctx, HEADER *cur, FILE *out)
   if (WithCrypto && (cur->security & ENCRYPT) && option (OPTFORWDECODE))
   {
     /* make sure we have the user's passphrase before proceeding... */
-    crypt_valid_passphrase (cur->security);
+    while (! crypt_valid_passphrase (cur->security) )
+      crypt_forget_passphrase ();
   }
 
   mutt_forward_intro (out, cur);
@@ -426,7 +427,8 @@ static int include_reply (CONTEXT *ctx, HEADER *cur, FILE *out)
   if (WithCrypto && (cur->security & ENCRYPT))
   {
     /* make sure we have the user's passphrase before proceeding... */
-    crypt_valid_passphrase (cur->security);
+    while (! crypt_valid_passphrase (cur->security) )
+      crypt_forget_passphrase ();
   }
 
   mutt_parse_mime_message (ctx, cur);
