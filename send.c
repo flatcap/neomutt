@@ -1602,7 +1602,7 @@ main_loop:
       mutt_prepare_envelope (msg->env, 0);
       mutt_env_to_idna (msg->env, NULL, NULL);	/* Handle bad IDNAs the next time. */
 
-      if (!Postponed || mutt_write_fcc (NONULL (Postponed), msg, (cur && (flags & SENDREPLY)) ? cur->env->message_id : NULL, 1, fcc) < 0)
+      if (!Postponed || mutt_write_postponed (NONULL (Postponed), msg, (cur && (flags & SENDREPLY)) ? cur->env->message_id : NULL, fcc) < 0)
       {
 	msg->content = mutt_remove_multipart (msg->content);
 	decode_descriptions (msg->content);

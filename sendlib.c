@@ -2510,6 +2510,165 @@ void mutt_unprepare_envelope (ENVELOPE *env)
   rfc2047_decode (&env->x_label);
 }
 
+static int count_length_lines (FILE *fp, LOFF_T *content_lengthp, int *linesp)
+{
+  char sasha[LONG_STRING];
+  int lines = 0;
+
+  /* count the number of lines */
+  while (fgets (sasha, sizeof (sasha), fp) != NULL)
+    lines++;
+  if (ferror (fp))
+    return -1;
+
+  *linesp = lines;
+  *content_lengthp = (LOFF_T) ftello (fp);
+
+  return 0;
+}
+
+/* state maintained between mutt_start_message and
+ * mutt_finish_message, opaque to callers.
+ */
+struct mutt_message_handle
+{
+  FILE *tempfp;
+  char tempfile[_POSIX_PATH_MAX];
+  LOFF_T content_length;
+  int lines;
+  struct stat st;
+  int passthru;
+};
+
+static struct mutt_message_handle *
+mutt_start_message (const char *path, HEADER *hdr, 
+                    CONTEXT *ctxp, MESSAGE **msgp, int passthru)
+{
+  struct mutt_message_handle *mh;
+
+  if (mx_open_mailbox (path, M_APPEND | M_QUIET, ctxp) == NULL)
+  {
+    dprint (1, (debugfile, "mutt_start_message: unable to open mailbox %s"
+                "in append-mode, aborting.\n", path));
+    return NULL;
+  }
+
+  mh = safe_calloc (1, sizeof (*mh));
+  mh->passthru = passthru;
+
+  if (ctxp->magic == M_MMDF || ctxp->magic == M_MBOX)
+  {
+    /* remember new mail status before appending message */
+    stat (path, &mh->st);
+
+    if (!passthru) {
+      /* need to add a Content-Length field to avoid problems
+       * where a line in the message body begins with "From "
+       */
+      mutt_mktemp (mh->tempfile, sizeof (mh->tempfile));
+      mh->tempfp = safe_fopen (mh->tempfile, "w+");
+      if (!mh->tempfp)
+      {
+        mutt_perror (mh->tempfile);
+        dprint (1, (debugfile, "mutt_start_message: failed "
+                    "to open tempfile, aborting.\n"));
+        goto error_out;
+      }
+
+      mutt_write_mime_body (hdr->content, mh->tempfp);
+
+      /* make sure the last line ends with a newline.  Emacs doesn't ensure
+       * this will happen, and it can cause problems parsing the mailbox   
+       * later.
+       */
+      fseek (mh->tempfp, -1, 2);
+      if (fgetc (mh->tempfp) != '\n')
+      {
+        fseek (mh->tempfp, 0, 2);
+        fputc ('\n', mh->tempfp);
+      }
+      if (fflush (mh->tempfp) || ferror (mh->tempfp))
+      {
+        dprint (1, (debugfile, "mutt_start_message: failed "
+                    "to write tempfile, aborting.\n"));
+        goto error_out;
+      }
+
+      rewind (mh->tempfp);
+
+      if (count_length_lines (mh->tempfp, &mh->content_length, &mh->lines))
+      {
+        mutt_perror (mh->tempfile);
+        dprint (1, (debugfile, "mutt_start_message: failed "
+                    "to count message length, aborting.\n"));
+        goto error_out;
+      }
+    }
+  }
+
+  if ((*msgp = mx_open_new_message (ctxp, hdr, M_ADD_FROM)) == NULL)
+  {
+    dprint (1, (debugfile, "mutt_start_message: mx_open_new_message "
+                "failed in %s, aborting.\n", path));
+    goto error_out;
+  }
+  return mh;
+
+error_out:
+  /* error message already provided, just clean up */
+  if (mh->tempfp)
+  {
+    safe_fclose (&mh->tempfp);
+    unlink (mh->tempfile);
+  }
+  FREE (&mh);
+  mx_close_mailbox (ctxp, NULL);
+  return NULL;
+}
+
+static int mutt_finish_message (struct mutt_message_handle *mh,
+                                const char *path, HEADER *hdr,
+                                CONTEXT *ctxp, MESSAGE **msgp, int skip_buffy)
+{
+  int ret = 0;
+
+  if (mh->tempfp)
+  {
+    fprintf ((*msgp)->fp, "Content-Length: " OFF_T_FMT "\n", mh->content_length);
+    fprintf ((*msgp)->fp, "Lines: %d\n\n", mh->lines); /* NOTE double newline */
+
+    /* copy the body */
+    rewind (mh->tempfp);
+    ret = mutt_copy_stream (mh->tempfp, (*msgp)->fp);
+    if (safe_fclose (&mh->tempfp))
+      ret = -1;
+
+    /* if there was an error, leave the temp version */
+    if (!ret)
+      unlink (mh->tempfile);
+  }
+  else
+  {
+    if (!mh->passthru)
+    {
+      fputc ('\n', (*msgp)->fp); /* finish off the header */
+      ret = mutt_write_mime_body (hdr->content, (*msgp)->fp);
+    }
+    skip_buffy = 1; /* only needed for file-based mailboxes */
+  }
+
+  ret |= mx_commit_message (*msgp, ctxp);
+  mx_close_message (msgp);
+  mx_close_mailbox (ctxp, NULL);
+
+  if (!skip_buffy)
+    mutt_buffy_cleanup (path, &mh->st);
+
+  FREE (&mh);
+
+  return ret;
+}
+
 static int _mutt_bounce_message (FILE *fp, HEADER *h, ADDRESS *to, const char *resent_from,
 				  ADDRESS *env_from)
 {
@@ -2737,7 +2896,7 @@ int mutt_write_multiple_fcc (const char *path, HEADER *hdr, const char *msgid, i
    tok = strtok(fcc_tok, ",");
    dprint(1, (debugfile, "Fcc: initial mailbox = '%s'\n", tok));
    /* mutt_expand_path already called above for the first token */
-   if((status = mutt_write_fcc (tok, hdr, NULL, 0, NULL)) != 0)
+   if((status = mutt_write_fcc (tok, hdr)) != 0)
 	  return status;
 
    while((tok = strtok(NULL, ",")) != NULL) {
@@ -2747,7 +2906,7 @@ int mutt_write_multiple_fcc (const char *path, HEADER *hdr, const char *msgid, i
 		 strfcpy(fcc_expanded, tok, sizeof(fcc_expanded));
 		 mutt_expand_path(fcc_expanded, sizeof(fcc_expanded));
 		 dprint(1, (debugfile, "     Additional mailbox expanded = '%s'\n", fcc_expanded));
-		 if((status = mutt_write_fcc (fcc_expanded, hdr, NULL, 0, NULL)) != 0)
+		 if((status = mutt_write_fcc (fcc_expanded, hdr)) != 0)
 			return status;
 	  }
    }
@@ -2756,81 +2915,60 @@ int mutt_write_multiple_fcc (const char *path, HEADER *hdr, const char *msgid, i
 }
 
 
-int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, char *fcc)
+int mutt_write_fcc (const char *path, HEADER *hdr)
 {
+  struct mutt_message_handle *mh;
   CONTEXT f;
   MESSAGE *msg;
-  char tempfile[_POSIX_PATH_MAX];
-  FILE *tempfp = NULL;
-  int r, need_buffy_cleanup = 0;
-  struct stat st;
-  char buf[SHORT_STRING];
 
-  if (post)
-    set_noconv_flags (hdr->content, 1);
+  hdr->read = 1; /* make sure to put it in the `cur' directory (maildir) */
 
-  if (mx_open_mailbox (path, M_APPEND | M_QUIET, &f) == NULL)
+  mh = mutt_start_message (path, hdr, &f, &msg, 0);
+  if (!mh)
+    return -1;
+
+  mutt_write_rfc822_header (msg->fp, hdr->env, hdr->content, 0, 0);
+  fprintf (msg->fp, "Status: RO\n");
+
+  return mutt_finish_message (mh, path, hdr, &f, &msg, 0);
+}
+
+int mutt_write_postponed (const char *path, HEADER *hdr, const char *msgid, char *fcc)
+{
+  struct mutt_message_handle *mh;
+  CONTEXT f;
+  MESSAGE *msg;
+  int ret;
+
+  hdr->read = 0; /* make sure to put it in the `new' directory (maildir) */
+  set_noconv_flags (hdr->content, 1);
+
+  mh = mutt_start_message (path, hdr, &f, &msg, 0);
+  if (!mh)
   {
-    dprint (1, (debugfile, "mutt_write_fcc(): unable to open mailbox %s in append-mode, aborting.\n",
-		path));
-    return (-1);
+    set_noconv_flags (hdr->content, 0);
+    return -1;
   }
 
-  /* We need to add a Content-Length field to avoid problems where a line in
-   * the message body begins with "From "
-   */
-  if (f.magic == M_MMDF || f.magic == M_MBOX)
-  {
-    mutt_mktemp (tempfile, sizeof (tempfile));
-    if ((tempfp = safe_fopen (tempfile, "w+")) == NULL)
-    {
-      mutt_perror (tempfile);
-      mx_close_mailbox (&f, NULL);
-      return (-1);
-    }
-    /* remember new mail status before appending message */
-    need_buffy_cleanup = 1;
-    stat (path, &st);
-  }
+  mutt_write_rfc822_header (msg->fp, hdr->env, hdr->content, -1, 0);
 
-  hdr->read = !post; /* make sure to put it in the `cur' directory (maildir) */
-  if ((msg = mx_open_new_message (&f, hdr, M_ADD_FROM)) == NULL)
-  {
-    mx_close_mailbox (&f, NULL);
-    return (-1);
-  }
-
-  /* post == 1 => postpone message. Set mode = -1 in mutt_write_rfc822_header()
-   * post == 0 => Normal mode. Set mode = 0 in mutt_write_rfc822_header()
-   * */
-  mutt_write_rfc822_header (msg->fp, hdr->env, hdr->content, post ? -post : 0, 0);
-
-  /* (postponment) if this was a reply of some sort, <msgid> contians the
+  /* if this was a reply of some sort, <msgid> contains the
    * Message-ID: of message replied to.  Save it using a special X-Mutt-
    * header so it can be picked up if the message is recalled at a later
    * point in time.  This will allow the message to be marked as replied if
    * the same mailbox is still open.
    */
-  if (post && msgid)
+  if (msgid)
     fprintf (msg->fp, "X-Mutt-References: %s\n", msgid);
 
-  /* (postponment) save the Fcc: using a special X-Mutt- header so that
+  /* save the Fcc: using a special X-Mutt- header so that
    * it can be picked up when the message is recalled
    */
-  if (post && fcc)
+  if (fcc)
     fprintf (msg->fp, "X-Mutt-Fcc: %s\n", fcc);
 
-  if (f.magic == M_MMDF || f.magic == M_MBOX)
-    fprintf (msg->fp, "Status: RO\n");
-
-  /* mutt_write_rfc822_header() only writes out a Date: header with
-   * mode == 0, i.e. _not_ postponment; so write out one ourself */
-  if (post)
-    fprintf (msg->fp, "%s", mutt_make_date (buf, sizeof (buf)));
-
-  /* (postponment) if the mail is to be signed or encrypted, save this info */
-  if ((WithCrypto & APPLICATION_PGP)
-      && post && (hdr->security & APPLICATION_PGP))
+  /* if the mail is to be signed or encrypted, save this info */
+  if ((WithCrypto & APPLICATION_PGP) && (hdr->security & APPLICATION_PGP))
   {
     fputs ("X-Mutt-PGP: ", msg->fp);
     if (hdr->security & ENCRYPT)
@@ -2846,9 +2984,8 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
     fputc ('\n', msg->fp);
   }
 
-  /* (postponment) if the mail is to be signed or encrypted, save this info */
-  if ((WithCrypto & APPLICATION_SMIME)
-      && post && (hdr->security & APPLICATION_SMIME))
+  /* if the mail is to be signed or encrypted, save this info */
+  if ((WithCrypto & APPLICATION_SMIME) && (hdr->security & APPLICATION_SMIME))
   {
     fputs ("X-Mutt-SMIME: ", msg->fp);
     if (hdr->security & ENCRYPT) {
@@ -2867,86 +3004,22 @@ int mutt_write_fcc (const char *path, HEADER *hdr, const char *msgid, int post, 
   }
 
 #ifdef MIXMASTER
-  /* (postponement) if the mail is to be sent through a mixmaster
+  /* if the mail is to be sent through a mixmaster
    * chain, save that information
    */
-
-  if (post && hdr->chain && hdr->chain)
+  if (hdr->chain)
   {
     LIST *p;
-
     fputs ("X-Mutt-Mix:", msg->fp);
     for (p = hdr->chain; p; p = p->next)
       fprintf (msg->fp, " %s", (char *) p->data);
-
     fputc ('\n', msg->fp);
   }
 #endif
 
-  if (tempfp)
-  {
-    char sasha[LONG_STRING];
-    int lines = 0;
-
-    mutt_write_mime_body (hdr->content, tempfp);
-
-    /* make sure the last line ends with a newline.  Emacs doesn't ensure
-     * this will happen, and it can cause problems parsing the mailbox
-     * later.
-     */
-    fseek (tempfp, -1, 2);
-    if (fgetc (tempfp) != '\n')
-    {
-      fseek (tempfp, 0, 2);
-      fputc ('\n', tempfp);
-    }
-
-    fflush (tempfp);
-    if (ferror (tempfp))
-    {
-      dprint (1, (debugfile, "mutt_write_fcc(): %s: write failed.\n", tempfile));
-      safe_fclose (&tempfp);
-      unlink (tempfile);
-      mx_commit_message (msg, &f);	/* XXX - really? */
-      mx_close_message (&msg);
-      mx_close_mailbox (&f, NULL);
-      return -1;
-    }
-
-    /* count the number of lines */
-    rewind (tempfp);
-    while (fgets (sasha, sizeof (sasha), tempfp) != NULL)
-      lines++;
-    fprintf (msg->fp, "Content-Length: " OFF_T_FMT "\n", (LOFF_T) ftello (tempfp));
-    fprintf (msg->fp, "Lines: %d\n\n", lines);
-
-    /* copy the body and clean up */
-    rewind (tempfp);
-    r = mutt_copy_stream (tempfp, msg->fp);
-    if (fclose (tempfp) != 0)
-      r = -1;
-    /* if there was an error, leave the temp version */
-    if (!r)
-      unlink (tempfile);
-  }
-  else
-  {
-    fputc ('\n', msg->fp); /* finish off the header */
-    r = mutt_write_mime_body (hdr->content, msg->fp);
-  }
-
-  if (mx_commit_message (msg, &f) != 0)
-    r = -1;
-  mx_close_message (&msg);
-  mx_close_mailbox (&f, NULL);
-
-  if (!post && need_buffy_cleanup)
-    mutt_buffy_cleanup (path, &st);
-
-  if (post)
-    set_noconv_flags (hdr->content, 0);
-
-  return r;
+  ret = mutt_finish_message (mh, path, hdr, &f, &msg, 0);
+  set_noconv_flags (hdr->content, 0);
+  return ret;
 }
 
 #ifdef USE_SENDBOX
