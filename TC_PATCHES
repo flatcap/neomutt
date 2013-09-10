@@ -676,3 +676,16 @@ New keybindings
 group-alternatives    combine tagged items into a multipart/alternative group
 move-up               move the current attachment up in the list
 move-down             move the current attachment down in the list
+
+===========
+dgc.isalias
+===========
+
+Commit 5fbf3dcd77a73baf8953821d2104e983f148aa27
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+Adds the '@' pattern modifier to limit matches to known aliases.
+
+Example: ~f joe matches messages from joe. @~f joe matches messages from
+any joe who is defined as an alias.
