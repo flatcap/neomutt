@@ -161,6 +161,11 @@ WHERE const char *ReleaseDate;
 WHERE HASH *Groups;
 WHERE HASH *ReverseAlias;
 
+WHERE char *UncompFace;
+WHERE char *IconToPbm;
+WHERE char *W3mImgDisplay;
+WHERE char *W3mOpt;
+
 WHERE LIST *AutoViewList INITVAL(0);
 WHERE LIST *AlternativeOrderList INITVAL(0);
 WHERE LIST *AttachAllow INITVAL(0);

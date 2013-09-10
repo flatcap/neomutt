@@ -1529,6 +1529,89 @@ upNLines (int nlines, struct line_t *info, int cur, int hiding)
   return cur;
 }
 
+static int
+display_xface (HEADER *hdr)
+{
+  char facefile[_POSIX_PATH_MAX + 1];
+  char command[LONG_STRING];
+  char *facedata;
+  FILE *fpin = NULL, *fpout = NULL;
+  pid_t pid;
+
+  /* everything ready? */
+  if (!UncompFace	|| !(*UncompFace) ||
+      !IconToPbm	|| !(*IconToPbm) ||
+      !W3mImgDisplay	|| !(*W3mImgDisplay) ||
+      !hdr || !hdr->env || !hdr->env->x_face)
+    return 0;
+
+  /* test w3mimgdisplay */
+  snprintf (command, sizeof (command), "%s -test >/dev/null", W3mImgDisplay);
+  if (mutt_system (command) == -1)
+    return 0;
+
+  /* prepare facedata */
+  facedata = hdr->env->x_face;
+
+  /* convert facedata to imagedata
+   * and store imagedata in facefile
+   */
+  mutt_mktemp (facefile, sizeof(facefile));
+  if ((fpout = safe_fopen (facefile, "w")) == NULL)
+  {
+    mutt_error (_("Could not create temporary file!"));
+    return 0;
+  }
+  snprintf (command, sizeof (command),
+	    "( echo '/* Width=48, Height=48 */'; %s ) | %s",
+	    UncompFace, IconToPbm);
+  pid = mutt_create_filter_fd
+	  (command, &fpin, NULL, NULL, -1, fileno (fpout), -1);
+  if (pid < 0)
+  {
+    mutt_perror (_("face filter"));
+    safe_fclose (&fpout);
+    mutt_unlink (facefile);
+    return 0;
+  }
+  /* pass facedata to converters */
+  fputs (facedata, fpin);
+  if (safe_fclose (&fpin) != 0 && errno != EPIPE)
+  {
+    if (fpout != NULL)
+    {
+      mutt_wait_filter (pid);
+      safe_fclose (&fpout);
+    }
+    mutt_unlink (facefile);
+    return 0;
+  }
+  if (fpout != NULL)
+    mutt_wait_filter (pid);
+  safe_fclose (&fpout);
+
+  /*
+   * w3mimgdisplay
+   */
+  snprintf (command, sizeof (command),
+	    "%s %s", W3mImgDisplay, NONULL (W3mOpt));
+  pid = mutt_create_filter_fd
+	  (command, &fpin, NULL, NULL, -1, -1, -1);
+  if (pid < 0)
+  {
+    mutt_perror ("w3mdisp");
+    mutt_unlink (facefile);
+    return 0;
+  }
+  /* pass facefile to w3mimgdisplay */
+  fprintf (fpin, "2;3;\n0;1;0;0;48;48;0;0;48;48;%s\n4;\n3;\n", facefile);
+  if (safe_fclose (&fpin) != 0 && errno != EPIPE)
+    mutt_perror ("w3mdisp");
+  mutt_wait_filter (pid);
+  mutt_unlink (facefile);
+  return 0;
+}
+
 static const struct mapping_t PagerHelp[] = {
   { N_("Exit"),	OP_EXIT },
   { N_("PrevPg"), OP_PREV_PAGE },
@@ -1564,6 +1647,7 @@ mutt_pager (const char *banner, const char *fname, int flags, pager_t *extra)
   int lines = 0, curline = 0, topline = 0, oldtopline = 0, err, first = 1;
   int r = -1, wrapped = 0, searchctx = 0;
   int redraw = REDRAW_FULL;
+  int xface = 0;
   FILE *fp = NULL;
   LOFF_T last_pos = 0, last_offset = 0;
   int old_smart_wrap, old_markers;
@@ -1640,6 +1724,8 @@ mutt_pager (const char *banner, const char *fname, int flags, pager_t *extra)
 
     if (redraw & REDRAW_FULL)
     {
+      xface = 1; /* display xface later */
+
       NORMAL_COLOR;
       /* clear() doesn't optimize screen redraws */
       move (0, 0);
@@ -1865,6 +1951,11 @@ mutt_pager (const char *banner, const char *fname, int flags, pager_t *extra)
       }
     } else move (statusoffset, COLS-1);
     mutt_refresh ();
+
+    /* X-Face */
+    if (option (OPTXFACE) && xface && IsHeader (extra))
+      display_xface (extra->hdr);
+    xface = 0;
 
     if (IsHeader (extra) && OldHdr == extra->hdr && TopLine != topline
         && lineInfo[curline].offset < sb.st_size-1)
