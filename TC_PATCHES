@@ -387,3 +387,24 @@ New settings
 open-hook regexp "command"
 close-hook regexp "command"
 append-hook regexp "command"
+
+===============
+sidebar-newonly
+===============
+
+Commit ac6c93a324173cc9ce8133d198622c91861cf469
+Written by Steve Kemp
+Source: mutt debian package
+
+Adds settings to only show new mail in the sidebar.
+
+New settings
+------------
+
+Keybindings:
+sidebar-next-new / sidebar-prev-new
+
+Settings:
+sidebar_newmail_only (bool)
+
+Show only new mail in the sidebar.
