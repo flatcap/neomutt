@@ -685,3 +685,30 @@ Adds <mark-message> binding to create "hotkeys" for messages.
 return to the current message by searching for that message's
 message id.  The initial character of the macro is defined by
 $mark_macro_prefix, and defaults to "'" for verisimilitude vs. vi.
+
+===============
+dgc.nested_if.2
+===============
+
+Commit e977770f30b64a5b806d50d5052ca62b8f8d98d7
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+Adds nestable if-else sequences to format strings.
+
+Convetional if-else expressions (%?x?true&false?) are not nestable.  An
+earlier "deepif" patch allowed nesting by means of backslash-escaping
+inner '?' characters within the 'true' and 'false' expressions, but this
+got messy fast with mutt rc file quoting taken into account.  It would
+be cleaner if there were left-right-balanced symbols for 'containing'
+the expression.
+
+This patch steals the '%<...>' notation and uses it to implement
+nestable conditionals. '%<...>' is conventionally used to format current
+local time, but that's not really very useful since mutt has no means
+of refreshing the screen periodically.  Even in the status bar a current
+local time could be rather out of date.
+
+Notation, then, is: %<x?true&false>, where 'x' is the test character
+(analogous to '%x').  Now you can use %<x?%<y?%<z?xyz&xy>&x>&none> to
+get a triple-depth expression with no backslashing.
