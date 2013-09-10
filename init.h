@@ -1996,6 +1996,11 @@ struct option_t MuttVars[] = {
   ** not used.
   ** (PGP only)
   */
+  {"sidebar_newmail_only", DT_BOOL, R_BOTH, OPTSIDEBARNEWMAILONLY, "no" },
+  /*
+  ** .pp
+  ** Show only new mail in the sidebar.
+  */
   {"sidebar_delim", DT_STR, R_BOTH, UL &SidebarDelim, UL "|"},
   /*
   ** .pp

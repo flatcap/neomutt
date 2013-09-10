@@ -529,6 +529,8 @@ enum
   OPTDONTHANDLEPGPKEYS,	/* (pseudo) used to extract PGP keys */
   OPTUNBUFFEREDINPUT,   /* (pseudo) don't use key buffer */
 
+  OPTSIDEBARNEWMAILONLY,
+
   OPTMAX
 };
 
