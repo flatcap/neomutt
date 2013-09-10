@@ -452,3 +452,20 @@ quote_quoted (bool)
 Controls how quoted lines will be quoted. If set, one quote
 character will be added to the end of existing prefix.  Otherwise,
 quoted lines will be prepended by `$indent_string'.
+
+===================================
+patch-1.5.21.ats.date_conditional.3
+===================================
+
+Commit ab4b5e73837f2eb93b64f773b37c007eaa937417
+Written by: Aaron Schrab
+Source: http://www.schrab.com/aaron/mutt/
+
+Adds conditional date settings.
+
+For example, using ' %?[1y?%\?[1d\?%[%H:%M]\&%[%m/%d]\?&%[%y.%m]?' for the date
+in the index format will produce a display like:
+
+   1   F 97.12 To mutt-users@c (   40) Re: rfc934 compliance
+   2   F 10/02 To Mutt Develop (   15) Re: tiny mkstemp patch
+   3   L 12:17 Michael Elkins  (   16) Re: Replying with the appropriate address
