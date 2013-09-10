@@ -516,3 +516,14 @@ Specifies a special mailbox that will send mail when written. When set, this
 variable overrides smtp_url and sendmail.
 To make use of this, you probably want a Courier IMAP server configured for
 sending, see http://www.inter7.com/courierimap/INSTALL.html#imapsend
+
+==========================
+mutt-write_postponed.patch
+==========================
+
+Commit df62d8e14a555603bdaf8dbd636404e1da19b55e
+Written by: Aron Griffis
+Source: http://www.mail-archive.com/mutt-dev@mutt.org/msg04922.html
+
+This patch breaks the postponement code out of mutt_write_fcc.
+(Cleanup/Bugfixes)
