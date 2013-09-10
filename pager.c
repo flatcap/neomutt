@@ -1826,6 +1826,13 @@ mutt_pager (const char *banner, const char *fname, int flags, pager_t *extra)
       if(!option(OPTSTATUSONTOP) || PagerIndexLines == 0)
           DrawFullLine = 0; /* reset */
       NORMAL_COLOR;
+      if (option(OPTXTERMSETTITLES))
+      {
+        menu_status_line (buffer, sizeof (buffer), index, NONULL (XtermTitle));
+        set_xterm_title_bar(buffer);
+        menu_status_line (buffer, sizeof (buffer), index, NONULL (XtermIcon));
+        set_xterm_icon_name(buffer);
+      }
     }
 
     if ((redraw & REDRAW_INDEX) && index)

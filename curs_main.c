@@ -117,6 +117,19 @@ static const char *No_visible = N_("No visible messages.");
 
 extern size_t UngetCount;
 
+#define ASCII_CTRL_G                  0x07
+#define ASCII_CTRL_OPEN_SQUARE_BRAKET 0x1b
+
+void set_xterm_title_bar(char *title)
+{
+  fprintf(stderr ,"%c]2;%s%c", ASCII_CTRL_OPEN_SQUARE_BRAKET, title, ASCII_CTRL_G);
+}
+
+void set_xterm_icon_name(char *name)
+{
+  fprintf(stderr, "%c]1;%s%c", ASCII_CTRL_OPEN_SQUARE_BRAKET, name, ASCII_CTRL_G);
+}
+
 void index_make_entry (char *s, size_t l, MUTTMENU *menu, int num)
 {
   format_flag flag = M_FORMAT_MAKEPRINT | M_FORMAT_ARROWCURSOR | M_FORMAT_INDEX;
@@ -585,6 +598,13 @@ int mutt_index_menu (void)
 	mutt_paddstr (COLS, buf);
 	NORMAL_COLOR;
 	menu->redraw &= ~REDRAW_STATUS;
+	if (option(OPTXTERMSETTITLES))
+	{
+	  menu_status_line (buf, sizeof (buf), menu, NONULL (XtermTitle));
+	  set_xterm_title_bar(buf);
+	  menu_status_line (buf, sizeof (buf), menu, NONULL (XtermIcon));
+	  set_xterm_icon_name(buf);
+	}
       }
 
       menu->redraw = 0;

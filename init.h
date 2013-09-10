@@ -3553,6 +3553,27 @@ struct option_t MuttVars[] = {
   ** Also see the $$read_inc, $$net_inc and $$time_inc variables and the
   ** ``$tuning'' section of the manual for performance considerations.
   */
+  {"xterm_icon",       DT_STR,   R_BOTH, UL &XtermIcon,  UL "M%?n?AIL&ail?"},
+  /*
+  ** .pp
+  ** Controls the format of the icon title, as long as xterm_set_titles
+  ** is enabled. This string is identical in formatting to the one used by
+  ** ``$$status_format''.
+  */
+  {"xterm_set_titles", DT_BOOL,  R_BOTH, OPTXTERMSETTITLES, 0},
+  /* The default must be off to force in the validity checking. */
+  /*
+  ** .pp
+  ** Controls whether mutt sets the xterm title bar and icon name
+  ** (as long as you are in an appropriate terminal).
+  */
+  {"xterm_title",      DT_STR,   R_BOTH, UL &XtermTitle, UL "Mutt with %?m?%m messages&no messages?%?n? [%n NEW]?"},
+  /*
+  ** .pp
+  ** Controls the format of the title bar of the xterm provided that
+  ** xterm_set_titles has been set. This string is identical in formatting
+  ** to the one used by ``$$status_format''.
+  */
   /*--*/
   { NULL, 0, 0, 0, 0 }
 };

@@ -104,6 +104,8 @@ void menu_current_middle (MUTTMENU *);
 void menu_current_bottom (MUTTMENU *);
 void menu_check_recenter (MUTTMENU *);
 void menu_status_line (char *, size_t, MUTTMENU *, const char *);
+void set_xterm_title_bar (char *title);
+void set_xterm_icon_name (char *name);
 
 MUTTMENU *mutt_new_menu (int);
 void mutt_menuDestroy (MUTTMENU **);

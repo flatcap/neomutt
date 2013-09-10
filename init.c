@@ -1877,6 +1877,26 @@ static int parse_set (BUFFER *tmp, BUFFER *s, unsigned long data, BUFFER *err)
 	toggle_option (MuttVars[idx].data);
       else
 	set_option (MuttVars[idx].data);
+
+      /* sanity check for xterm */
+      if ((mutt_strcmp (MuttVars[idx].option, "xterm_set_titles") == 0)
+		&& option (OPTXTERMSETTITLES))
+      {
+	char *ep = getenv ("TERM");
+	/* Make sure that the terminal can take the control codes */
+	if (ep == NULL) unset_option (MuttVars[idx].data);
+	else if (mutt_strncasecmp (ep, "xterm", 5) &&
+		 mutt_strncasecmp (ep, "color-xterm", 11) &&
+		 mutt_strncasecmp (ep, "eterm", 5) &&
+		 mutt_strncasecmp (ep, "kterm", 5) &&
+		 mutt_strncasecmp (ep, "nxterm", 6) &&
+		 mutt_strncasecmp (ep, "putty", 5) &&
+		 mutt_strncasecmp (ep, "screen", 6) &&
+		 mutt_strncasecmp (ep, "cygwin", 6) &&
+		 mutt_strncasecmp (ep, "rxvt", 4) )
+	  unset_option (MuttVars[idx].  data);
+
+      }
     }
     else if (myvar || DTYPE (MuttVars[idx].type) == DT_STR ||
 	     DTYPE (MuttVars[idx].type) == DT_PATH ||
