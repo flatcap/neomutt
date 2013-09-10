@@ -4381,14 +4381,6 @@ single mailbox named <quote>+mailbox1 +mailbox2</quote> and not two
 distinct mailboxes.
 </para>
 
-<para>
-You can also nest if statements, by escaping the ?. For example:
-</para>
-
-<screen>
-&percnt;?M?&lt;&percnt;2M&gt;&amp;&percnt;\?X\?{&percnt;2X}\&amp;&percnt;4c\??
-</screen>
-
 </sect2>
 
 </sect1>
