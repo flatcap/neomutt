@@ -640,3 +640,22 @@ Source: http://lists.df7cb.de/mutt/message/20050309.162127.a244a894.en.html
 
 Sets the cursor position to the entered directory if returning from a
 subdirectory.
+
+============
+dgc.flagsafe
+============
+
+Commit 39a6d142fff1a695b02110d4c4fa833f985a42e9
+Written by: ?
+Source: https://aur.archlinux.org/packages/mutt-kz-dgc-git/
+
+When $flag_safe is set, flagged messages cannot be deleted.
+
+This saves them from bulk operations on threads and tagged messages.  To
+remove a flagged message, first unflag it.
+
+New settings
+------------
+
+flag_safe (bool)
+If set, flagged messages cannot be deleted.
