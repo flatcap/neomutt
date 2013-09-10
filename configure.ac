@@ -807,11 +807,6 @@ AC_ARG_ENABLE(mailtool, AS_HELP_STRING([--enable-mailtool],[Enable Sun mailtool 
                 AC_DEFINE(SUN_ATTACHMENT,1,[ Define to enable Sun mailtool attachments support. ])
         fi])
 
-AC_ARG_ENABLE(compressed, AC_HELP_STRING([--enable-compressed], [Enable compressed folders support]),
-        [if test x$enableval = xyes; then
-                AC_DEFINE(USE_COMPRESSED,1,[ Define to enable compressed folders support. ])
-        fi])
-
 AC_ARG_ENABLE(locales-fix, AS_HELP_STRING([--enable-locales-fix],[The result of isprint() is unreliable]),
         [if test x$enableval = xyes; then
                 AC_DEFINE(LOCALES_HACK,1,[ Define if the result of isprint() is unreliable. ])

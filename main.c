@@ -341,12 +341,6 @@ static void show_version (void)
 	"-USE_GNU_REGEX  "
 #endif
 
-#ifdef USE_COMPRESSED
-	"+COMPRESSED  "
-#else
-	"-COMPRESSED  "
-#endif
-
 	"\n"
 	
 #ifdef HAVE_COLOR
