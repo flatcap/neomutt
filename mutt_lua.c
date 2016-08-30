@@ -433,3 +433,135 @@ int mutt_lua_source_file(struct Buffer *tmp, struct Buffer *s,
   }
   return 2;
 }
+
+typedef struct _ls {
+  lua_State *state;
+  const char *script;
+} LUA_STATE;
+
+int
+set_mailbox_color (lua_State *l)
+{
+  /* get number of arguments */
+  int n = lua_gettop (l);
+  if (n != 2)
+  {
+    /* Empty the stack */
+    lua_pop (l, n);
+    return -1;
+  }
+
+  if (lua_isstring (l, 1) && lua_isstring (l, 2))
+  {
+    const char *mailbox = lua_tostring (l, 1);
+    const char *color   = lua_tostring (l, 2);
+    mutt_debug (1, "set_mailbox_color %s - %s\n", mailbox, color);
+  }
+
+  /* return the number of results */
+  return 0;
+}
+
+void
+lua_destroy_state (LUA_STATE **state)
+{
+  if (!state)
+    return;
+
+  lua_close ((*state)->state);
+
+  FREE(&(*state)->script);
+  FREE(state);
+}
+
+LUA_STATE *
+lua_create_state (const char *script)
+{
+  if (!script)
+    return NULL;
+
+  LUA_STATE *s = mutt_mem_malloc (sizeof (LUA_STATE));
+
+  s->script = mutt_str_strdup (script);
+  s->state  = luaL_newstate();
+
+  if (!s->state)
+  {
+    lua_destroy_state (&s);
+  }
+
+  luaL_openlibs (s->state);
+
+  /* register our function */
+  lua_register (s->state, "set_mailbox_color", set_mailbox_color);
+
+  return s;
+}
+
+int
+get_lua_integer (lua_State *l, const char *name)
+{
+  if (!name)
+    return -1;
+
+  /* lookup the name and put it on the stack */
+  lua_getglobal (l, name);
+  if (!lua_isnumber (l, -1))
+    return -1;
+
+  int ret = lua_tonumber (l, -1);
+  lua_pop (l, 1);
+
+  return ret;
+}
+
+int
+lua_process_mailbox (LUA_STATE *state, const char *mailbox)
+{
+  int retval = -1;
+
+  if (!state || !mailbox)
+    return 0;
+
+  if (!state->script)
+    return 0;
+
+  lua_State *l = state->state;
+  if (!l)
+    return 0;
+
+  /* set some default values */
+  lua_pushstring (l, mailbox);
+  lua_setglobal (l, "mailbox");
+
+  if (luaL_dofile (l, state->script) == 0)
+  {
+    // /* retrieve the values */
+    // mutt_message ("apple  = %d", get_lua_integer (l, "apple"));  mutt_sleep(1);
+    // mutt_message ("banana = %d", get_lua_integer (l, "banana")); mutt_sleep(1);
+    // mutt_message ("cherry = %d", get_lua_integer (l, "cherry")); mutt_sleep(1);
+
+    /* one value on the stack */
+    if (lua_gettop (l) == 1)
+    {
+      retval = lua_tointeger (l, 1);
+      if (retval != 42)
+      {
+        mutt_message ("lua returned: %s - %lld", mailbox, retval);
+        mutt_sleep (1);
+      }
+      lua_pop (l, 1);
+    }
+    else
+    {
+      // mutt_message ("lua returned");
+    }
+  }
+  else
+  {
+    mutt_error ("error running lua script");
+  }
+
+  return retval;
+}
+

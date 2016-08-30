@@ -36,6 +36,7 @@
 #include "format_flags.h"
 #include "globals.h"
 #include "mutt_curses.h"
+#include "mutt_lua.h"
 #include "mutt_menu.h"
 #include "mx.h"
 #include "opcodes.h"
@@ -984,6 +985,17 @@ void mutt_sb_draw(void)
   if (!Entries)
     for (struct Buffy *b = Incoming; b; b = b->next)
       mutt_sb_notify_mailbox(b, 1);
+
+  LUA_STATE *l = lua_create_state(LuaScript);
+
+  int i;
+  for (i = 0; i < EntryCount; i++)
+  {
+    if (Entries[i]->buffy)
+      lua_process_mailbox(l, Entries[i]->buffy->path);
+  }
+
+  lua_destroy_state(&l);
 
   if (!prepare_sidebar(num_rows))
   {

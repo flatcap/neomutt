@@ -1620,6 +1620,13 @@ struct Option MuttVars[] = {
   ** from your spool mailbox to your $$mbox mailbox, or as a result of
   ** a ``$mbox-hook'' command.
   */
+#ifdef USE_LUA
+  { "lua_script",       DT_STRING,  R_NONE, UL &LuaScript, 0 },
+  /*
+  ** .pp
+  ** External Lua script to run.
+  */
+#endif
   { "mail_check",       DT_NUMBER,  R_NONE, UL &MailCheck, 5 },
   /*
   ** .pp

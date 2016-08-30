@@ -28,4 +28,12 @@ struct Buffer;
 int mutt_lua_parse(struct Buffer *tmp, struct Buffer *s, unsigned long data, struct Buffer *err);
 int mutt_lua_source_file(struct Buffer *tmp, struct Buffer *s, unsigned long data, struct Buffer *err);
 
+typedef struct _ls LUA_STATE;
+
+LUA_STATE * lua_create_state (const char *script);
+void        lua_set_script   (const char *script);
+void        lua_destroy_state (LUA_STATE **state);
+
+int lua_process_mailbox (LUA_STATE *state, const char *mailbox);
+
 #endif /* _MUTT_LUA_H */

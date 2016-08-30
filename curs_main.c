@@ -74,6 +74,9 @@
 #ifdef USE_NNTP
 #include "nntp.h"
 #endif
+#ifdef USE_LUA
+#include "mutt_lua.h"
+#endif
 
 static const char *No_mailbox_is_open = N_("No mailbox is open.");
 static const char *There_are_no_messages = N_("There are no messages.");

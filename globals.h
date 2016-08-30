@@ -138,6 +138,9 @@ WHERE char *ImapUser;
 #endif
 WHERE char *Mbox;
 WHERE char *Ispell;
+#ifdef USE_LUA
+WHERE char *LuaScript;
+#endif
 WHERE char *MailcapPath;
 WHERE char *Folder;
 #if defined(USE_IMAP) || defined(USE_POP) || defined(USE_NNTP)
