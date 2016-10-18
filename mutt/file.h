@@ -46,10 +46,7 @@ int         mutt_file_copy_bytes(FILE *in, FILE *out, size_t size);
 int         mutt_file_copy_stream(FILE *fin, FILE *fout);
 time_t      mutt_file_decrease_mtime(const char *f, struct stat *st);
 const char *mutt_file_dirname(const char *p);
-int         mutt_file_fclose(FILE **f);
-FILE *      mutt_file_fopen(const char *path, const char *mode);
-int         mutt_file_fsync_close(FILE **f);
-int         mutt_file_lock(int fd, int excl, int timeout);
+int         mutt_file_lock(const char *path, int fd, int excl, int timeout);
 int         mutt_file_mkdir(const char *path, mode_t mode);
 int         mutt_file_open(const char *path, int flags);
 size_t      mutt_file_quote_filename(char *d, size_t l, const char *f);
@@ -67,5 +64,13 @@ void        mutt_file_touch_atime(int f);
 void        mutt_file_unlink(const char *s);
 void        mutt_file_unlink_empty(const char *path);
 int         mutt_file_unlock(int fd);
+
+FILE *_safe_fopen(const char *path, const char *mode, const char *file, int line);
+int _safe_fclose(FILE **f, const char *file, int line);
+int _safe_fsync_close(FILE **f, const char *file, int line);
+
+#define mutt_file_fopen(X,Y)     _safe_fopen(X,Y,__FILE__,__LINE__)
+#define mutt_file_fclose(X)      _safe_fclose(X,__FILE__,__LINE__)
+#define mutt_file_fsync_close(X) _safe_fsync_close(X,__FILE__,__LINE__)
 
 #endif /* _MUTT_FILE_H */

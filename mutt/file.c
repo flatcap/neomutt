@@ -182,12 +182,15 @@ static int put_file_in_place(const char *path, const char *safe_file, const char
  * @retval 0   Success
  * @retval EOF Error, see errno
  */
-int mutt_file_fclose(FILE **f)
+int _safe_fclose(FILE **f, const char *file, int line)
 {
   int r = 0;
 
   if (*f)
+  {
+    mutt_debug(1, "FILE CLOSE 0x%lx %s:%d\n", *f, file, line);
     r = fclose(*f);
+  }
 
   *f = NULL;
   return r;
@@ -199,7 +202,7 @@ int mutt_file_fclose(FILE **f)
  * @retval 0   Success
  * @retval EOF Error, see errno
  */
-int mutt_file_fsync_close(FILE **f)
+int _safe_fsync_close(FILE **f, const char *file, int line)
 {
   int r = 0;
 
@@ -209,11 +212,11 @@ int mutt_file_fsync_close(FILE **f)
     {
       int save_errno = errno;
       r = -1;
-      mutt_file_fclose(f);
+      _safe_fclose(f, file, line);
       errno = save_errno;
     }
     else
-      r = mutt_file_fclose(f);
+      r = _safe_fclose(f, file, line);
   }
 
   return r;
@@ -553,11 +556,12 @@ int mutt_file_open(const char *path, int flags)
  * When opening files for writing, make sure the file doesn't already exist to
  * avoid race conditions.
  */
-FILE *mutt_file_fopen(const char *path, const char *mode)
+FILE *_safe_fopen(const char *path, const char *mode, const char *file, int line)
 {
   if (!path || !mode)
     return NULL;
 
+  FILE *fp = NULL;
   if (mode[0] == 'w')
   {
     int fd;
@@ -572,10 +576,14 @@ FILE *mutt_file_fopen(const char *path, const char *mode)
     if (fd < 0)
       return NULL;
 
-    return (fdopen(fd, mode));
+    fp = fdopen(fd, mode);
   }
   else
-    return (fopen(path, mode));
+  {
+    fp = fopen(path, mode);
+  }
+  mutt_debug(1, "FILE OPEN '%s' = 0x%lx - %s:%d\n", path, fp, file, line);
+  return fp;
 }
 
 /**

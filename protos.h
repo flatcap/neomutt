@@ -92,7 +92,8 @@ void mutt_generate_boundary(struct ParameterList *parm);
 int mutt_parse_virtual_mailboxes(struct Buffer *path, struct Buffer *s, unsigned long data, struct Buffer *err);
 #endif
 
-FILE *mutt_open_read(const char *path, pid_t *thepid);
+#define mutt_open_read(X,Y) _mutt_open_read(X,Y,__FILE__,__LINE__)
+FILE *_mutt_open_read (const char *, pid_t *, const char *file, int line);
 
 int query_quadoption(int opt, const char *prompt);
 

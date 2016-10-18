@@ -1248,7 +1248,7 @@ void mutt_expando_format(char *buf, size_t buflen, size_t col, int cols, const c
  * place of a normal file.  If the last character in the string is a pipe (|),
  * then we assume it is a command to run instead of a normal file.
  */
-FILE *mutt_open_read(const char *path, pid_t *thepid)
+FILE *_mutt_open_read(const char *path, pid_t *thepid, const char *file, int line)
 {
   FILE *f = NULL;
   struct stat s;
@@ -1280,6 +1280,7 @@ FILE *mutt_open_read(const char *path, pid_t *thepid)
       return NULL;
     }
     f = fopen(path, "r");
+    mutt_debug(1, "FILE OPEN '%s' = 0x%lx - %s:%d\n", path, f, file, line);
     *thepid = -1;
   }
   return f;
