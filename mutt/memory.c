@@ -41,8 +41,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "memory.h"
+#include "debug.h"
 #include "exit.h"
 #include "message.h"
+
+struct MemCheck
+{
+  const char *file;
+  const char *func;
+  size_t size;
+  unsigned int line;
+};
 
 /**
  * mutt_mem_calloc - Allocate zeroed memory on the heap
@@ -55,7 +64,7 @@
  *
  * The caller should call mutt_mem_free() to release the memory
  */
-void *mutt_mem_calloc(size_t nmemb, size_t size)
+void *_safe_calloc(size_t nmemb, size_t size, const char *func, const char *file, int line)
 {
   void *p = NULL;
 
@@ -69,6 +78,9 @@ void *mutt_mem_calloc(size_t nmemb, size_t size)
     mutt_exit(1);
   }
 
+  size_t mcs = sizeof(struct MemCheck);
+  size += mcs;
+
   p = calloc(nmemb, size);
   if (!p)
   {
@@ -76,23 +88,38 @@ void *mutt_mem_calloc(size_t nmemb, size_t size)
     sleep(1);
     mutt_exit(1);
   }
-  return p;
+
+  struct MemCheck *mc = p;
+  mc->func = func;
+  mc->file = file;
+  mc->line = line;
+  mc->size = size;
+  mutt_debug(1, "CALLOC %ld, %s:%d %s\n", size - mcs, file, line, func);
+
+  return ((unsigned char *) p + mcs);
 }
 
 /**
  * mutt_mem_free - Release memory allocated on the heap
  * @param ptr Memory to release
  */
-void mutt_mem_free(void *ptr)
+void _safe_free(void *ptr, const char *func, const char *file, int line)
 {
   if (!ptr)
     return;
-  void **p = (void **) ptr;
-  if (*p)
-  {
-    free(*p);
-    *p = 0;
-  }
+
+  unsigned char **p = ptr;
+  if (!*p)
+    return;
+
+  size_t mcs = sizeof(struct MemCheck);
+  *p -= mcs;
+
+  struct MemCheck *mc = (struct MemCheck *) *p;
+  mutt_debug(1, "FREE %ld, %s:%d %s\n", mc->size, mc->file, mc->line, mc->func);
+
+  free(*p);
+  *p = 0;
 }
 
 /**
@@ -105,20 +132,32 @@ void mutt_mem_free(void *ptr)
  *
  * The caller should call mutt_mem_free() to release the memory
  */
-void *mutt_mem_malloc(size_t size)
+void *_safe_malloc(size_t siz, const char *func, const char *file, int line)
 {
-  void *p = NULL;
+  unsigned char *p;
 
-  if (size == 0)
+  if (siz == 0)
     return NULL;
-  p = malloc(size);
+
+  size_t mcs = sizeof(struct MemCheck);
+  siz += mcs;
+
+  p = malloc(siz);
   if (!p)
   {
     mutt_error(_("Out of memory!"));
     sleep(1);
     mutt_exit(1);
   }
-  return p;
+
+  struct MemCheck *mc = (struct MemCheck *) p;
+  mc->func = func;
+  mc->file = file;
+  mc->line = line;
+  mc->size = siz;
+  mutt_debug(1, "MALLOC %ld, %s:%d %s\n", siz - mcs, file, line, func);
+
+  return (p + mcs);
 }
 
 /**
@@ -131,22 +170,38 @@ void *mutt_mem_malloc(size_t size)
  *
  * If the new size is zero, the block will be freed.
  */
-void mutt_mem_realloc(void *ptr, size_t size)
+void _safe_realloc(void *ptr, size_t siz, const char *func, const char *file, int line)
 {
-  void *r = NULL;
-  void **p = (void **) ptr;
+  unsigned char *r;
+  unsigned char **p = ptr;
 
-  if (size == 0)
+  size_t mcs = sizeof(struct MemCheck);
+  siz += mcs;
+
+  if (siz == 0)
   {
     if (*p)
     {
-      free(*p);
-      *p = NULL;
+      _safe_free(*p, func, file, line);
     }
     return;
   }
 
-  r = realloc(*p, size);
+  if (*p)
+  {
+    *p -= mcs;
+    siz += mcs;
+    r = realloc(*p, siz);
+    mutt_debug(1, "REALLOC %ld, %s:%d %s\n", siz - mcs, file, line, func);
+  }
+  else
+  {
+    *p -= mcs;
+    siz += mcs;
+    r = malloc(siz);
+    mutt_debug(1, "MALLOC %ld, %s:%d %s\n", siz - mcs, file, line, func);
+  }
+ 
   if (!r)
   {
     mutt_error(_("Out of memory!"));
@@ -154,5 +209,5 @@ void mutt_mem_realloc(void *ptr, size_t size)
     mutt_exit(1);
   }
 
-  *p = r;
+  *p = (r + mcs);
 }

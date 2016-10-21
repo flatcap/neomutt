@@ -32,11 +32,16 @@
 
 #define mutt_array_size(x) (sizeof(x) / sizeof((x)[0]))
 
-void *mutt_mem_calloc(size_t nmemb, size_t size);
-void  mutt_mem_free(void *ptr);
-void *mutt_mem_malloc(size_t size);
-void  mutt_mem_realloc(void *ptr, size_t size);
+void *_safe_calloc(size_t nmemb, size_t size, const char *func, const char *file, int line);
+void *_safe_malloc(size_t siz, const char *func, const char *file, int line);
+void _safe_free(void *ptr, const char *func, const char *file, int line);
+void _safe_realloc(void *ptr, size_t siz, const char *func, const char *file, int line);
 
-#define FREE(x) mutt_mem_free(x)
+#define mutt_mem_calloc(X,Y)  _safe_calloc (X,Y,__func__,__FILE__,__LINE__)
+#define mutt_mem_malloc(X)    _safe_malloc (X,__func__,__FILE__,__LINE__)
+#define mutt_mem_free(X)      _safe_free (X,__func__,__FILE__,__LINE__)
+#define mutt_mem_realloc(X,Y) _safe_realloc (X,Y,__func__,__FILE__,__LINE__)
+
+#define FREE(X) _safe_free (X,__func__,__FILE__,__LINE__)
 
 #endif /* _MUTT_MEMORY_H */
