@@ -1,10 +1,11 @@
 # This is the NeoMutt Project
 
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://github.com/neomutt/neomutt/blob/neomutt/COPYRIGHT)
-[![Travis branch](https://api.travis-ci.org/neomutt/neomutt.svg?branch=neomutt)](https://travis-ci.org/neomutt/neomutt)
-[![Coverity Scan](https://img.shields.io/coverity/scan/8495.svg)](https://scan.coverity.com/projects/neomutt-neomutt)
-[![In Progress](https://badge.waffle.io/neomutt/neomutt.svg?label=status:in-progress&title=In%20Progress)](http://waffle.io/neomutt/neomutt)
-[![Ready](https://badge.waffle.io/neomutt/neomutt.svg?label=status:ready&title=Ready)](http://waffle.io/neomutt/neomutt)
+[![1]][GPL v2]
+[![2]][Travis CI]
+[![3]][Coverity Scan]
+[![4]][Backlog]
+[![5]][In Progress]
+[![6]][Ready]
 
 ## What is NeoMutt?
 
@@ -124,3 +125,17 @@ detailed list.
 
 http://www.neomutt.org/guide/miscellany.html#acknowledgements
 
+
+[GPL v2]: https://github.com/neomutt/neomutt/blob/neomutt/COPYRIGHT
+[Travis CI]: https://travis-ci.org/neomutt/neomutt
+[Coverity Scan]: https://scan.coverity.com/projects/neomutt-neomutt
+[Backlog]: http://waffle.io/neomutt/neomutt
+[In Progress]: http://waffle.io/neomutt/neomutt
+[Ready]: http://waffle.io/neomutt/neomutt
+
+[1]: https://img.shields.io/badge/License-GPL%20v2-blue.svg
+[2]: https://api.travis-ci.org/neomutt/neomutt.svg?branch=neomutt
+[3]: https://img.shields.io/coverity/scan/8495.svg
+[4]: https://badge.waffle.io/neomutt/neomutt.svg?label=status:backlog&title=Backlog
+[5]: https://badge.waffle.io/neomutt/neomutt.svg?label=status:in-progress&title=In%20Progress
+[6]: https://badge.waffle.io/neomutt/neomutt.svg?label=status:ready&title=Ready
