@@ -64,17 +64,6 @@
 #include "thread.h"
 #include "url.h"
 
-#ifdef LIBNOTMUCH_CHECK_VERSION
-#undef LIBNOTMUCH_CHECK_VERSION
-#endif
-
-/* @def The definition in <notmuch.h> is broken */
-#define LIBNOTMUCH_CHECK_VERSION(major, minor, micro)                             \
-  (LIBNOTMUCH_MAJOR_VERSION > (major) ||                                          \
-   (LIBNOTMUCH_MAJOR_VERSION == (major) && LIBNOTMUCH_MINOR_VERSION > (minor)) || \
-   (LIBNOTMUCH_MAJOR_VERSION == (major) &&                                        \
-    LIBNOTMUCH_MINOR_VERSION == (minor) && LIBNOTMUCH_MICRO_VERSION >= (micro)))
-
 /**
  * enum NmQueryType - Notmuch Query Types
  *
@@ -165,11 +154,7 @@ static void free_ctxdata(struct NmCtxData *data)
   mutt_debug(1, "nm: freeing context data %p\n", (void *) data);
 
   if (data->db)
-#ifdef NOTMUCH_API_3
     notmuch_database_destroy(data->db);
-#else
-    notmuch_database_close(data->db);
-#endif
   data->db = NULL;
 
   url_free(&data->db_url);
@@ -487,14 +472,9 @@ static notmuch_database_t *do_database_open(const char *filename, bool writable,
              writable ? "[WRITE]" : "[READ]", NmOpenTimeout);
   do
   {
-#ifdef NOTMUCH_API_3
-    st = notmuch_database_open(filename, writable ? NOTMUCH_DATABASE_MODE_READ_WRITE : NOTMUCH_DATABASE_MODE_READ_ONLY,
+    st = notmuch_database_open(filename, writable ? NOTMUCH_DATABASE_MODE_READ_WRITE :
+                                                    NOTMUCH_DATABASE_MODE_READ_ONLY,
                                &db);
-#else
-    db = notmuch_database_open(filename,
-                               writable ? NOTMUCH_DATABASE_MODE_READ_WRITE :
-                                          NOTMUCH_DATABASE_MODE_READ_ONLY);
-#endif
     if (db || !NmOpenTimeout || ((ct / 2) > NmOpenTimeout))
       break;
 
@@ -534,11 +514,7 @@ static int release_db(struct NmCtxData *data)
   if (data && data->db)
   {
     mutt_debug(1, "nm: db close\n");
-#ifdef NOTMUCH_API_3
     notmuch_database_destroy(data->db);
-#else
-    notmuch_database_close(data->db);
-#endif
     data->db = NULL;
     data->longrun = false;
     return 0;
@@ -890,15 +866,8 @@ static void progress_update(struct Context *ctx, notmuch_query_t *q)
     static char msg[STRING];
     snprintf(msg, sizeof(msg), _("Reading messages..."));
 
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
     if (notmuch_query_count_messages(q, &count) != NOTMUCH_STATUS_SUCCESS)
       count = 0; /* may not be defined on error */
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-    if (notmuch_query_count_messages_st(q, &count) != NOTMUCH_STATUS_SUCCESS)
-      count = 0; /* may not be defined on error */
-#else
-    count = notmuch_query_count_messages(q);
-#endif
     mutt_progress_init(&data->progress, msg, MUTT_PROGRESS_MSG, ReadInc, count);
     data->progress_ready = true;
   }
@@ -1080,15 +1049,8 @@ static bool read_mesgs_query(struct Context *ctx, notmuch_query_t *q, bool dedup
 
   limit = get_limit(data);
 
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
   if (notmuch_query_search_messages(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
     return false;
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-  if (notmuch_query_search_messages_st(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
-    return false;
-#else
-  msgs = notmuch_query_search_messages(q);
-#endif
 
   for (; notmuch_messages_valid(msgs) && ((limit == 0) || (ctx->msgcount < limit));
        notmuch_messages_move_to_next(msgs))
@@ -1113,15 +1075,8 @@ static bool read_threads_query(struct Context *ctx, notmuch_query_t *q, bool ded
   if (!data)
     return false;
 
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
   if (notmuch_query_search_threads(q, &threads) != NOTMUCH_STATUS_SUCCESS)
     return false;
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-  if (notmuch_query_search_threads_st(q, &threads) != NOTMUCH_STATUS_SUCCESS)
-    return false;
-#else
-  threads = notmuch_query_search_threads(q);
-#endif
 
   for (; notmuch_threads_valid(threads) && ((limit == 0) || (ctx->msgcount < limit));
        notmuch_threads_move_to_next(threads))
@@ -1480,15 +1435,8 @@ static unsigned int count_query(notmuch_database_t *db, const char *qstr)
   if (q)
   {
     apply_exclude_tags(q);
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
     if (notmuch_query_count_messages(q, &res) != NOTMUCH_STATUS_SUCCESS)
       res = 0; /* may not be defined on error */
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-    if (notmuch_query_count_messages_st(q, &res) != NOTMUCH_STATUS_SUCCESS)
-      res = 0; /* may not be defined on error */
-#else
-    res = notmuch_query_count_messages(q);
-#endif
     notmuch_query_destroy(q);
     mutt_debug(1, "nm: count '%s', result=%d\n", qstr, res);
   }
@@ -1797,15 +1745,8 @@ bool nm_message_is_still_queried(struct Context *ctx, struct Header *hdr)
     case NM_QUERY_TYPE_MESGS:
     {
       notmuch_messages_t *messages = NULL;
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
       if (notmuch_query_search_messages(q, &messages) != NOTMUCH_STATUS_SUCCESS)
         return false;
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-      if (notmuch_query_search_messages_st(q, &messages) != NOTMUCH_STATUS_SUCCESS)
-        return false;
-#else
-      messages = notmuch_query_search_messages(q);
-#endif
       result = notmuch_messages_valid(messages);
       notmuch_messages_destroy(messages);
       break;
@@ -1813,15 +1754,8 @@ bool nm_message_is_still_queried(struct Context *ctx, struct Header *hdr)
     case NM_QUERY_TYPE_THREADS:
     {
       notmuch_threads_t *threads = NULL;
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
       if (notmuch_query_search_threads(q, &threads) != NOTMUCH_STATUS_SUCCESS)
         return false;
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-      if (notmuch_query_search_threads_st(q, &threads) != NOTMUCH_STATUS_SUCCESS)
-        return false;
-#else
-      threads = notmuch_query_search_threads(q);
-#endif
       result = notmuch_threads_valid(threads);
       notmuch_threads_destroy(threads);
       break;
@@ -1928,11 +1862,7 @@ int nm_nonctx_get_count(char *path, int *all, int *new)
 done:
   if (db)
   {
-#ifdef NOTMUCH_API_3
     notmuch_database_destroy(db);
-#else
-    notmuch_database_close(db);
-#endif
     mutt_debug(1, "nm: count close DB\n");
   }
   url_free(&url);
@@ -2191,15 +2121,8 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
 
   limit = get_limit(data);
 
-#if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
   if (notmuch_query_search_messages(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
     return false;
-#elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-  if (notmuch_query_search_messages_st(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
-    goto done;
-#else
-  msgs = notmuch_query_search_messages(q);
-#endif
 
   for (int i = 0; notmuch_messages_valid(msgs) && ((limit == 0) || (i < limit));
        notmuch_messages_move_to_next(msgs), i++)
