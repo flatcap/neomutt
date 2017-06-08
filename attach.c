@@ -224,7 +224,7 @@ int mutt_edit_attachment(struct Body *a)
   char command[STRING];
   char newfile[_POSIX_PATH_MAX] = "";
   struct Rfc1524MailcapEntry *entry = rfc1524_new_entry();
-  short unlink_newfile = 0;
+  bool unlink_newfile = false;
   int rc = 0;
 
   snprintf(type, sizeof(type), "%s/%s", TYPE(a), a->subtype);
@@ -242,7 +242,7 @@ int mutt_edit_attachment(struct Body *a)
             goto bailout;
         }
         else
-          unlink_newfile = 1;
+          unlink_newfile = true;
       }
       else
         strfcpy(newfile, a->filename, sizeof(newfile));
