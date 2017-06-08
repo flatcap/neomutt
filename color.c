@@ -945,10 +945,10 @@ static int _mutt_parse_color(struct Buffer *buf, struct Buffer *s, struct Buffer
 int mutt_parse_color(struct Buffer *buff, struct Buffer *s, unsigned long data,
                      struct Buffer *err)
 {
-  int dry_run = 0;
+  bool dry_run = false;
 
   if (option(OPTNOCURSES) || !has_colors())
-    dry_run = 1;
+    dry_run = true;
 
   return _mutt_parse_color(buff, s, err, parse_color_pair, dry_run);
 }
