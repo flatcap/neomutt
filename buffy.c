@@ -100,14 +100,14 @@ static int fseek_last_message(FILE *f)
 }
 
 /* Return 1 if the last message is new */
-static int test_last_status_new(FILE *f)
+static bool test_last_status_new(FILE *f)
 {
   struct Header *hdr = NULL;
   struct Envelope *tmp_envelope = NULL;
-  int result = 0;
+  bool result = false;
 
   if (fseek_last_message(f) == -1)
-    return 0;
+    return false;
 
   hdr = mutt_new_header();
   tmp_envelope = mutt_read_rfc822_header(f, hdr, false, false);
