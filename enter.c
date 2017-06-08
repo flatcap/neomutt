@@ -233,7 +233,7 @@ int mutt_enter_string(char *buf, size_t buflen, int col, int flags)
       clearok(stdscr, TRUE);
     }
 #endif
-    rv = _mutt_enter_string(buf, buflen, col, flags, 0, NULL, NULL, es);
+    rv = _mutt_enter_string(buf, buflen, col, flags, false, NULL, NULL, es);
   } while (rv == 1);
   mutt_free_enter_state(&es);
   return rv;
@@ -245,13 +245,13 @@ int mutt_enter_string(char *buf, size_t buflen, int col, int flags)
  *      0 if input was given
  *      -1 if abort.
  */
-int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multiple,
+int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, bool multiple,
                        char ***files, int *numfiles, struct EnterState *state)
 {
   int width = MuttMessageWindow->cols - col - 1;
   int redraw;
   int pass = (flags & MUTT_PASS);
-  int first = 1;
+  bool first = true;
   int ch, w, r;
   size_t i;
   wchar_t *tempbuf = NULL;
@@ -267,7 +267,7 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
   {
     /* Coming back after return 1 */
     redraw = MUTT_REDRAW_LINE;
-    first = 0;
+    first = false;
   }
   else
   {
@@ -332,7 +332,7 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
     if (ch != OP_NULL)
     {
-      first = 0;
+      first = false;
       if (ch != OP_EDITOR_COMPLETE && ch != OP_EDITOR_COMPLETE_QUERY)
         state->tabs = 0;
       redraw = MUTT_REDRAW_LINE;
@@ -542,7 +542,7 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
         case OP_EDITOR_BUFFY_CYCLE:
           if (flags & MUTT_EFILE)
           {
-            first = 1; /* clear input if user types a real key later */
+            first = true; /* clear input if user types a real key later */
             my_wcstombs(buf, buflen, state->wbuf, state->curpos);
             mutt_buffy(buf, buflen);
             state->curpos = state->lastchar =
@@ -787,7 +787,7 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
       if (first && (flags & MUTT_CLEAR))
       {
-        first = 0;
+        first = false;
         if (IsWPrint(wc)) /* why? */
           state->curpos = state->lastchar = 0;
       }
