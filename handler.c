@@ -1845,7 +1845,7 @@ int mutt_body_handler(struct Body *b, struct State *s)
   if (!b || !s)
     return -1;
 
-  int plaintext = 0;
+  bool plaintext = false;
   handler_t handler = NULL;
   int rc = 0;
 
@@ -1876,14 +1876,14 @@ int mutt_body_handler(struct Body *b, struct State *s)
     else if (ascii_strcasecmp("enriched", b->subtype) == 0)
       handler = text_enriched_handler;
     else /* text body type without a handler */
-      plaintext = 0;
+      plaintext = false;
   }
   else if (b->type == TYPEMESSAGE)
   {
     if (mutt_is_message_type(b->type, b->subtype))
       handler = message_handler;
     else if (ascii_strcasecmp("delivery-status", b->subtype) == 0)
-      plaintext = 1;
+      plaintext = true;
     else if (ascii_strcasecmp("external-body", b->subtype) == 0)
       handler = external_body_handler;
   }
@@ -1924,7 +1924,7 @@ int mutt_body_handler(struct Body *b, struct State *s)
     if (option(OPTDONTHANDLEPGPKEYS) && (ascii_strcasecmp("pgp-keys", b->subtype) == 0))
     {
       /* pass raw part through for key extraction */
-      plaintext = 1;
+      plaintext = true;
     }
     else if ((WithCrypto & APPLICATION_PGP) && mutt_is_application_pgp(b))
       handler = crypt_pgp_application_pgp_handler;
