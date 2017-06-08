@@ -296,7 +296,7 @@ int mutt_get_postponed(struct Context *ctx, struct Header *hdr,
     return -1;
   }
 
-  if (mutt_prepare_template(NULL, PostContext, hdr, h, 0) < 0)
+  if (mutt_prepare_template(NULL, PostContext, hdr, h, false) < 0)
   {
     mx_fastclose_mailbox(PostContext);
     FREE(&PostContext);
@@ -564,7 +564,7 @@ int mutt_parse_crypt_hdr(const char *p, int set_empty_signas, int crypt_app)
  *             discard any existing Message-ID and Mail-Followup-To.
  */
 int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
-                          struct Header *hdr, short resend)
+                          struct Header *hdr, bool resend)
 {
   struct Message *msg = NULL;
   char file[_POSIX_PATH_MAX];

@@ -289,7 +289,7 @@ int mutt_fetch_recips(struct Envelope *out, struct Envelope *in, int flags);
 int mutt_chscmp(const char *s, const char *chs);
 #define mutt_is_utf8(a) mutt_chscmp(a, "utf-8")
 #define mutt_is_us_ascii(a) mutt_chscmp(a, "us-ascii")
-int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr, struct Header *hdr, short resend);
+int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr, struct Header *hdr, bool resend);
 int mutt_resend_message(FILE *fp, struct Context *ctx, struct Header *cur);
 int mutt_compose_to_sender(struct Header *hdr);
 #define mutt_enter_fname(A, B, C, D) _mutt_enter_fname(A, B, C, D, 0, NULL, NULL, 0)

@@ -692,7 +692,7 @@ int main(int argc, char **argv, char **env)
         }
         context_hdr->content->length = st.st_size;
 
-        mutt_prepare_template(fin, NULL, msg, context_hdr, 0);
+        mutt_prepare_template(fin, NULL, msg, context_hdr, false);
 
         /* Scan for mutt header to set OPTRESUMEDRAFTFILES */
         for (last_uhp = &msg->env->userhdrs, uh = *last_uhp; uh; uh = *last_uhp)
