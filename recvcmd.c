@@ -380,7 +380,6 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr,
                                   struct AttachPtr **idx, short idxlen,
                                   struct Body *cur, short nattach, int flags)
 {
-  short i;
   short mime_fwd_all = 0;
   short mime_fwd_any = 1;
   struct Header *parent = NULL;
@@ -500,7 +499,7 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr,
 
     if (!mime_fwd_all)
     {
-      for (i = 0; i < idxlen; i++)
+      for (int i = 0; i < idxlen; i++)
       {
         if (idx[i]->content->tagged && mutt_can_decode(idx[i]->content))
         {
