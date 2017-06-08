@@ -334,17 +334,17 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
 {
   char tempfile[_POSIX_PATH_MAX] = "";
   char pagerfile[_POSIX_PATH_MAX] = "";
-  int is_message;
-  int use_mailcap;
-  int use_pipe = 0;
-  int use_pager = 1;
+  bool is_message = false;
+  bool use_mailcap = false;
+  bool use_pipe = false;
+  bool use_pager = true;
   char type[STRING];
   char command[HUGE_STRING];
   char descrip[STRING];
   char *fname = NULL;
   struct Rfc1524MailcapEntry *entry = NULL;
   int rc = -1;
-  int unlink_tempfile = 0;
+  bool unlink_tempfile = false;
 
   is_message = mutt_is_message_type(a->type, a->subtype);
   if (WithCrypto && is_message && a->hdr && (a->hdr->security & ENCRYPT) &&
@@ -365,7 +365,7 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
         rfc1524_free_entry(&entry);
         mutt_error(_("No matching mailcap entry found.  Viewing as text."));
         flag = MUTT_AS_TEXT;
-        use_mailcap = 0;
+        use_mailcap = false;
       }
       else
         goto return_error;
@@ -402,7 +402,7 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
             goto return_error;
         }
         else
-          unlink_tempfile = 1;
+          unlink_tempfile = true;
       }
     }
     else if (!fp) /* send case */
