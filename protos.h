@@ -333,7 +333,7 @@ int mutt_parse_unmono(struct Buffer *buf, struct Buffer *s, unsigned long data, 
 int mutt_parse_push(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 int mutt_parse_rc_line(/* const */ char *line, struct Buffer *token, struct Buffer *err);
 int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line, char *p,
-                           short user_hdrs, short weed, short do_2047, struct List **lastp);
+                           bool user_hdrs, bool weed, bool do_2047, struct List **lastp);
 int mutt_parse_score(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 int mutt_parse_unscore(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 int mutt_parse_unhook(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);

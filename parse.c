@@ -985,10 +985,10 @@ void mutt_parse_mime_message(struct Context *ctx, struct Header *cur)
 }
 
 int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
-                           char *p, short user_hdrs, short weed, short do_2047,
+                           char *p, bool user_hdrs, bool weed, bool do_2047,
                            struct List **lastp)
 {
-  int matched = 0;
+  bool matched = false;
   struct List *last = NULL;
 
   if (lastp)
@@ -1000,12 +1000,12 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (ascii_strcasecmp(line + 1, "pparently-to") == 0)
       {
         e->to = rfc822_parse_adrlist(e->to, p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "pparently-from") == 0)
       {
         e->from = rfc822_parse_adrlist(e->from, p);
-        matched = 1;
+        matched = true;
       }
       break;
 
@@ -1013,7 +1013,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (ascii_strcasecmp(line + 1, "cc") == 0)
       {
         e->bcc = rfc822_parse_adrlist(e->bcc, p);
-        matched = 1;
+        matched = true;
       }
       break;
 
@@ -1021,7 +1021,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (ascii_strcasecmp(line + 1, "c") == 0)
       {
         e->cc = rfc822_parse_adrlist(e->cc, p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strncasecmp(line + 1, "ontent-", 7) == 0)
       {
@@ -1029,13 +1029,13 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
         {
           if (hdr)
             mutt_parse_content_type(p, hdr->content);
-          matched = 1;
+          matched = true;
         }
         else if (ascii_strcasecmp(line + 8, "transfer-encoding") == 0)
         {
           if (hdr)
             hdr->content->encoding = mutt_check_encoding(p);
-          matched = 1;
+          matched = true;
         }
         else if (ascii_strcasecmp(line + 8, "length") == 0)
         {
@@ -1044,7 +1044,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
             if ((hdr->content->length = atol(p)) < 0)
               hdr->content->length = -1;
           }
-          matched = 1;
+          matched = true;
         }
         else if (ascii_strcasecmp(line + 8, "description") == 0)
         {
@@ -1053,13 +1053,13 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
             mutt_str_replace(&hdr->content->description, p);
             rfc2047_decode(&hdr->content->description);
           }
-          matched = 1;
+          matched = true;
         }
         else if (ascii_strcasecmp(line + 8, "disposition") == 0)
         {
           if (hdr)
             parse_content_disposition(p, hdr->content);
-          matched = 1;
+          matched = true;
         }
       }
       break;
@@ -1070,7 +1070,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
         mutt_str_replace(&e->date, p);
         if (hdr)
           hdr->date_sent = mutt_parse_date(p, hdr);
-        matched = 1;
+        matched = true;
       }
       break;
 
@@ -1084,7 +1084,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (ascii_strcasecmp("rom", line + 1) == 0)
       {
         e->from = rfc822_parse_adrlist(e->from, p);
-        matched = 1;
+        matched = true;
       }
 #ifdef USE_NNTP
       else if (ascii_strcasecmp(line + 1, "ollowup-to") == 0)
@@ -1094,7 +1094,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
           mutt_remove_trailing_ws(p);
           e->followup_to = safe_strdup(mutt_skip_whitespace(p));
         }
-        matched = 1;
+        matched = true;
       }
 #endif
       break;
@@ -1104,7 +1104,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       {
         mutt_free_list(&e->in_reply_to);
         e->in_reply_to = parse_references(p, 1);
-        matched = 1;
+        matched = true;
       }
       break;
 
@@ -1121,7 +1121,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
             hdr->lines = 0;
         }
 
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "ist-Post") == 0)
       {
@@ -1144,7 +1144,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
             }
           }
         }
-        matched = 1;
+        matched = true;
       }
       break;
 
@@ -1153,14 +1153,14 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       {
         if (hdr)
           hdr->mime = true;
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "essage-id") == 0)
       {
         /* We add a new "Message-ID:" when building a message */
         FREE(&e->message_id);
         e->message_id = mutt_extract_message_id(p, NULL);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strncasecmp(line + 1, "ail-", 4) == 0)
       {
@@ -1169,12 +1169,12 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
           /* override the Reply-To: field */
           rfc822_free_address(&e->reply_to);
           e->reply_to = rfc822_parse_adrlist(e->reply_to, p);
-          matched = 1;
+          matched = true;
         }
         else if (ascii_strcasecmp(line + 5, "followup-to") == 0)
         {
           e->mail_followup_to = rfc822_parse_adrlist(e->mail_followup_to, p);
-          matched = 1;
+          matched = true;
         }
       }
       break;
@@ -1186,7 +1186,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
         FREE(&e->newsgroups);
         mutt_remove_trailing_ws(p);
         e->newsgroups = safe_strdup(mutt_skip_whitespace(p));
-        matched = 1;
+        matched = true;
       }
       break;
 #endif
@@ -1205,17 +1205,17 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       {
         mutt_free_list(&e->references);
         e->references = parse_references(p, 0);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "eply-to") == 0)
       {
         e->reply_to = rfc822_parse_adrlist(e->reply_to, p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "eturn-path") == 0)
       {
         e->return_path = rfc822_parse_adrlist(e->return_path, p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "eceived") == 0)
       {
@@ -1234,12 +1234,12 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       {
         if (!e->subject)
           e->subject = safe_strdup(p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "ender") == 0)
       {
         e->sender = rfc822_parse_adrlist(e->sender, p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "tatus") == 0)
       {
@@ -1262,7 +1262,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
             p++;
           }
         }
-        matched = 1;
+        matched = true;
       }
       else if (((ascii_strcasecmp("upersedes", line + 1) == 0) ||
                 (ascii_strcasecmp("upercedes", line + 1) == 0)) &&
@@ -1277,7 +1277,7 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (ascii_strcasecmp(line + 1, "o") == 0)
       {
         e->to = rfc822_parse_adrlist(e->to, p);
-        matched = 1;
+        matched = true;
       }
       break;
 
@@ -1305,32 +1305,32 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
             p++;
           }
         }
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "-label") == 0)
       {
         FREE(&e->x_label);
         e->x_label = safe_strdup(p);
-        matched = 1;
+        matched = true;
       }
 #ifdef USE_NNTP
       else if (ascii_strcasecmp(line + 1, "-comment-to") == 0)
       {
         if (!e->x_comment_to)
           e->x_comment_to = safe_strdup(p);
-        matched = 1;
+        matched = true;
       }
       else if (ascii_strcasecmp(line + 1, "ref") == 0)
       {
         if (!e->xref)
           e->xref = safe_strdup(p);
-        matched = 1;
+        matched = true;
       }
 #endif
       else if (ascii_strcasecmp(line + 1, "-original-to") == 0)
       {
         e->x_original_to = rfc822_parse_adrlist(e->x_original_to, p);
-        matched = 1;
+        matched = true;
       }
 
     default:
@@ -1484,7 +1484,7 @@ struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
     if (!*p)
       continue; /* skip empty header fields */
 
-    mutt_parse_rfc822_line(e, hdr, line, p, user_hdrs, weed, 1, &last);
+    mutt_parse_rfc822_line(e, hdr, line, p, user_hdrs, weed, true, &last);
   }
 
   FREE(&line);
