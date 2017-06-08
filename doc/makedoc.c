@@ -890,14 +890,14 @@ static int handle_docline(char *l, FILE *out, int docstat)
     }
     else if (*s == '$')
     {
-      int output_dollar = 0;
+      bool output_dollar = false;
       char *ref = NULL;
       char save;
 
       ++s;
       if (*s == '$')
       {
-        output_dollar = 1;
+        output_dollar = true;
         ++s;
       }
       if (*s == '$')
