@@ -1182,7 +1182,7 @@ fail:
  *      -1: error
  *       0: success
  *       1: non-fatal error - try fetch/append */
-int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int delete)
+int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, bool delete)
 {
   struct ImapData *idata = NULL;
   struct Buffer cmd, sync_cmd;
@@ -1193,7 +1193,7 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
   int n;
   struct ImapMbox mx;
   int err_continue = MUTT_NO;
-  int triedcreate = 0;
+  bool triedcreate = false;
 
   idata = ctx->data;
 
@@ -1311,7 +1311,7 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
       }
       if (imap_create_mailbox(idata, mbox) < 0)
         break;
-      triedcreate = 1;
+      triedcreate = true;
     }
   } while (rc == -2);
 

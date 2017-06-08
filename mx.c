@@ -860,7 +860,7 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
         else
           ctx->hdrs[i]->tagged = false;
 
-      i = imap_copy_messages(ctx, NULL, mbox, 1);
+      i = imap_copy_messages(ctx, NULL, mbox, true);
     }
 
     if (i == 0) /* success */
