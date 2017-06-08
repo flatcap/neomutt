@@ -264,7 +264,7 @@ static const char *folder_format_str(char *dest, size_t destlen, size_t col, int
   struct Folder *folder = (struct Folder *) data;
   struct passwd *pw = NULL;
   struct group *gr = NULL;
-  int optional = (flags & MUTT_FORMAT_OPTIONAL);
+  bool optional = (flags & MUTT_FORMAT_OPTIONAL);
 
   switch (op)
   {
@@ -407,7 +407,7 @@ static const char *folder_format_str(char *dest, size_t destlen, size_t col, int
           mutt_format_s(dest, destlen, fmt, "");
       }
       else if (!folder->ff->msg_count)
-        optional = 0;
+        optional = false;
       break;
 
     case 'N':
@@ -427,7 +427,7 @@ static const char *folder_format_str(char *dest, size_t destlen, size_t col, int
           mutt_format_s(dest, destlen, fmt, "");
       }
       else if (!folder->ff->msg_unread)
-        optional = 0;
+        optional = false;
       break;
 
     case 's':
