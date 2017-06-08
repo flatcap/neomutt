@@ -219,8 +219,7 @@ void imap_logout_all(void)
 int imap_read_literal(FILE *fp, struct ImapData *idata, long bytes, struct Progress *pbar)
 {
   char c;
-
-  int r = 0;
+  bool r = false;
 
   mutt_debug(2, "imap_read_literal: reading %ld bytes\n", bytes);
 
@@ -234,16 +233,16 @@ int imap_read_literal(FILE *fp, struct ImapData *idata, long bytes, struct Progr
       return -1;
     }
 
-    if (r == 1 && c != '\n')
+    if (r && c != '\n')
       fputc('\r', fp);
 
     if (c == '\r')
     {
-      r = 1;
+      r = true;
       continue;
     }
     else
-      r = 0;
+      r = false;
 
     fputc(c, fp);
 
