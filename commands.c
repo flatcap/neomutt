@@ -665,7 +665,7 @@ void mutt_display_address(struct Envelope *env)
   mutt_message("%s: %s", pfx, buf);
 }
 
-static void set_copy_flags(struct Header *hdr, int decode, int decrypt,
+static void set_copy_flags(struct Header *hdr, bool decode, bool decrypt,
                            int *cmflags, int *chflags)
 {
   *cmflags = 0;
@@ -679,7 +679,7 @@ static void set_copy_flags(struct Header *hdr, int decode, int decrypt,
       *cmflags = MUTT_CM_DECODE_PGP;
     }
     else if ((WithCrypto & APPLICATION_PGP) && mutt_is_application_pgp(hdr->content) & ENCRYPT)
-      decode = 1;
+      decode = true;
     else if ((WithCrypto & APPLICATION_SMIME) &&
              mutt_is_application_smime(hdr->content) & ENCRYPT)
     {
