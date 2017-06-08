@@ -1033,7 +1033,7 @@ static struct Header *find_virtual(struct MuttThread *cur, int reverse)
 /* dir => true when moving forward, false when moving in reverse
  * subthreads => false when moving to next thread, true when moving to next subthread
  */
-int _mutt_aside_thread(struct Header *hdr, short dir, short subthreads)
+int _mutt_aside_thread(struct Header *hdr, bool dir, bool subthreads)
 {
   struct MuttThread *cur = NULL;
   struct Header *tmp = NULL;
@@ -1053,7 +1053,7 @@ int _mutt_aside_thread(struct Header *hdr, short dir, short subthreads)
   }
   else
   {
-    if ((dir != 0) ^ ((Sort & SORT_REVERSE) != 0))
+    if (dir ^ ((Sort & SORT_REVERSE) != 0))
     {
       while (!cur->next && cur->parent)
         cur = cur->parent;
@@ -1065,7 +1065,7 @@ int _mutt_aside_thread(struct Header *hdr, short dir, short subthreads)
     }
   }
 
-  if ((dir != 0) ^ ((Sort & SORT_REVERSE) != 0))
+  if (dir ^ ((Sort & SORT_REVERSE) != 0))
   {
     do
     {
