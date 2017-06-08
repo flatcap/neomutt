@@ -673,7 +673,7 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
 {
   int i = 0;
   int offset = 0;
-  int found = 0;
+  bool found = false;
   int chunks = 0;
   int len = 0;
 
@@ -690,7 +690,7 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
   do
   {
     struct ColorLine *cl = NULL;
-    found = 0;
+    found = false;
 
     if (!buf[offset])
       break;
@@ -723,7 +723,7 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
         syntax[i].first = first;
         syntax[i].last = last;
       }
-      found = 1;
+      found = true;
     }
 
     if (syntax)
