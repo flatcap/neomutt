@@ -1047,9 +1047,9 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
   struct Menu *menu = NULL;
   struct stat st;
   int i, killPrefix = 0;
-  int multiple = (flags & MUTT_SEL_MULTI) ? 1 : 0;
-  int folder = (flags & MUTT_SEL_FOLDER) ? 1 : 0;
-  int buffy = (flags & MUTT_SEL_BUFFY) ? 1 : 0;
+  bool multiple = (flags & MUTT_SEL_MULTI);
+  bool folder = (flags & MUTT_SEL_FOLDER);
+  bool buffy = (flags & MUTT_SEL_BUFFY);
 
   /* Keeps in memory the directory we were in when hitting '='
    * to go directly to $folder (Maildir)
@@ -1071,13 +1071,13 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
       unsigned int j;
 
       /* default state for news reader mode is browse subscribed newsgroups */
-      buffy = 0;
+      buffy = false;
       for (j = 0; j < nserv->groups_num; j++)
       {
         struct NntpData *nntp_data = nserv->groups_list[j];
         if (nntp_data && nntp_data->subscribed)
         {
-          buffy = 1;
+          buffy = true;
           break;
         }
       }
@@ -1150,18 +1150,18 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
        * on which sort method we chose to use. This variable is defined
        * only to help readability of the code.
        */
-      short browser_track;
+      bool browser_track;
 
       switch (BrowserSort & SORT_MASK)
       {
         case SORT_DESC:
         case SORT_SUBJECT:
         case SORT_ORDER:
-          browser_track = 1;
+          browser_track = true;
           break;
 
         default:
-          browser_track = 0;
+          browser_track = false;
           break;
       }
 
@@ -1386,7 +1386,7 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
               prefix[0] = 0;
               killPrefix = 0;
             }
-            buffy = 0;
+            buffy = false;
 #ifdef USE_IMAP
             if (state.imap_browse)
             {
@@ -1593,7 +1593,7 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
 
         if (mutt_get_field(_("Chdir to: "), buf, sizeof(buf), MUTT_FILE) == 0 && buf[0])
         {
-          buffy = 0;
+          buffy = false;
           mutt_expand_path(buf, sizeof(buf));
 #ifdef USE_IMAP
           if (mx_is_imap(buf))
@@ -1655,7 +1655,7 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
           char *s = buf;
           int not = 0, err;
 
-          buffy = 0;
+          buffy = false;
           /* assume that the user wants to see everything */
           if (!buf[0])
             strfcpy(buf, ".", sizeof(buf));
@@ -1776,7 +1776,7 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
       case OP_BROWSER_GOTO_FOLDER:
       case OP_CHECK_NEW:
         if (i == OP_TOGGLE_MAILBOXES)
-          buffy = 1 - buffy;
+          buffy = !buffy;
 
         if (i == OP_BROWSER_GOTO_FOLDER)
         {
