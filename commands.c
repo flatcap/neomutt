@@ -706,7 +706,7 @@ static void set_copy_flags(struct Header *hdr, int decode, int decrypt,
   }
 }
 
-int _mutt_save_message(struct Header *h, struct Context *ctx, int delete, int decode, int decrypt)
+int _mutt_save_message(struct Header *h, struct Context *ctx, bool delete, bool decode, bool decrypt)
 {
   int cmflags, chflags;
   int rc;
