@@ -2114,7 +2114,7 @@ int imap_fast_trash(struct Context *ctx, char *dest)
   char prompt[LONG_STRING];
   int rc;
   struct ImapMbox mx;
-  int triedcreate = 0;
+  bool triedcreate = false;
 
   idata = ctx->data;
 
@@ -2182,7 +2182,7 @@ int imap_fast_trash(struct Context *ctx, char *dest)
       }
       if (imap_create_mailbox(idata, mbox) < 0)
         break;
-      triedcreate = 1;
+      triedcreate = true;
     }
   } while (rc == -2);
 
