@@ -958,14 +958,14 @@ int mutt_parse_color(struct Buffer *buff, struct Buffer *s, unsigned long data,
 int mutt_parse_mono(struct Buffer *buff, struct Buffer *s, unsigned long data,
                     struct Buffer *err)
 {
-  int dry_run = 0;
+  bool dry_run = false;
 
 #ifdef HAVE_COLOR
   if (option(OPTNOCURSES) || has_colors())
-    dry_run = 1;
+    dry_run = true;
 #else
   if (option(OPTNOCURSES))
-    dry_run = 1;
+    dry_run = true;
 #endif
 
   return _mutt_parse_color(buff, s, err, parse_attr_spec, dry_run);
