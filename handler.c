@@ -1061,14 +1061,14 @@ static int alternative_handler(struct Body *a, struct State *s)
   struct Body *b = NULL;
   struct List *t = NULL;
   int type = 0;
-  int mustfree = 0;
+  bool mustfree = false;
   int rc = 0;
   int count = 0;
 
   if (a->encoding == ENCBASE64 || a->encoding == ENCQUOTEDPRINTABLE || a->encoding == ENCUUENCODED)
   {
     struct stat st;
-    mustfree = 1;
+    mustfree = true;
     fstat(fileno(s->fpin), &st);
     b = mutt_new_body();
     b->length = (long) st.st_size;
@@ -1087,7 +1087,7 @@ static int alternative_handler(struct Body *a, struct State *s)
   {
     char *c = NULL;
     int btlen; /* length of basetype */
-    int wild;  /* do we have a wildcard to match all subtypes? */
+    bool wild;  /* do we have a wildcard to match all subtypes? */
 
     c = strchr(t->data, '/');
     if (c)
@@ -1097,7 +1097,7 @@ static int alternative_handler(struct Body *a, struct State *s)
     }
     else
     {
-      wild = 1;
+      wild = true;
       btlen = mutt_strlen(t->data);
     }
 
