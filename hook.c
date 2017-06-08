@@ -550,7 +550,7 @@ void mutt_account_hook(const char *url)
   /* parsing commands with URLs in an account hook can cause a recursive
    * call. We just skip processing if this occurs. Typically such commands
    * belong in a folder-hook -- perhaps we should warn the user. */
-  static int inhook = 0;
+  static bool inhook = false;
 
   struct Hook *hook = NULL;
   struct Buffer token;
@@ -571,7 +571,7 @@ void mutt_account_hook(const char *url)
 
     if ((regexec(hook->rx.rx, url, 0, NULL, 0) == 0) ^ hook->rx.not)
     {
-      inhook = 1;
+      inhook = true;
 
       if (mutt_parse_rc_line(hook->command, &token, &err) == -1)
       {
@@ -580,11 +580,11 @@ void mutt_account_hook(const char *url)
         FREE(&err.data);
         mutt_sleep(1);
 
-        inhook = 0;
+        inhook = false;
         return;
       }
 
-      inhook = 0;
+      inhook = false;
     }
   }
 
