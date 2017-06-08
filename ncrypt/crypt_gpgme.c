@@ -4035,20 +4035,20 @@ static struct CryptKeyinfo *crypt_select_key(struct CryptKeyinfo *keys,
 
 static struct CryptKeyinfo *crypt_getkeybyaddr(struct Address *a,
                                                short abilities, unsigned int app,
-                                               int *forced_valid, int oppenc_mode)
+                                               int *forced_valid, bool oppenc_mode)
 {
   struct Address *r = NULL, *p = NULL;
   struct List *hints = NULL;
 
-  int weak = 0;
-  int invalid = 0;
-  int addr_match = 0;
-  int multi = 0;
-  int this_key_has_strong;
-  int this_key_has_addr_match;
-  int this_key_has_weak;
-  int this_key_has_invalid;
-  int match;
+  int weak = false;
+  int invalid = false;
+  int addr_match = false;
+  int multi = false;
+  int this_key_has_strong = false;
+  int this_key_has_addr_match = false;
+  int this_key_has_weak = false;
+  int this_key_has_invalid = false;
+  int match = false;
 
   struct CryptKeyinfo *keys = NULL, *k = NULL;
   struct CryptKeyinfo *the_strong_valid_key = NULL;
@@ -4084,11 +4084,11 @@ static struct CryptKeyinfo *crypt_getkeybyaddr(struct Address *a,
       continue;
     }
 
-    this_key_has_weak = 0;    /* weak but valid match   */
-    this_key_has_invalid = 0; /* invalid match          */
-    this_key_has_strong = 0;  /* strong and valid match */
-    this_key_has_addr_match = 0;
-    match = 0; /* any match            */
+    this_key_has_weak = false;    /* weak but valid match   */
+    this_key_has_invalid = false; /* invalid match          */
+    this_key_has_strong = false;  /* strong and valid match */
+    this_key_has_addr_match = false;
+    match = false; /* any match */
 
     r = rfc822_parse_adrlist(NULL, k->uid);
     for (p = r; p; p = p->next)
@@ -4097,7 +4097,7 @@ static struct CryptKeyinfo *crypt_getkeybyaddr(struct Address *a,
 
       if (validity & CRYPT_KV_MATCH) /* something matches */
       {
-        match = 1;
+        match = true;
 
         if (validity & CRYPT_KV_VALID)
         {
@@ -4106,17 +4106,17 @@ static struct CryptKeyinfo *crypt_getkeybyaddr(struct Address *a,
             if (validity & CRYPT_KV_STRONGID)
             {
               if (the_strong_valid_key && the_strong_valid_key->kobj != k->kobj)
-                multi = 1;
-              this_key_has_strong = 1;
+                multi = true;
+              this_key_has_strong = true;
             }
             else
-              this_key_has_addr_match = 1;
+              this_key_has_addr_match = true;
           }
           else
-            this_key_has_weak = 1;
+            this_key_has_weak = true;
         }
         else
-          this_key_has_invalid = 1;
+          this_key_has_invalid = true;
       }
     }
     rfc822_free_address(&r);
@@ -4132,13 +4132,13 @@ static struct CryptKeyinfo *crypt_getkeybyaddr(struct Address *a,
         the_strong_valid_key = tmp;
       else if (this_key_has_addr_match)
       {
-        addr_match = 1;
+        addr_match = true;
         a_valid_addrmatch_key = tmp;
       }
       else if (this_key_has_invalid)
-        invalid = 1;
+        invalid = true;
       else if (this_key_has_weak)
-        weak = 1;
+        weak = true;
     }
   }
 
