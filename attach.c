@@ -918,7 +918,7 @@ int mutt_print_attachment(FILE *fp, struct Body *a)
   {
     char command[_POSIX_PATH_MAX + STRING];
     struct Rfc1524MailcapEntry *entry = NULL;
-    int piped = false;
+    bool piped = false;
 
     mutt_debug(2, "Using mailcap...\n");
 

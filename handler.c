@@ -1391,7 +1391,7 @@ static int autoview_handler(struct Body *a, struct State *s)
   FILE *fpin = NULL;
   FILE *fpout = NULL;
   FILE *fperr = NULL;
-  int piped = false;
+  bool piped = false;
   pid_t thepid;
   int rc = 0;
 

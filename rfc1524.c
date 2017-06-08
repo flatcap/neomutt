@@ -49,13 +49,13 @@
  * %n is the integer number of sub-parts in the multipart
  * %F is "content-type filename" repeated for each sub-part
  *
- * In addition, this function returns a 0 if the command works on a file,
- * and 1 if the command works on a pipe.
+ * In addition, this function returns false if the command works on a file,
+ * and true if the command works on a pipe.
  */
-int rfc1524_expand_command(struct Body *a, char *filename, char *_type, char *command, int clen)
+bool rfc1524_expand_command(struct Body *a, char *filename, char *_type, char *command, int clen)
 {
   int x = 0, y = 0;
-  int needspipe = true;
+  bool needspipe = true;
   char buf[LONG_STRING];
   char type[LONG_STRING];
 
