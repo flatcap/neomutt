@@ -1019,14 +1019,15 @@ int mutt_multi_choice(char *prompt, char *letters)
 {
   struct Event ch;
   int choice;
-  int redraw = 1, prompt_lines = 1;
+  bool redraw = true;
+  int prompt_lines = 1;
   char *p = NULL;
 
   while (true)
   {
     if (redraw || SigWinch)
     {
-      redraw = 0;
+      redraw = false;
 #if defined(USE_SLANG_CURSES) || defined(HAVE_RESIZETERM)
       if (SigWinch)
       {
