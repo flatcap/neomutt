@@ -840,7 +840,7 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
 
   /* Sam's weird courier server returns an OK response even when FETCH
    * fails. Thanks Sam. */
-  short fetched = 0;
+  bool fetched = false;
   int output_progress;
 
   idata = ctx->data;
@@ -946,7 +946,7 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
             goto bail;
           pc = idata->buf;
 
-          fetched = 1;
+          fetched = true;
         }
         /* UW-IMAP will provide a FLAGS update here if the FETCH causes a
          * change (eg from \Unseen to \Seen).
