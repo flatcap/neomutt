@@ -120,7 +120,7 @@ static bool test_last_status_new(FILE *f)
   return result;
 }
 
-static int test_new_folder(const char *path)
+static bool test_new_folder(const char *path)
 {
   FILE *f = NULL;
   int rc = 0;
@@ -129,7 +129,7 @@ static int test_new_folder(const char *path)
   typ = mx_get_magic(path);
 
   if (typ != MUTT_MBOX && typ != MUTT_MMDF)
-    return 0;
+    return false;
 
   if ((f = fopen(path, "rb")))
   {
