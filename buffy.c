@@ -274,7 +274,7 @@ static int buffy_maildir_check(struct Buffy *mailbox, bool check_stats)
  * check_stats: if true, also count total, new, and flagged messages.
  * Returns 1 if the mailbox has new mail.
  */
-static int buffy_mbox_check(struct Buffy *mailbox, struct stat *sb, int check_stats)
+static int buffy_mbox_check(struct Buffy *mailbox, struct stat *sb, bool check_stats)
 {
   int rc = 0;
   int new_or_changed;
