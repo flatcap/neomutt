@@ -1538,7 +1538,7 @@ static int imap_get_mailbox(const char *path, struct ImapData **hidata, char *bu
 /* check for new mail in any subscribed mailboxes. Given a list of mailboxes
  * rather than called once for each so that it can batch the commands and
  * save on round trips. Returns number of mailboxes with new mail. */
-int imap_buffy_check(int force, int check_stats)
+int imap_buffy_check(int force, bool check_stats)
 {
   struct ImapData *idata = NULL;
   struct ImapData *lastdata = NULL;
