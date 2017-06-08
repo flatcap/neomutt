@@ -901,20 +901,20 @@ bool imap_has_flag(struct List *flag_list, const char *flag)
 /* Note: headers must be in SORT_ORDER. See imap_exec_msgset for args.
  * Pos is an opaque pointer a la strtok. It should be 0 at first call. */
 static int imap_make_msg_set(struct ImapData *idata, struct Buffer *buf,
-                             int flag, int changed, int invert, int *pos)
+                             int flag, bool changed, bool invert, int *pos)
 {
   struct Header **hdrs = idata->ctx->hdrs;
   int count = 0; /* number of messages in message set */
-  int match = 0; /* whether current message matches flag condition */
+  bool match = false; /* whether current message matches flag condition */
   unsigned int setstart = 0; /* start of current message range */
   int n;
-  int started = 0;
+  bool started = false;
 
   hdrs = idata->ctx->hdrs;
 
   for (n = *pos; n < idata->ctx->msgcount && buf->dptr - buf->data < IMAP_MAX_CMDLEN; n++)
   {
-    match = 0;
+    match = false;
     /* don't include pending expunged messages */
     if (hdrs[n]->active)
       switch (flag)
@@ -942,11 +942,11 @@ static int imap_make_msg_set(struct ImapData *idata, struct Buffer *buf,
 
         case MUTT_TAG:
           if (hdrs[n]->tagged)
-            match = 1;
+            match = true;
           break;
         case MUTT_TRASH:
           if (hdrs[n]->deleted && !hdrs[n]->purge)
-            match = 1;
+            match = true;
           break;
       }
 
@@ -956,10 +956,10 @@ static int imap_make_msg_set(struct ImapData *idata, struct Buffer *buf,
       if (setstart == 0)
       {
         setstart = HEADER_DATA(hdrs[n])->uid;
-        if (started == 0)
+        if (!started)
         {
           mutt_buffer_printf(buf, "%u", HEADER_DATA(hdrs[n])->uid);
-          started = 1;
+          started = true;
         }
         else
           mutt_buffer_printf(buf, ",%u", HEADER_DATA(hdrs[n])->uid);
