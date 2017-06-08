@@ -535,12 +535,12 @@ static void mh_update_sequences(struct Context *ctx)
   FREE(&tmpfname);
 }
 
-static void mh_sequences_add_one(struct Context *ctx, int n, short unseen,
-                                 short flagged, short replied)
+static void mh_sequences_add_one(struct Context *ctx, int n, bool unseen,
+                                 bool flagged, bool replied)
 {
-  short unseen_done = 0;
-  short flagged_done = 0;
-  short replied_done = 0;
+  bool unseen_done = false;
+  bool flagged_done = false;
+  bool replied_done = false;
 
   FILE *ofp = NULL, *nfp = NULL;
 
@@ -570,17 +570,17 @@ static void mh_sequences_add_one(struct Context *ctx, int n, short unseen,
       if (unseen && (strncmp(buff, seq_unseen, mutt_strlen(seq_unseen)) == 0))
       {
         fprintf(nfp, "%s %d\n", buff, n);
-        unseen_done = 1;
+        unseen_done = true;
       }
       else if (flagged && (strncmp(buff, seq_flagged, mutt_strlen(seq_flagged)) == 0))
       {
         fprintf(nfp, "%s %d\n", buff, n);
-        flagged_done = 1;
+        flagged_done = true;
       }
       else if (replied && (strncmp(buff, seq_replied, mutt_strlen(seq_replied)) == 0))
       {
         fprintf(nfp, "%s %d\n", buff, n);
-        replied_done = 1;
+        replied_done = true;
       }
       else
         fprintf(nfp, "%s\n", buff);
