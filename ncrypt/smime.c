@@ -718,7 +718,7 @@ static struct SmimeKey *smime_get_key_by_str(char *str, short abilities, short p
   return return_key;
 }
 
-static struct SmimeKey *smime_ask_for_key(char *prompt, short abilities, short public)
+static struct SmimeKey *smime_ask_for_key(char *prompt, short abilities, bool public)
 {
   struct SmimeKey *key = NULL;
   char resp[SHORT_STRING];
@@ -756,7 +756,7 @@ static void _smime_getkeys(char *mailbox)
   if (!key)
   {
     snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), mailbox);
-    key = smime_ask_for_key(buf, KEYFLAG_CANENCRYPT, 0);
+    key = smime_ask_for_key(buf, KEYFLAG_CANENCRYPT, false);
   }
 
   if (key)
@@ -856,7 +856,7 @@ char *smime_find_keys(struct Address *adrlist, int oppenc_mode)
     if (!key && !oppenc_mode)
     {
       snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), q->mailbox);
-      key = smime_ask_for_key(buf, KEYFLAG_CANENCRYPT, 1);
+      key = smime_ask_for_key(buf, KEYFLAG_CANENCRYPT, true);
     }
     if (!key)
     {
@@ -2092,7 +2092,7 @@ int smime_send_menu(struct Header *msg)
       case 'S': /* (s)ign in oppenc mode */
         if (!SmimeDefaultKey)
         {
-          if ((key = smime_ask_for_key(_("Sign as: "), KEYFLAG_CANSIGN, 0)))
+          if ((key = smime_ask_for_key(_("Sign as: "), KEYFLAG_CANSIGN, false)))
           {
             mutt_str_replace(&SmimeDefaultKey, key->hash);
             smime_free_key(&key);
@@ -2107,7 +2107,7 @@ int smime_send_menu(struct Header *msg)
 
       case 'a': /* sign (a)s */
 
-        if ((key = smime_ask_for_key(_("Sign as: "), KEYFLAG_CANSIGN, 0)))
+        if ((key = smime_ask_for_key(_("Sign as: "), KEYFLAG_CANSIGN, false)))
         {
           mutt_str_replace(&SmimeDefaultKey, key->hash);
           smime_free_key(&key);
