@@ -101,7 +101,7 @@ int mutt_num_postponed(int force)
     {
       short newpc;
 
-      newpc = imap_status(Postponed, 0);
+      newpc = imap_status(Postponed, false);
       if (newpc >= 0)
       {
         PostCount = newpc;

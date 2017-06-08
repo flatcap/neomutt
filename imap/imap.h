@@ -43,7 +43,7 @@ int imap_delete_mailbox(struct Context *ctx, struct ImapMbox *mx);
 int imap_sync_mailbox(struct Context *ctx, int expunge);
 int imap_close_mailbox(struct Context *ctx);
 int imap_buffy_check(int force, int check_stats);
-int imap_status(char *path, int queue);
+int imap_status(char *path, bool queue);
 int imap_search(struct Context *ctx, const struct Pattern *pat);
 int imap_subscribe(char *path, int subscribe);
 int imap_complete(char *dest, size_t dlen, char *path);

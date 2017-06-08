@@ -647,7 +647,7 @@ static int imap_open_mailbox(struct Context *ctx)
   pmx.mbox = NULL;
   if (mx_is_imap(Postponed) && !imap_parse_path(Postponed, &pmx) &&
       mutt_account_match(&pmx.account, &mx.account))
-    imap_status(Postponed, 1);
+    imap_status(Postponed, true);
   FREE(&pmx.mbox);
 
   snprintf(bufout, sizeof(bufout), "%s %s",
@@ -1630,9 +1630,9 @@ int imap_buffy_check(int force, int check_stats)
 /* imap_status: returns count of messages in mailbox, or -1 on error.
  * if queue != 0, queue the command and expect it to have been run
  * on the next call (for pipelining the postponed count) */
-int imap_status(char *path, int queue)
+int imap_status(char *path, bool queue)
 {
-  static int queued = 0;
+  static bool queued = false;
 
   struct ImapData *idata = NULL;
   char buf[LONG_STRING];
@@ -1660,13 +1660,13 @@ int imap_status(char *path, int queue)
   if (queue)
   {
     imap_exec(idata, buf, IMAP_CMD_QUEUE);
-    queued = 1;
+    queued = true;
     return 0;
   }
   else if (!queued)
     imap_exec(idata, buf, 0);
 
-  queued = 0;
+  queued = false;
   if ((status = imap_mboxcache_get(idata, mbox, 0)))
     return status->messages;
 
