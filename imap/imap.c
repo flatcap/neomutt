@@ -993,7 +993,7 @@ static int imap_make_msg_set(struct ImapData *idata, struct Buffer *buf,
  *   invert: invert sense of flag, eg MUTT_READ matches unread messages
  * Returns: number of matched messages, or -1 on failure */
 int imap_exec_msgset(struct ImapData *idata, const char *pre, const char *post,
-                     int flag, int changed, int invert)
+                     int flag, bool changed, bool invert)
 {
   struct Header **hdrs = NULL;
   short oldsort;
@@ -1164,12 +1164,12 @@ static int sync_helper(struct ImapData *idata, int right, int flag, const char *
     return 0;
 
   snprintf(buf, sizeof(buf), "+FLAGS.SILENT (%s)", name);
-  if ((rc = imap_exec_msgset(idata, "UID STORE", buf, flag, 1, 0)) < 0)
+  if ((rc = imap_exec_msgset(idata, "UID STORE", buf, flag, true, false)) < 0)
     return rc;
   count += rc;
 
   buf[0] = '-';
-  if ((rc = imap_exec_msgset(idata, "UID STORE", buf, flag, 1, 1)) < 0)
+  if ((rc = imap_exec_msgset(idata, "UID STORE", buf, flag, true, true)) < 0)
     return rc;
   count += rc;
 
@@ -1210,7 +1210,7 @@ int imap_sync_mailbox(struct Context *ctx, int expunge)
   if (expunge && mutt_bit_isset(ctx->rights, MUTT_ACL_DELETE))
   {
     if ((rc = imap_exec_msgset(idata, "UID STORE", "+FLAGS.SILENT (\\Deleted)",
-                               MUTT_DELETED, 1, 0)) < 0)
+                               MUTT_DELETED, true, false)) < 0)
     {
       mutt_error(_("Expunge failed"));
       mutt_sleep(1);
@@ -2138,14 +2138,14 @@ int imap_fast_trash(struct Context *ctx, char *dest)
   /* loop in case of TRYCREATE */
   do
   {
-    rc = imap_exec_msgset(idata, "UID STORE", "+FLAGS.SILENT (\\Seen)", MUTT_TRASH, 0, 0);
+    rc = imap_exec_msgset(idata, "UID STORE", "+FLAGS.SILENT (\\Seen)", MUTT_TRASH, false, false);
     if (rc < 0)
     {
       mutt_debug(1, "imap_fast_trash: Unable to mark messages as seen\n");
       goto out;
     }
 
-    rc = imap_exec_msgset(idata, "UID COPY", mmbox, MUTT_TRASH, 0, 0);
+    rc = imap_exec_msgset(idata, "UID COPY", mmbox, MUTT_TRASH, false, false);
     if (!rc)
     {
       mutt_debug(1, "imap_fast_trash: No messages to trash\n");
