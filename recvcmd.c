@@ -374,8 +374,8 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr,
                                   struct AttachPtr **idx, short idxlen,
                                   struct Body *cur, short nattach, int flags)
 {
-  short mime_fwd_all = 0;
-  short mime_fwd_any = 1;
+  bool mime_fwd_all = false;
+  bool mime_fwd_any = true;
   struct Header *parent = NULL;
   struct Header *tmphdr = NULL;
   struct Body **last = NULL;
@@ -437,7 +437,7 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr,
 
   if ((!cur || mutt_can_decode(cur)) &&
       (rc = query_quadoption(OPT_MIMEFWD, _("Forward as attachments?"))) == MUTT_YES)
-    mime_fwd_all = 1;
+    mime_fwd_all = true;
   else if (rc == -1)
     goto bail;
 
@@ -453,7 +453,7 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr,
                                  "MIME-forward the others?"))) == MUTT_ABORT)
       goto bail;
     else if (rc == MUTT_NO)
-      mime_fwd_any = 0;
+      mime_fwd_any = false;
   }
 
   /* initialize a state structure */
