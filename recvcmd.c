@@ -116,7 +116,6 @@ static short count_tagged_children(struct AttachPtr **idx, short idxlen, short i
 void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
                         short idxlen, struct Body *cur)
 {
-  short i;
   char prompt[STRING];
   char buf[HUGE_STRING];
   char *err = NULL;
@@ -143,7 +142,7 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
   }
   else
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
     {
       if (idx[i]->content->tagged)
       {
@@ -216,7 +215,7 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
     ret = mutt_bounce_message(fp, cur->hdr, adr);
   else
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
     {
       if (idx[i]->content->tagged)
         if (mutt_bounce_message(fp, idx[i]->content->hdr, adr))
