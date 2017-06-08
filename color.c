@@ -790,7 +790,7 @@ static int fgbgattr_to_color(int fg, int bg, int attr)
  *        mono  <object> <attr> [ <regexp> ]
  */
 static int _mutt_parse_color(struct Buffer *buf, struct Buffer *s, struct Buffer *err,
-                             parser_callback_t callback, short dry_run)
+                             parser_callback_t callback, bool dry_run)
 {
   int object = 0, attr = 0, fg = 0, bg = 0, q_level = 0;
   int r = 0, match = 0;
