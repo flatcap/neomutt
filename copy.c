@@ -921,7 +921,8 @@ static void format_address_header(char **h, struct Address *a)
 static int address_header_decode(char **h)
 {
   char *s = *h;
-  int l, rp = 0;
+  int l;
+  bool rp = false;
 
   struct Address *a = NULL;
   struct Address *cur = NULL;
@@ -933,7 +934,7 @@ static int address_header_decode(char **h)
       if (ascii_strncasecmp(s, "return-path:", 12) == 0)
       {
         l = 12;
-        rp = 1;
+        rp = true;
         break;
       }
       else if (ascii_strncasecmp(s, "reply-to:", 9) == 0)
