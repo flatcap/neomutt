@@ -841,8 +841,8 @@ static int mbox_check_mailbox(struct Context *ctx, int *index_hint)
 {
   struct stat st;
   char buffer[LONG_STRING];
-  int unlock = 0;
-  int modified = 0;
+  bool unlock = false;
+  bool modified = false;
 
   if (stat(ctx->path, &st) == 0)
   {
@@ -908,16 +908,16 @@ static int mbox_check_mailbox(struct Context *ctx, int *index_hint)
           return MUTT_NEW_MAIL; /* signal that new mail arrived */
         }
         else
-          modified = 1;
+          modified = true;
       }
       else
       {
         mutt_debug(1, "mbox_check_mailbox: fgets returned NULL.\n");
-        modified = 1;
+        modified = true;
       }
     }
     else
-      modified = 1;
+      modified = true;
   }
 
   if (modified)
