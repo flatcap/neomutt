@@ -155,7 +155,7 @@ static struct ColorLine *new_color_line(void)
   return p;
 }
 
-static void free_color_line(struct ColorLine **l, int free_colors)
+static void free_color_line(struct ColorLine **l, bool free_colors)
 {
   struct ColorLine *tmp = NULL;
 
@@ -619,7 +619,7 @@ static int add_pattern(struct ColorLine **top, const char *s, int sensitive, int
       mutt_check_simple(buf, sizeof(buf), NONULL(SimpleSearch));
       if ((tmp->color_pattern = mutt_pattern_comp(buf, MUTT_FULL_MSG, err)) == NULL)
       {
-        free_color_line(&tmp, 1);
+        free_color_line(&tmp, true);
         return -1;
       }
       /* force re-caching of index colors */
@@ -629,7 +629,7 @@ static int add_pattern(struct ColorLine **top, const char *s, int sensitive, int
     else if ((r = REGCOMP(&tmp->rx, s, (sensitive ? mutt_which_case(s) : REG_ICASE))) != 0)
     {
       regerror(r, &tmp->rx, err->data, err->dsize);
-      free_color_line(&tmp, 1);
+      free_color_line(&tmp, true);
       return -1;
     }
     tmp->next = *top;
