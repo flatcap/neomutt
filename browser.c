@@ -919,7 +919,7 @@ static void browser_highlight_default(struct BrowserState *state, struct Menu *m
 }
 
 static void init_menu(struct BrowserState *state, struct Menu *menu,
-                      char *title, size_t titlelen, int buffy)
+                      char *title, size_t titlelen, bool buffy)
 {
   char path[_POSIX_PATH_MAX];
 
@@ -986,13 +986,13 @@ static void init_menu(struct BrowserState *state, struct Menu *menu,
     /* If we get here, it means that LastDir is the parent directory of
      * OldLastDir.  I.e., we're returning from a subdirectory, and we want
      * to position the cursor on the directory we're returning from. */
-    unsigned int matched = 0;
+    bool matched = false;
     for (unsigned int i = 0; i < state->entrylen; i++)
     {
       if (mutt_strcmp(state->entry[i].name, TargetDir) == 0)
       {
         menu->current = i;
-        matched = 1;
+        matched = true;
         break;
       }
     }
