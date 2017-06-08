@@ -242,7 +242,8 @@ int mutt_yesorno(const char *msg, int def)
   char *answer_string = NULL;
   int answer_string_wid, msg_wid;
   size_t trunc_msg_len;
-  int redraw = 1, prompt_lines = 1;
+  bool redraw = true;
+  int prompt_lines = 0;
 
   char *expr = NULL;
   regex_t reyes;
@@ -273,7 +274,7 @@ int mutt_yesorno(const char *msg, int def)
   {
     if (redraw || SigWinch)
     {
-      redraw = 0;
+      redraw = false;
 #if defined(USE_SLANG_CURSES) || defined(HAVE_RESIZETERM)
       if (SigWinch)
       {
