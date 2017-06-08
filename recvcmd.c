@@ -550,7 +550,6 @@ static void attach_forward_msgs(FILE *fp, struct Header *hdr, struct AttachPtr *
 {
   struct Header *curhdr = NULL;
   struct Header *tmphdr = NULL;
-  short i;
   int rc;
 
   struct Body **last = NULL;
@@ -564,7 +563,7 @@ static void attach_forward_msgs(FILE *fp, struct Header *hdr, struct AttachPtr *
     curhdr = cur->hdr;
   else
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
       if (idx[i]->content->tagged)
       {
         curhdr = idx[i]->content->hdr;
@@ -616,7 +615,7 @@ static void attach_forward_msgs(FILE *fp, struct Header *hdr, struct AttachPtr *
     }
     else
     {
-      for (i = 0; i < idxlen; i++)
+      for (short i = 0; i < idxlen; i++)
       {
         if (idx[i]->content->tagged)
         {
@@ -636,7 +635,7 @@ static void attach_forward_msgs(FILE *fp, struct Header *hdr, struct AttachPtr *
       mutt_copy_body(fp, last, cur);
     else
     {
-      for (i = 0; i < idxlen; i++)
+      for (short i = 0; i < idxlen; i++)
         if (idx[i]->content->tagged)
         {
           mutt_copy_body(fp, last, idx[i]->content);
