@@ -910,7 +910,7 @@ int mutt_print_attachment(FILE *fp, struct Body *a)
   char type[STRING];
   pid_t thepid;
   FILE *ifp = NULL, *fpout = NULL;
-  short unlink_newfile = 0;
+  bool unlink_newfile = false;
 
   snprintf(type, sizeof(type), "%s/%s", TYPE(a), a->subtype);
 
@@ -938,7 +938,7 @@ int mutt_print_attachment(FILE *fp, struct Body *a)
           strfcpy(newfile, a->filename, sizeof(newfile));
         }
         else
-          unlink_newfile = 1;
+          unlink_newfile = true;
       }
     }
 
