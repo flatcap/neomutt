@@ -181,7 +181,7 @@ void mutt_label_hash_remove(struct Context *ctx, struct Header *hdr);
 int mutt_label_complete(char *buffer, size_t len, int numtabs);
 void mutt_curses_error(const char *fmt, ...);
 void mutt_curses_message(const char *fmt, ...);
-void mutt_encode_descriptions(struct Body *b, short recurse);
+void mutt_encode_descriptions(struct Body *b, bool recurse);
 void mutt_encode_path(char *dest, size_t dlen, const char *src);
 void mutt_enter_command(void);
 void mutt_expand_file_fmt(char *dest, size_t destlen, const char *fmt, const char *src);

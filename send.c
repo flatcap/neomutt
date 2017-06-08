@@ -1144,7 +1144,7 @@ static int send_message(struct Header *msg)
 }
 
 /* rfc2047 encode the content-descriptions */
-void mutt_encode_descriptions(struct Body *b, short recurse)
+void mutt_encode_descriptions(struct Body *b, bool recurse)
 {
   struct Body *t = NULL;
 
@@ -1870,7 +1870,7 @@ int ci_send_message(int flags,           /* send mode */
       msg->read = false;
       msg->old = false;
 
-      mutt_encode_descriptions(msg->content, 1);
+      mutt_encode_descriptions(msg->content, true);
       mutt_prepare_envelope(msg->env, 0);
       mutt_env_to_intl(msg->env, NULL, NULL); /* Handle bad IDNAs the next time. */
 
@@ -1964,7 +1964,7 @@ int ci_send_message(int flags,           /* send mode */
    * in case of error.  Ugh.
    */
 
-  mutt_encode_descriptions(msg->content, 1);
+  mutt_encode_descriptions(msg->content, true);
 
   /*
    * Make sure that clear_content and free_clear_content are
@@ -1992,7 +1992,7 @@ int ci_send_message(int flags,           /* send mode */
         decode_descriptions(msg->content);
         goto main_loop;
       }
-      mutt_encode_descriptions(msg->content, 0);
+      mutt_encode_descriptions(msg->content, false);
     }
 
     /*
