@@ -364,15 +364,15 @@ void rfc1524_free_entry(struct Rfc1524MailcapEntry **entry)
 /*
  * rfc1524_mailcap_lookup attempts to find the given type in the
  * list of mailcap files.  On success, this returns the entry information
- * in *entry, and returns 1.  On failure (not found), returns 0.
- * If entry == NULL just return 1 if the given type is found.
+ * in *entry, and returns true.  On failure (not found), returns false.
+ * If entry == NULL just return true if the given type is found.
  */
-int rfc1524_mailcap_lookup(struct Body *a, char *type,
+bool rfc1524_mailcap_lookup(struct Body *a, char *type,
                            struct Rfc1524MailcapEntry *entry, int opt)
 {
   char path[_POSIX_PATH_MAX];
   int x;
-  int found = false;
+  bool found = false;
   char *curr = MailcapPath;
 
   /* rfc1524 specifies that a path of mailcap files should be searched.
@@ -384,7 +384,7 @@ int rfc1524_mailcap_lookup(struct Body *a, char *type,
   if (!curr || !*curr)
   {
     mutt_error(_("No mailcap path specified"));
-    return 0;
+    return false;
   }
 
   mutt_check_lookup_list(a, type, SHORT_STRING);
