@@ -2762,7 +2762,7 @@ struct Address *mutt_remove_duplicates(struct Address *addr)
   return top;
 }
 
-static void set_noconv_flags(struct Body *b, short flag)
+static void set_noconv_flags(struct Body *b, bool flag)
 {
   for (; b; b = b->next)
   {
@@ -2828,7 +2828,7 @@ int mutt_write_fcc(const char *path, struct Header *hdr, const char *msgid,
   int onm_flags;
 
   if (post)
-    set_noconv_flags(hdr->content, 1);
+    set_noconv_flags(hdr->content, true);
 
   if (mx_open_mailbox(path, MUTT_APPEND | MUTT_QUIET, &f) == NULL)
   {
@@ -3016,7 +3016,7 @@ int mutt_write_fcc(const char *path, struct Header *hdr, const char *msgid,
     mutt_buffy_cleanup(path, &st);
 
   if (post)
-    set_noconv_flags(hdr->content, 0);
+    set_noconv_flags(hdr->content, false);
 
   return r;
 }
