@@ -252,7 +252,7 @@ static void mix_screen_coordinates(struct Remailer **type2_list, struct Coord **
 }
 
 static void mix_redraw_ce(struct Remailer **type2_list, struct Coord *coords,
-                          struct MixChain *chain, int i, short selected)
+                          struct MixChain *chain, int i, bool selected)
 {
   if (!coords || !chain)
     return;
@@ -285,7 +285,7 @@ static void mix_redraw_chain(struct Remailer **type2_list, struct Coord *coords,
   }
 
   for (i = 0; i < chain->cl; i++)
-    mix_redraw_ce(type2_list, coords, chain, i, i == cur);
+    mix_redraw_ce(type2_list, coords, chain, i, (i == cur));
 }
 
 static void mix_redraw_head(struct MixChain *chain)
@@ -515,8 +515,8 @@ void mix_make_chain(struct List **chainp)
     }
     else if (c_cur != c_old)
     {
-      mix_redraw_ce(type2_list, coords, chain, c_old, 0);
-      mix_redraw_ce(type2_list, coords, chain, c_cur, 1);
+      mix_redraw_ce(type2_list, coords, chain, c_old, false);
+      mix_redraw_ce(type2_list, coords, chain, c_cur, true);
     }
 
     c_old = c_cur;
