@@ -731,7 +731,7 @@ int _mutt_save_message(struct Header *h, struct Context *ctx, bool delete, bool 
 }
 
 /* returns 0 if the copy/save was successful, or -1 on error/abort */
-int mutt_save_message(struct Header *h, int delete, int decode, int decrypt)
+int mutt_save_message(struct Header *h, bool delete, bool decode, bool decrypt)
 {
   int i, need_buffy_cleanup;
   int need_passphrase = 0, app = 0;

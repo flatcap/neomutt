@@ -343,7 +343,7 @@ int mutt_query_complete(char *buf, size_t buflen);
 int mutt_query_variables(struct List *queries);
 int mutt_save_attachment(FILE *fp, struct Body *m, char *path, int flags, struct Header *hdr);
 int _mutt_save_message(struct Header *h, struct Context *ctx, bool delete, bool decode, bool decrypt);
-int mutt_save_message(struct Header *h, int delete, int decode, int decrypt);
+int mutt_save_message(struct Header *h, bool delete, bool decode, bool decrypt);
 #ifdef USE_SMTP
 int mutt_smtp_send(const struct Address *from, const struct Address *to, const struct Address *cc,
                    const struct Address *bcc, const char *msgfile, int eightbit);
