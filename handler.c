@@ -1399,7 +1399,7 @@ static int autoview_handler(struct Body *a, struct State *s)
   rfc1524_mailcap_lookup(a, type, entry, MUTT_AUTOVIEW);
 
   fname = safe_strdup(a->filename);
-  mutt_sanitize_filename(fname, 1);
+  mutt_sanitize_filename(fname, true);
   rfc1524_expand_filename(entry->nametemplate, fname, tempfile, sizeof(tempfile));
   FREE(&fname);
 

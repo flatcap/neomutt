@@ -107,7 +107,7 @@ void mutt_adv_mktemp(char *s, size_t l)
   else
   {
     strfcpy(prefix, s, sizeof(prefix));
-    mutt_sanitize_filename(prefix, 1);
+    mutt_sanitize_filename(prefix, true);
     snprintf(s, l, "%s/%s", NONULL(Tempdir), prefix);
     if (lstat(s, &sb) == -1 && errno == ENOENT)
       return;

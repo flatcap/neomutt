@@ -23,6 +23,7 @@
 
 #include <ctype.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -177,7 +178,7 @@ void *safe_calloc(size_t nmemb, size_t size);
 void *safe_malloc(size_t siz);
 void mutt_nocurses_error(const char *, ...);
 void mutt_remove_trailing_ws(char *s);
-void mutt_sanitize_filename(char *f, short slash);
+void mutt_sanitize_filename(char *f, bool slash);
 void mutt_str_replace(char **p, const char *s);
 void mutt_str_adjust(char **p);
 void mutt_unlink(const char *s);

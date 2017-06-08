@@ -699,7 +699,7 @@ FILE *safe_fopen(const char *path, const char *mode)
 static const char safe_chars[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+@{}._-:%/";
 
-void mutt_sanitize_filename(char *f, short slash)
+void mutt_sanitize_filename(char *f, bool slash)
 {
   if (!f)
     return;
