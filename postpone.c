@@ -589,7 +589,7 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
   fseeko(fp, hdr->offset, SEEK_SET);
   newhdr->offset = hdr->offset;
   /* enable header weeding for resent messages */
-  newhdr->env = mutt_read_rfc822_header(fp, newhdr, 1, resend);
+  newhdr->env = mutt_read_rfc822_header(fp, newhdr, true, resend);
   newhdr->content->length = hdr->content->length;
   mutt_parse_part(fp, newhdr->content);
 

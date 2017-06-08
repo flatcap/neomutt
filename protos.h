@@ -109,7 +109,7 @@ struct Body *mutt_read_mime_header(FILE *fp, int digest);
 struct Content *mutt_get_content_info(const char *fname, struct Body *b);
 
 char *mutt_read_rfc822_line(FILE *f, char *line, size_t *linelen);
-struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr, short user_hdrs, short weed);
+struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr, bool user_hdrs, bool weed);
 
 void mutt_set_mtime(const char *from, const char *to);
 time_t mutt_decrease_mtime(const char *f, struct stat *st);

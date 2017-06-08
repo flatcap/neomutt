@@ -749,7 +749,7 @@ struct Header *maildir_parse_stream(int magic, FILE *f, const char *fname,
 
   if (!h)
     h = mutt_new_header();
-  h->env = mutt_read_rfc822_header(f, h, 0, 0);
+  h->env = mutt_read_rfc822_header(f, h, false, false);
 
   fstat(fileno(f), &st);
 

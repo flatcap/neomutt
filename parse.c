@@ -553,7 +553,7 @@ struct Body *mutt_parse_message_rfc822(FILE *fp, struct Body *parent)
 
   parent->hdr = mutt_new_header();
   parent->hdr->offset = ftello(fp);
-  parent->hdr->env = mutt_read_rfc822_header(fp, parent->hdr, 0, 0);
+  parent->hdr->env = mutt_read_rfc822_header(fp, parent->hdr, false, false);
   msg = parent->hdr->content;
 
   /* ignore the length given in the content-length since it could be wrong
@@ -1385,7 +1385,7 @@ done:
  *              mutt_free_envelope() when envelope stay unneeded.
  */
 struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
-                                         short user_hdrs, short weed)
+                                         bool user_hdrs, bool weed)
 {
   struct Envelope *e = mutt_new_envelope();
   struct List *last = NULL;
