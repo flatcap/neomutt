@@ -689,11 +689,10 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachPtr
 {
   struct Envelope *curenv = NULL;
   struct Header *curhdr = NULL;
-  short i;
 
   if (!parent)
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
     {
       if (idx[i]->content->tagged)
       {
@@ -733,7 +732,7 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachPtr
     }
     else
     {
-      for (i = 0; i < idxlen; i++)
+      for (short i = 0; i < idxlen; i++)
       {
         if (idx[i]->content->tagged &&
             mutt_fetch_recips(env, idx[i]->content->hdr->env, flags) == -1)
@@ -757,7 +756,7 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachPtr
   {
     struct List **p = NULL, **q = NULL;
 
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
     {
       if (idx[i]->content->tagged)
         mutt_add_to_reference_headers(env, idx[i]->content->hdr->env, &p, &q);
