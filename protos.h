@@ -164,7 +164,7 @@ void mutt_check_rescore(struct Context *ctx);
 void mutt_clear_error(void);
 void mutt_clear_pager_position(void);
 void mutt_decode_attachment(struct Body *b, struct State *s);
-void mutt_decode_base64(struct State *s, long len, int istext, iconv_t cd);
+void mutt_decode_base64(struct State *s, long len, bool istext, iconv_t cd);
 void mutt_default_save(char *path, size_t pathlen, struct Header *hdr);
 void mutt_display_address(struct Envelope *env);
 void mutt_draw_statusline(int cols, const char *buf, int buflen);

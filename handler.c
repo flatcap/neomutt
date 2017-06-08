@@ -143,7 +143,7 @@ static void convert_to_state(iconv_t cd, char *bufi, size_t *l, struct State *s)
   *l = ibl;
 }
 
-static void decode_xbit(struct State *s, long len, int istext, iconv_t cd)
+static void decode_xbit(struct State *s, long len, bool istext, iconv_t cd)
 {
   int c, ch;
   char bufi[BUFI_SIZE];
@@ -264,7 +264,7 @@ static void qp_decode_line(char *dest, char *src, size_t *l, int last)
  * above, we just use STRING*2 for the target buffer's size.
  *
  */
-static void decode_quoted(struct State *s, long len, int istext, iconv_t cd)
+static void decode_quoted(struct State *s, long len, bool istext, iconv_t cd)
 {
   char line[STRING];
   char decline[2 * STRING];
@@ -318,7 +318,7 @@ static void decode_quoted(struct State *s, long len, int istext, iconv_t cd)
   state_reset_prefix(s);
 }
 
-void mutt_decode_base64(struct State *s, long len, int istext, iconv_t cd)
+void mutt_decode_base64(struct State *s, long len, bool istext, iconv_t cd)
 {
   char buf[5];
   int c1, c2, c3, c4, ch, cr = 0, i;
@@ -412,7 +412,7 @@ static unsigned char decode_byte(char ch)
   return ch - 32;
 }
 
-static void decode_uuencoded(struct State *s, long len, int istext, iconv_t cd)
+static void decode_uuencoded(struct State *s, long len, bool istext, iconv_t cd)
 {
   char tmps[SHORT_STRING];
   char linelen, c, l, out;
@@ -1606,7 +1606,7 @@ static int external_body_handler(struct Body *b, struct State *s)
 
 void mutt_decode_attachment(struct Body *b, struct State *s)
 {
-  int istext = mutt_is_text_part(b);
+  bool istext = mutt_is_text_part(b);
   iconv_t cd = (iconv_t)(-1);
 
   if (istext && s->flags & MUTT_CHARCONV)
