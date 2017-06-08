@@ -587,7 +587,7 @@ static struct SmimeKey *smime_get_candidates(char *search, bool public)
 /* Returns the first matching key record, without prompting or checking of
  * abilities or trust.
  */
-static struct SmimeKey *smime_get_key_by_hash(char *hash, short public)
+static struct SmimeKey *smime_get_key_by_hash(char *hash, bool public)
 {
   struct SmimeKey *results = NULL, *result = NULL;
   struct SmimeKey *match = NULL;
@@ -1475,7 +1475,7 @@ struct Body *smime_sign_message(struct Body *a)
   snprintf(SmimeCertToUse, sizeof(SmimeCertToUse), "%s/%s",
            NONULL(SmimeCertificates), SmimeDefaultKey);
 
-  default_key = smime_get_key_by_hash(SmimeDefaultKey, 1);
+  default_key = smime_get_key_by_hash(SmimeDefaultKey, true);
   if ((!default_key) || (mutt_strcmp("?", default_key->issuer) == 0))
     intermediates = SmimeDefaultKey; /* so openssl won't complain in any case */
   else
