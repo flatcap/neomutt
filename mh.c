@@ -1628,7 +1628,7 @@ static int maildir_commit_message(struct Context *ctx, struct Message *msg)
 
 
 static int _mh_commit_message(struct Context *ctx, struct Message *msg,
-                              struct Header *hdr, short updseq)
+                              struct Header *hdr, bool updseq)
 {
   DIR *dirp = NULL;
   struct dirent *de = NULL;
@@ -1705,7 +1705,7 @@ static int _mh_commit_message(struct Context *ctx, struct Message *msg,
 
 static int mh_commit_message(struct Context *ctx, struct Message *msg)
 {
-  return _mh_commit_message(ctx, msg, NULL, 1);
+  return _mh_commit_message(ctx, msg, NULL, true);
 }
 
 
@@ -1740,7 +1740,7 @@ static int mh_rewrite_message(struct Context *ctx, int msgno)
     if (ctx->magic == MUTT_MAILDIR)
       rc = _maildir_commit_message(ctx, dest, h);
     else
-      rc = _mh_commit_message(ctx, dest, h, 0);
+      rc = _mh_commit_message(ctx, dest, h, false);
 
     mx_close_message(ctx, &dest);
 
