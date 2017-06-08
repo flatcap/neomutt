@@ -608,7 +608,7 @@ static struct SmimeKey *smime_get_key_by_hash(char *hash, short public)
 }
 
 static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
-                                              short public, short may_ask)
+                                              bool public, bool may_ask)
 {
   struct SmimeKey *results = NULL, *result = NULL;
   struct SmimeKey *matches = NULL;
@@ -617,7 +617,7 @@ static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
   struct SmimeKey *trusted_match = NULL;
   struct SmimeKey *valid_match = NULL;
   struct SmimeKey *return_key = NULL;
-  int multi_trusted_matches = 0;
+  bool multi_trusted_matches = false;
 
   if (!mailbox)
     return NULL;
@@ -640,7 +640,7 @@ static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
       {
         if (trusted_match && (mutt_strcasecmp(match->hash, trusted_match->hash) != 0))
         {
-          multi_trusted_matches = 1;
+          multi_trusted_matches = true;
         }
         trusted_match = match;
       }
@@ -751,7 +751,7 @@ static void _smime_getkeys(char *mailbox)
   char *k = NULL;
   char buf[STRING];
 
-  key = smime_get_key_by_addr(mailbox, KEYFLAG_CANENCRYPT, 0, 1);
+  key = smime_get_key_by_addr(mailbox, KEYFLAG_CANENCRYPT, false, true);
 
   if (!key)
   {
@@ -852,7 +852,7 @@ char *smime_find_keys(struct Address *adrlist, int oppenc_mode)
 
     q = p;
 
-    key = smime_get_key_by_addr(q->mailbox, KEYFLAG_CANENCRYPT, 1, !oppenc_mode);
+    key = smime_get_key_by_addr(q->mailbox, KEYFLAG_CANENCRYPT, true, !oppenc_mode);
     if (!key && !oppenc_mode)
     {
       snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), q->mailbox);
