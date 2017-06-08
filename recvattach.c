@@ -891,17 +891,16 @@ int mutt_attach_display_loop(struct Menu *menu, int op, FILE *fp, struct Header 
   return op;
 }
 
-static void attach_collapse(struct Body *b, short collapse, short init, short just_one)
+static void attach_collapse(struct Body *b, bool collapse, bool init, bool just_one)
 {
-  short i;
   for (; b; b = b->next)
   {
-    i = init || b->collapsed;
+    bool i = init || b->collapsed;
     if (i && option(OPTDIGESTCOLLAPSE) && b->type == TYPEMULTIPART &&
         (ascii_strcasecmp(b->subtype, "digest") == 0))
-      attach_collapse(b->parts, 1, 1, 0);
+      attach_collapse(b->parts, true, true, false);
     else if (b->type == TYPEMULTIPART || mutt_is_message_type(b->type, b->subtype))
-      attach_collapse(b->parts, collapse, i, 0);
+      attach_collapse(b->parts, collapse, i, false);
     b->collapsed = collapse;
     if (just_one)
       return;
@@ -1023,7 +1022,7 @@ void mutt_view_attachments(struct Header *hdr)
   mutt_push_current_menu(menu);
 
   mutt_attach_init(cur);
-  attach_collapse(cur, 0, 1, 0);
+  attach_collapse(cur, false, true, false);
   update_attach_index(cur, &idx, &idxlen, &idxmax, menu);
 
   while (true)
@@ -1057,9 +1056,9 @@ void mutt_view_attachments(struct Header *hdr)
           break;
         }
         if (!idx[menu->current]->content->collapsed)
-          attach_collapse(idx[menu->current]->content, 1, 0, 1);
+          attach_collapse(idx[menu->current]->content, true, false, true);
         else
-          attach_collapse(idx[menu->current]->content, 0, 1, 1);
+          attach_collapse(idx[menu->current]->content, false, true, true);
         update_attach_index(cur, &idx, &idxlen, &idxmax, menu);
         break;
 
