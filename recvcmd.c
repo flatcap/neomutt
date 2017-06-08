@@ -240,8 +240,6 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
 void mutt_attach_resend(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
                         short idxlen, struct Body *cur)
 {
-  short i;
-
   if (!check_all_msg(idx, idxlen, cur, true))
     return;
 
@@ -249,7 +247,7 @@ void mutt_attach_resend(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
     mutt_resend_message(fp, Context, cur->hdr);
   else
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
       if (idx[i]->content->tagged)
         mutt_resend_message(fp, Context, idx[i]->content->hdr);
   }
