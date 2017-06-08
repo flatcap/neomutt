@@ -357,14 +357,14 @@ void mutt_free_color(int fg, int bg)
 
 #ifdef HAVE_COLOR
 
-static int parse_color_name(const char *s, int *col, int *attr, int is_fg, struct Buffer *err)
+static int parse_color_name(const char *s, int *col, int *attr, bool is_fg, struct Buffer *err)
 {
   char *eptr = NULL;
-  int is_bright = 0;
+  bool is_bright = false;
 
   if (ascii_strncasecmp(s, "bright", 6) == 0)
   {
-    is_bright = 1;
+    is_bright = true;
     s += 6;
   }
 
@@ -720,7 +720,7 @@ static int parse_color_pair(struct Buffer *buf, struct Buffer *s, int *fg,
 
   mutt_extract_token(buf, s, 0);
 
-  if (parse_color_name(buf->data, fg, attr, 1, err) != 0)
+  if (parse_color_name(buf->data, fg, attr, true, err) != 0)
     return -1;
 
   if (!MoreArgs(s))
@@ -731,7 +731,7 @@ static int parse_color_pair(struct Buffer *buf, struct Buffer *s, int *fg,
 
   mutt_extract_token(buf, s, 0);
 
-  if (parse_color_name(buf->data, bg, attr, 0, err) != 0)
+  if (parse_color_name(buf->data, bg, attr, false, err) != 0)
     return -1;
 
   return 0;
