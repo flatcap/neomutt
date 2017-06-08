@@ -462,7 +462,7 @@ static void do_uncolor(struct Buffer *buf, struct Buffer *s,
  *        unmono  index pattern [pattern...]
  */
 static int _mutt_parse_uncolor(struct Buffer *buf, struct Buffer *s, unsigned long data,
-                               struct Buffer *err, short parse_uncolor)
+                               struct Buffer *err, bool parse_uncolor)
 {
   int object = 0, do_cache = 0;
 
@@ -553,7 +553,7 @@ static int _mutt_parse_uncolor(struct Buffer *buf, struct Buffer *s, unsigned lo
 int mutt_parse_uncolor(struct Buffer *buf, struct Buffer *s, unsigned long data,
                        struct Buffer *err)
 {
-  return _mutt_parse_uncolor(buf, s, data, err, 1);
+  return _mutt_parse_uncolor(buf, s, data, err, true);
 }
 
 #endif
@@ -561,7 +561,7 @@ int mutt_parse_uncolor(struct Buffer *buf, struct Buffer *s, unsigned long data,
 int mutt_parse_unmono(struct Buffer *buf, struct Buffer *s, unsigned long data,
                       struct Buffer *err)
 {
-  return _mutt_parse_uncolor(buf, s, data, err, 0);
+  return _mutt_parse_uncolor(buf, s, data, err, false);
 }
 
 
