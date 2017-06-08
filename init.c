@@ -2271,12 +2271,13 @@ void mutt_envlist_set(const char *name, const char *value, bool overwrite)
 static int parse_setenv(struct Buffer *tmp, struct Buffer *s,
                         unsigned long data, struct Buffer *err)
 {
-  int query, unset, len;
+  bool query, unset;
+  int len;
   char *name = NULL, **save = NULL, **envp = envlist;
   int count = 0;
 
-  query = 0;
-  unset = data & MUTT_SET_UNSET;
+  query = false;
+  unset = ((data & MUTT_SET_UNSET) == MUTT_SET_UNSET);
 
   if (!MoreArgs(s))
   {
@@ -2286,7 +2287,7 @@ static int parse_setenv(struct Buffer *tmp, struct Buffer *s,
 
   if (*s->dptr == '?')
   {
-    query = 1;
+    query = true;
     s->dptr++;
   }
 
@@ -2370,7 +2371,8 @@ static int parse_setenv(struct Buffer *tmp, struct Buffer *s,
 static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
                      struct Buffer *err)
 {
-  int query, unset, inv, reset, r = 0;
+  bool query, unset, inv, reset;
+  int r = 0;
   int idx = -1;
   const char *p = NULL;
   char scratch[_POSIX_PATH_MAX];
@@ -2379,15 +2381,15 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
   while (MoreArgs(s))
   {
     /* reset state variables */
-    query = 0;
-    unset = data & MUTT_SET_UNSET;
-    inv = data & MUTT_SET_INV;
-    reset = data & MUTT_SET_RESET;
+    query = false;
+    unset = ((data & MUTT_SET_UNSET) == MUTT_SET_UNSET);
+    inv = ((data & MUTT_SET_INV) == MUTT_SET_INV);
+    reset = ((data & MUTT_SET_RESET) == MUTT_SET_RESET);
     myvar = NULL;
 
     if (*s->dptr == '?')
     {
-      query = 1;
+      query = true;
       s->dptr++;
     }
     else if (mutt_strncmp("no", s->dptr, 2) == 0)
@@ -2402,7 +2404,7 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
     }
     else if (*s->dptr == '&')
     {
-      reset = 1;
+      reset = true;
       s->dptr++;
     }
 
@@ -2471,9 +2473,9 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
         s->dptr++;
         mutt_extract_token(tmp, s, 0);
         if (ascii_strcasecmp("yes", tmp->data) == 0)
-          unset = inv = 0;
+          unset = inv = false;
         else if (ascii_strcasecmp("no", tmp->data) == 0)
-          unset = 1;
+          unset = true;
         else
         {
           snprintf(err->data, err->dsize, "%s", _("Usage: set variable=yes|no"));
