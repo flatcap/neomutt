@@ -44,7 +44,7 @@
  * imap_unmunge_mbox_name().
  */
 static void imap_add_folder(char delim, char *folder, int noselect, int noinferiors,
-                            struct BrowserState *state, short isparent)
+                            struct BrowserState *state, bool isparent)
 {
   char tmp[LONG_STRING];
   char relpath[LONG_STRING];
@@ -257,7 +257,7 @@ int imap_browse(char *path, struct BrowserState *state)
       if (showparents)
       {
         mutt_debug(3, "imap_init_browse: adding parent %s\n", mbox);
-        imap_add_folder(list.delim, mbox, 1, 0, state, 1);
+        imap_add_folder(list.delim, mbox, 1, 0, state, true);
       }
 
       /* if our target isn't a folder, we are in our superior */
@@ -279,7 +279,7 @@ int imap_browse(char *path, struct BrowserState *state)
       /* folder may be "/" */
       snprintf(relpath, sizeof(relpath), "%c", n < 0 ? '\0' : idata->delim);
       if (showparents)
-        imap_add_folder(idata->delim, relpath, 1, 0, state, 1);
+        imap_add_folder(idata->delim, relpath, 1, 0, state, true);
       if (!state->folder)
       {
         imap_qualify_path(buf, sizeof(buf), &mx, relpath);
