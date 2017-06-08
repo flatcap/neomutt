@@ -1443,7 +1443,7 @@ int imap_close_mailbox(struct Context *ctx)
  *      0               no change
  *      -1              error
  */
-int imap_check_mailbox(struct Context *ctx, int force)
+int imap_check_mailbox(struct Context *ctx, bool force)
 {
   return imap_check(ctx->data, force);
 }

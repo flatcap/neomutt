@@ -38,7 +38,7 @@ struct ImapMbox
 
 /* imap.c */
 int imap_access(const char *path, int flags);
-int imap_check_mailbox(struct Context *ctx, int force);
+int imap_check_mailbox(struct Context *ctx, bool force);
 int imap_delete_mailbox(struct Context *ctx, struct ImapMbox *mx);
 int imap_sync_mailbox(struct Context *ctx, int expunge);
 int imap_close_mailbox(struct Context *ctx);

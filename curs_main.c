@@ -1678,7 +1678,7 @@ int mutt_index_menu(void)
 #ifdef USE_IMAP
       case OP_MAIN_IMAP_FETCH:
         if (Context && Context->magic == MUTT_IMAP)
-          imap_check_mailbox(Context, 1);
+          imap_check_mailbox(Context, true);
         break;
 
       case OP_MAIN_IMAP_LOGOUT_ALL:
