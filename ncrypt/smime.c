@@ -547,7 +547,7 @@ static struct SmimeKey *smime_parse_key(char *buf)
   return key;
 }
 
-static struct SmimeKey *smime_get_candidates(char *search, short public)
+static struct SmimeKey *smime_get_candidates(char *search, bool public)
 {
   char index_file[_POSIX_PATH_MAX];
   FILE *fp = NULL;
