@@ -169,7 +169,7 @@ static void buffy_free(struct Buffy **mailbox)
  * Returns 1 if the dir has new mail.
  */
 static int buffy_maildir_check_dir(struct Buffy *mailbox, const char *dir_name,
-                                   int check_new, int check_stats)
+                                   bool check_new, bool check_stats)
 {
   char path[_POSIX_PATH_MAX];
   char msgpath[_POSIX_PATH_MAX];
@@ -189,7 +189,7 @@ static int buffy_maildir_check_dir(struct Buffy *mailbox, const char *dir_name,
     if (stat(path, &sb) == 0 && sb.st_mtime < mailbox->last_visited)
     {
       rc = 0;
-      check_new = 0;
+      check_new = false;
     }
   }
 
@@ -232,7 +232,7 @@ static int buffy_maildir_check_dir(struct Buffy *mailbox, const char *dir_name,
         }
         mailbox->new = true;
         rc = 1;
-        check_new = 0;
+        check_new = false;
         if (!check_stats)
           break;
       }
@@ -248,9 +248,10 @@ static int buffy_maildir_check_dir(struct Buffy *mailbox, const char *dir_name,
  * check_stats: if true, also count total, new, and flagged messages.
  * Returns 1 if the mailbox has new mail.
  */
-static int buffy_maildir_check(struct Buffy *mailbox, int check_stats)
+static int buffy_maildir_check(struct Buffy *mailbox, bool check_stats)
 {
-  int rc, check_new = 1;
+  int rc;
+  bool check_new = true;
 
   if (check_stats)
   {
