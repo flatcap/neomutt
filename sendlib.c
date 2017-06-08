@@ -2134,7 +2134,7 @@ static void encode_headers(struct List *h)
   }
 }
 
-const char *mutt_fqdn(short may_hide_host)
+const char *mutt_fqdn(bool may_hide_host)
 {
   char *p = NULL;
 
@@ -2171,7 +2171,7 @@ static char *gen_msgid(void)
   rndid[MUTT_RANDTAG_LEN] = 0;
   now = time(NULL);
   tm = gmtime(&now);
-  if (!(fqdn = mutt_fqdn(0)))
+  if (!(fqdn = mutt_fqdn(false)))
     fqdn = NONULL(Hostname);
 
   snprintf(buf, sizeof(buf), "<%d%02d%02d%02d%02d%02d.%s@%s>", tm->tm_year + 1900,
@@ -2670,7 +2670,7 @@ static int _mutt_bounce_message(FILE *fp, struct Header *h, struct Address *to,
 int mutt_bounce_message(FILE *fp, struct Header *h, struct Address *to)
 {
   struct Address *from = NULL, *resent_to = NULL;
-  const char *fqdn = mutt_fqdn(1);
+  const char *fqdn = mutt_fqdn(true);
   char resent_from[STRING];
   int ret;
   char *err = NULL;

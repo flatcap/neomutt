@@ -123,7 +123,7 @@ static struct Address *expand_aliases_r(struct Address *a, struct List **expn)
     last->next = NULL;
   }
 
-  if (option(OPTUSEDOMAIN) && (fqdn = mutt_fqdn(1)))
+  if (option(OPTUSEDOMAIN) && (fqdn = mutt_fqdn(true)))
   {
     /* now qualify all local addresses */
     rfc822_qualify(head, fqdn);
@@ -641,14 +641,14 @@ bool mutt_addr_is_user(struct Address *addr)
     mutt_debug(5, "mutt_addr_is_user: yes, %s = %s @ %s \n", addr->mailbox, Username, Hostname);
     return true;
   }
-  fqdn = mutt_fqdn(0);
+  fqdn = mutt_fqdn(false);
   if (string_is_address(addr->mailbox, Username, fqdn))
   {
     mutt_debug(5, "mutt_addr_is_user: yes, %s = %s @ %s \n", addr->mailbox,
                Username, NONULL(fqdn));
     return true;
   }
-  fqdn = mutt_fqdn(1);
+  fqdn = mutt_fqdn(true);
   if (string_is_address(addr->mailbox, Username, fqdn))
   {
     mutt_debug(5, "mutt_addr_is_user: yes, %s = %s @ %s \n", addr->mailbox,

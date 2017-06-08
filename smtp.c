@@ -337,7 +337,7 @@ static int smtp_helo(struct Connection *conn)
 #endif
   }
 
-  if (!(fqdn = mutt_fqdn(0)))
+  if (!(fqdn = mutt_fqdn(false)))
     fqdn = NONULL(Hostname);
 
   snprintf(buf, sizeof(buf), "%s %s\r\n", Esmtp ? "EHLO" : "HELO", fqdn);

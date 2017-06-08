@@ -793,7 +793,7 @@ void crypt_extract_keys_from_messages(struct Header *h)
 int crypt_get_keys(struct Header *msg, char **keylist, int oppenc_mode)
 {
   struct Address *adrlist = NULL, *last = NULL;
-  const char *fqdn = mutt_fqdn(1);
+  const char *fqdn = mutt_fqdn(true);
   char *self_encrypt = NULL;
   size_t keylist_size;
 

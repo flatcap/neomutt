@@ -141,7 +141,7 @@ int mutt_set_xdg_path(const XDGType type, char *buf, size_t bufsize);
 
 const char *mutt_make_version(void);
 
-const char *mutt_fqdn(short may_hide_host);
+const char *mutt_fqdn(bool may_hide_host);
 
 struct Regex *mutt_compile_regexp(const char *s, int flags);
 
