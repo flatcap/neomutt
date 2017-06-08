@@ -1678,7 +1678,7 @@ static int text_plain_handler(struct Body *b, struct State *s)
 }
 
 static int run_decode_and_handler(struct Body *b, struct State *s,
-                                  handler_t handler, int plaintext)
+                                  handler_t handler, bool plaintext)
 {
   int origType;
   char *savePrefix = NULL;
@@ -1688,7 +1688,7 @@ static int run_decode_and_handler(struct Body *b, struct State *s,
 #endif
   size_t tmplength = 0;
   LOFF_T tmpoffset = 0;
-  int decode = 0;
+  bool decode = false;
   int rc = 0;
 
   fseeko(s->fpin, b->offset, SEEK_SET);
@@ -1741,7 +1741,7 @@ static int run_decode_and_handler(struct Body *b, struct State *s,
       savePrefix = s->prefix;
       s->prefix = NULL;
 
-      decode = 1;
+      decode = true;
     }
     else
       b->type = TYPETEXT;
@@ -1835,7 +1835,7 @@ static int malformed_pgp_encrypted_handler(struct Body *b, struct State *s)
 
   octetstream = b->parts->next->next;
   /* exchange encodes the octet-stream, so re-run it through the decoder */
-  rc = run_decode_and_handler(octetstream, s, crypt_pgp_encrypted_handler, 0);
+  rc = run_decode_and_handler(octetstream, s, crypt_pgp_encrypted_handler, false);
   b->goodsig |= octetstream->goodsig;
 
   return rc;
