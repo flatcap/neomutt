@@ -934,7 +934,6 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, pgp_ring_t keyring)
   struct PgpKeyInfo **last = &matches;
   struct PgpKeyInfo *k = NULL, *kn = NULL;
   struct PgpUid *a = NULL;
-  short match;
   size_t l;
   const char *ps = NULL, *pl = NULL, *pfcopy = NULL, *phint = NULL;
 
@@ -963,7 +962,7 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, pgp_ring_t keyring)
     if (!k->address)
       continue;
 
-    match = 0;
+    bool match = false;
 
     mutt_debug(5, "pgp_getkeybystr: matching \"%s\" against key %s:\n", p,
                pgp_long_keyid(k));
@@ -973,7 +972,7 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, pgp_ring_t keyring)
         (ps && (mutt_strcasecmp(ps, pgp_short_keyid(k)) == 0)))
     {
       mutt_debug(5, "\t\tmatch.\n");
-      match = 1;
+      match = true;
     }
     else
     {
@@ -985,7 +984,7 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, pgp_ring_t keyring)
         if (mutt_stristr(a->addr, p))
         {
           mutt_debug(5, "\t\tmatch.\n");
-          match = 1;
+          match = true;
           break;
         }
       }
