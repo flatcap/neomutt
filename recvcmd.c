@@ -70,7 +70,7 @@ static bool check_all_msg(struct AttachPtr **idx, short idxlen, struct Body *cur
 
 
 /* can we decode all tagged attachments? */
-static short check_can_decode(struct AttachPtr **idx, short idxlen, struct Body *cur)
+static bool check_can_decode(struct AttachPtr **idx, short idxlen, struct Body *cur)
 {
   if (cur)
     return mutt_can_decode(cur);
