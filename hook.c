@@ -60,7 +60,8 @@ int mutt_parse_hook(struct Buffer *buf, struct Buffer *s, unsigned long data,
 {
   struct Hook *ptr = NULL;
   struct Buffer command, pattern;
-  int rc, not = 0;
+  int rc;
+  bool not = false;
   regex_t *rx = NULL;
   struct Pattern *pat = NULL;
   char path[_POSIX_PATH_MAX];
@@ -74,7 +75,7 @@ int mutt_parse_hook(struct Buffer *buf, struct Buffer *s, unsigned long data,
     {
       s->dptr++;
       SKIPWS(s->dptr);
-      not = 1;
+      not = true;
     }
 
     mutt_extract_token(&pattern, s, 0);
