@@ -1181,7 +1181,7 @@ static int sync_helper(struct ImapData *idata, int right, int flag, const char *
  *   ctx: the current context
  *   expunge: 0 or 1 - do expunge?
  */
-int imap_sync_mailbox(struct Context *ctx, int expunge)
+int imap_sync_mailbox(struct Context *ctx, bool expunge)
 {
   struct ImapData *idata = NULL;
   struct Context *appendctx = NULL;

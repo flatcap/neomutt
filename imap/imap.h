@@ -40,7 +40,7 @@ struct ImapMbox
 int imap_access(const char *path, int flags);
 int imap_check_mailbox(struct Context *ctx, bool force);
 int imap_delete_mailbox(struct Context *ctx, struct ImapMbox *mx);
-int imap_sync_mailbox(struct Context *ctx, int expunge);
+int imap_sync_mailbox(struct Context *ctx, bool expunge);
 int imap_close_mailbox(struct Context *ctx);
 int imap_buffy_check(int force, bool check_stats);
 int imap_status(char *path, bool queue);
