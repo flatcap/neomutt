@@ -165,7 +165,7 @@ struct Event mutt_getch(void)
 }
 
 int _mutt_get_field(const char *field, char *buf, size_t buflen, int complete,
-                    int multiple, char ***files, int *numfiles)
+                    bool multiple, char ***files, int *numfiles)
 {
   int ret;
   int x;

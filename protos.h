@@ -301,7 +301,7 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, bool multip
                        char ***files, int *numfiles, struct EnterState *state);
 #define mutt_get_field(A, B, C, D) _mutt_get_field(A, B, C, D, 0, NULL, NULL)
 int _mutt_get_field(const char *field, char *buf, size_t buflen, int complete,
-                    int multiple, char ***files, int *numfiles);
+                    bool multiple, char ***files, int *numfiles);
 int mutt_get_hook_type(const char *name);
 int mutt_get_field_unbuffered(char *msg, char *buf, size_t buflen, int flags);
 #define mutt_get_password(A, B, C) mutt_get_field_unbuffered(A, B, C, MUTT_PASS)
