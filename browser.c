@@ -948,12 +948,12 @@ static void init_menu(struct BrowserState *state, struct Menu *menu,
   {
     if (buffy)
     {
-      menu->is_mailbox_list = 1;
+      menu->is_mailbox_list = true;
       snprintf(title, titlelen, _("Mailboxes [%d]"), mutt_buffy_check(false));
     }
     else
     {
-      menu->is_mailbox_list = 0;
+      menu->is_mailbox_list = false;
       strfcpy(path, LastDir, sizeof(path));
       mutt_pretty_mailbox(path, sizeof(path));
       snprintf(title, titlelen, _("Directory [%s], File mask: %s"), path,

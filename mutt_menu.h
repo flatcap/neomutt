@@ -52,7 +52,7 @@ struct Menu
   int offset;  /* row offset within the window to start the index */
   int pagelen; /* number of entries per screen */
   int tagprefix;
-  int is_mailbox_list;
+  bool is_mailbox_list;
   struct MuttWindow *indexwin;
   struct MuttWindow *statuswin;
   struct MuttWindow *helpwin;
