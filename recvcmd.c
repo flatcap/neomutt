@@ -309,12 +309,11 @@ static bool is_parent(short i, struct AttachPtr **idx, short idxlen, struct Body
 static struct Header *find_parent(struct AttachPtr **idx, short idxlen,
                                   struct Body *cur, short nattach)
 {
-  short i;
   struct Header *parent = NULL;
 
   if (cur)
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
     {
       if (mutt_is_message_type(idx[i]->content->type, idx[i]->content->subtype) &&
           is_parent(i, idx, idxlen, cur))
