@@ -835,7 +835,7 @@ int main(int argc, char **argv, char **env)
   {
     if (flags & MUTT_BUFFY)
     {
-      if (!mutt_buffy_check(0))
+      if (!mutt_buffy_check(false))
       {
         mutt_endwin(_("No mailbox with new mail."));
         exit(1);

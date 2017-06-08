@@ -606,7 +606,7 @@ void mutt_shell_escape(void)
       fflush(stdout);
       if (mutt_system(buf) != 0 || option(OPTWAITKEY))
         mutt_any_key_to_continue(NULL);
-      mutt_buffy_check(1);
+      mutt_buffy_check(true);
     }
   }
 }

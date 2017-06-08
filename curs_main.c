@@ -498,7 +498,7 @@ static int main_change_folder(struct Menu *menu, int op, char *buf, size_t bufsz
 #endif
 
   mutt_clear_error();
-  mutt_buffy_check(1); /* force the buffy check after we have changed the folder */
+  mutt_buffy_check(true); /* force the buffy check after we have changed the folder */
   menu->redraw = REDRAW_FULL;
   set_option(OPTSEARCHINVALID);
 
@@ -906,7 +906,7 @@ int mutt_index_menu(void)
   mutt_push_current_menu(menu);
 
   if (!attach_msg)
-    mutt_buffy_check(1); /* force the buffy check after we enter the folder */
+    mutt_buffy_check(true); /* force the buffy check after we enter the folder */
 
   if (((Sort & SORT_MASK) == SORT_THREADS) && option(OPTCOLLAPSEALL))
   {
@@ -1013,7 +1013,7 @@ int mutt_index_menu(void)
     {
       /* check for new mail in the incoming folders */
       oldcount = newcount;
-      if ((newcount = mutt_buffy_check(0)) != oldcount)
+      if ((newcount = mutt_buffy_check(false)) != oldcount)
         menu->redraw |= REDRAW_STATUS;
       if (do_buffy_notify)
       {
