@@ -395,7 +395,7 @@ static void curses_message(int error, const char *fmt, va_list ap)
 
   mutt_debug(1, "%s\n", scratch);
   mutt_format_string(Errorbuf, sizeof(Errorbuf), 0, MuttMessageWindow->cols,
-                     FMT_LEFT, 0, scratch, sizeof(scratch), 0);
+                     FMT_LEFT, 0, scratch, sizeof(scratch), false);
 
   if (!option(OPTKEEPQUIET))
   {
@@ -489,7 +489,7 @@ static void message_bar(int percent, const char *fmt, ...)
   l = mutt_strwidth(buf);
   va_end(ap);
 
-  mutt_format_string(buf2, sizeof(buf2), 0, COLS - 2, FMT_LEFT, 0, buf, sizeof(buf), 0);
+  mutt_format_string(buf2, sizeof(buf2), 0, COLS - 2, FMT_LEFT, 0, buf, sizeof(buf), false);
 
   move(LINES - 1, 0);
 
@@ -1122,7 +1122,7 @@ int mutt_addwch(wchar_t wc)
  * when printed.
  */
 void mutt_format_string(char *dest, size_t destlen, int min_width, int max_width,
-                        int justify, char m_pad_char, const char *s, size_t n, int arboreal)
+                        int justify, char m_pad_char, const char *s, size_t n, bool arboreal)
 {
   char *p = NULL;
   wchar_t wc;
@@ -1130,7 +1130,7 @@ void mutt_format_string(char *dest, size_t destlen, int min_width, int max_width
   size_t k, k2;
   char scratch[MB_LEN_MAX];
   mbstate_t mbstate1, mbstate2;
-  int escaped = 0;
+  bool escaped = false;
 
   memset(&mbstate1, 0, sizeof(mbstate1));
   memset(&mbstate2, 0, sizeof(mbstate2));
@@ -1148,12 +1148,12 @@ void mutt_format_string(char *dest, size_t destlen, int min_width, int max_width
     }
     if (escaped)
     {
-      escaped = 0;
+      escaped = false;
       w = 0;
     }
     else if (arboreal && wc == MUTT_SPECIAL_INDEX)
     {
-      escaped = 1;
+      escaped = true;
       w = 0;
     }
     else if (arboreal && wc < MUTT_TREE_MAX)

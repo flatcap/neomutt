@@ -320,7 +320,7 @@ void ci_bounce_message(struct Header *h)
   if (mutt_strwidth(prompt) > MuttMessageWindow->cols - extra_space)
   {
     mutt_format_string(prompt, sizeof(prompt), 0, MuttMessageWindow->cols - extra_space,
-                       FMT_LEFT, 0, scratch, sizeof(scratch), 0);
+                       FMT_LEFT, 0, scratch, sizeof(scratch), false);
     safe_strcat(prompt, sizeof(prompt), "...?");
   }
   else
