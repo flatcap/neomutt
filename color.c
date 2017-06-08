@@ -410,7 +410,7 @@ static int parse_color_name(const char *s, int *col, int *attr, int is_fg, struc
 
 
 static void do_uncolor(struct Buffer *buf, struct Buffer *s,
-                       struct ColorLine **cl, int *do_cache, int parse_uncolor)
+                       struct ColorLine **cl, int *do_cache, bool parse_uncolor)
 {
   struct ColorLine *tmp = NULL, *last = NULL;
 
