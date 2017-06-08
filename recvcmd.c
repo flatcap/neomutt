@@ -52,13 +52,11 @@ static bool check_msg(struct Body *b, bool err)
 
 static bool check_all_msg(struct AttachPtr **idx, short idxlen, struct Body *cur, bool err)
 {
-  short i;
-
   if (cur && !check_msg(cur, err))
     return false;
   else if (!cur)
   {
-    for (i = 0; i < idxlen; i++)
+    for (short i = 0; i < idxlen; i++)
     {
       if (idx[i]->content->tagged)
       {
