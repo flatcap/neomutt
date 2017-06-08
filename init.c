@@ -3924,12 +3924,12 @@ static char *find_cfg(const char *home, const char *xdg_cfg_home)
   return NULL;
 }
 
-void mutt_init(int skip_sys_rc, struct List *commands)
+void mutt_init(bool skip_sys_rc, struct List *commands)
 {
   struct passwd *pw = NULL;
   struct utsname utsname;
   char *p, buffer[STRING];
-  int need_pause = 0;
+  bool need_pause = false;
   struct Buffer err;
 
   mutt_buffer_init(&err);
@@ -4246,7 +4246,7 @@ void mutt_init(int skip_sys_rc, struct List *commands)
       {
         fputs(err.data, stderr);
         fputc('\n', stderr);
-        need_pause = 1;
+        need_pause = true;
       }
     }
   }
@@ -4262,13 +4262,13 @@ void mutt_init(int skip_sys_rc, struct List *commands)
       {
         fputs(err.data, stderr);
         fputc('\n', stderr);
-        need_pause = 1;
+        need_pause = true;
       }
     }
   }
 
   if (execute_commands(commands) != 0)
-    need_pause = 1;
+    need_pause = true;
 
   if (need_pause && !option(OPTNOCURSES))
   {

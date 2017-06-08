@@ -311,7 +311,7 @@ void mutt_push_list(struct List **head, const char *data);
 bool mutt_pop_list(struct List **head);
 const char *mutt_front_list(struct List *head);
 
-void mutt_init(int skip_sys_rc, struct List *commands);
+void mutt_init(bool skip_sys_rc, struct List *commands);
 
 /* flag to mutt_pattern_comp() */
 #define MUTT_FULL_MSG (1 << 0) /* enable body and header matching */
