@@ -204,7 +204,7 @@ static void qp_decode_line(char *dest, char *src, size_t *l, int last)
   char c = 0;
 
   int kind = -1;
-  int soft = 0;
+  bool soft = false;
 
   /* decode the line */
 
@@ -220,7 +220,7 @@ static void qp_decode_line(char *dest, char *src, size_t *l, int last)
         *d++ = *s++;
         break; /* single character */
       case 1:
-        soft = 1;
+        soft = true;
         s++;
         break; /* soft line break */
     }
