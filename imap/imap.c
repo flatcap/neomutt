@@ -348,7 +348,7 @@ struct ImapData *imap_conn_find(const struct Account *account, int flags)
   struct Connection *conn = NULL;
   struct Account *creds = NULL;
   struct ImapData *idata = NULL;
-  int new = 0;
+  bool new = false;
 
   while ((conn = mutt_conn_find(conn, account)))
   {
@@ -389,7 +389,7 @@ struct ImapData *imap_conn_find(const struct Account *account, int flags)
 
     conn->data = idata;
     idata->conn = conn;
-    new = 1;
+    new = true;
   }
 
   if (idata->state == IMAP_DISCONNECTED)
@@ -400,7 +400,7 @@ struct ImapData *imap_conn_find(const struct Account *account, int flags)
     {
       idata->state = IMAP_AUTHENTICATED;
       FREE(&idata->capstr);
-      new = 1;
+      new = true;
       if (idata->conn->ssf)
         mutt_debug(2, "Communication encrypted at %d bits\n", idata->conn->ssf);
     }
