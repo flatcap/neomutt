@@ -791,7 +791,6 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
   short nattach = 0;
   struct Header *parent = NULL;
   struct Header *tmphdr = NULL;
-  short i;
 
   struct State st;
   char tmpbody[_POSIX_PATH_MAX];
@@ -850,7 +849,7 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
       attach_include_reply(fp, tmpfp, cur->hdr, flags);
     else
     {
-      for (i = 0; i < idxlen; i++)
+      for (short i = 0; i < idxlen; i++)
       {
         if (idx[i]->content->tagged)
           attach_include_reply(fp, tmpfp, idx[i]->content->hdr, flags);
@@ -891,7 +890,7 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
     }
     else
     {
-      for (i = 0; i < idxlen; i++)
+      for (short i = 0; i < idxlen; i++)
       {
         if (idx[i]->content->tagged && mutt_can_decode(idx[i]->content))
         {
