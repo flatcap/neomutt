@@ -784,7 +784,7 @@ static void attach_include_reply(FILE *fp, FILE *tmpfp, struct Header *cur, int 
 void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
                        short idxlen, struct Body *cur, int flags)
 {
-  short mime_reply_any = 0;
+  bool mime_reply_any = false;
 
   short nattach = 0;
   struct Header *parent = NULL;
@@ -818,10 +818,10 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachPtr **idx,
                                  "MIME-encapsulate the others?"))) == MUTT_ABORT)
       return;
     else if (rc == MUTT_YES)
-      mime_reply_any = 1;
+      mime_reply_any = true;
   }
   else if (nattach == 1)
-    mime_reply_any = 1;
+    mime_reply_any = true;
 
   tmphdr = mutt_new_header();
   tmphdr->env = mutt_new_envelope();
