@@ -679,7 +679,7 @@ static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
   return return_key;
 }
 
-static struct SmimeKey *smime_get_key_by_str(char *str, short abilities, short public)
+static struct SmimeKey *smime_get_key_by_str(char *str, short abilities, bool public)
 {
   struct SmimeKey *results = NULL, *result = NULL;
   struct SmimeKey *matches = NULL;
