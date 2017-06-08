@@ -1011,17 +1011,17 @@ static int is_mmnoask(const char *buf)
  *
  * 0    otherwise
  */
-static int is_autoview(struct Body *b)
+static bool is_autoview(struct Body *b)
 {
   char type[SHORT_STRING];
-  int is_av = 0;
+  bool is_av = false;
 
   snprintf(type, sizeof(type), "%s/%s", TYPE(b), b->subtype);
 
   if (option(OPTIMPLICITAUTOVIEW))
   {
     /* $implicit_autoview is essentially the same as "auto_view *" */
-    is_av = 1;
+    is_av = true;
   }
   else
   {
@@ -1035,11 +1035,11 @@ static int is_autoview(struct Body *b)
       if ((i > 0 && t->data[i - 1] == '/' && t->data[i] == '*' &&
            (ascii_strncasecmp(type, t->data, i) == 0)) ||
           (ascii_strcasecmp(type, t->data) == 0))
-        is_av = 1;
+        is_av = true;
     }
 
     if (is_mmnoask(type))
-      is_av = 1;
+      is_av = true;
   }
 
   /* determine if there is a mailcap entry suitable for auto_view
@@ -1048,7 +1048,7 @@ static int is_autoview(struct Body *b)
   if (is_av)
     return rfc1524_mailcap_lookup(b, type, NULL, MUTT_AUTOVIEW);
 
-  return 0;
+  return false;
 }
 
 #define TXTHTML 1
