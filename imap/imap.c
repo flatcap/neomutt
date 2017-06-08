@@ -1889,7 +1889,7 @@ int imap_search(struct Context *ctx, const struct Pattern *pat)
   return 0;
 }
 
-int imap_subscribe(char *path, int subscribe)
+int imap_subscribe(char *path, bool subscribe)
 {
   struct ImapData *idata = NULL;
   char buf[LONG_STRING];

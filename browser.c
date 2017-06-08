@@ -2048,9 +2048,9 @@ void _mutt_select_file(char *f, size_t flen, int flags, char ***files, int *numf
 #ifdef USE_IMAP
         {
           if (i == OP_BROWSER_SUBSCRIBE)
-            imap_subscribe(state.entry[menu->current].name, 1);
+            imap_subscribe(state.entry[menu->current].name, true);
           else
-            imap_subscribe(state.entry[menu->current].name, 0);
+            imap_subscribe(state.entry[menu->current].name, false);
         }
 #endif /* USE_IMAP */
     }
