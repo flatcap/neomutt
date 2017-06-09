@@ -2315,8 +2315,9 @@ static void copy_clearsigned(gpgme_data_t data, struct State *s, char *charset)
 /* Support for classic_application/pgp */
 int pgp_gpgme_application_handler(struct Body *m, struct State *s)
 {
-  int needpass = -1, pgp_keyblock = 0;
-  int clearsign = 0;
+  int needpass = -1;
+  bool pgp_keyblock = false;
+  bool clearsign = false;
   long bytes;
   LOFF_T last_pos, offset;
   char buf[HUGE_STRING];
@@ -2352,19 +2353,19 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
 
     if (mutt_strncmp("-----BEGIN PGP ", buf, 15) == 0)
     {
-      clearsign = 0;
+      clearsign = false;
 
       if (MESSAGE(buf + 15))
         needpass = 1;
       else if (SIGNED_MESSAGE(buf + 15))
       {
-        clearsign = 1;
+        clearsign = true;
         needpass = 0;
       }
       else if (PUBLIC_KEY_BLOCK(buf + 15))
       {
         needpass = 0;
-        pgp_keyblock = 1;
+        pgp_keyblock = true;
       }
       else
       {
@@ -2386,7 +2387,7 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
       }
       else if (!clearsign || (s->flags & MUTT_VERIFY))
       {
-        unsigned int sig_stat = 0;
+        bool sig_stat = false;
         gpgme_data_t plaintext;
         gpgme_ctx_t ctx;
 
@@ -2431,7 +2432,7 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
 
             verify_result = gpgme_op_verify_result(ctx);
             if (verify_result->signatures)
-              sig_stat = 1;
+              sig_stat = true;
           }
 
           have_any_sigs = false;
@@ -2439,7 +2440,7 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
           if ((s->flags & MUTT_DISPLAY) && sig_stat)
           {
             int res, idx;
-            int anybad = 0;
+            bool anybad = false;
 
             state_attach_puts(_("[-- Begin signature "
                                 "information --]\n"),
@@ -2448,7 +2449,7 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
             for (idx = 0; (res = show_one_sig_status(ctx, idx, s)) != -1; idx++)
             {
               if (res == 1)
-                anybad = 1;
+                anybad = true;
             }
             if (!anybad && idx)
               maybe_goodsig = true;
