@@ -320,7 +320,7 @@ bool mutt_match_rx_list(const char *s, struct RxList *l);
 bool mutt_match_spam_list(const char *s, struct ReplaceList *l, char *text, int textsize);
 int mutt_multi_choice(char *prompt, char *letters);
 bool mutt_needs_mailcap(struct Body *m);
-int mutt_num_postponed(int force);
+int mutt_num_postponed(bool force);
 int mutt_parse_bind(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 int mutt_parse_exec(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 int mutt_parse_color(struct Buffer *buff, struct Buffer *s, unsigned long data, struct Buffer *err);

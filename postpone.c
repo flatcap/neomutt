@@ -65,10 +65,10 @@ static struct Context *PostContext = NULL;
 static short UpdateNumPostponed = 0;
 
 /* Return the number of postponed messages.
- * if force is 0, use a cached value if it is costly to get a fresh
+ * if force is false, use a cached value if it is costly to get a fresh
  * count (IMAP) - else check.
  */
-int mutt_num_postponed(int force)
+int mutt_num_postponed(bool force)
 {
   struct stat st;
   struct Context ctx;
@@ -79,7 +79,7 @@ int mutt_num_postponed(int force)
   if (UpdateNumPostponed)
   {
     UpdateNumPostponed = 0;
-    force = 1;
+    force = true;
   }
 
   if (mutt_strcmp(Postponed, OldPostponed) != 0)
@@ -87,7 +87,7 @@ int mutt_num_postponed(int force)
     FREE(&OldPostponed);
     OldPostponed = safe_strdup(Postponed);
     LastModify = 0;
-    force = 1;
+    force = true;
   }
 
   if (!Postponed)

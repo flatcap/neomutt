@@ -1331,7 +1331,7 @@ int ci_send_message(int flags,           /* send mode */
     unset_option(OPTNEWSSEND);
 #endif
 
-  if (!flags && !msg && quadoption(OPT_RECALL) != MUTT_NO && mutt_num_postponed(1))
+  if (!flags && !msg && quadoption(OPT_RECALL) != MUTT_NO && mutt_num_postponed(true))
   {
     /* If the user is composing a new message, check to see if there
      * are any postponed messages first.
