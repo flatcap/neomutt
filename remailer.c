@@ -355,7 +355,7 @@ static const char *mix_entry_fmt(char *dest, size_t destlen, size_t col, int col
 {
   char fmt[16];
   struct Remailer *remailer = (struct Remailer *) data;
-  int optional = (flags & MUTT_FORMAT_OPTIONAL);
+  bool optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
 
   switch (op)
   {
@@ -380,7 +380,7 @@ static const char *mix_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, NONULL(remailer->shortname));
       }
       else if (!remailer->shortname)
-        optional = 0;
+        optional = false;
       break;
     case 'a':
       if (!optional)
@@ -389,7 +389,7 @@ static const char *mix_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, NONULL(remailer->addr));
       }
       else if (!remailer->addr)
-        optional = 0;
+        optional = false;
       break;
 
     default:
