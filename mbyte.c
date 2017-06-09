@@ -37,9 +37,9 @@
 #define EILSEQ EINVAL
 #endif
 
-int Charset_is_utf8 = 0;
+bool Charset_is_utf8 = false;
 #ifndef HAVE_WC_FUNCS
-static int charset_is_ja = 0;
+static bool charset_is_ja = false;
 static iconv_t charset_to_utf8 = (iconv_t)(-1);
 static iconv_t charset_from_utf8 = (iconv_t)(-1);
 #endif
@@ -50,9 +50,9 @@ void mutt_set_charset(char *charset)
 
   mutt_canonical_charset(buffer, sizeof(buffer), charset);
 
-  Charset_is_utf8 = 0;
+  Charset_is_utf8 = false;
 #ifndef HAVE_WC_FUNCS
-  charset_is_ja = 0;
+  charset_is_ja = false;
   if (charset_to_utf8 != (iconv_t)(-1))
   {
     iconv_close(charset_to_utf8);
@@ -66,14 +66,14 @@ void mutt_set_charset(char *charset)
 #endif
 
   if (mutt_is_utf8(buffer))
-    Charset_is_utf8 = 1;
+    Charset_is_utf8 = true;
 #ifndef HAVE_WC_FUNCS
   else if ((ascii_strcasecmp(buffer, "euc-jp") == 0) ||
            (ascii_strcasecmp(buffer, "shift_jis") == 0) ||
            (ascii_strcasecmp(buffer, "cp932") == 0) ||
            (ascii_strcasecmp(buffer, "eucJP-ms") == 0))
   {
-    charset_is_ja = 1;
+    charset_is_ja = true;
 
     /* Note flags=0 to skip charset-hooks: User masters the $charset
      * name, and we are sure of our "utf-8" constant. So there is no
