@@ -1792,7 +1792,7 @@ int pgp_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body
   struct State s;
   struct Body *first_part = b;
   int is_signed = 0;
-  int need_decode = 0;
+  bool need_decode = false;
   int saved_type;
   LOFF_T saved_offset;
   size_t saved_length;
@@ -1807,7 +1807,7 @@ int pgp_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body
   else if (mutt_is_malformed_multipart_pgp_encrypted(b))
   {
     b = b->parts->next->next;
-    need_decode = 1;
+    need_decode = true;
   }
   else
     return -1;
