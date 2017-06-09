@@ -596,7 +596,7 @@ int crypt_write_signed(struct Body *a, struct State *s, const char *tempfile)
 {
   FILE *fp = NULL;
   int c;
-  short hadcr;
+  bool hadcr;
   size_t bytes;
 
   if (!WithCrypto)
@@ -610,7 +610,7 @@ int crypt_write_signed(struct Body *a, struct State *s, const char *tempfile)
 
   fseeko(s->fpin, a->hdr_offset, SEEK_SET);
   bytes = a->length + a->offset - a->hdr_offset;
-  hadcr = 0;
+  hadcr = false;
   while (bytes > 0)
   {
     if ((c = fgetc(s->fpin)) == EOF)
@@ -619,13 +619,13 @@ int crypt_write_signed(struct Body *a, struct State *s, const char *tempfile)
     bytes--;
 
     if (c == '\r')
-      hadcr = 1;
+      hadcr = true;
     else
     {
       if (c == '\n' && !hadcr)
         fputc('\r', fp);
 
-      hadcr = 0;
+      hadcr = false;
     }
 
     fputc(c, fp);
