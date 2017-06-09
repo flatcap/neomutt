@@ -608,24 +608,24 @@ static bool check_certificate_cache(X509 *peercert)
   return false;
 }
 
-static int check_certificate_file(X509 *peercert)
+static bool check_certificate_file(X509 *peercert)
 {
   unsigned char peermd[EVP_MAX_MD_SIZE];
   unsigned int peermdlen;
   X509 *cert = NULL;
-  int pass = 0;
+  bool pass = false;
   FILE *fp = NULL;
 
   if (!SslCertFile)
-    return 0;
+    return false;
 
   if ((fp = fopen(SslCertFile, "rt")) == NULL)
-    return 0;
+    return false;
 
   if (!X509_digest(peercert, EVP_sha256(), peermd, &peermdlen))
   {
     safe_fclose(&fp);
-    return 0;
+    return false;
   }
 
   while (PEM_read_X509(fp, &cert, NULL, NULL) != NULL)
@@ -633,7 +633,7 @@ static int check_certificate_file(X509 *peercert)
     if (compare_certificates(cert, peercert, peermd, peermdlen) &&
         check_certificate_expiration(cert, true))
     {
-      pass = 1;
+      pass = true;
       break;
     }
   }
