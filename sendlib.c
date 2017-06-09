@@ -2821,7 +2821,8 @@ int mutt_write_fcc(const char *path, struct Header *hdr, const char *msgid,
   struct Message *msg = NULL;
   char tempfile[_POSIX_PATH_MAX];
   FILE *tempfp = NULL;
-  int r, need_buffy_cleanup = 0;
+  int r;
+  bool need_buffy_cleanup = false;
   struct stat st;
   char buf[SHORT_STRING];
   int onm_flags;
@@ -2850,7 +2851,7 @@ int mutt_write_fcc(const char *path, struct Header *hdr, const char *msgid,
       return -1;
     }
     /* remember new mail status before appending message */
-    need_buffy_cleanup = 1;
+    need_buffy_cleanup = true;
     stat(path, &st);
   }
 
