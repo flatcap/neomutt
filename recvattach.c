@@ -666,7 +666,7 @@ static void pipe_attachment_list(char *command, FILE *fp, int tag,
   }
 }
 
-void mutt_pipe_attachment_list(FILE *fp, int tag, struct Body *top, int filter)
+void mutt_pipe_attachment_list(FILE *fp, int tag, struct Body *top, bool filter)
 {
   struct State state;
   char buf[SHORT_STRING];
@@ -1092,7 +1092,7 @@ void mutt_view_attachments(struct Header *hdr)
 
       case OP_PIPE:
         mutt_pipe_attachment_list(fp, menu->tagprefix,
-                                  menu->tagprefix ? cur : idx[menu->current]->content, 0);
+                                  menu->tagprefix ? cur : idx[menu->current]->content, false);
         break;
 
       case OP_SAVE:

@@ -2807,7 +2807,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
       case OP_PIPE:
         CHECK_MODE(IsHeader(extra) || IsAttach(extra));
         if (IsAttach(extra))
-          mutt_pipe_attachment_list(extra->fp, 0, extra->bdy, 0);
+          mutt_pipe_attachment_list(extra->fp, 0, extra->bdy, false);
         else
           mutt_pipe_message(extra->hdr);
         break;

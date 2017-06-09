@@ -48,7 +48,7 @@ int mutt_attach_display_loop(struct Menu *menu, int op, FILE *fp, struct Header 
                              struct AttachPtr ***idxp, short *idxlen, short *idxmax, int recv);
 
 void mutt_save_attachment_list(FILE *fp, int tag, struct Body *top, struct Header *hdr, struct Menu *menu);
-void mutt_pipe_attachment_list(FILE *fp, int tag, struct Body *top, int filter);
+void mutt_pipe_attachment_list(FILE *fp, int tag, struct Body *top, bool filter);
 void mutt_print_attachment_list(FILE *fp, int tag, struct Body *top);
 
 void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachPtr **idx, short idxlen, struct Body *cur);
