@@ -906,7 +906,7 @@ int mutt_signed_handler(struct Body *a, struct State *s)
 {
   char tempfile[_POSIX_PATH_MAX];
   int signed_type;
-  int inconsistent = 0;
+  bool inconsistent = false;
 
   struct Body *b = a;
   struct Body **signatures = NULL;
@@ -930,7 +930,7 @@ int mutt_signed_handler(struct Body *a, struct State *s)
   }
 
   if (!(a && a->next))
-    inconsistent = 1;
+    inconsistent = true;
   else
   {
     switch (signed_type)
@@ -938,21 +938,21 @@ int mutt_signed_handler(struct Body *a, struct State *s)
       case SIGN:
         if (a->next->type != TYPEMULTIPART ||
             (ascii_strcasecmp(a->next->subtype, "mixed") != 0))
-          inconsistent = 1;
+          inconsistent = true;
         break;
       case PGPSIGN:
         if (a->next->type != TYPEAPPLICATION ||
             (ascii_strcasecmp(a->next->subtype, "pgp-signature") != 0))
-          inconsistent = 1;
+          inconsistent = true;
         break;
       case SMIMESIGN:
         if (a->next->type != TYPEAPPLICATION ||
             ((ascii_strcasecmp(a->next->subtype, "x-pkcs7-signature") != 0) &&
              (ascii_strcasecmp(a->next->subtype, "pkcs7-signature") != 0)))
-          inconsistent = 1;
+          inconsistent = true;
         break;
       default:
-        inconsistent = 1;
+        inconsistent = true;
     }
   }
   if (inconsistent)
