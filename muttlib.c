@@ -447,11 +447,11 @@ char *_mutt_expand_path(char *s, size_t slen, int rx)
 
   char *tail = "";
 
-  int recurse = 0;
+  bool recurse = false;
 
   do
   {
-    recurse = 0;
+    recurse = false;
 
     switch (*s)
     {
@@ -532,7 +532,7 @@ char *_mutt_expand_path(char *s, size_t slen, int rx)
           mutt_free_header(&h);
           /* Avoid infinite recursion if the resulting folder starts with '@' */
           if (*p != '@')
-            recurse = 1;
+            recurse = true;
 
           tail = "";
         }
