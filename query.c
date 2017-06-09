@@ -198,7 +198,7 @@ static const char *query_format_str(char *dest, size_t destlen, size_t col, int 
   struct Query *query = entry->data;
   char tmp[SHORT_STRING];
   char buf2[STRING] = "";
-  int optional = (flags & MUTT_FORMAT_OPTIONAL);
+  bool optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
 
   switch (op)
   {
@@ -218,7 +218,7 @@ static const char *query_format_str(char *dest, size_t destlen, size_t col, int 
         snprintf(dest, destlen, tmp, NONULL(query->other));
       }
       else if (!query->other || !*query->other)
-        optional = 0;
+        optional = false;
       break;
     case 'n':
       snprintf(tmp, sizeof(tmp), "%%%ss", fmt);
