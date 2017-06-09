@@ -465,7 +465,8 @@ int mutt_is_application_pgp(struct Body *m)
 int mutt_is_application_smime(struct Body *m)
 {
   char *t = NULL;
-  int len, complain = 0;
+  int len;
+  bool complain = false;
 
   if (!m)
     return 0;
@@ -491,7 +492,7 @@ int mutt_is_application_smime(struct Body *m)
        */
       if (ascii_strcasecmp(m->description, "S/MIME Encrypted Message") == 0)
         return SMIMEENCRYPT;
-      complain = 1;
+      complain = true;
     }
     else if (ascii_strcasecmp(m->subtype, "octet-stream") != 0)
       return 0;
