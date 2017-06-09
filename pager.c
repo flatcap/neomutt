@@ -738,7 +738,9 @@ static void resolve_types(char *buf, char *raw, struct Line *lineInfo, int n,
 {
   struct ColorLine *color_line = NULL;
   regmatch_t pmatch[1], smatch[1];
-  int found, offset, null_rx, i;
+  bool found;
+  bool null_rx;
+  int offset, i;
 
   if (n == 0 || ISHEADER(lineInfo[n - 1].type))
   {
@@ -883,8 +885,8 @@ static void resolve_types(char *buf, char *raw, struct Line *lineInfo, int n,
       if (!buf[offset])
         break;
 
-      found = 0;
-      null_rx = 0;
+      found = false;
+      null_rx = false;
       if (lineInfo[n].type == MT_COLOR_HDEFAULT)
         color_line = ColorHdrList;
       else
@@ -901,7 +903,7 @@ static void resolve_types(char *buf, char *raw, struct Line *lineInfo, int n,
                * Yes, this really happened. See #3888 */
               if (lineInfo[n].chunks == SHRT_MAX)
               {
-                null_rx = 0;
+                null_rx = false;
                 break;
               }
               if (++(lineInfo[n].chunks) > 1)
@@ -919,11 +921,11 @@ static void resolve_types(char *buf, char *raw, struct Line *lineInfo, int n,
               (lineInfo[n].syntax)[i].first = pmatch[0].rm_so;
               (lineInfo[n].syntax)[i].last = pmatch[0].rm_eo;
             }
-            found = 1;
-            null_rx = 0;
+            found = true;
+            null_rx = false;
           }
           else
-            null_rx = 1; /* empty regexp; don't add it, but keep looking */
+            null_rx = true; /* empty regexp; don't add it, but keep looking */
         }
         color_line = color_line->next;
       }
@@ -955,8 +957,8 @@ static void resolve_types(char *buf, char *raw, struct Line *lineInfo, int n,
       if (!buf[offset])
         break;
 
-      found = 0;
-      null_rx = 0;
+      found = false;
+      null_rx = false;
       for (color_line = ColorAttachList; color_line; color_line = color_line->next)
       {
         if (regexec(&color_line->rx, buf + offset, 1, pmatch, (offset ? REG_NOTBOL : 0)) == 0)
