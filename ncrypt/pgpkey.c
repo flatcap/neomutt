@@ -140,7 +140,7 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
   struct PgpUid *uid = NULL;
   struct PgpKeyInfo *key = NULL, *pkey = NULL;
   int kflags = 0;
-  int optional = (flags & MUTT_FORMAT_OPTIONAL);
+  bool optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
 
   entry = (struct PgpEntry *) data;
   uid = entry->uid;
@@ -159,7 +159,7 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
     {
       const char *cp = NULL;
       char buf2[SHORT_STRING], *p = NULL;
-      int do_locales;
+      bool do_locales;
       struct tm *tm = NULL;
       size_t len;
 
@@ -168,11 +168,11 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
       cp = src;
       if (*cp == '!')
       {
-        do_locales = 0;
+        do_locales = false;
         cp++;
       }
       else
-        do_locales = 1;
+        do_locales = true;
 
       len = destlen - 1;
       while (len > 0 && *cp != ']')
@@ -254,7 +254,7 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, pgp_flags(kflags));
       }
       else if (!(kflags & (KEYFLAG_RESTRICTIONS)))
-        optional = 0;
+        optional = false;
       break;
     case 'c':
       if (!optional)
@@ -263,7 +263,7 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, pgp_key_abilities(kflags));
       }
       else if (!(kflags & (KEYFLAG_ABILITIES)))
-        optional = 0;
+        optional = false;
       break;
     case 't':
       if (!optional)
@@ -273,7 +273,7 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
       }
       else if (!(uid->trust & 0x03))
         /* undefined trust */
-        optional = 0;
+        optional = false;
       break;
     default:
       *dest = '\0';
