@@ -895,13 +895,13 @@ static int patmatch(const struct Pattern *pat, const char *buf)
     return regexec(pat->p.rx, buf, 0, NULL, 0);
 }
 
-static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
+static bool msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
 {
   struct Message *msg = NULL;
   struct State s;
   FILE *fp = NULL;
   long lng = 0;
-  int match = 0;
+  bool match = false;
   struct Header *h = ctx->hdrs[msgno];
   char *buf = NULL;
   size_t blen;
@@ -926,14 +926,14 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
       if (!s.fpout)
       {
         mutt_perror(_("Error opening memstream"));
-        return 0;
+        return false;
       }
 #else
       mutt_mktemp(tempfile, sizeof(tempfile));
       if ((s.fpout = safe_fopen(tempfile, "w+")) == NULL)
       {
         mutt_perror(tempfile);
-        return 0;
+        return false;
       }
 #endif
 
@@ -956,7 +956,7 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
             unlink(tempfile);
 #endif
           }
-          return 0;
+          return false;
         }
 
         fseeko(msg->fp, h->offset, SEEK_SET);
@@ -973,7 +973,7 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
         if (!fp)
         {
           mutt_perror(_("Error re-opening memstream"));
-          return 0;
+          return false;
         }
       }
       else
@@ -982,7 +982,7 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
         if (!fp)
         {
           mutt_perror(_("Error opening /dev/null"));
-          return 0;
+          return false;
         }
       }
 #else
@@ -1025,7 +1025,7 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
         break; /* don't loop forever */
       if (patmatch(pat, buf) == 0)
       {
-        match = 1;
+        match = true;
         break;
       }
       lng -= mutt_strlen(buf);
