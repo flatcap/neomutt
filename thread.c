@@ -732,7 +732,7 @@ struct MuttThread *mutt_sort_subthreads(struct MuttThread *thread, int init)
   }
 }
 
-static void check_subjects(struct Context *ctx, int init)
+static void check_subjects(struct Context *ctx, bool init)
 {
   struct Header *cur = NULL;
   struct MuttThread *tmp = NULL;
