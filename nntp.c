@@ -69,7 +69,7 @@ static int nntp_connect_error(struct NntpServer *nserv)
 static int nntp_capabilities(struct NntpServer *nserv)
 {
   struct Connection *conn = nserv->conn;
-  unsigned int mode_reader = 0;
+  bool mode_reader = false;
   char buf[LONG_STRING];
   char authinfo[LONG_STRING] = "";
 
@@ -99,7 +99,7 @@ static int nntp_capabilities(struct NntpServer *nserv)
     if (mutt_strcmp("STARTTLS", buf) == 0)
       nserv->hasSTARTTLS = true;
     else if (mutt_strcmp("MODE-READER", buf) == 0)
-      mode_reader = 1;
+      mode_reader = true;
     else if (mutt_strcmp("READER", buf) == 0)
     {
       nserv->hasDATE = true;
