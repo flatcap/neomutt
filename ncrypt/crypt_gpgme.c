@@ -1328,7 +1328,8 @@ static void print_smime_keyinfo(const char *msg, gpgme_signature_t sig,
 {
   int msgwid;
   gpgme_user_id_t uids = NULL;
-  int i, aka = 0;
+  int i;
+  bool aka = false;
 
   state_puts(msg, s);
   state_puts(" ", s);
@@ -1351,7 +1352,7 @@ static void print_smime_keyinfo(const char *msg, gpgme_signature_t sig,
       state_puts(uids->uid, s);
       state_puts("\n", s);
 
-      aka = 1;
+      aka = true;
     }
   }
   else
