@@ -204,7 +204,8 @@ static void resolve_color(struct Line *lineInfo, int n, int cnt, int flags,
   int def_color;         /* color without syntax highlight */
   int color;             /* final color */
   static int last_color; /* last color set */
-  int search = 0, i, m;
+  bool search = false;
+  int i, m;
 
   if (!cnt)
     last_color = -1; /* force attrset() */
@@ -276,7 +277,7 @@ static void resolve_color(struct Line *lineInfo, int n, int cnt, int flags,
       if (cnt != (lineInfo[m].search)[i].last)
       {
         color = ColorDefs[MT_COLOR_SEARCH];
-        search = 1;
+        search = true;
         break;
       }
     }
