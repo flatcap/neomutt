@@ -1697,13 +1697,13 @@ static int count_body_parts(struct Body *body, int flags)
 
 int mutt_count_body_parts(struct Context *ctx, struct Header *hdr)
 {
-  short keep_parts = 0;
+  bool keep_parts = false;
 
   if (hdr->attach_valid)
     return hdr->attach_total;
 
   if (hdr->content->parts)
-    keep_parts = 1;
+    keep_parts = true;
   else
     mutt_parse_mime_message(ctx, hdr);
 
