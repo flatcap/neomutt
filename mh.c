@@ -1720,7 +1720,7 @@ static int mh_rewrite_message(struct Context *ctx, int msgno)
   struct Message *dest = NULL;
 
   int rc;
-  short restore = 1;
+  bool restore = true;
   char oldpath[_POSIX_PATH_MAX];
   char newpath[_POSIX_PATH_MAX];
   char partpath[_POSIX_PATH_MAX];
@@ -1747,7 +1747,7 @@ static int mh_rewrite_message(struct Context *ctx, int msgno)
     if (rc == 0)
     {
       unlink(oldpath);
-      restore = 0;
+      restore = false;
     }
 
     /*
