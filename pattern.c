@@ -520,8 +520,8 @@ static bool eat_date(struct Pattern *pat, struct Buffer *s, struct Buffer *err)
 static bool eat_range(struct Pattern *pat, struct Buffer *s, struct Buffer *err)
 {
   char *tmp = NULL;
-  int do_exclusive = 0;
-  int skip_quote = 0;
+  bool do_exclusive = false;
+  bool skip_quote = false;
 
   /*
    * If simple_search is set to "~m %s", the range will have double quotes
@@ -530,10 +530,10 @@ static bool eat_range(struct Pattern *pat, struct Buffer *s, struct Buffer *err)
   if (*s->dptr == '"')
   {
     s->dptr++;
-    skip_quote = 1;
+    skip_quote = true;
   }
   if (*s->dptr == '<')
-    do_exclusive = 1;
+    do_exclusive = true;
   if ((*s->dptr != '-') && (*s->dptr != '<'))
   {
     /* range minimum */
