@@ -1388,7 +1388,8 @@ static int show_one_sig_status(gpgme_ctx_t ctx, int idx, struct State *s)
 {
   const char *fpr = NULL;
   gpgme_key_t key = NULL;
-  int i, anybad = 0, anywarn = 0;
+  int i;
+  bool anybad = false, anywarn = false;
   unsigned int sum;
   gpgme_verify_result_t result;
   gpgme_signature_t sig;
@@ -1417,7 +1418,7 @@ static int show_one_sig_status(gpgme_ctx_t ctx, int idx, struct State *s)
     sum = sig->summary;
 
     if (gpg_err_code(sig->status) != GPG_ERR_NO_ERROR)
-      anybad = 1;
+      anybad = true;
 
     if (gpg_err_code(sig->status) != GPG_ERR_NO_PUBKEY)
     {
@@ -1446,13 +1447,13 @@ static int show_one_sig_status(gpgme_ctx_t ctx, int idx, struct State *s)
                _("Error getting key information for KeyID %s: %s\n"), fpr,
                gpgme_strerror(err));
       state_puts(buf, s);
-      anybad = 1;
+      anybad = true;
     }
     else if ((sum & GPGME_SIGSUM_GREEN))
     {
       print_smime_keyinfo(_("Good signature from:"), sig, key, s);
       if (show_sig_summary(sum, ctx, key, idx, s, sig))
-        anywarn = 1;
+        anywarn = true;
       show_one_sig_validity(ctx, idx, s);
     }
     else if ((sum & GPGME_SIGSUM_RED))
@@ -1469,7 +1470,7 @@ static int show_one_sig_status(gpgme_ctx_t ctx, int idx, struct State *s)
       show_one_sig_validity(ctx, idx, s);
       show_fingerprint(key, s);
       if (show_sig_summary(sum, ctx, key, idx, s, sig))
-        anywarn = 1;
+        anywarn = true;
     }
     else /* can't decide (yellow) */
     {
@@ -1485,7 +1486,7 @@ static int show_one_sig_status(gpgme_ctx_t ctx, int idx, struct State *s)
         state_puts("\n", s);
       }
       show_sig_summary(sum, ctx, key, idx, s, sig);
-      anywarn = 1;
+      anywarn = true;
     }
 
     if (key != signature_key)
