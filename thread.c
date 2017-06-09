@@ -604,11 +604,12 @@ static int compare_threads(const void *a, const void *b)
   }
 }
 
-struct MuttThread *mutt_sort_subthreads(struct MuttThread *thread, int init)
+struct MuttThread *mutt_sort_subthreads(struct MuttThread *thread, bool init)
 {
   struct MuttThread **array = NULL, *sort_key = NULL, *top = NULL, *tmp = NULL;
   struct Header *oldsort_key = NULL;
-  int i, array_size, sort_top = 0;
+  int i, array_size;
+  bool sort_top = false;
 
   /* we put things into the array backwards to save some cycles,
    * but we want to have to move less stuff around if we're
@@ -631,7 +632,7 @@ struct MuttThread *mutt_sort_subthreads(struct MuttThread *thread, int init)
       if (thread->parent)
         thread->parent->sort_children = true;
       else
-        sort_top = 1;
+        sort_top = true;
     }
 
     if (thread->child)
@@ -716,7 +717,7 @@ struct MuttThread *mutt_sort_subthreads(struct MuttThread *thread, int init)
             if (thread->parent)
               thread->parent->sort_children = true;
             else
-              sort_top = 1;
+              sort_top = true;
           }
         }
       }
