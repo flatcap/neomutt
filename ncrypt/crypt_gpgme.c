@@ -1645,7 +1645,7 @@ int smime_gpgme_verify_one(struct Body *sigbdy, struct State *s, const char *tem
    encrypted and signed message, for S/MIME it returns true when it is
    not a encrypted but a signed message.  */
 static struct Body *decrypt_part(struct Body *a, struct State *s, FILE *fpout,
-                                 int is_smime, int *r_is_signed)
+                                 bool is_smime, int *r_is_signed)
 {
   if (!a || !s || !fpout)
     return NULL;
@@ -1657,7 +1657,7 @@ static struct Body *decrypt_part(struct Body *a, struct State *s, FILE *fpout,
   gpgme_data_t ciphertext, plaintext;
   bool maybe_signed = false;
   bool anywarn = false;
-  int sig_stat = 0;
+  bool sig_stat = false;
 
   if (r_is_signed)
     *r_is_signed = 0;
@@ -1684,7 +1684,7 @@ restart:
       /* Check whether signatures have been verified.  */
       gpgme_verify_result_t verify_result = gpgme_op_verify_result(ctx);
       if (verify_result->signatures)
-        sig_stat = 1;
+        sig_stat = true;
     }
   }
   else
@@ -1854,7 +1854,7 @@ int pgp_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body
   }
   unlink(tempfile);
 
-  if ((*cur = decrypt_part(b, &s, *fpout, 0, &is_signed)) == NULL)
+  if ((*cur = decrypt_part(b, &s, *fpout, false, &is_signed)) == NULL)
     rv = -1;
   rewind(*fpout);
   if (is_signed > 0)
@@ -1926,7 +1926,7 @@ int smime_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Bo
   }
   mutt_unlink(tempfile);
 
-  *cur = decrypt_part(b, &s, *fpout, 1, &is_signed);
+  *cur = decrypt_part(b, &s, *fpout, true, &is_signed);
   if (*cur)
     (*cur)->goodsig = is_signed > 0;
   b->type = saved_b_type;
@@ -1981,7 +1981,7 @@ int smime_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Bo
     }
     mutt_unlink(tempfile);
 
-    tmp_b = decrypt_part(bb, &s, *fpout, 1, &is_signed);
+    tmp_b = decrypt_part(bb, &s, *fpout, true, &is_signed);
     if (tmp_b)
       tmp_b->goodsig = is_signed > 0;
     bb->type = saved_b_type;
@@ -2582,7 +2582,7 @@ int pgp_gpgme_encrypted_handler(struct Body *a, struct State *s)
     return -1;
   }
 
-  tattach = decrypt_part(a, s, fpout, 0, &is_signed);
+  tattach = decrypt_part(a, s, fpout, false, &is_signed);
   if (tattach)
   {
     tattach->goodsig = is_signed > 0;
@@ -2657,7 +2657,7 @@ int smime_gpgme_application_handler(struct Body *a, struct State *s)
     return -1;
   }
 
-  tattach = decrypt_part(a, s, fpout, 1, &is_signed);
+  tattach = decrypt_part(a, s, fpout, true, &is_signed);
   if (tattach)
   {
     tattach->goodsig = is_signed > 0;
