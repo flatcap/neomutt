@@ -1995,7 +1995,7 @@ int smime_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Bo
   return *cur ? 0 : -1;
 }
 
-static int pgp_gpgme_extract_keys(gpgme_data_t keydata, FILE **fp, int dryrun)
+static int pgp_gpgme_extract_keys(gpgme_data_t keydata, FILE **fp, bool dryrun)
 {
   /* there's no side-effect free way to view key data in GPGME,
    * so we import the key into a temporary keyring */
@@ -2010,7 +2010,7 @@ static int pgp_gpgme_extract_keys(gpgme_data_t keydata, FILE **fp, int dryrun)
   const char *shortid = NULL;
   int len;
   char date[STRING];
-  int more;
+  bool more;
   int rc = -1;
   time_t tt;
 
@@ -2069,7 +2069,7 @@ static int pgp_gpgme_extract_keys(gpgme_data_t keydata, FILE **fp, int dryrun)
       break;
     uid = key->uids;
     subkey = key->subkeys;
-    more = 0;
+    more = false;
     while (subkey)
     {
       shortid = subkey->keyid;
@@ -2086,7 +2086,7 @@ static int pgp_gpgme_extract_keys(gpgme_data_t keydata, FILE **fp, int dryrun)
         fprintf(*fp, "sub %5.5s %d/%8s %s\n", gpgme_pubkey_algo_name(subkey->pubkey_algo),
                 subkey->length, shortid, date);
       subkey = subkey->next;
-      more = 1;
+      more = true;
     }
     gpgme_key_unref(key);
   }
@@ -2234,7 +2234,7 @@ void pgp_gpgme_invoke_import(const char *fname)
     return;
   }
 
-  if (pgp_gpgme_extract_keys(keydata, &out, 0))
+  if (pgp_gpgme_extract_keys(keydata, &out, false))
   {
     mutt_error(_("Error extracting key data!\n"));
     mutt_sleep(1);
@@ -2386,7 +2386,7 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
       /* Invoke PGP if needed */
       if (pgp_keyblock)
       {
-        pgp_gpgme_extract_keys(armored_data, &pgpout, 1);
+        pgp_gpgme_extract_keys(armored_data, &pgpout, true);
       }
       else if (!clearsign || (s->flags & MUTT_VERIFY))
       {
