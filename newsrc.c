@@ -651,7 +651,7 @@ header_cache_t *nntp_hcache_open(struct NntpData *nntp_data)
 void nntp_hcache_update(struct NntpData *nntp_data, header_cache_t *hc)
 {
   char buf[16];
-  int old = 0;
+  bool old = false;
   void *hdata = NULL;
   anum_t first, last, current;
 
@@ -665,7 +665,7 @@ void nntp_hcache_update(struct NntpData *nntp_data, header_cache_t *hc)
     mutt_debug(2, "nntp_hcache_update: mutt_hcache_fetch index: %s\n", (char *) hdata);
     if (sscanf(hdata, ANUM " " ANUM, &first, &last) == 2)
     {
-      old = 1;
+      old = true;
       nntp_data->lastCached = last;
 
       /* clean removed headers from cache */
