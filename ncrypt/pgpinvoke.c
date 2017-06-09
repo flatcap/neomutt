@@ -60,7 +60,7 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
 {
   char fmt[16];
   struct PgpCommandContext *cctx = (struct PgpCommandContext *) data;
-  int optional = (flags & MUTT_FORMAT_OPTIONAL);
+  bool optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
 
   switch (op)
   {
@@ -72,7 +72,7 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->ids));
       }
       else if (!cctx->ids)
-        optional = 0;
+        optional = false;
       break;
     }
 
@@ -84,7 +84,7 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->signas));
       }
       else if (!cctx->signas)
-        optional = 0;
+        optional = false;
       break;
     }
 
@@ -96,7 +96,7 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->sig_fname));
       }
       else if (!cctx->sig_fname)
-        optional = 0;
+        optional = false;
       break;
     }
 
@@ -108,7 +108,7 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->fname));
       }
       else if (!cctx->fname)
-        optional = 0;
+        optional = false;
       break;
     }
 
@@ -120,7 +120,7 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, cctx->need_passphrase ? "PGPPASSFD=0" : "");
       }
       else if (!cctx->need_passphrase || pgp_use_gpg_agent())
-        optional = 0;
+        optional = false;
       break;
     }
     default:
