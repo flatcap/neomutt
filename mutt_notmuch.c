@@ -2198,7 +2198,8 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
   time_t mtime = 0;
   notmuch_query_t *q = NULL;
   notmuch_messages_t *msgs = NULL;
-  int i, limit, occult = 0, new_flags = 0;
+  int i, limit, new_flags = 0;
+  bool occult = false;
 
   if (!data || (get_database_mtime(data, &mtime) != 0))
     return -1;
@@ -2282,7 +2283,7 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
   {
     if (!ctx->hdrs[i]->active)
     {
-      occult = 1;
+      occult = true;
       break;
     }
   }
