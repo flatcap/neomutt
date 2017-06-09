@@ -69,7 +69,8 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
                                      unsigned long data, format_flag flags)
 {
   char fmt[SHORT_STRING], tmp[SHORT_STRING], *cp = NULL;
-  int count, optional = (flags & MUTT_FORMAT_OPTIONAL);
+  int count;
+  bool optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
   struct Menu *menu = (struct Menu *) data;
 
   *buf = 0;
@@ -82,7 +83,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, mutt_buffy_check(false));
       }
       else if (!mutt_buffy_check(false))
-        optional = 0;
+        optional = false;
       break;
 
     case 'd':
@@ -92,7 +93,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->deleted : 0);
       }
       else if (!Context || !Context->deleted)
-        optional = 0;
+        optional = false;
       break;
 
     case 'f':
@@ -130,7 +131,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->flagged : 0);
       }
       else if (!Context || !Context->flagged)
-        optional = 0;
+        optional = false;
       break;
 
     case 'h':
@@ -146,7 +147,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, tmp);
       }
       else if (!Context || !Context->size)
-        optional = 0;
+        optional = false;
       break;
 
     case 'L':
@@ -157,7 +158,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, tmp);
       }
       else if (!Context || !Context->pattern)
-        optional = 0;
+        optional = false;
       break;
 
     case 'm':
@@ -167,7 +168,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->msgcount : 0);
       }
       else if (!Context || !Context->msgcount)
-        optional = 0;
+        optional = false;
       break;
 
     case 'M':
@@ -177,7 +178,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->vcount : 0);
       }
       else if (!Context || !Context->pattern)
-        optional = 0;
+        optional = false;
       break;
 
     case 'n':
@@ -187,7 +188,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->new : 0);
       }
       else if (!Context || !Context->new)
-        optional = 0;
+        optional = false;
       break;
 
     case 'o':
@@ -197,7 +198,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->unread - Context->new : 0);
       }
       else if (!Context || !(Context->unread - Context->new))
-        optional = 0;
+        optional = false;
       break;
 
     case 'p':
@@ -208,7 +209,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, count);
       }
       else if (!count)
-        optional = 0;
+        optional = false;
       break;
 
     case 'P':
@@ -269,7 +270,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->tagged : 0);
       }
       else if (!Context || !Context->tagged)
-        optional = 0;
+        optional = false;
       break;
 
     case 'u':
@@ -279,7 +280,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->unread : 0);
       }
       else if (!Context || !Context->unread)
-        optional = 0;
+        optional = false;
       break;
 
     case 'v':
@@ -294,7 +295,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, (Context && Context->pattern) ? Context->pattern : "");
       }
       else if (!Context || !Context->pattern)
-        optional = 0;
+        optional = false;
       break;
 
     case 0:
