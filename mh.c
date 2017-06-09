@@ -270,10 +270,10 @@ static bool mh_valid_message(const char *s)
  * check_stats: if true, also count total, new, and flagged messages.
  * Returns 1 if the mailbox has new mail.
  */
-int mh_buffy(struct Buffy *mailbox, int check_stats)
+int mh_buffy(struct Buffy *mailbox, bool check_stats)
 {
   struct MhSequences mhs;
-  int check_new = 1;
+  bool check_new = true;
   int rc = 0;
   DIR *dirp = NULL;
   struct dirent *de = NULL;
@@ -283,7 +283,7 @@ int mh_buffy(struct Buffy *mailbox, int check_stats)
   if (option(OPTMAILCHECKRECENT) && mh_sequences_changed(mailbox) <= 0)
   {
     rc = 0;
-    check_new = 0;
+    check_new = false;
   }
 
   if (!(check_new || check_stats))
@@ -320,7 +320,7 @@ int mh_buffy(struct Buffy *mailbox, int check_stats)
         /* Because we are traversing from high to low, we can stop
          * checking for new mail after the first unseen message.
          * Whether it resulted in "new mail" or not. */
-        check_new = 0;
+        check_new = false;
         if (!check_stats)
           break;
       }

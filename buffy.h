@@ -73,6 +73,6 @@ void mutt_buffy_cleanup(const char *buf, struct stat *st);
 /* mark mailbox just left as already notified */
 void mutt_buffy_setnotified(const char *path);
 
-int mh_buffy(struct Buffy *mailbox, int check_stats);
+int mh_buffy(struct Buffy *mailbox, bool check_stats);
 
 #endif /* _MUTT_BUFFY_H */
