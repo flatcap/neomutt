@@ -1265,25 +1265,25 @@ static int has_recips(struct Address *a)
   return c;
 }
 
-static int mutt_search_attach_keyword(char *filename)
+static bool mutt_search_attach_keyword(char *filename)
 {
   /* Search for the regex in AttachKeyword within a file */
   if (!AttachKeyword.rx)
-    return 0;
+    return false;
 
   FILE *attf = safe_fopen(filename, "r");
   if (!attf)
-    return 0;
+    return false;
 
   char *inputline = safe_malloc(LONG_STRING);
-  int found = 0;
+  bool found = false;
   while (!feof(attf))
   {
     fgets(inputline, LONG_STRING, attf);
     if (regexec(QuoteRegexp.rx, inputline, 0, NULL, 0) != 0 &&
         regexec(AttachKeyword.rx, inputline, 0, NULL, 0) == 0)
     {
-      found = 1;
+      found = true;
       break;
     }
   }
