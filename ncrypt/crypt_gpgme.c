@@ -3845,12 +3845,13 @@ static struct CryptKeyinfo *crypt_select_key(struct CryptKeyinfo *keys,
   int keymax;
   struct CryptKeyinfo **key_table = NULL;
   struct Menu *menu = NULL;
-  int i, done = 0;
+  int i;
+  bool done = false;
   char helpstr[LONG_STRING], buf[LONG_STRING];
   struct CryptKeyinfo *k = NULL;
   int (*f)(const void *, const void *);
   int menu_to_use = 0;
-  int unusable = 0;
+  bool unusable = false;
 
   *forced_valid = 0;
 
@@ -3861,7 +3862,7 @@ static struct CryptKeyinfo *crypt_select_key(struct CryptKeyinfo *keys,
   {
     if (!option(OPTPGPSHOWUNUSABLE) && (k->flags & KEYFLAG_CANTUSE))
     {
-      unusable = 1;
+      unusable = true;
       continue;
     }
 
@@ -4016,12 +4017,12 @@ static struct CryptKeyinfo *crypt_select_key(struct CryptKeyinfo *keys,
         }
 
         k = crypt_copy_key(key_table[menu->current]);
-        done = 1;
+        done = true;
         break;
 
       case OP_EXIT:
         k = NULL;
-        done = 1;
+        done = true;
         break;
     }
   }
@@ -4325,11 +4326,11 @@ static char *find_keys(struct Address *adrlist, unsigned int app, int oppenc_mod
   char buf[LONG_STRING];
   int forced_valid;
   int r;
-  int key_selected;
+  bool key_selected;
 
   for (p = adrlist; p; p = p->next)
   {
-    key_selected = 0;
+    key_selected = false;
     crypt_hook_list = crypt_hook = mutt_crypt_hook(p);
     do
     {
@@ -4416,7 +4417,7 @@ static char *find_keys(struct Address *adrlist, unsigned int app, int oppenc_mod
               keyID, forced_valid ? "!" : "");
       keylist_used = mutt_strlen(keylist);
 
-      key_selected = 1;
+      key_selected = true;
 
       crypt_free_key(&k_info);
       rfc822_free_address(&addr);
