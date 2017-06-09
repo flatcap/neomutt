@@ -1379,7 +1379,8 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **lineInfo, int n
   size_t buflen = 0;
   unsigned char *buf_ptr = buf;
   int ch, vch, col, cnt, b_read;
-  int buf_ready = 0, change_last = 0;
+  int buf_ready = 0;
+  bool change_last = false;
   int special;
   int offset;
   int def_color;
@@ -1391,7 +1392,7 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **lineInfo, int n
   if (n == *last)
   {
     (*last)++;
-    change_last = 1;
+    change_last = true;
   }
 
   if (*last == *max)
