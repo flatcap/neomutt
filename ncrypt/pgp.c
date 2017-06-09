@@ -314,9 +314,11 @@ static void pgp_copy_clearsigned(FILE *fpin, struct State *s, char *charset)
 /* Support for the Application/PGP Content Type. */
 int pgp_application_pgp_handler(struct Body *m, struct State *s)
 {
-  int could_not_decrypt = 0;
-  int needpass = -1, pgp_keyblock = 0;
-  int clearsign = 0, rv, rc;
+  bool could_not_decrypt = false;
+  int needpass = -1;
+  bool pgp_keyblock = false;
+  bool clearsign = false;
+  int rv, rc;
   int c = 1; /* silence GCC warning */
   long bytes;
   LOFF_T last_pos, offset;
@@ -327,8 +329,8 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
   FILE *tmpfp = NULL;
   pid_t thepid;
 
-  short maybe_goodsig = 1;
-  short have_any_sigs = 0;
+  bool maybe_goodsig = true;
+  bool have_any_sigs = false;
 
   char *gpgcharset = NULL;
   char body_charset[STRING];
@@ -350,19 +352,19 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
 
     if (mutt_strncmp("-----BEGIN PGP ", buf, 15) == 0)
     {
-      clearsign = 0;
+      clearsign = false;
 
       if (mutt_strcmp("MESSAGE-----\n", buf + 15) == 0)
         needpass = 1;
       else if (mutt_strcmp("SIGNED MESSAGE-----\n", buf + 15) == 0)
       {
-        clearsign = 1;
+        clearsign = true;
         needpass = 0;
       }
       else if (mutt_strcmp("PUBLIC KEY BLOCK-----\n", buf + 15) == 0)
       {
         needpass = 0;
-        pgp_keyblock = 1;
+        pgp_keyblock = true;
       }
       else
       {
@@ -429,7 +431,7 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
                                         -1, tmpfname, needpass)) == -1)
         {
           safe_fclose(&pgpout);
-          maybe_goodsig = 0;
+          maybe_goodsig = false;
           pgpin = NULL;
           pgperr = NULL;
           state_attach_puts(
@@ -460,7 +462,7 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
           if (s->flags & MUTT_DISPLAY)
           {
             if (rc == 0)
-              have_any_sigs = 1;
+              have_any_sigs = true;
             /*
              * Sig is bad if
              * gpg_good_sign-pattern did not match || pgp_decode_command returned not 0
@@ -468,7 +470,7 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
              *  gpg_good_sign="" && pgp_decode_command returned 0
              */
             if (rc == -1 || rv)
-              maybe_goodsig = 0;
+              maybe_goodsig = false;
 
             state_attach_puts(_("[-- End of PGP output --]\n\n"), s);
           }
@@ -486,7 +488,7 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
         }
         if (!clearsign && (!pgpout || c == EOF))
         {
-          could_not_decrypt = 1;
+          could_not_decrypt = true;
           pgp_void_passphrase();
         }
 
