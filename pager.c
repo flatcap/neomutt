@@ -1973,7 +1973,8 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
   char tmphelp[SHORT_STRING * 2];
   int i, ch = 0, rc = -1;
   int err, first = 1;
-  int r = -1, wrapped = 0, searchctx = 0;
+  int r = -1, searchctx = 0;
+  bool wrapped = false;
 
   struct Menu *pager_menu = NULL;
   int old_PagerIndexLines; /* some people want to resize it
@@ -2099,7 +2100,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
     }
     mutt_curs_set(1);
 
-    int do_new_mail = 0;
+    bool do_new_mail = false;
 
     if (Context && !option(OPTATTACHMSG))
     {
@@ -2129,7 +2130,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
             if (h && !h->read)
             {
               mutt_message(_("New mail in this mailbox."));
-              do_new_mail = 1;
+              do_new_mail = true;
               break;
             }
           }
@@ -2321,7 +2322,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
       case OP_SEARCH_OPPOSITE:
         if (rd.SearchCompiled)
         {
-          wrapped = 0;
+          wrapped = false;
 
           if (SearchContext > 0 && SearchContext < rd.pager_window->rows)
             searchctx = SearchContext;
@@ -2347,7 +2348,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
             else
             {
               mutt_message(_("Search wrapped to top."));
-              wrapped = 1;
+              wrapped = true;
               goto search_next;
             }
           }
@@ -2368,7 +2369,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
             else
             {
               mutt_message(_("Search wrapped to bottom."));
-              wrapped = 1;
+              wrapped = true;
               goto search_next;
             }
           }
@@ -2404,7 +2405,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
             else
               ch = OP_SEARCH_OPPOSITE;
 
-            wrapped = 0;
+            wrapped = false;
             goto search_next;
           }
         }
