@@ -1209,13 +1209,13 @@ char *pgp_find_keys(struct Address *adrlist, int oppenc_mode)
   struct PgpKeyInfo *k_info = NULL;
   char buf[LONG_STRING];
   int r;
-  int key_selected;
+  bool key_selected;
 
   const char *fqdn = mutt_fqdn(1);
 
   for (p = adrlist; p; p = p->next)
   {
-    key_selected = 0;
+    key_selected = false;
     crypt_hook_list = crypt_hook = mutt_crypt_hook(p);
     do
     {
@@ -1297,7 +1297,7 @@ char *pgp_find_keys(struct Address *adrlist, int oppenc_mode)
       sprintf(keylist + keylist_used, "%s0x%s", keylist_used ? " " : "", keyID);
       keylist_used = mutt_strlen(keylist);
 
-      key_selected = 1;
+      key_selected = true;
 
       pgp_free_key(&k_info);
       rfc822_free_address(&addr);
