@@ -89,7 +89,7 @@ static int get_color(int index, unsigned char *s)
   return 0;
 }
 
-static void print_enriched_string(int index, int attr, unsigned char *s, int do_color)
+static void print_enriched_string(int index, int attr, unsigned char *s, bool do_color)
 {
   wchar_t wc;
   size_t k;
@@ -396,7 +396,7 @@ void menu_redraw_motion(struct Menu *menu)
       menu_pad_string(menu, buf, sizeof(buf));
       mutt_window_move(menu->indexwin, menu->oldcurrent + menu->offset - menu->top, 3);
       print_enriched_string(menu->oldcurrent, menu->color(menu->oldcurrent),
-                            (unsigned char *) buf, 1);
+                            (unsigned char *) buf, true);
     }
 
     /* now draw it in the new location */
@@ -409,7 +409,7 @@ void menu_redraw_motion(struct Menu *menu)
     menu_make_entry(buf, sizeof(buf), menu, menu->oldcurrent);
     menu_pad_string(menu, buf, sizeof(buf));
     print_enriched_string(menu->oldcurrent, menu->color(menu->oldcurrent),
-                          (unsigned char *) buf, 1);
+                          (unsigned char *) buf, true);
 
     /* now draw the new one to reflect the change */
     menu_make_entry(buf, sizeof(buf), menu, menu->current);
@@ -417,7 +417,7 @@ void menu_redraw_motion(struct Menu *menu)
     SETCOLOR(MT_COLOR_INDICATOR);
     mutt_window_move(menu->indexwin, menu->current + menu->offset - menu->top, 0);
     print_enriched_string(menu->current, menu->color(menu->current),
-                          (unsigned char *) buf, 0);
+                          (unsigned char *) buf, false);
   }
   menu->redraw &= REDRAW_STATUS;
   NORMAL_COLOR;
@@ -439,10 +439,10 @@ void menu_redraw_current(struct Menu *menu)
     ATTRSET(attr);
     addch(' ');
     menu_pad_string(menu, buf, sizeof(buf));
-    print_enriched_string(menu->current, attr, (unsigned char *) buf, 1);
+    print_enriched_string(menu->current, attr, (unsigned char *) buf, true);
   }
   else
-    print_enriched_string(menu->current, attr, (unsigned char *) buf, 0);
+    print_enriched_string(menu->current, attr, (unsigned char *) buf, false);
   menu->redraw &= REDRAW_STATUS;
   NORMAL_COLOR;
 }
