@@ -2732,7 +2732,7 @@ static const char *crypt_entry_fmt(char *dest, size_t destlen, size_t col, int c
   struct CryptEntry *entry = NULL;
   struct CryptKeyinfo *key = NULL;
   int kflags = 0;
-  int optional = (flags & MUTT_FORMAT_OPTIONAL);
+  bool optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
   const char *s = NULL;
   unsigned long val;
 
@@ -2751,7 +2751,7 @@ static const char *crypt_entry_fmt(char *dest, size_t destlen, size_t col, int c
     {
       const char *cp = NULL;
       char buf2[SHORT_STRING], *p = NULL;
-      int do_locales;
+      bool do_locales;
       struct tm *tm = NULL;
       size_t len;
 
@@ -2760,11 +2760,11 @@ static const char *crypt_entry_fmt(char *dest, size_t destlen, size_t col, int c
       cp = src;
       if (*cp == '!')
       {
-        do_locales = 0;
+        do_locales = false;
         cp++;
       }
       else
-        do_locales = 1;
+        do_locales = true;
 
       len = destlen - 1;
       while (len > 0 && *cp != ']')
@@ -2863,7 +2863,7 @@ static const char *crypt_entry_fmt(char *dest, size_t destlen, size_t col, int c
         snprintf(dest, destlen, fmt, crypt_flags(kflags));
       }
       else if (!(kflags & (KEYFLAG_RESTRICTIONS)))
-        optional = 0;
+        optional = false;
       break;
     case 'c':
       if (!optional)
@@ -2872,7 +2872,7 @@ static const char *crypt_entry_fmt(char *dest, size_t destlen, size_t col, int c
         snprintf(dest, destlen, fmt, crypt_key_abilities(kflags));
       }
       else if (!(kflags & (KEYFLAG_ABILITIES)))
-        optional = 0;
+        optional = false;
       break;
     case 't':
       if ((kflags & KEYFLAG_ISX509))
