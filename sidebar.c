@@ -134,7 +134,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
                                  unsigned long data, format_flag flags)
 {
   struct SbEntry *sbe = (struct SbEntry *) data;
-  unsigned int optional;
+  bool optional;
   char fmt[STRING];
 
   if (!sbe || !dest)
@@ -148,7 +148,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
 
   int c = Context && (mutt_strcmp(Context->realpath, b->realpath) == 0);
 
-  optional = flags & MUTT_FORMAT_OPTIONAL;
+  optional = ((flags & MUTT_FORMAT_OPTIONAL) == MUTT_FORMAT_OPTIONAL);
 
   switch (op)
   {
@@ -163,7 +163,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, c ? Context->deleted : 0);
       }
       else if ((c && Context->deleted == 0) || !c)
-        optional = 0;
+        optional = false;
       break;
 
     case 'F':
@@ -173,7 +173,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->msg_flagged);
       }
       else if (b->msg_flagged == 0)
-        optional = 0;
+        optional = false;
       break;
 
     case 'L':
@@ -183,7 +183,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, c ? Context->vcount : b->msg_count);
       }
       else if ((c && Context->vcount == b->msg_count) || !c)
-        optional = 0;
+        optional = false;
       break;
 
     case 'N':
@@ -193,7 +193,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->msg_unread);
       }
       else if (b->msg_unread == 0)
-        optional = 0;
+        optional = false;
       break;
 
     case 'n':
@@ -203,7 +203,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->new ? 'N' : ' ');
       }
       else if (b->new == false)
-        optional = 0;
+        optional = false;
       break;
 
     case 'S':
@@ -213,7 +213,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->msg_count);
       }
       else if (b->msg_count == 0)
-        optional = 0;
+        optional = false;
       break;
 
     case 't':
@@ -223,7 +223,7 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, c ? Context->tagged : 0);
       }
       else if ((c && Context->tagged == 0) || !c)
-        optional = 0;
+        optional = false;
       break;
 
     case '!':
