@@ -319,7 +319,7 @@ static int buffy_mbox_check(struct Buffy *mailbox, struct stat *sb, int check_st
   return rc;
 }
 
-static void buffy_check(struct Buffy *tmp, struct stat *contex_sb, int check_stats)
+static void buffy_check(struct Buffy *tmp, struct stat *contex_sb, bool check_stats)
 {
   struct stat sb;
 #ifdef USE_SIDEBAR
