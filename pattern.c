@@ -759,7 +759,7 @@ static int eat_range_by_regexp(struct Pattern *pat, struct Buffer *s, int kind,
 
 static bool eat_message_range(struct Pattern *pat, struct Buffer *s, struct Buffer *err)
 {
-  int skip_quote = 0;
+  bool skip_quote = false;
 
   /* We need a Context for pretty much anything. */
   if (!Context)
@@ -775,7 +775,7 @@ static bool eat_message_range(struct Pattern *pat, struct Buffer *s, struct Buff
   if (*s->dptr == '"')
   {
     s->dptr++;
-    skip_quote = 1;
+    skip_quote = true;
   }
 
   for (int i_kind = 0; i_kind != RANGE_K_INVALID; ++i_kind)
