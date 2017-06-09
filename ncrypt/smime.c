@@ -802,7 +802,7 @@ static void _smime_getkeys(char *mailbox)
 void smime_getkeys(struct Envelope *env)
 {
   struct Address *t = NULL;
-  int found = 0;
+  bool found = false;
 
   if (option(OPTSDEFAULTDECRYPTKEY) && SmimeDefaultKey && *SmimeDefaultKey)
   {
@@ -817,13 +817,13 @@ void smime_getkeys(struct Envelope *env)
   for (t = env->to; !found && t; t = t->next)
     if (mutt_addr_is_user(t))
     {
-      found = 1;
+      found = true;
       _smime_getkeys(t->mailbox);
     }
   for (t = env->cc; !found && t; t = t->next)
     if (mutt_addr_is_user(t))
     {
-      found = 1;
+      found = true;
       _smime_getkeys(t->mailbox);
     }
   if (!found && (t = mutt_default_from()))
