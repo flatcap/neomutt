@@ -445,7 +445,8 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
   int keymax;
   struct PgpUid **KeyTable = NULL;
   struct Menu *menu = NULL;
-  int i, done = 0;
+  int i;
+  bool done = false;
   char helpstr[LONG_STRING], buf[LONG_STRING], tmpbuf[STRING];
   char cmd[LONG_STRING], tempfile[_POSIX_PATH_MAX];
   FILE *fp = NULL, *devnull = NULL;
@@ -454,7 +455,7 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
   struct PgpUid *a = NULL;
   int (*f)(const void *, const void *);
 
-  int unusable = 0;
+  bool unusable = false;
 
   keymax = 0;
   KeyTable = NULL;
@@ -463,7 +464,7 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
   {
     if (!option(OPTPGPSHOWUNUSABLE) && (kp->flags & KEYFLAG_CANTUSE))
     {
-      unusable = 1;
+      unusable = true;
       continue;
     }
 
@@ -471,7 +472,7 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
     {
       if (!option(OPTPGPSHOWUNUSABLE) && (a->flags & KEYFLAG_CANTUSE))
       {
-        unusable = 1;
+        unusable = true;
         continue;
       }
 
@@ -631,13 +632,13 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
         }
 
         kp = KeyTable[menu->current]->parent;
-        done = 1;
+        done = true;
         break;
 
       case OP_EXIT:
 
         kp = NULL;
-        done = 1;
+        done = true;
         break;
     }
   }
