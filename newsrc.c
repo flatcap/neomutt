@@ -282,7 +282,7 @@ void nntp_newsrc_gen_entries(struct Context *ctx)
 {
   struct NntpData *nntp_data = ctx->data;
   anum_t last = 0, first = 1;
-  int series;
+  bool series;
   int save_sort = SORT_ORDER;
   unsigned int entries;
 
@@ -303,7 +303,7 @@ void nntp_newsrc_gen_entries(struct Context *ctx)
   /* Set up to fake initial sequence from 1 to the article before the
    * first article in our list */
   nntp_data->newsrc_len = 0;
-  series = 1;
+  series = true;
   for (int i = 0; i < ctx->msgcount; i++)
   {
     /* search for first unread */
@@ -323,7 +323,7 @@ void nntp_newsrc_gen_entries(struct Context *ctx)
         nntp_data->newsrc_ent[nntp_data->newsrc_len].first = first;
         nntp_data->newsrc_ent[nntp_data->newsrc_len].last = last - 1;
         nntp_data->newsrc_len++;
-        series = 0;
+        series = false;
       }
     }
 
@@ -333,7 +333,7 @@ void nntp_newsrc_gen_entries(struct Context *ctx)
       if (ctx->hdrs[i]->deleted || ctx->hdrs[i]->read)
       {
         first = last + 1;
-        series = 1;
+        series = true;
       }
       last = NHDR(ctx->hdrs[i])->article_num;
     }
