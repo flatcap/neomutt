@@ -1314,15 +1314,15 @@ char *pgp_find_keys(struct Address *adrlist, int oppenc_mode)
 
 /* Warning: "a" is no longer freed in this routine, you need
  * to free it later.  This is necessary for $fcc_attach. */
-struct Body *pgp_encrypt_message(struct Body *a, char *keylist, int sign)
+struct Body *pgp_encrypt_message(struct Body *a, char *keylist, bool sign)
 {
   char buf[LONG_STRING];
   char tempfile[_POSIX_PATH_MAX], pgperrfile[_POSIX_PATH_MAX];
   char pgpinfile[_POSIX_PATH_MAX];
   FILE *pgpin = NULL, *pgperr = NULL, *fpout = NULL, *fptmp = NULL;
   struct Body *t = NULL;
-  int err = 0;
-  int empty = 0;
+  bool err = false;
+  bool empty = false;
   pid_t thepid;
 
   mutt_mktemp(tempfile, sizeof(tempfile));
@@ -1378,7 +1378,7 @@ struct Body *pgp_encrypt_message(struct Body *a, char *keylist, int sign)
   safe_fclose(&pgpin);
 
   if (mutt_wait_filter(thepid) && option(OPTPGPCHECKEXIT))
-    empty = 1;
+    empty = true;
 
   unlink(pgpinfile);
 
@@ -1392,7 +1392,7 @@ struct Body *pgp_encrypt_message(struct Body *a, char *keylist, int sign)
   rewind(pgperr);
   while (fgets(buf, sizeof(buf) - 1, pgperr) != NULL)
   {
-    err = 1;
+    err = true;
     fputs(buf, stdout);
   }
   safe_fclose(&pgperr);

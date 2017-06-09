@@ -57,7 +57,7 @@ int pgp_valid_passphrase(void);
 /* private ? */
 int pgp_verify_one(struct Body *sigbdy, struct State *s, const char *tempfile);
 struct Body *pgp_traditional_encryptsign(struct Body *a, int flags, char *keylist);
-struct Body *pgp_encrypt_message(struct Body *a, char *keylist, int sign);
+struct Body *pgp_encrypt_message(struct Body *a, char *keylist, bool sign);
 struct Body *pgp_sign_message(struct Body *a);
 
 int pgp_send_menu(struct Header *msg);
