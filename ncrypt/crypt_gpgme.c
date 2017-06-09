@@ -2195,7 +2195,7 @@ static int pgp_check_traditional_one_body(FILE *fp, struct Body *b, bool tagged_
   return 1;
 }
 
-int pgp_gpgme_check_traditional(FILE *fp, struct Body *b, int tagged_only)
+int pgp_gpgme_check_traditional(FILE *fp, struct Body *b, bool tagged_only)
 {
   int rv = 0;
   int r;
