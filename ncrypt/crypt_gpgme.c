@@ -2137,14 +2137,14 @@ static int line_compare(const char *a, size_t n, const char *b)
 /*
  * Implementation of `pgp_check_traditional'.
  */
-static int pgp_check_traditional_one_body(FILE *fp, struct Body *b, int tagged_only)
+static int pgp_check_traditional_one_body(FILE *fp, struct Body *b, bool tagged_only)
 {
   char tempfile[_POSIX_PATH_MAX];
   char buf[HUGE_STRING];
   FILE *tfp = NULL;
 
-  short sgn = 0;
-  short enc = 0;
+  bool sgn = false;
+  bool enc = false;
 
   if (b->type != TYPETEXT)
     return 0;
@@ -2171,12 +2171,12 @@ static int pgp_check_traditional_one_body(FILE *fp, struct Body *b, int tagged_o
     {
       if (MESSAGE(buf + 15))
       {
-        enc = 1;
+        enc = true;
         break;
       }
       else if (SIGNED_MESSAGE(buf + 15))
       {
-        sgn = 1;
+        sgn = true;
         break;
       }
     }
