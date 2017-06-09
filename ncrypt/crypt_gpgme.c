@@ -320,9 +320,9 @@ static bool crypt_key_is_valid(struct CryptKeyinfo *k)
 }
 
 /* Return true when validity of KEY is sufficient. */
-static int crypt_id_is_strong(struct CryptKeyinfo *key)
+static bool crypt_id_is_strong(struct CryptKeyinfo *key)
 {
-  unsigned int is_strong = 0;
+  bool is_strong = false;
 
   if ((key->flags & KEYFLAG_ISX509))
     return 1;
@@ -333,12 +333,12 @@ static int crypt_id_is_strong(struct CryptKeyinfo *key)
     case GPGME_VALIDITY_UNDEFINED:
     case GPGME_VALIDITY_NEVER:
     case GPGME_VALIDITY_MARGINAL:
-      is_strong = 0;
+      is_strong = false;
       break;
 
     case GPGME_VALIDITY_FULL:
     case GPGME_VALIDITY_ULTIMATE:
-      is_strong = 1;
+      is_strong = true;
       break;
   }
 
