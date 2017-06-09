@@ -590,7 +590,7 @@ struct Body *mutt_parse_multipart(FILE *fp, const char *boundary, LOFF_T end_off
   char buffer[LONG_STRING];
   struct Body *head = NULL, *last = NULL, *new = NULL;
   int i;
-  int final = 0; /* did we see the ending boundary? */
+  bool final = false; /* did we see the ending boundary? */
 
   if (!boundary)
   {
@@ -625,7 +625,7 @@ struct Body *mutt_parse_multipart(FILE *fp, const char *boundary, LOFF_T end_off
       /* Check for the end boundary */
       if (mutt_strcmp(buffer + blen + 2, "--") == 0)
       {
-        final = 1;
+        final = true;
         break; /* done parsing */
       }
       else if (buffer[2 + blen] == 0)
