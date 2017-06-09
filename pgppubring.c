@@ -50,8 +50,8 @@ extern int optind;
 
 #define MD5_DIGEST_LENGTH 16
 
-static short dump_signatures = 0;
-static short dump_fingerprints = 0;
+static bool dump_signatures = false;
+static bool dump_fingerprints = false;
 
 static char gnupg_trustletter(int t)
 {
@@ -847,13 +847,13 @@ int main(int argc, char *const argv[])
     {
       case 'S':
       {
-        dump_signatures = 1;
+        dump_signatures = true;
         break;
       }
 
       case 'f':
       {
-        dump_fingerprints = 1;
+        dump_fingerprints = true;
         break;
       }
 
