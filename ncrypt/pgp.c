@@ -1453,8 +1453,8 @@ struct Body *pgp_traditional_encryptsign(struct Body *a, int flags, char *keylis
   FILE *pgpout = NULL, *pgperr = NULL, *pgpin = NULL;
   FILE *fp = NULL;
 
-  int empty = 0;
-  int err;
+  bool empty = false;
+  bool err;
 
   char buff[STRING];
 
@@ -1551,7 +1551,7 @@ struct Body *pgp_traditional_encryptsign(struct Body *a, int flags, char *keylis
   safe_fclose(&pgpin);
 
   if (mutt_wait_filter(thepid) && option(OPTPGPCHECKEXIT))
-    empty = 1;
+    empty = true;
 
   mutt_unlink(pgpinfile);
 
@@ -1565,11 +1565,11 @@ struct Body *pgp_traditional_encryptsign(struct Body *a, int flags, char *keylis
     empty = (fgetc(pgpout) == EOF);
   safe_fclose(&pgpout);
 
-  err = 0;
+  err = false;
 
   while (fgets(buff, sizeof(buff), pgperr))
   {
-    err = 1;
+    err = true;
     fputs(buff, stdout);
   }
 
