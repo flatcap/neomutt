@@ -771,11 +771,12 @@ static int envelope_defaults(struct Envelope *env, struct Context *ctx,
                              struct Header *cur, int flags)
 {
   struct Envelope *curenv = NULL;
-  int i = 0, tag = 0;
+  int i = 0;
+  bool tag = false;
 
   if (!cur)
   {
-    tag = 1;
+    tag = true;
     for (i = 0; i < ctx->vcount; i++)
       if (ctx->hdrs[ctx->v2r[i]]->tagged)
       {
