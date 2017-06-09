@@ -1944,7 +1944,7 @@ int mutt_write_rfc822_header(FILE *fp, struct Envelope *env,
   char buffer[LONG_STRING];
   char *p = NULL, *q = NULL;
   struct List *tmp = env->userhdrs;
-  int has_agent = 0; /* user defined user-agent header field exists */
+  bool has_agent = false; /* user defined user-agent header field exists */
 
   if (mode == 0 && !privacy)
     fputs(mutt_make_date(buffer, sizeof(buffer)), fp);
@@ -2085,7 +2085,7 @@ int mutt_write_rfc822_header(FILE *fp, struct Envelope *env,
       /* check to see if the user has overridden the user-agent field */
       if (ascii_strncasecmp("user-agent", tmp->data, 10) == 0)
       {
-        has_agent = 1;
+        has_agent = true;
         if (privacy)
         {
           *q = ':';
