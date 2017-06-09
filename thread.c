@@ -1276,13 +1276,13 @@ int _mutt_traverse_thread(struct Context *ctx, struct Header *cur, int flag)
       thread = thread->next;
     else
     {
-      int done = 0;
+      bool done = false;
       while (!thread->next)
       {
         thread = thread->parent;
         if (thread == top)
         {
-          done = 1;
+          done = true;
           break;
         }
       }
