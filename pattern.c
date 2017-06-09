@@ -1672,7 +1672,7 @@ static void quote_simple(char *tmp, size_t len, const char *p)
 void mutt_check_simple(char *s, size_t len, const char *simple)
 {
   char tmp[LONG_STRING];
-  int do_simple = 1;
+  bool do_simple = true;
   char *p = NULL;
 
   for (p = s; p && *p; p++)
@@ -1681,7 +1681,7 @@ void mutt_check_simple(char *s, size_t len, const char *simple)
       p++;
     else if (*p == '~' || *p == '=' || *p == '%')
     {
-      do_simple = 0;
+      do_simple = false;
       break;
     }
   }
