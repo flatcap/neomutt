@@ -1078,8 +1078,8 @@ struct Body *pgp_sign_message(struct Body *a)
   char buffer[LONG_STRING];
   char sigfile[_POSIX_PATH_MAX], signedfile[_POSIX_PATH_MAX];
   FILE *pgpin = NULL, *pgpout = NULL, *pgperr = NULL, *fp = NULL, *sfp = NULL;
-  int err = 0;
-  int empty = 1;
+  bool err = false;
+  bool empty = true;
   pid_t thepid;
 
   convert_to_7bit(a); /* Signed data _must_ be in 7-bit format. */
@@ -1130,19 +1130,19 @@ struct Body *pgp_sign_message(struct Body *a)
       fputs("-----END PGP SIGNATURE-----\n", fp);
     else
       fputs(buffer, fp);
-    empty = 0; /* got some output, so we're ok */
+    empty = false; /* got some output, so we're ok */
   }
 
   /* check for errors from PGP */
-  err = 0;
+  err = false;
   while (fgets(buffer, sizeof(buffer) - 1, pgperr) != NULL)
   {
-    err = 1;
+    err = true;
     fputs(buffer, stdout);
   }
 
   if (mutt_wait_filter(thepid) && option(OPTPGPCHECKEXIT))
-    empty = 1;
+    empty = true;
 
   safe_fclose(&pgperr);
   safe_fclose(&pgpout);
