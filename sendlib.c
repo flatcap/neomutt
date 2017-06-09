@@ -2727,16 +2727,16 @@ struct Address *mutt_remove_duplicates(struct Address *addr)
   struct Address *top = addr;
   struct Address **last = &top;
   struct Address *tmp = NULL;
-  int dup;
+  bool dup;
 
   while (addr)
   {
-    for (tmp = top, dup = 0; tmp && tmp != addr; tmp = tmp->next)
+    for (tmp = top, dup = false; tmp && tmp != addr; tmp = tmp->next)
     {
       if (tmp->mailbox && addr->mailbox &&
           (ascii_strcasecmp(addr->mailbox, tmp->mailbox) == 0))
       {
-        dup = 1;
+        dup = true;
         break;
       }
     }
