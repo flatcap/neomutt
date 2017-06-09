@@ -266,7 +266,7 @@ static int pgp_check_decryption_okay(FILE *fpin)
 static void pgp_copy_clearsigned(FILE *fpin, struct State *s, char *charset)
 {
   char buf[HUGE_STRING];
-  short complete, armor_header;
+  bool complete, armor_header;
 
   FGETCONV *fc = NULL;
 
@@ -278,8 +278,8 @@ static void pgp_copy_clearsigned(FILE *fpin, struct State *s, char *charset)
    */
   fc = fgetconv_open(fpin, charset, Charset, MUTT_ICONV_HOOK_FROM);
 
-  for (complete = 1, armor_header = 1; fgetconvs(buf, sizeof(buf), fc) != NULL;
-       complete = strchr(buf, '\n') != NULL)
+  for (complete = true, armor_header = true; fgetconvs(buf, sizeof(buf), fc) != NULL;
+       complete = (strchr(buf, '\n') != NULL))
   {
     if (!complete)
     {
@@ -295,7 +295,7 @@ static void pgp_copy_clearsigned(FILE *fpin, struct State *s, char *charset)
     {
       char *p = mutt_skip_whitespace(buf);
       if (*p == '\0')
-        armor_header = 0;
+        armor_header = false;
       continue;
     }
 
