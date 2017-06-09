@@ -804,8 +804,7 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
   struct Address *r = NULL, *p = NULL;
   struct List *hints = NULL;
 
-  int multi = 0;
-  int match;
+  bool multi = false;
 
   struct PgpKeyInfo *keys = NULL, *k = NULL, *kn = NULL;
   struct PgpKeyInfo *the_strong_valid_key = NULL;
@@ -842,7 +841,7 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
       continue;
     }
 
-    match = 0; /* any match              */
+    bool match = false; /* any match */
 
     for (q = k->address; q; q = q->next)
     {
@@ -853,14 +852,14 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
         int validity = pgp_id_matches_addr(a, p, q);
 
         if (validity & PGP_KV_MATCH) /* something matches */
-          match = 1;
+          match = true;
 
         if ((validity & PGP_KV_VALID) && (validity & PGP_KV_ADDR))
         {
           if (validity & PGP_KV_STRONGID)
           {
             if (the_strong_valid_key && the_strong_valid_key != k)
-              multi = 1;
+              multi = true;
             the_strong_valid_key = k;
           }
           else
