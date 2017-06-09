@@ -61,7 +61,7 @@ void mutt_draw_tree(struct Context *ctx);
 
 void mutt_clear_threads(struct Context *ctx);
 struct MuttThread *mutt_sort_subthreads(struct MuttThread *thread, bool init);
-void mutt_sort_threads(struct Context *ctx, int init);
+void mutt_sort_threads(struct Context *ctx, bool init);
 int mutt_parent_message(struct Context *ctx, struct Header *hdr, int find_root);
 void mutt_set_virtual(struct Context *ctx);
 struct Hash *mutt_make_id_hash(struct Context *ctx);

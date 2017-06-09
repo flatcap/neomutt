@@ -763,7 +763,7 @@ static void check_subjects(struct Context *ctx, bool init)
   }
 }
 
-void mutt_sort_threads(struct Context *ctx, int init)
+void mutt_sort_threads(struct Context *ctx, bool init)
 {
   struct Header *cur = NULL;
   int i, oldsort, using_refs = 0;
@@ -779,7 +779,7 @@ void mutt_sort_threads(struct Context *ctx, int init)
   Sort = SortAux;
 
   if (!ctx->thread_hash)
-    init = 1;
+    init = true;
 
   if (init)
     ctx->thread_hash = hash_create(ctx->msgcount * 2, MUTT_HASH_ALLOW_DUPS);
