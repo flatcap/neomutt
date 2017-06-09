@@ -2315,7 +2315,7 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
   char msgbuf[STRING];
   struct Progress progress;
   char *uri = ctx->path;
-  int changed = 0;
+  bool changed = false;
 
   if (!data)
     return -1;
@@ -2368,9 +2368,9 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
     if (h->deleted || (strcmp(old, new) != 0))
     {
       if (h->deleted && (remove_filename(data, old) == 0))
-        changed = 1;
+        changed = true;
       else if (*new &&*old && (rename_filename(data, old, new, h) == 0))
-        changed = 1;
+        changed = true;
     }
 
     FREE(&hd->oldpath);
