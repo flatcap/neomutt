@@ -833,7 +833,7 @@ int main(int argc, char *const argv[])
   int c;
 
   short version = 2;
-  short secring = 0;
+  bool secring = false;
 
   const char *_kring = NULL;
   char *env_pgppath = NULL, *env_home = NULL;
@@ -872,7 +872,7 @@ int main(int argc, char *const argv[])
 
       case 's':
       {
-        secring = 1;
+        secring = true;
         break;
       }
 
