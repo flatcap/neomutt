@@ -428,7 +428,7 @@ static gpgme_data_t create_gpgme_data(void)
 /* Create a new GPGME Data object from the mail body A.  With CONVERT
    passed as true, the lines are converted to CR,LF if required.
    Return NULL on error or the gpgme_data_t object on success. */
-static gpgme_data_t body_to_data_object(struct Body *a, int convert)
+static gpgme_data_t body_to_data_object(struct Body *a, bool convert)
 {
   char tempfile[_POSIX_PATH_MAX];
   FILE *fptmp = NULL;
@@ -449,7 +449,8 @@ static gpgme_data_t body_to_data_object(struct Body *a, int convert)
 
   if (convert)
   {
-    int c, hadcr = 0;
+    int c;
+    bool hadcr = false;
     unsigned char buf[1];
 
     data = create_gpgme_data();
@@ -457,7 +458,7 @@ static gpgme_data_t body_to_data_object(struct Body *a, int convert)
     while ((c = fgetc(fptmp)) != EOF)
     {
       if (c == '\r')
-        hadcr = 1;
+        hadcr = true;
       else
       {
         if (c == '\n' && !hadcr)
@@ -466,7 +467,7 @@ static gpgme_data_t body_to_data_object(struct Body *a, int convert)
           gpgme_data_write(data, buf, 1);
         }
 
-        hadcr = 0;
+        hadcr = false;
       }
       /* FIXME: This is quite suboptimal */
       buf[0] = c;
@@ -875,7 +876,7 @@ static struct Body *sign_message(struct Body *a, int use_smime)
 
   convert_to_7bit(a); /* Signed data _must_ be in 7-bit format. */
 
-  message = body_to_data_object(a, 1);
+  message = body_to_data_object(a, true);
   if (!message)
     return NULL;
   signature = create_gpgme_data();
@@ -1012,7 +1013,7 @@ struct Body *pgp_gpgme_encrypt_message(struct Body *a, char *keylist, int sign)
 
   if (sign)
     convert_to_7bit(a);
-  plaintext = body_to_data_object(a, 0);
+  plaintext = body_to_data_object(a, false);
   if (!plaintext)
   {
     free_recipient_set(&rset);
@@ -1075,7 +1076,7 @@ struct Body *smime_gpgme_build_smime_entity(struct Body *a, char *keylist)
    * clients depend on this for signed+encrypted messages: they do not
    * convert line endings between decrypting and checking the
    * signature.  See #3904. */
-  plaintext = body_to_data_object(a, 1);
+  plaintext = body_to_data_object(a, true);
   if (!plaintext)
   {
     free_recipient_set(&rset);
