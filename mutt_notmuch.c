@@ -1928,7 +1928,8 @@ int nm_nonctx_get_count(char *path, int *all, int *new)
   struct UriTag *query_items = NULL, *item = NULL;
   char *db_filename = NULL, *db_query = NULL;
   notmuch_database_t *db = NULL;
-  int rc = -1, dflt = 0;
+  int rc = -1;
+  bool dflt = false;
 
   mutt_debug(1, "nm: count\n");
 
@@ -1963,7 +1964,7 @@ int nm_nonctx_get_count(char *path, int *all, int *new)
     }
     else if (Maildir)
       db_filename = Maildir;
-    dflt = 1;
+    dflt = true;
   }
 
   /* don't be verbose about connection, as we're called from
