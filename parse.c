@@ -193,7 +193,7 @@ static struct Parameter *parse_parameters(const char *s)
 
       if (*s == '"')
       {
-        int state_ascii = 1;
+        bool state_ascii = true;
         s++;
         for (i = 0; *s && i < sizeof(buffer) - 1; i++, s++)
         {
@@ -204,9 +204,9 @@ static struct Parameter *parse_parameters(const char *s)
             if (*s == 0x1b && i < sizeof(buffer) - 2)
             {
               if (s[1] == '(' && (s[2] == 'B' || s[2] == 'J'))
-                state_ascii = 1;
+                state_ascii = true;
               else
-                state_ascii = 0;
+                state_ascii = false;
             }
           }
           if (state_ascii && *s == '"')
