@@ -3044,9 +3044,9 @@ static int crypt_compare_trust(const void *a, const void *b)
 
 /* Print the X.500 Distinguished Name part KEY from the array of parts
    DN to FP. */
-static int print_dn_part(FILE *fp, struct DnArrayS *dn, const char *key)
+static bool print_dn_part(FILE *fp, struct DnArrayS *dn, const char *key)
 {
-  int any = 0;
+  bool any = false;
 
   for (; dn->key; dn++)
   {
@@ -3055,7 +3055,7 @@ static int print_dn_part(FILE *fp, struct DnArrayS *dn, const char *key)
       if (any)
         fputs(" + ", fp);
       print_utf8(fp, dn->value, strlen(dn->value));
-      any = 1;
+      any = true;
     }
   }
   return any;
@@ -3067,7 +3067,8 @@ static void print_dn_parts(FILE *fp, struct DnArrayS *dn)
   static const char *const stdpart[] = {
     "CN", "OU", "O", "STREET", "L", "ST", "C", NULL,
   };
-  int any = 0, any2 = 0, i;
+  bool any = false, any2 = false;
+  int i;
 
   for (i = 0; stdpart[i]; i++)
   {
@@ -3090,7 +3091,7 @@ static void print_dn_parts(FILE *fp, struct DnArrayS *dn)
       if (!any2)
         fputs("(", fp);
       any = print_dn_part(fp, dn, dn->key);
-      any2 = 1;
+      any2 = true;
     }
   }
   if (any2)
