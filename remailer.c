@@ -660,7 +660,7 @@ void mix_make_chain(struct List **chainp)
 int mix_check_message(struct Header *msg)
 {
   const char *fqdn = NULL;
-  short need_hostname = 0;
+  bool need_hostname = false;
   struct Address *p = NULL;
 
   if (msg->env->cc || msg->env->bcc)
@@ -679,7 +679,7 @@ int mix_check_message(struct Header *msg)
   {
     if (!p->group && strchr(p->mailbox, '@') == NULL)
     {
-      need_hostname = 1;
+      need_hostname = true;
       break;
     }
   }
