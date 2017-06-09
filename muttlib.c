@@ -1688,15 +1688,15 @@ void mutt_FormatString(char *dest,     /* output buffer */
       }
       else
       {
-        short tolower = 0;
-        short nodots = 0;
+        bool tolower = false;
+        bool nodots = false;
 
         while (ch == '_' || ch == ':')
         {
           if (ch == '_')
-            tolower = 1;
+            tolower = true;
           else if (ch == ':')
-            nodots = 1;
+            nodots = true;
 
           ch = *src++;
         }
