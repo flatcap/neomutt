@@ -293,7 +293,7 @@ sort_t *mutt_get_sort_func(int method)
   /* not reached */
 }
 
-void mutt_sort_headers(struct Context *ctx, int init)
+void mutt_sort_headers(struct Context *ctx, bool init)
 {
   int i;
   struct Header *h = NULL;
@@ -329,7 +329,7 @@ void mutt_sort_headers(struct Context *ctx, int init)
   if (option(OPTRESORTINIT))
   {
     unset_option(OPTRESORTINIT);
-    init = 1;
+    init = true;
   }
 
   if (init && ctx->tree)

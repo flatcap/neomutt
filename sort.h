@@ -65,7 +65,7 @@ struct Context;
 typedef int sort_t(const void *a, const void *b);
 sort_t *mutt_get_sort_func(int method);
 
-void mutt_sort_headers(struct Context *ctx, int init);
+void mutt_sort_headers(struct Context *ctx, bool init);
 int mutt_select_sort(int reverse);
 
 WHERE short BrowserSort INITVAL(SORT_SUBJECT);

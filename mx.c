@@ -602,7 +602,7 @@ struct Context *mx_open_mailbox(const char *path, int flags, struct Context *pct
          to begin with */
       unset_option(OPTSORTSUBTHREADS);
       unset_option(OPTNEEDRESCORE);
-      mutt_sort_headers(ctx, 1);
+      mutt_sort_headers(ctx, true);
     }
     if (!ctx->quiet)
       mutt_clear_error();
@@ -1195,7 +1195,7 @@ int mx_sync_mailbox(struct Context *ctx, int *index_hint)
       if (ctx->magic != MUTT_IMAP)
       {
         mx_update_tables(ctx, 1);
-        mutt_sort_headers(ctx, 1); /* rethread from scratch */
+        mutt_sort_headers(ctx, true); /* rethread from scratch */
       }
     }
   }

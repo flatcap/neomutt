@@ -674,7 +674,7 @@ static int reopen_mailbox(struct Context *ctx, int *index_hint)
 
     old_sort = Sort;
     Sort = SORT_ORDER;
-    mutt_sort_headers(ctx, 1);
+    mutt_sort_headers(ctx, true);
     Sort = old_sort;
   }
 
@@ -1007,7 +1007,7 @@ static int mbox_sync_mailbox(struct Context *ctx, int *index_hint)
   {
     save_sort = Sort;
     Sort = SORT_ORDER;
-    mutt_sort_headers(ctx, 0);
+    mutt_sort_headers(ctx, false);
     Sort = save_sort;
     need_sort = 1;
   }

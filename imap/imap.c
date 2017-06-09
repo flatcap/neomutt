@@ -272,7 +272,7 @@ void imap_expunge_mailbox(struct ImapData *idata)
 
   old_sort = Sort;
   Sort = SORT_ORDER;
-  mutt_sort_headers(idata->ctx, 0);
+  mutt_sort_headers(idata->ctx, false);
 
   for (int i = 0; i < idata->ctx->msgcount; i++)
   {
@@ -315,7 +315,7 @@ void imap_expunge_mailbox(struct ImapData *idata)
    * to always know to rethread */
   mx_update_tables(idata->ctx, 0);
   Sort = old_sort;
-  mutt_sort_headers(idata->ctx, 1);
+  mutt_sort_headers(idata->ctx, true);
 }
 
 /* imap_check_capabilities: make sure we can log in to this server. */

@@ -1965,7 +1965,7 @@ static void maildir_update_tables(struct Context *ctx, int *index_hint)
   {
     old_sort = Sort;
     Sort = SORT_ORDER;
-    mutt_sort_headers(ctx, 1);
+    mutt_sort_headers(ctx, true);
     Sort = old_sort;
   }
 

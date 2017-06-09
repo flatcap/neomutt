@@ -290,7 +290,7 @@ void nntp_newsrc_gen_entries(struct Context *ctx)
   {
     save_sort = Sort;
     Sort = SORT_ORDER;
-    mutt_sort_headers(ctx, 0);
+    mutt_sort_headers(ctx, false);
   }
 
   entries = nntp_data->newsrc_len;
@@ -355,7 +355,7 @@ void nntp_newsrc_gen_entries(struct Context *ctx)
   if (save_sort != Sort)
   {
     Sort = save_sort;
-    mutt_sort_headers(ctx, 0);
+    mutt_sort_headers(ctx, false);
   }
 }
 
