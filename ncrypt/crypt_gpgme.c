@@ -2259,7 +2259,7 @@ void pgp_gpgme_invoke_import(const char *fname)
 static void copy_clearsigned(gpgme_data_t data, struct State *s, char *charset)
 {
   char buf[HUGE_STRING];
-  short complete, armor_header;
+  bool complete, armor_header;
   FGETCONV *fc = NULL;
   char *fname = NULL;
   FILE *fp = NULL;
@@ -2279,8 +2279,8 @@ static void copy_clearsigned(gpgme_data_t data, struct State *s, char *charset)
    */
   fc = fgetconv_open(fp, charset, Charset, MUTT_ICONV_HOOK_FROM);
 
-  for (complete = 1, armor_header = 1; fgetconvs(buf, sizeof(buf), fc) != NULL;
-       complete = strchr(buf, '\n') != NULL)
+  for (complete = true, armor_header = true; fgetconvs(buf, sizeof(buf), fc) != NULL;
+       complete = (strchr(buf, '\n') != NULL))
   {
     if (!complete)
     {
@@ -2295,7 +2295,7 @@ static void copy_clearsigned(gpgme_data_t data, struct State *s, char *charset)
     if (armor_header)
     {
       if (buf[0] == '\n')
-        armor_header = 0;
+        armor_header = false;
       continue;
     }
 
