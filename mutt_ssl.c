@@ -762,7 +762,7 @@ static int ssl_cache_trusted_cert(X509 *c)
   return (sk_X509_push(SslSessionCerts, X509_dup(c)));
 }
 
-static int interactive_check_cert(X509 *cert, int idx, int len, SSL *ssl, int allow_always)
+static int interactive_check_cert(X509 *cert, int idx, int len, SSL *ssl, bool allow_always)
 {
   static const int part[] = {
     NID_commonName,             /* CN */
@@ -782,7 +782,7 @@ static int interactive_check_cert(X509 *cert, int idx, int len, SSL *ssl, int al
   int done, row;
   unsigned u;
   FILE *fp = NULL;
-  int allow_skip = 0;
+  bool allow_skip = false;
 
   mutt_push_current_menu(menu);
 
@@ -829,7 +829,7 @@ static int interactive_check_cert(X509 *cert, int idx, int len, SSL *ssl, int al
 /* The leaf/host certificate can't be skipped. */
 #ifdef HAVE_SSL_PARTIAL_CHAIN
   if ((idx != 0) && (option(OPTSSLVERIFYPARTIAL)))
-    allow_skip = 1;
+    allow_skip = true;
 #endif
 
   /* Inside ssl_verify_callback(), this function is guarded by a call to
@@ -1012,7 +1012,7 @@ static int ssl_verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
       mutt_sleep(2);
       /* we disallow (a)ccept always in the prompt, because it will have no effect
        * for hostname mismatches. */
-      return interactive_check_cert(cert, pos, len, ssl, 0);
+      return interactive_check_cert(cert, pos, len, ssl, false);
     }
     mutt_debug(2, "ssl_verify_callback: hostname check passed\n");
   }
@@ -1037,7 +1037,7 @@ static int ssl_verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
 #endif
 
     /* prompt user */
-    return interactive_check_cert(cert, pos, len, ssl, 1);
+    return interactive_check_cert(cert, pos, len, ssl, true);
   }
 
   return 1;
