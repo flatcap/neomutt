@@ -1052,7 +1052,7 @@ void mutt_expand_fmt(char *dest, size_t destlen, const char *fmt, const char *sr
   const char *p = NULL;
   char *d = NULL;
   size_t slen;
-  int found = 0;
+  bool found = false;
 
   slen = mutt_strlen(src);
   destlen--;
@@ -1068,7 +1068,7 @@ void mutt_expand_fmt(char *dest, size_t destlen, const char *fmt, const char *sr
           destlen--;
           break;
         case 's':
-          found = 1;
+          found = true;
           strfcpy(d, src, destlen + 1);
           d += destlen > slen ? slen : destlen;
           destlen -= destlen > slen ? slen : destlen;
