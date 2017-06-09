@@ -1111,20 +1111,20 @@ struct Body *smime_gpgme_build_smime_entity(struct Body *a, char *keylist)
  */
 
 /* Display the common attributes of the signature summary SUM.
-   Return 1 if there is is a severe warning.
+   Return true if there is is a severe warning.
  */
-static int show_sig_summary(unsigned long sum, gpgme_ctx_t ctx, gpgme_key_t key,
+static bool show_sig_summary(unsigned long sum, gpgme_ctx_t ctx, gpgme_key_t key,
                             int idx, struct State *s, gpgme_signature_t sig)
 {
   if (!key)
     return 1;
 
-  int severe = 0;
+  bool severe = false;
 
   if ((sum & GPGME_SIGSUM_KEY_REVOKED))
   {
     state_puts(_("Warning: One of the keys has been revoked\n"), s);
-    severe = 1;
+    severe = true;
   }
 
   if ((sum & GPGME_SIGSUM_KEY_EXPIRED))
@@ -1168,13 +1168,13 @@ static int show_sig_summary(unsigned long sum, gpgme_ctx_t ctx, gpgme_key_t key,
   if ((sum & GPGME_SIGSUM_CRL_MISSING))
   {
     state_puts(_("The CRL is not available\n"), s);
-    severe = 1;
+    severe = true;
   }
 
   if ((sum & GPGME_SIGSUM_CRL_TOO_OLD))
   {
     state_puts(_("Available CRL is too old\n"), s);
-    severe = 1;
+    severe = true;
   }
 
   if ((sum & GPGME_SIGSUM_BAD_POLICY))
