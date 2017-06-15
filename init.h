@@ -4534,7 +4534,11 @@ static int parse_path_unlist     (struct Buffer *buf, struct Buffer *s, unsigned
 static int parse_group_context   (struct GroupContext **ctx,
                                   struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 
+static int parse_account(struct Buffer *buf, struct Buffer *s, unsigned long data,
+                         struct Buffer *err);
+
 const struct Command Commands[] = {
+  { "account",          parse_account,          0 },
 #ifdef USE_SOCKET
   { "account-hook",        mutt_parse_hook,        MUTT_ACCOUNTHOOK },
 #endif

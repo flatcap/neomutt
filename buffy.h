@@ -30,6 +30,7 @@
 #include "where.h"
 
 struct stat;
+struct MailAccount;
 
 /* parameter to mutt_parse_mailboxes */
 #define MUTT_NAMED   1
@@ -58,6 +59,7 @@ struct Buffy
   bool newly_created;        /**< mbox or mmdf just popped into existence */
   time_t last_visited;       /**< time of last exit from this mailbox */
   time_t stats_last_checked; /**< mtime of mailbox the last time stats where checked. */
+  struct MailAccount *account;
 };
 
 WHERE struct Buffy *Incoming;

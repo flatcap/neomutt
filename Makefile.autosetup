@@ -65,9 +65,9 @@ NEOMUTTOBJS=	mutt_account.o addrbook.o alias.o attach.o bcache.o body.o \
 		newsrc.o nntp.o pager.o parse.o pattern.o pop.o \
 		pop_auth.o pop_lib.o postpone.o query.o recvattach.o recvcmd.o \
 		rfc1524.o rfc2047.o rfc2231.o rfc3676.o address.o \
-		safe_asprintf.o score.o send.o sendlib.o sidebar.o mutt_signal.o \
+		safe_asprintf.o score.o send.o sendlib.o sidebar.o signal.o \
 		resize.o smtp.o sort.o state.o status.o system.o thread.o url.o \
-		version.o
+		version.o config_set.o mail_account.o
 
 @if !HAVE_WCSCASECMP
 NEOMUTTOBJS+=	wcscasecmp.o

@@ -48,6 +48,7 @@
 #include "header.h"
 #include "history.h"
 #include "keymap.h"
+#include "mail_account.h"
 #include "mailbox.h"
 #include "mbtable.h"
 #include "mutt_curses.h"
@@ -884,6 +885,47 @@ static void remove_from_stailq(struct ListHead *head, const char *str)
       }
     }
   }
+}
+
+static int parse_account(struct Buffer *tmp, struct Buffer *s,
+                         unsigned long data, struct Buffer *err)
+{
+  /* Go back to the default account */
+  if (!MoreArgs(s))
+  {
+    current_account = NULL;
+    return 0;
+  }
+
+  mutt_extract_token(tmp, s, 0);
+
+  struct MailAccount *ma = mail_account_find(tmp->data);
+  if (!ma)
+    ma = mail_account_create(tmp->data);
+
+  /* Set the current account, nothing more to do */
+  if (!MoreArgs(s))
+  {
+    current_account = ma;
+    return 0;
+  }
+
+  struct Buffer token;
+  memset(&token, 0, sizeof(token));
+
+  /* Temporarily alter the current account */
+  struct MailAccount *oca = current_account;
+  current_account = ma;
+
+  /* Process the rest of the line */
+  int rc = mutt_parse_rc_line(s->dptr, &token, err);
+  if (rc == -1)
+    mutt_error("Error: %s", err->data);
+
+  current_account = oca;
+
+  FREE(&token.data);
+  return rc;
 }
 
 static int parse_unignore(struct Buffer *buf, struct Buffer *s,
@@ -3021,6 +3063,8 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
     STAILQ_REMOVE_HEAD(&MuttrcStack, entries);
   }
 
+  /* The account command stops at the end of the file */
+  current_account = NULL;
   return rc;
 }
 

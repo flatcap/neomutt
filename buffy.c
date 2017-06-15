@@ -36,6 +36,7 @@
 #include "envelope.h"
 #include "globals.h"
 #include "header.h"
+#include "mail_account.h"
 #include "mailbox.h"
 #include "mutt_curses.h"
 #include "mutt_menu.h"
@@ -604,6 +605,7 @@ int mutt_parse_mailboxes(struct Buffer *path, struct Buffer *s,
     (*b)->notified = true;
     (*b)->newly_created = false;
     (*b)->desc = desc;
+    (*b)->account = current_account;
 #ifdef USE_NOTMUCH
     if (mx_is_notmuch((*b)->path))
     {
