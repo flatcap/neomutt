@@ -19,7 +19,7 @@ struct ConfigSet *config_set_new(void)
 
 void config_set_free(struct ConfigSet *config)
 {
-  mutt_hash_destroy(&config->hash, NULL);
+  mutt_hash_destroy(&config->hash);
 }
 
 void config_set_int(struct ConfigSet *config, const char *name, intptr_t value)
