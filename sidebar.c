@@ -35,6 +35,7 @@
 #include "context.h"
 #include "format_flags.h"
 #include "globals.h"
+#include "mail_account.h"
 #include "mutt_curses.h"
 #include "mutt_menu.h"
 #include "mx.h"
@@ -457,7 +458,7 @@ static bool select_next(void)
     entry++;
     if (entry == EntryCount)
       return false;
-  } while (Entries[entry]->is_hidden);
+  } while ((Entries[entry]->is_hidden) || !Entries[entry]->buffy);
 
   HilIndex = entry;
   return true;
@@ -489,7 +490,7 @@ static int select_next_new(void)
     }
     if (entry == HilIndex)
       return false;
-  } while (!Entries[entry]->buffy->new && !Entries[entry]->buffy->msg_unread);
+  } while (!Entries[entry]->buffy || (!Entries[entry]->buffy->new && !Entries[entry]->buffy->msg_unread));
 
   HilIndex = entry;
   return true;
@@ -512,7 +513,7 @@ static bool select_prev(void)
     entry--;
     if (entry < 0)
       return false;
-  } while (Entries[entry]->is_hidden);
+  } while (Entries[entry]->is_hidden || !Entries[entry]->buffy);
 
   HilIndex = entry;
   return true;
@@ -544,7 +545,7 @@ static bool select_prev_new(void)
     }
     if (entry == HilIndex)
       return false;
-  } while (!Entries[entry]->buffy->new && !Entries[entry]->buffy->msg_unread);
+  } while (!Entries[entry]->buffy || (!Entries[entry]->buffy->new && !Entries[entry]->buffy->msg_unread));
 
   HilIndex = entry;
   return true;
@@ -826,6 +827,15 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
       continue;
     b = entry->buffy;
 
+    if (!b)
+    {
+      SETCOLOR(MT_COLOR_NORMAL);
+      mutt_window_move(MuttSidebarWindow, row, 0);
+      printw("%s", entry->box);
+      row++;
+      continue;
+    }
+
     if (entryidx == OpnIndex)
     {
       if ((ColorDefs[MT_COLOR_SB_INDICATOR] != 0))
@@ -955,6 +965,36 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
   }
 
   fill_empty_space(row, num_rows - row, div_width, w);
+}
+
+bool find_account(const char *name, int *acc_idx, int *last_idx)
+{
+  if (!name || !acc_idx || !last_idx)
+    return false;
+
+  *acc_idx = -1;
+  *last_idx = -1;
+
+  for (int i = 0; i < EntryCount; i++)
+  {
+    struct SbEntry *e = Entries[i];
+    if (!e->buffy)
+      continue;
+
+    struct MailAccount *ma = e->buffy->account;
+    if (!ma)
+      continue;
+
+    if ((strcmp(ma->name, name) != 0))
+      continue;
+
+    if (*acc_idx < 0)
+      *acc_idx = i;
+
+    *last_idx = i;
+  }
+
+  return (*last_idx >= 0);
 }
 
 /**
@@ -1108,6 +1148,8 @@ void mutt_sb_set_open_buffy(void)
 
   for (int entry = 0; entry < EntryCount; entry++)
   {
+    if (!Entries[entry]->buffy)
+      continue;
     if (mutt_str_strcmp(Entries[entry]->buffy->realpath, Context->realpath) == 0)
     {
       OpnIndex = entry;
@@ -1136,13 +1178,31 @@ void mutt_sb_notify_mailbox(struct Buffy *b, int created)
   /* Any new/deleted mailboxes will cause a refresh.  As long as
    * they're valid, our pointers will be updated in prepare_sidebar() */
 
+  int acc_idx = -1;
+  int last_idx = -1;
+  bool fa = false;
+
+  if (b->account)
+    fa = find_account(b->account->name, &acc_idx, &last_idx);
+
+  if (fa);
+
   if (created)
   {
-    if (EntryCount >= EntryLen)
+    if ((EntryCount + 2) > EntryLen)
     {
       EntryLen += 10;
       mutt_mem_realloc(&Entries, EntryLen * sizeof(struct SbEntry *));
     }
+    if (!fa && b->account)
+    {
+      /* Insert a fake entry */
+      struct SbEntry *sbe = mutt_mem_calloc(1, sizeof(struct SbEntry));
+      Entries[EntryCount] = sbe;
+      mutt_str_strfcpy(sbe->box, b->account->name, sizeof(sbe->box));
+      EntryCount++;
+    }
+
     Entries[EntryCount] = mutt_mem_calloc(1, sizeof(struct SbEntry));
     Entries[EntryCount]->buffy = b;
 
