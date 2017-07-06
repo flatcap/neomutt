@@ -600,6 +600,12 @@ void mutt_timeout_hook(void)
   err.dsize = sizeof(buf);
   mutt_buffer_init(&token);
 
+  if (OPT_USED_SYNONYM && !OPT_INFORMED_USER)
+  {
+    mutt_error(_("Please read: /usr/share/doc/neomutt/deprecated.txt"));
+    OPT_INFORMED_USER = false;
+  }
+
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
     if (!(hook->command && (hook->type & MUTT_TIMEOUTHOOK)))

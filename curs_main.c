@@ -1158,15 +1158,7 @@ int mutt_index_menu(void)
       else if (AutoTag && Context && Context->tagged)
         tag = true;
 
-      if (OPT_USED_SYNONYM && !OPT_INFORMED_USER)
-      {
-        mutt_error(_("Please read: /usr/share/doc/neomutt/deprecated.txt"));
-        OPT_INFORMED_USER = true;
-      }
-      else
-      {
-        mutt_clear_error();
-      }
+      mutt_clear_error();
     }
     else
     {

@@ -225,6 +225,7 @@ int mutt_option_index(const char *s)
         return i;
 
       OPT_USED_SYNONYM = true;
+      OPT_INFORMED_USER = false;
       return mutt_option_index((char *) MuttVars[i].var);
     }
   }
