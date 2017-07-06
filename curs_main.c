@@ -1160,7 +1160,7 @@ int mutt_index_menu(void)
 
       if (OPT_USED_SYNONYM && !OPT_INFORMED_USER)
       {
-        mutt_message(_("Please read: /usr/share/doc/neomutt/deprecated.txt"));
+        mutt_error(_("Please read: /usr/share/doc/neomutt/deprecated.txt"));
         OPT_INFORMED_USER = true;
       }
       else
