@@ -51,9 +51,12 @@ WHERE bool OPT_DONT_HANDLE_PGP_KEYS; /**< (pseudo) used to extract PGP keys */
 WHERE bool OPT_IGNORE_MACRO_EVENTS; /**< (pseudo) don't process macro/push/exec events while set */
 
 #ifdef USE_NNTP
-WHERE bool OPT_NEWS;              /**< (pseudo) used to change reader mode */
+WHERE bool OPT_NEWS;               /**< (pseudo) used to change reader mode */
 WHERE bool OPT_NEWS_SEND;          /**< (pseudo) used to change behavior when posting */
 #endif
+
+WHERE bool OPT_USED_SYNONYM;       /**< (pseudo) a deprecated config variable has been used */
+WHERE bool OPT_INFORMED_USER;      /**< (pseudo) but the user has been informed */
 
 #define mutt_bit_set(v, n)    v[n / 8] |= (1 << (n % 8))
 #define mutt_bit_unset(v, n)  v[n / 8] &= ~(1 << (n % 8))
