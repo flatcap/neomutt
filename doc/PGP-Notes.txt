@@ -9,13 +9,11 @@ WARNING: The configuration interface has completely changed as of
                             USERS' GUIDE
 
 
-How do I use mutt with PGP, PGP5, or GnuPG?
+How do I use mutt with GnuPG?
 -------------------------------------------
 
-Go to the contrib subdirectory of the source tree.  You'll find
-three files there, pgp2.rc, pgp5.rc, and gpg.rc.  These files
-contain ready-to-use configurations for using mutt with pgp2, pgp5,
-and gpg.
+Go to the contrib subdirectory of the source tree.  You'll find gpg.rc.
+This file contain ready-to-use configurations for using mutt gpg.
 
 Include one of these files with your ~/.muttrc, and things should
 work out fine.
@@ -131,8 +129,7 @@ language support.  So we just introduce a language called "mutt"
 which contains empty strings for the messages we don't want to see.
 To use this, copy either language.txt or language50.txt (depending
 on what PGP version you are using) to your $PGPPATH.  Make sure the
-PGP command formats pass "+language=pgp" to all the PGP binaries
-(but not to pgpring!).
+PGP command formats pass "+language=pgp" to all the PGP binaries.
 
 For PGP 2.6, a German version called "muttde" is available
 as well.
@@ -152,59 +149,6 @@ or exim.
 
 
                              BACKGROUND
-
-
-Auxiliary Programs
-------------------
-
-Mutt needs two auxiliary programs for its PGP support: pgpewrap and
-pgpring.
-
-
-1. pgpring
-
-pgpring is a key ring dumper.  It extracts information from PGP's
-binary key ring and emits it in an (almost) readable output format
-understood by mutt's key selection routines.  This output format
-mimics the one used by the GNU Privacy Guard (GPG).
-
-You'll need this program with PGP 2 and PGP 5.
-
-Command line options:
-
-        -k <key ring>   Dump the contents of the key ring specified
-                        as an argument to -k.
-
-        -2, -5          Use the default key ring for PGP 2 or 5,
-                        respectively.
-
-        -s              Dump the secret key ring.
-
-        -S              Dump signatures.
-
-        -f              Dump fingerprints.
-
-
-
-2. pgpewrap
-
-This is a little C program which does some command line munging: The
-first argument is a command to be executed.  When pgpewrap
-encounters a "--" (dash-dash) argument, it will interpret the next
-argument as a prefix which is put in front of all following
-arguments.
-
-Example:
-
-        pgpewrap pgpe file -- -r a b c
-
-will execute:
-
-        pgpe file -r a -r b -r c
-
-This script is needed with PGP 5 and with GPG, since their command
-line interfaces can't be properly served by mutt's format mechanism.
-
 
 
 The Configuration Interface

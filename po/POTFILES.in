@@ -115,8 +115,6 @@ opcodes.h
 pager.c
 parse.c
 pattern.c
-pgpewrap.c
-pgppubring.c
 pop.c
 pop_auth.c
 pop_lib.c

@@ -288,7 +288,6 @@ set markers=no                          # Don't mark wrapped lines
 set wrapmargin=4                        # Leave a margin in the pager
 
 # PGP command configuration
-# source ~/.mutt/pgp2.rc
 source ~/.mutt/gpg.rc
 set pgp_getkeys_command=""
 
