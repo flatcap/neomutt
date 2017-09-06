@@ -5,6 +5,8 @@ include $(top_srcdir)/flymake.am
 AUTOMAKE_OPTIONS = 1.6 foreign
 EXTRA_PROGRAMS = pgpewrap pgpring
 
+GIT_VERSION = $(shell git describe --dirty --abbrev=6 --match "neomutt-*" 2> /dev/null | sed -e 's/^neomutt-[0-9]\{8\}//' -e 's/g//')
+
 # Test the .tar file by building everything
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-debug \
@@ -38,7 +40,7 @@ endif
 
 distdir = $(PACKAGE)-$(VERSION)
 
-BUILT_SOURCES = conststrings.c git_ver.h
+BUILT_SOURCES = conststrings.c
 
 bin_PROGRAMS = neomutt
 
@@ -75,7 +77,8 @@ neomutt_DEPENDENCIES = $(MUTT_LIB_OBJECTS) $(LIBOBJS) $(LIBIMAPDEPS) $(LIBCONNDE
 	$(LIBMUTTDEPS) $(HCACHE_DEPS) $(NCRYPT_DEPS) $(INTLDEPS)
 
 DEFS=-DPKGDATADIR=\"$(pkgdatadir)\" -DSYSCONFDIR=\"$(sysconfdir)\" \
-	-DBINDIR=\"$(bindir)\" -DMUTTLOCALEDIR=\"$(datadir)/locale\"
+	-DBINDIR=\"$(bindir)\" -DMUTTLOCALEDIR=\"$(datadir)/locale\" \
+	-DGIT_VERSION=\"$(GIT_VERSION)\"
 
 AM_CPPFLAGS=-I. -I$(top_srcdir) $(GPGME_CFLAGS)
 
@@ -130,12 +133,6 @@ LDADD = $(LIBOBJS) $(INTLLIBS)
 
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
-
-git_ver.h: $(neomutt_SOURCES) $(SUBDIRS)
-	version=`git describe --dirty --abbrev=6 --match "neomutt-*" 2> /dev/null | sed -e 's/^neomutt-[0-9]\{8\}//' -e 's/g//'`; \
-	echo 'const char *GitVer = "'$$version'";' > git_ver.h.tmp; \
-	cmp -s git_ver.h.tmp git_ver.h || mv git_ver.h.tmp git_ver.h; \
-	rm -f git_ver.h.tmp
 
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(sysconfdir)

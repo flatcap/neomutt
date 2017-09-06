@@ -30,7 +30,6 @@
 
 #ifdef MAIN_C
 /* so that global vars get included */
-#include "git_ver.h"
 #include "mx.h"
 #include "ncrypt/ncrypt.h"
 #include "sort.h"
@@ -179,8 +178,6 @@ WHERE char *Visual;
 
 WHERE char *CurrentFolder;
 WHERE char *LastFolder;
-
-WHERE const char *GitVer;
 
 WHERE struct Hash *Groups;
 WHERE struct Hash *ReverseAliases;

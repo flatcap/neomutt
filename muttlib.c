@@ -1539,7 +1539,7 @@ void mutt_sleep(short s)
 const char *mutt_make_version(void)
 {
   static char vstring[STRING];
-  snprintf(vstring, sizeof(vstring), "NeoMutt %s%s", PACKAGE_VERSION, GitVer);
+  snprintf(vstring, sizeof(vstring), "NeoMutt %s%s", PACKAGE_VERSION, GIT_VERSION);
   return vstring;
 }
 
