@@ -635,11 +635,11 @@ int mutt_extract_token(struct Buffer *dest, struct Buffer *tok, int flags)
         ptr = mutt_mem_malloc(tok->dsize);
         memcpy(ptr, expn.data, expnlen);
         strcpy(ptr + expnlen, tok->dptr);
-        if (tok->destroy)
+        if (tok->destroy2)
           FREE(&tok->data);
         tok->data = ptr;
         tok->dptr = ptr;
-        tok->destroy = 1; /* mark that the caller should destroy this data */
+        tok->destroy2 = 1; /* mark that the caller should destroy this data */
         ptr = NULL;
         FREE(&expn.data);
       }
@@ -3109,7 +3109,7 @@ int mutt_parse_rc_line(/* const */ char *line, struct Buffer *token, struct Buff
     }
   }
 finish:
-  if (expn.destroy)
+  if (expn.destroy2)
     FREE(&expn.data);
   return r;
 }

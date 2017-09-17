@@ -35,7 +35,7 @@ struct Buffer
   char *data;   /**< pointer to data */
   char *dptr;   /**< current read/write position */
   size_t dsize; /**< length of data */
-  int destroy;  /**< destroy 'data' when done? */
+  int destroy2;  /**< destroy 'data' when done? */
 };
 
 #define MoreArgs(p) (*p->dptr && (*p->dptr != ';') && (*p->dptr != '#'))

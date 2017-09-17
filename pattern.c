@@ -93,6 +93,7 @@ static bool eat_regex(struct Pattern *pat, struct Buffer *s, struct Buffer *err)
     return false;
   }
 
+
   if (pat->stringmatch)
   {
     pat->p.str = mutt_str_strdup(buf.data);
