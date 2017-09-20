@@ -66,6 +66,8 @@
 #include "imap/imap.h" /* for imap_subscribe() */
 #endif
 
+struct ListHead Deprecated = STAILQ_HEAD_INITIALIZER(Deprecated);
+
 #define CHECK_PAGER                                                                  \
   if ((CurrentMenu == MENU_PAGER) && (idx >= 0) && (MuttVars[idx].flags & R_RESORT)) \
   {                                                                                  \
@@ -215,21 +217,39 @@ int query_quadoption(int opt, const char *prompt)
  * @retval -1 on error
  * @retval >0 on success
  */
-int mutt_option_index(const char *s)
+int mutt_option_index(const char *s, int *synonym)
 {
+  int index = -1;
+  int syn = -1;
+
   for (int i = 0; MuttVars[i].name; i++)
-    if (mutt_str_strcmp(s, MuttVars[i].name) == 0)
-      return (MuttVars[i].type == DT_SYNONYM ?
-                  mutt_option_index((char *) MuttVars[i].var) :
-                  i);
-  return -1;
+  {
+    if (mutt_str_strcmp(s, MuttVars[i].name) != 0)
+      continue;
+
+    if (MuttVars[i].type == DT_SYNONYM)
+    {
+      syn = i;
+      index = mutt_option_index((char *) MuttVars[i].var, NULL);
+    }
+    else
+    {
+      index = i;
+    }
+    break;
+  }
+
+  if (synonym)
+    *synonym = syn;
+
+  return index;
 }
 
 #ifdef USE_LUA
 int mutt_option_to_string(const struct Option *opt, char *val, size_t len)
 {
   mutt_debug(2, " * mutt_option_to_string(%s)\n", NONULL((char *) opt->var));
-  int idx = mutt_option_index((const char *) opt->name);
+  int idx = mutt_option_index((const char *) opt->name, NULL);
   if (idx != -1)
     return var_to_string(idx, val, len);
   return 0;
@@ -238,7 +258,7 @@ int mutt_option_to_string(const struct Option *opt, char *val, size_t len)
 bool mutt_option_get(const char *s, struct Option *opt)
 {
   mutt_debug(2, " * mutt_option_get(%s)\n", s);
-  int idx = mutt_option_index(s);
+  int idx = mutt_option_index(s, NULL);
   if (idx != -1)
   {
     if (opt)
@@ -348,7 +368,7 @@ static int parse_sort(short *val, const char *s, const struct Mapping *map, stru
 int mutt_option_set(const struct Option *val, struct Buffer *err)
 {
   mutt_debug(2, " * mutt_option_set()\n");
-  int idx = mutt_option_index(val->name);
+  int idx = mutt_option_index(val->name, NULL);
   if (idx != -1)
   {
     switch (DTYPE(MuttVars[idx].type))
@@ -672,7 +692,7 @@ int mutt_extract_token(struct Buffer *dest, struct Buffer *tok, int flags)
       {
         if ((env = mutt_str_getenv(var)) || (env = myvar_get(var)))
           mutt_buffer_addstr(dest, env);
-        else if ((idx = mutt_option_index(var)) != -1)
+        else if ((idx = mutt_option_index(var, NULL)) != -1)
         {
           /* expand settable neomutt variables */
           char val[LONG_STRING];
@@ -795,7 +815,7 @@ static int parse_ifdef(struct Buffer *tmp, struct Buffer *s, unsigned long data,
   mutt_extract_token(tmp, s, 0);
 
   /* is the item defined as a variable? */
-  res = (mutt_option_index(tmp->data) != -1);
+  res = (mutt_option_index(tmp->data, NULL) != -1);
 
   /* is the item a compiled-in feature? */
   if (!res)
@@ -2288,6 +2308,7 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
   const char *p = NULL;
   char scratch[_POSIX_PATH_MAX];
   char *myvar = NULL;
+  int synonym = -1;
 
   while (MoreArgs(s))
   {
@@ -2324,7 +2345,7 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
 
     if (mutt_str_strncmp("my_", tmp->data, 3) == 0)
       myvar = tmp->data;
-    else if ((idx = mutt_option_index(tmp->data)) == -1 &&
+    else if ((idx = mutt_option_index(tmp->data, &synonym)) == -1 &&
              !(reset && (mutt_str_strcmp("all", tmp->data) == 0)))
     {
       snprintf(err->data, err->dsize, _("%s: unknown variable"), tmp->data);
@@ -2875,6 +2896,15 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
         mutt_set_current_menu_redraw_full();
     }
   }
+
+  if ((synonym > 0) && (r == 0))
+  {
+    mutt_buffer_printf(err, "%s -> %s",
+        MuttVars[synonym].name,
+        MuttVars[idx].name);
+    r = 2;
+  }
+
   return r;
 }
 
@@ -2890,7 +2920,7 @@ static struct ListHead MuttrcStack = STAILQ_HEAD_INITIALIZER(MuttrcStack);
  * @param err         Buffer for error messages
  * @retval <0 if neomutt should pause to let the user know
  */
-static int source_rc(const char *rcfile_path, struct Buffer *err)
+static int source_rc(const char *rcfile_path, struct Buffer *err, bool synonym)
 {
   FILE *f = NULL;
   int line = 0, rc = 0, conv = 0, line_rc, warnings = 0;
@@ -2962,6 +2992,7 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
     else
       currentline = linebuf;
 
+    mutt_buffer_reset(err);
     line_rc = mutt_parse_rc_line(currentline, &token, err);
     if (line_rc == -1)
     {
@@ -2971,6 +3002,21 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
         if (conv)
           FREE(&currentline);
         break;
+      }
+    }
+    else if (line_rc == 2)
+    {
+      char buf[STRING] = "";
+      snprintf(buf, sizeof(buf), "%s:%d: %s", rcfile, line, err->data);
+
+      if (synonym)
+      {
+        add_to_stailq(&Deprecated, buf);
+      }
+      else
+      {
+        mutt_error("SYNONYM: %s", buf);
+        warnings++;
       }
     }
     else if (line_rc == -2)
@@ -3041,7 +3087,7 @@ static int parse_source(struct Buffer *tmp, struct Buffer *token,
     mutt_str_strfcpy(path, tmp->data, sizeof(path));
     mutt_expand_path(path, sizeof(path));
 
-    if (source_rc(path, err) < 0)
+    if (source_rc(path, err, true) < 0)
     {
       snprintf(err->data, err->dsize,
                _("source: file %s could not be sourced."), path);
@@ -3380,7 +3426,7 @@ int mutt_var_value_complete(char *buffer, size_t len, int pos)
       return 0;
 
     var[vlen - 1] = '\0';
-    idx = mutt_option_index(var);
+    idx = mutt_option_index(var, NULL);
     if (idx == -1)
     {
       myvarval = myvar_get(var);
@@ -3739,6 +3785,25 @@ int mutt_dump_variables(int hide_sensitive)
   return 0;
 }
 
+int mutt_dump_deprecated(void)
+{
+  if (STAILQ_EMPTY(&Deprecated))
+  {
+    printf("No problems detected\n");
+    return 0;
+  }
+
+  printf("Problems detected:\n");
+  struct ListNode *np = NULL;
+  STAILQ_FOREACH(np, &Deprecated, entries)
+  {
+    printf("  %s\n", np->data);
+  }
+
+  mutt_list_free(&Deprecated);
+  return 1;
+}
+
 static int execute_commands(struct ListHead *p)
 {
   struct Buffer err, token;
@@ -3792,14 +3857,21 @@ static char *find_cfg(const char *home, const char *xdg_cfg_home)
       snprintf(buffer, sizeof(buffer), "%s/%s%s", locations[i][0],
                locations[i][1], names[j]);
       if (access(buffer, F_OK) == 0)
+      {
+        if (((i % 2) == 1) || (j == 1))
+        {
+          add_to_stailq(&Deprecated, buffer);
+          fprintf(stderr, "%s\n", buffer);
+        }
         return mutt_str_strdup(buffer);
+      }
     }
   }
 
   return NULL;
 }
 
-void mutt_init(int skip_sys_rc, struct ListHead *commands)
+void mutt_init(int skip_sys_rc, struct ListHead *commands, bool synonym)
 {
   struct passwd *pw = NULL;
   struct utsname utsname;
@@ -3875,7 +3947,7 @@ void mutt_init(int skip_sys_rc, struct ListHead *commands)
     }
     else
     {
-      int i = mutt_option_index("debug_file");
+      int i = mutt_option_index("debug_file", NULL);
       if ((i >= 0) && (MuttVars[i].initial != 0))
         DebugFile = mutt_str_strdup((const char *) MuttVars[i].initial);
     }
@@ -4094,6 +4166,8 @@ void mutt_init(int skip_sys_rc, struct ListHead *commands)
      requested not to via "-n".  */
   if (!skip_sys_rc)
   {
+    bool dep_warning = false;
+
     do
     {
       if (mutt_set_xdg_path(XDG_CONFIG_DIRS, buffer, sizeof(buffer)))
@@ -4105,17 +4179,36 @@ void mutt_init(int skip_sys_rc, struct ListHead *commands)
 
       snprintf(buffer, sizeof(buffer), "%s/Muttrc", SYSCONFDIR);
       if (access(buffer, F_OK) == 0)
+      {
+        dep_warning = true;
         break;
+      }
 
       snprintf(buffer, sizeof(buffer), "%s/neomuttrc", PKGDATADIR);
       if (access(buffer, F_OK) == 0)
         break;
 
       snprintf(buffer, sizeof(buffer), "%s/Muttrc", PKGDATADIR);
+      if (access(buffer, F_OK) == 0)
+      {
+        dep_warning = true;
+        break;
+      }
+
     } while (0);
+
+    if (dep_warning)
+    {
+      char buf[STRING] = "";
+      snprintf(buf, sizeof(buf), "%s", buffer);
+      add_to_stailq(&Deprecated, buf);
+      fprintf(stderr, "%s\n", buf);
+      need_pause = 1;
+    }
+
     if (access(buffer, F_OK) == 0)
     {
-      if (source_rc(buffer, &err) != 0)
+      if (source_rc(buffer, &err, synonym) != 0)
       {
         fputs(err.data, stderr);
         fputc('\n', stderr);
@@ -4132,7 +4225,7 @@ void mutt_init(int skip_sys_rc, struct ListHead *commands)
     {
       if (!OPT_NO_CURSES)
         endwin();
-      if (source_rc(np->data, &err) != 0)
+      if (source_rc(np->data, &err, synonym) != 0)
       {
         fputs(err.data, stderr);
         fputc('\n', stderr);

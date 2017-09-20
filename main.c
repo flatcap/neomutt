@@ -172,6 +172,7 @@ static void start_curses(void)
 #ifdef USE_NNTP
 #define MUTT_NEWS (1 << 5) /* -g and -G */
 #endif
+#define MUTT_SYNONYM (1 << 6)
 
 /**
  * main - Start NeoMutt
@@ -268,7 +269,7 @@ int main(int argc, char **argv, char **env)
     }
 
     /* USE_NNTP 'g:G' */
-    i = getopt(argc, argv, "+A:a:Bb:F:f:c:Dd:l:Ee:g:GH:s:i:hm:npQ:RSvxyzZ");
+    i = getopt(argc, argv, "+A:a:Bb:F:f:c:Dd:l:Ee:g:GH:s:i:hm:npQ:RSvXxyzZ");
     if (i != EOF)
     {
       switch (i)
@@ -373,6 +374,10 @@ int main(int argc, char **argv, char **env)
           version++;
           break;
 
+        case 'X':
+          flags |= MUTT_SYNONYM;
+          break;
+
         case 'x': /* mailx compatible send mode */
           sendflags |= SENDMAILX;
           break;
@@ -451,7 +456,7 @@ int main(int argc, char **argv, char **env)
   }
 
   /* set defaults and read init files */
-  mutt_init(flags & MUTT_NOSYSRC, &commands);
+  mutt_init(flags & MUTT_NOSYSRC, &commands, flags & MUTT_SYNONYM);
   mutt_list_free(&commands);
 
   /* Initialize crypto backends.  */
@@ -467,7 +472,12 @@ int main(int argc, char **argv, char **env)
     return mutt_query_variables(&queries);
   }
   if (dump_variables)
-    return mutt_dump_variables(hide_sensitive);
+  {
+    if (flags & MUTT_SYNONYM)
+      return mutt_dump_deprecated();
+    else
+      return mutt_dump_variables(hide_sensitive);
+  }
 
   if (!STAILQ_EMPTY(&alias_queries))
   {

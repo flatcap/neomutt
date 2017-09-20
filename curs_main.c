@@ -1114,7 +1114,16 @@ int mutt_index_menu(void)
       /* either user abort or timeout */
       if (op < 0)
       {
-        mutt_timeout_hook();
+        static bool shown = false;
+        if (!shown)
+        {
+          shown = true;
+          mutt_error("hello world");
+        }
+        else
+        {
+          mutt_timeout_hook();
+        }
         if (tag)
           mutt_window_clearline(MuttMessageWindow, 0);
         continue;

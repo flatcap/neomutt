@@ -33,6 +33,7 @@
 
 struct ListHead;
 struct Mapping;
+struct RegexList;
 
 /* On OS X 10.5.x, wide char functions are inlined by default breaking
  * --without-wc-funcs compilation
@@ -259,7 +260,10 @@ enum QuadOptionResponse
 
 bool mutt_matches_ignore(const char *s);
 
-void mutt_init(int skip_sys_rc, struct ListHead *commands);
+/* add an element to a list */
+int mutt_remove_from_regex_list(struct RegexList **l, const char *str);
+
+void mutt_init(int skip_sys_rc, struct ListHead *commands, bool synonym);
 
 /* flag to mutt_pattern_comp() */
 #define MUTT_FULL_MSG (1 << 0) /* enable body and header matching */

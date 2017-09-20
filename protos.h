@@ -254,6 +254,7 @@ int mutt_compose_attachment(struct Body *a);
 int mutt_decode_save_attachment(FILE *fp, struct Body *m, char *path, int displaying, int flags);
 int mutt_display_message(struct Header *cur);
 int mutt_dump_variables(int hide_sensitive);
+int mutt_dump_deprecated(void);
 int mutt_edit_attachment(struct Body *a);
 int mutt_edit_message(struct Context *ctx, struct Header *hdr);
 int mutt_view_message(struct Context *ctx, struct Header *hdr);
