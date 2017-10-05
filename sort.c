@@ -92,14 +92,22 @@ static int compare_subject(const void *a, const void *b)
   if (!(*pa)->env->real_subj)
   {
     if (!(*pb)->env->real_subj)
+    {
       rc = compare_date_sent(pa, pb);
+    }
     else
+    {
       rc = -1;
+    }
   }
   else if (!(*pb)->env->real_subj)
+  {
     rc = 1;
+  }
   else
+  {
     rc = mutt_strcasecmp((*pa)->env->real_subj, (*pb)->env->real_subj);
+  }
   AUXSORT(rc, a, b);
   return (SORTCODE(rc));
 }
@@ -111,11 +119,17 @@ const char *mutt_get_name(struct Address *a)
   if (a)
   {
     if (option(OPT_REVERSE_ALIAS) && (ali = alias_reverse_lookup(a)) && ali->personal)
+    {
       return ali->personal;
+    }
     else if (a->personal)
+    {
       return a->personal;
+    }
     else if (a->mailbox)
+    {
       return (mutt_addr_for_display(a));
+    }
   }
   /* don't return NULL to avoid segfault when printing/comparing */
   return "";
@@ -175,9 +189,11 @@ static int compare_order(const void *a, const void *b)
     return (SORTCODE(result));
   }
   else
+  {
 #endif
     /* no need to auxsort because you will never have equality here */
     return (SORTCODE((*ha)->index - (*hb)->index));
+  }
 }
 
 static int compare_spam(const void *a, const void *b)
@@ -196,9 +212,13 @@ static int compare_spam(const void *a, const void *b)
 
   /* If one msg has spam attr but other does not, sort the one with first. */
   if (ahas && !bhas)
+  {
     return (SORTCODE(1));
+  }
   if (!ahas && bhas)
+  {
     return (SORTCODE(-1));
+  }
 
   /* Else, if neither has a spam attr, presume equality. Fall back on aux. */
   if (!ahas && !bhas)
@@ -219,7 +239,9 @@ static int compare_spam(const void *a, const void *b)
   /* If either aptr or bptr is equal to data, there is no numeric    */
   /* value for that spam attribute. In this case, compare lexically. */
   if ((aptr == (*ppa)->env->spam->data) || (bptr == (*ppb)->env->spam->data))
+  {
     return (SORTCODE(strcmp(aptr, bptr)));
+  }
 
   /* Otherwise, we have numeric value for both attrs. If these values */
   /* are equal, then we first fall back upon string comparison, then  */
@@ -250,9 +272,13 @@ static int compare_label(const void *a, const void *b)
 
   /* First we bias toward a message with a label, if the other does not. */
   if (ahas && !bhas)
+  {
     return (SORTCODE(-1));
+  }
   if (!ahas && bhas)
+  {
     return (SORTCODE(1));
+  }
 
   /* If neither has a label, use aux sort. */
   if (!ahas && !bhas)
@@ -306,7 +332,9 @@ void mutt_sort_headers(struct Context *ctx, int init)
   unset_option(OPT_NEED_RESORT);
 
   if (!ctx)
+  {
     return;
+  }
 
   if (!ctx->msgcount)
   {
@@ -320,12 +348,16 @@ void mutt_sort_headers(struct Context *ctx, int init)
   }
 
   if (!ctx->quiet)
+  {
     mutt_message(_("Sorting mailbox..."));
+  }
 
   if (option(OPT_NEED_RESCORE) && option(OPT_SCORE))
   {
     for (i = 0; i < ctx->msgcount; i++)
+    {
       mutt_score_message(ctx, ctx->hdrs[i], 1);
+    }
   }
   unset_option(OPT_NEED_RESCORE);
 
@@ -336,7 +368,9 @@ void mutt_sort_headers(struct Context *ctx, int init)
   }
 
   if (init && ctx->tree)
+  {
     mutt_clear_threads(ctx);
+  }
 
   if ((Sort & SORT_MASK) == SORT_THREADS)
   {
@@ -348,7 +382,9 @@ void mutt_sort_headers(struct Context *ctx, int init)
       i = Sort;
       Sort = SortAux;
       if (ctx->tree)
+      {
         ctx->tree = mutt_sort_subthreads(ctx->tree, 1);
+      }
       Sort = i;
       unset_option(OPT_SORT_SUBTHREADS);
     }
@@ -362,7 +398,9 @@ void mutt_sort_headers(struct Context *ctx, int init)
     return;
   }
   else
+  {
     qsort((void *) ctx->hdrs, ctx->msgcount, sizeof(struct Header *), sortfunc);
+  }
 
   /* adjust the virtual message numbers */
   ctx->vcount = 0;
@@ -385,16 +423,22 @@ void mutt_sort_headers(struct Context *ctx, int init)
     while ((thread = top) != NULL)
     {
       while (!thread->message)
+      {
         thread = thread->child;
+      }
       h = thread->message;
 
       if (h->collapsed)
+      {
         mutt_collapse_thread(ctx, h);
+      }
       top = top->next;
     }
     mutt_set_virtual(ctx);
   }
 
   if (!ctx->quiet)
+  {
     mutt_clear_error();
+  }
 }

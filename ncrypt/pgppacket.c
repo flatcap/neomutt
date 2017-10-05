@@ -69,7 +69,9 @@ unsigned char *pgp_read_packet(FILE *fp, size_t *len)
 
   startpos = ftello(fp);
   if (startpos < 0)
+  {
     return NULL;
+  }
 
   if (!plen)
   {
@@ -80,7 +82,9 @@ unsigned char *pgp_read_packet(FILE *fp, size_t *len)
   if (fread(&ctb, 1, 1, fp) < 1)
   {
     if (!feof(fp))
+    {
       perror("fread");
+    }
     goto bail;
   }
 
@@ -141,7 +145,9 @@ unsigned char *pgp_read_packet(FILE *fp, size_t *len)
       }
 
       if (read_material(material, &used, fp) == -1)
+      {
         goto bail;
+      }
 
     } while (partial);
   }
@@ -173,7 +179,9 @@ unsigned char *pgp_read_packet(FILE *fp, size_t *len)
       case 2:
       {
         if (!bytes)
+        {
           bytes = 4;
+        }
 
         material = 0;
 
@@ -195,11 +203,15 @@ unsigned char *pgp_read_packet(FILE *fp, size_t *len)
     }
 
     if (read_material(material, &used, fp) == -1)
+    {
       goto bail;
+    }
   }
 
   if (len)
+  {
     *len = used;
+  }
 
   return pbuf;
 

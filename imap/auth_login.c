@@ -50,9 +50,13 @@ enum ImapAuthRes imap_auth_login(struct ImapData *idata, const char *method)
   }
 
   if (mutt_account_getuser(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
   if (mutt_account_getpass(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
 
   mutt_message(_("Logging in..."));
 
@@ -64,7 +68,9 @@ enum ImapAuthRes imap_auth_login(struct ImapData *idata, const char *method)
    * of 5 or higher */
 
   if (debuglevel < IMAP_LOG_PASS)
+  {
     mutt_debug(2, "Sending LOGIN command for %s...\n", idata->conn->account.user);
+  }
 #endif
 
   snprintf(buf, sizeof(buf), "LOGIN %s %s", q_user, q_pass);

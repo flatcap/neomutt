@@ -215,7 +215,9 @@ void mutt_set_langinfo_charset(void)
 
   /* finally, set $charset */
   if (!(Charset = safe_strdup(buff2)))
+  {
     Charset = safe_strdup("iso-8859-1");
+  }
 }
 
 /**
@@ -231,8 +233,9 @@ void mutt_canonical_charset(char *dest, size_t dlen, const char *name)
 
   strfcpy(in, name, sizeof(in));
   if ((ext = strchr(in, '/')))
+  {
     *ext++ = '\0';
-
+  }
   if ((mutt_strcasecmp(in, "utf-8") == 0) || (mutt_strcasecmp(in, "utf8") == 0))
   {
     strfcpy(dest, "utf-8", dlen);
@@ -241,29 +244,43 @@ void mutt_canonical_charset(char *dest, size_t dlen, const char *name)
 
   /* catch some common iso-8859-something misspellings */
   if ((mutt_strncasecmp(in, "8859", 4) == 0) && in[4] != '-')
+  {
     snprintf(scratch, sizeof(scratch), "iso-8859-%s", in + 4);
+  }
   else if (mutt_strncasecmp(in, "8859-", 5) == 0)
+  {
     snprintf(scratch, sizeof(scratch), "iso-8859-%s", in + 5);
+  }
   else if ((mutt_strncasecmp(in, "iso8859", 7) == 0) && in[7] != '-')
+  {
     snprintf(scratch, sizeof(scratch), "iso_8859-%s", in + 7);
+  }
   else if (mutt_strncasecmp(in, "iso8859-", 8) == 0)
+  {
     snprintf(scratch, sizeof(scratch), "iso_8859-%s", in + 8);
+  }
   else
+  {
     strfcpy(scratch, in, sizeof(scratch));
+  }
 
   for (size_t i = 0; PreferredMIMENames[i].key; i++)
+  {
     if ((mutt_strcasecmp(scratch, PreferredMIMENames[i].key) == 0) ||
         (mutt_strcasecmp(scratch, PreferredMIMENames[i].key) == 0))
     {
       strfcpy(dest, PreferredMIMENames[i].pref, dlen);
       goto out;
     }
+  }
 
   strfcpy(dest, scratch, dlen);
 
   /* for cosmetics' sake, transform to lowercase. */
   for (p = dest; *p; p++)
+  {
     *p = tolower(*p);
+  }
 
 out:
   if (ext && *ext)
@@ -279,7 +296,9 @@ int mutt_chscmp(const char *s, const char *chs)
   int a, b;
 
   if (!s)
+  {
     return 0;
+  }
 
   /* charsets may have extensions mutt_canonical_charset()
      leaves intact; we expect `chs' to originate from neomutt
@@ -339,7 +358,9 @@ iconv_t mutt_iconv_open(const char *tocode, const char *fromcode, int flags)
    * but only when caller asked us to sanitize a potentially wrong
    * charset name incoming from the wild exterior. */
   if ((flags & MUTT_ICONV_HOOK_FROM) && (tmp = mutt_charset_hook(fromcode1)))
+  {
     mutt_canonical_charset(fromcode1, sizeof(fromcode1), tmp);
+  }
 
   /* always apply iconv-hooks to suit system's iconv tastes */
   tocode2 = mutt_iconv_hook(tocode1);
@@ -349,7 +370,9 @@ iconv_t mutt_iconv_open(const char *tocode, const char *fromcode, int flags)
 
   /* call system iconv with names it appreciates */
   if ((cd = iconv_open(tocode2, fromcode2)) != (iconv_t) -1)
+  {
     return cd;
+  }
 
   return (iconv_t) -1;
 }
@@ -375,7 +398,9 @@ size_t mutt_iconv(iconv_t cd, ICONV_CONST char **inbuf, size_t *inbytesleft,
   {
     ret1 = iconv(cd, &ib, &ibl, &ob, &obl);
     if (ret1 != (size_t) -1)
+    {
       ret += ret1;
+    }
     if (ibl && obl && errno == EILSEQ)
     {
       if (inrepls)
@@ -400,11 +425,15 @@ size_t mutt_iconv(iconv_t cd, ICONV_CONST char **inbuf, size_t *inbytesleft,
           }
         }
         if (*t)
+        {
           continue;
+        }
       }
       /* Replace the output */
       if (!outrepl)
+      {
         outrepl = "?";
+      }
       iconv(cd, 0, 0, &ob, &obl);
       if (obl)
       {
@@ -445,7 +474,9 @@ int mutt_convert_string(char **ps, const char *from, const char *to, int flags)
   char *s = *ps;
 
   if (!s || !*s)
+  {
     return 0;
+  }
 
   if (to && from && (cd = mutt_iconv_open(to, from, flags)) != (iconv_t) -1)
   {
@@ -457,11 +488,17 @@ int mutt_convert_string(char **ps, const char *from, const char *to, int flags)
     char *outrepl = NULL;
 
     if (mutt_is_utf8(to))
+    {
       outrepl = "\357\277\275";
+    }
     else if (mutt_is_utf8(from))
+    {
       inrepls = repls;
+    }
     else
+    {
       outrepl = "?";
+    }
 
     len = strlen(s);
     ib = s;
@@ -481,7 +518,9 @@ int mutt_convert_string(char **ps, const char *from, const char *to, int flags)
     return 0;
   }
   else
+  {
     return -1;
+  }
 }
 
 /*
@@ -527,7 +566,9 @@ FGETCONV *fgetconv_open(FILE *file, const char *from, const char *to, int flags)
   static ICONV_CONST char *repls[] = { "\357\277\275", "?", 0 };
 
   if (from && to)
+  {
     cd = mutt_iconv_open(to, from, flags);
+  }
 
   if (cd != (iconv_t) -1)
   {
@@ -538,7 +579,9 @@ FGETCONV *fgetconv_open(FILE *file, const char *from, const char *to, int flags)
     fc->inrepls = mutt_is_utf8(to) ? repls : repls + 1;
   }
   else
+  {
     fc = safe_malloc(sizeof(struct FgetConvNot));
+  }
   fc->file = file;
   fc->cd = cd;
   return (FGETCONV *) fc;
@@ -552,17 +595,25 @@ char *fgetconvs(char *buf, size_t l, FGETCONV *_fc)
   for (r = 0; r + 1 < l;)
   {
     if ((c = fgetconv(_fc)) == EOF)
+    {
       break;
+    }
     buf[r++] = (char) c;
     if (c == '\n')
+    {
       break;
+    }
   }
   buf[r] = '\0';
 
   if (r)
+  {
     return buf;
+  }
   else
+  {
     return NULL;
+  }
 }
 
 int fgetconv(FGETCONV *_fc)
@@ -570,13 +621,21 @@ int fgetconv(FGETCONV *_fc)
   struct FgetConv *fc = (struct FgetConv *) _fc;
 
   if (!fc)
+  {
     return EOF;
+  }
   if (fc->cd == (iconv_t) -1)
+  {
     return fgetc(fc->file);
+  }
   if (!fc->p)
+  {
     return EOF;
+  }
   if (fc->p < fc->ob)
+  {
     return (unsigned char) *(fc->p)++;
+  }
 
   /* Try to convert some more */
   fc->p = fc->ob = fc->bufo;
@@ -585,7 +644,9 @@ int fgetconv(FGETCONV *_fc)
     size_t obl = sizeof(fc->bufo);
     iconv(fc->cd, (ICONV_CONST char **) &fc->ib, &fc->ibl, &fc->ob, &obl);
     if (fc->p < fc->ob)
+    {
       return (unsigned char) *(fc->p)++;
+    }
   }
 
   /* If we trusted iconv a bit more, we would at this point
@@ -599,7 +660,9 @@ int fgetconv(FGETCONV *_fc)
     return EOF;
   }
   if (fc->ibl)
+  {
     memcpy(fc->bufi, fc->ib, fc->ibl);
+  }
   fc->ib = fc->bufi;
   fc->ibl += fread(fc->ib + fc->ibl, 1, sizeof(fc->bufi) - fc->ibl, fc->file);
 
@@ -610,7 +673,9 @@ int fgetconv(FGETCONV *_fc)
     mutt_iconv(fc->cd, (ICONV_CONST char **) &fc->ib, &fc->ibl, &fc->ob, &obl,
                fc->inrepls, 0);
     if (fc->p < fc->ob)
+    {
       return (unsigned char) *(fc->p)++;
+    }
   }
 
   /* Either the file has finished or one of the buffers is too small */
@@ -623,7 +688,9 @@ void fgetconv_close(FGETCONV **_fc)
   struct FgetConv *fc = (struct FgetConv *) *_fc;
 
   if (fc->cd != (iconv_t) -1)
+  {
     iconv_close(fc->cd);
+  }
   FREE(_fc);
 }
 
@@ -633,15 +700,21 @@ bool mutt_check_charset(const char *s, bool strict)
   iconv_t cd;
 
   if (mutt_is_utf8(s))
+  {
     return true;
+  }
 
   if (!strict)
+  {
     for (i = 0; PreferredMIMENames[i].key; i++)
     {
       if ((mutt_strcasecmp(PreferredMIMENames[i].key, s) == 0) ||
           (mutt_strcasecmp(PreferredMIMENames[i].pref, s) == 0))
+      {
         return true;
+      }
     }
+  }
 
   if ((cd = mutt_iconv_open(s, s, 0)) != (iconv_t)(-1))
   {

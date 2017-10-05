@@ -75,7 +75,9 @@ static struct CapabilityAlias CapabilityAliases[] = {
 static bool cmd_queue_full(struct ImapData *idata)
 {
   if ((idata->nextcmd + 1) % idata->cmdslots == idata->lastcmd)
+  {
     return true;
+  }
 
   return false;
 }
@@ -100,7 +102,9 @@ static struct ImapCommand *cmd_new(struct ImapData *idata)
 
   snprintf(cmd->seq, sizeof(cmd->seq), "a%04u", idata->seqno++);
   if (idata->seqno > 9999)
+  {
     idata->seqno = 0;
+  }
 
   cmd->state = IMAP_CMD_NEW;
 
@@ -124,14 +128,20 @@ static int cmd_queue(struct ImapData *idata, const char *cmdstr, int flags)
     rc = imap_exec(idata, NULL, IMAP_CMD_FAIL_OK | (flags & IMAP_CMD_POLL));
 
     if (rc < 0 && rc != -2)
+    {
       return rc;
+    }
   }
 
   if (!(cmd = cmd_new(idata)))
+  {
     return IMAP_CMD_BAD;
+  }
 
   if (mutt_buffer_printf(idata->cmdbuf, "%s %s\r\n", cmd->seq, cmdstr) < 0)
+  {
     return IMAP_CMD_BAD;
+  }
 
   return 0;
 }
@@ -157,7 +167,9 @@ static void cmd_handle_fatal(struct ImapData *idata)
   {
     idata->recovering = true;
     if (imap_conn_find(&idata->conn->account, 0))
+    {
       mutt_clear_error();
+    }
     idata->recovering = false;
   }
 }
@@ -173,13 +185,19 @@ static int cmd_start(struct ImapData *idata, const char *cmdstr, int flags)
   }
 
   if (cmdstr && ((rc = cmd_queue(idata, cmdstr, flags)) < 0))
+  {
     return rc;
+  }
 
   if (flags & IMAP_CMD_QUEUE)
+  {
     return 0;
+  }
 
   if (idata->cmdbuf->dptr == idata->cmdbuf->data)
+  {
     return IMAP_CMD_BAD;
+  }
 
   rc = mutt_socket_write_d(idata->conn, idata->cmdbuf->data, -1,
                            flags & IMAP_CMD_PASS ? IMAP_LOG_PASS : IMAP_LOG_CMD);
@@ -187,7 +205,9 @@ static int cmd_start(struct ImapData *idata, const char *cmdstr, int flags)
 
   /* unidle when command queue is flushed */
   if (idata->state == IMAP_IDLE)
+  {
     idata->state = IMAP_SELECTED;
+  }
 
   return (rc < 0) ? IMAP_CMD_BAD : 0;
 }
@@ -200,9 +220,13 @@ static int cmd_status(const char *s)
   s = imap_next_word((char *) s);
 
   if (mutt_strncasecmp("OK", s, 2) == 0)
+  {
     return IMAP_CMD_OK;
+  }
   if (mutt_strncasecmp("NO", s, 2) == 0)
+  {
     return IMAP_CMD_NO;
+  }
 
   return IMAP_CMD_BAD;
 }
@@ -222,7 +246,9 @@ static void cmd_parse_expunge(struct ImapData *idata, const char *s)
 
   exp_msn = atoi(s);
   if (exp_msn < 1 || exp_msn > idata->max_msn)
+  {
     return;
+  }
 
   h = idata->msn_index[exp_msn - 1];
   if (h)
@@ -239,7 +265,9 @@ static void cmd_parse_expunge(struct ImapData *idata, const char *s)
   {
     h = idata->msn_index[cur];
     if (h)
+    {
       HEADER_DATA(h)->msn--;
+    }
     idata->msn_index[cur - 1] = h;
   }
 
@@ -301,9 +329,13 @@ static void cmd_parse_fetch(struct ImapData *idata, char *s)
       {
         /* If server flags could conflict with mutt's flags, reopen the mailbox. */
         if (h->changed)
+        {
           idata->reopen |= IMAP_EXPUNGE_PENDING;
+        }
         else
+        {
           idata->check_status = IMAP_FLAGS_PENDING;
+        }
       }
       return;
     }
@@ -320,7 +352,9 @@ static void cmd_parse_fetch(struct ImapData *idata, char *s)
       s = imap_next_word(s);
     }
     else if (*s == ')')
+    {
       s++; /* end of request */
+    }
     else if (*s)
     {
       mutt_debug(2, "Only handle FLAGS updates\n");
@@ -342,7 +376,9 @@ static void cmd_parse_capability(struct ImapData *idata, char *s)
 
   s = imap_next_word(s);
   if ((bracket = strchr(s, ']')))
+  {
     *bracket = '\0';
+  }
   FREE(&idata->capstr);
   idata->capstr = safe_strdup(s);
 
@@ -352,6 +388,7 @@ static void cmd_parse_capability(struct ImapData *idata, char *s)
   {
     found = false;
     for (x = 0; x < CAPMAX; x++)
+    {
       if (imap_wordcasecmp(Capabilities[x], s) == 0)
       {
         mutt_bit_set(idata->capabilities, x);
@@ -359,6 +396,7 @@ static void cmd_parse_capability(struct ImapData *idata, char *s)
         found = true;
         break;
       }
+    }
     if (!found)
     {
       for (x = 0; CapabilityAliases[x].name != NULL; x++)
@@ -384,9 +422,13 @@ static void cmd_parse_list(struct ImapData *idata, char *s)
   long litlen;
 
   if (idata->cmddata && idata->cmdtype == IMAP_CT_LIST)
+  {
     list = (struct ImapList *) idata->cmddata;
+  }
   else
+  {
     list = &lb;
+  }
 
   memset(list, 0, sizeof(struct ImapList));
 
@@ -401,16 +443,24 @@ static void cmd_parse_list(struct ImapData *idata, char *s)
   while (*s)
   {
     if (mutt_strncasecmp(s, "\\NoSelect", 9) == 0)
+    {
       list->noselect = true;
+    }
     else if (mutt_strncasecmp(s, "\\NoInferiors", 12) == 0)
+    {
       list->noinferiors = true;
-    /* See draft-gahrns-imap-child-mailbox-?? */
+      /* See draft-gahrns-imap-child-mailbox-?? */
+    }
     else if (mutt_strncasecmp(s, "\\HasNoChildren", 14) == 0)
+    {
       list->noinferiors = true;
+    }
 
     s = imap_next_word(s);
     if (*(s - 2) == ')')
+    {
       break;
+    }
   }
 
   /* Delimiter */
@@ -463,7 +513,9 @@ static void cmd_parse_lsub(struct ImapData *idata, char *s)
   }
 
   if (!option(OPT_IMAP_CHECK_SUBSCRIBED))
+  {
     return;
+  }
 
   idata->cmdtype = IMAP_CT_LIST;
   idata->cmddata = &list;
@@ -471,7 +523,9 @@ static void cmd_parse_lsub(struct ImapData *idata, char *s)
   idata->cmddata = NULL;
   /* noselect is for a gmail quirk (#3445) */
   if (!list.name || list.noselect)
+  {
     return;
+  }
 
   mutt_debug(3, "Subscribing to %s\n", list.name);
 
@@ -482,7 +536,9 @@ static void cmd_parse_lsub(struct ImapData *idata, char *s)
   url.path = errstr + 1;
   url.path[strlen(url.path) - 1] = '\0';
   if (mutt_strcmp(url.user, ImapUser) == 0)
+  {
     url.user = NULL;
+  }
   url_tostring(&url, buf + 11, sizeof(buf) - 11, 0);
   safe_strcat(buf, sizeof(buf), "\"");
   mutt_buffer_init(&token);
@@ -490,7 +546,9 @@ static void cmd_parse_lsub(struct ImapData *idata, char *s)
   err.data = errstr;
   err.dsize = sizeof(errstr);
   if (mutt_parse_rc_line(buf, &token, &err))
+  {
     mutt_debug(1, "Error adding subscribed mailbox: %s\n", errstr);
+  }
   FREE(&token.data);
 }
 
@@ -576,7 +634,9 @@ static void cmd_parse_search(struct ImapData *idata, const char *s)
     uid = (unsigned int) atoi(s);
     h = (struct Header *) int_hash_find(idata->uid_hash, uid);
     if (h)
+    {
       h->matched = true;
+    }
   }
 }
 
@@ -642,17 +702,27 @@ static void cmd_parse_status(struct ImapData *idata, char *s)
       new_msg_count = 1;
     }
     else if (mutt_strncmp("RECENT", s, 6) == 0)
+    {
       status->recent = count;
+    }
     else if (mutt_strncmp("UIDNEXT", s, 7) == 0)
+    {
       status->uidnext = count;
+    }
     else if (mutt_strncmp("UIDVALIDITY", s, 11) == 0)
+    {
       status->uidvalidity = count;
+    }
     else if (mutt_strncmp("UNSEEN", s, 6) == 0)
+    {
       status->unseen = count;
+    }
 
     s = value;
     if (*s && *s != ')')
+    {
       s = imap_next_word(s);
+    }
   }
   mutt_debug(
       3,
@@ -673,7 +743,9 @@ static void cmd_parse_status(struct ImapData *idata, char *s)
   for (inc = Incoming; inc; inc = inc->next)
   {
     if (inc->magic != MUTT_IMAP)
+    {
       continue;
+    }
 
     if (imap_parse_path(inc->path, &mx) < 0)
     {
@@ -690,7 +762,9 @@ static void cmd_parse_status(struct ImapData *idata, char *s)
         FREE(&mx.mbox);
       }
       else
+      {
         value = safe_strdup("INBOX");
+      }
 
       if (value && (imap_mxcmp(mailbox, value) == 0))
       {
@@ -702,31 +776,45 @@ static void cmd_parse_status(struct ImapData *idata, char *s)
           if (olduv && olduv == status->uidvalidity)
           {
             if (oldun < status->uidnext)
+            {
               new = (status->unseen > 0);
+            }
           }
           else if (!olduv && !oldun)
+          {
             /* first check per session, use recent. might need a flag for this. */
             new = (status->recent > 0);
+          }
           else
+          {
             new = (status->unseen > 0);
+          }
         }
         else
+        {
           new = (status->unseen > 0);
+        }
 
 #ifdef USE_SIDEBAR
         if ((inc->new != new) || (inc->msg_count != status->messages) ||
             (inc->msg_unread != status->unseen))
+        {
           mutt_set_current_menu_redraw(REDRAW_SIDEBAR);
+        }
 #endif
         inc->new = new;
         if (new_msg_count)
+        {
           inc->msg_count = status->messages;
+        }
         inc->msg_unread = status->unseen;
 
         if (inc->new)
+        {
           /* force back to keep detecting new mail until the mailbox is
              opened */
           status->uidnext = oldun;
+        }
 
         FREE(&value);
         return;
@@ -750,7 +838,9 @@ static void cmd_parse_enabled(struct ImapData *idata, const char *s)
   {
     if ((mutt_strncasecmp(s, "UTF8=ACCEPT", 11) == 0) ||
         (mutt_strncasecmp(s, "UTF8=ONLY", 9) == 0))
+    {
       idata->unicode = 1;
+    }
   }
 }
 
@@ -791,7 +881,9 @@ static int cmd_handle_untagged(struct ImapData *idata)
       /* at least the InterChange server sends EXISTS messages freely,
        * even when there is no new mail */
       else if (count == idata->max_msn)
+      {
         mutt_debug(3, "cmd_handle_untagged: superfluous EXISTS message.\n");
+      }
       else
       {
         if (!(idata->reopen & IMAP_EXPUNGE_PENDING))
@@ -806,35 +898,59 @@ static int cmd_handle_untagged(struct ImapData *idata)
     }
     /* pn vs. s: need initial seqno */
     else if (mutt_strncasecmp("EXPUNGE", s, 7) == 0)
+    {
       cmd_parse_expunge(idata, pn);
+    }
     else if (mutt_strncasecmp("FETCH", s, 5) == 0)
+    {
       cmd_parse_fetch(idata, pn);
+    }
   }
   else if (mutt_strncasecmp("CAPABILITY", s, 10) == 0)
+  {
     cmd_parse_capability(idata, s);
+  }
   else if (mutt_strncasecmp("OK [CAPABILITY", s, 14) == 0)
+  {
     cmd_parse_capability(idata, pn);
+  }
   else if (mutt_strncasecmp("OK [CAPABILITY", pn, 14) == 0)
+  {
     cmd_parse_capability(idata, imap_next_word(pn));
+  }
   else if (mutt_strncasecmp("LIST", s, 4) == 0)
+  {
     cmd_parse_list(idata, s);
+  }
   else if (mutt_strncasecmp("LSUB", s, 4) == 0)
+  {
     cmd_parse_lsub(idata, s);
+  }
   else if (mutt_strncasecmp("MYRIGHTS", s, 8) == 0)
+  {
     cmd_parse_myrights(idata, s);
+  }
   else if (mutt_strncasecmp("SEARCH", s, 6) == 0)
+  {
     cmd_parse_search(idata, s);
+  }
   else if (mutt_strncasecmp("STATUS", s, 6) == 0)
+  {
     cmd_parse_status(idata, s);
+  }
   else if (mutt_strncasecmp("ENABLED", s, 7) == 0)
+  {
     cmd_parse_enabled(idata, s);
+  }
   else if (mutt_strncasecmp("BYE", s, 3) == 0)
   {
     mutt_debug(2, "Handling BYE\n");
 
     /* check if we're logging out */
     if (idata->status == IMAP_BYE)
+    {
       return 0;
+    }
 
     /* server shut down our connection */
     s += 3;
@@ -900,7 +1016,9 @@ int imap_cmd_step(struct ImapData *idata)
 
     /* back up over '\0' */
     if (len)
+    {
       len--;
+    }
     c = mutt_socket_readln(idata->buf + len, idata->blen - len, idata->conn);
     if (c <= 0)
     {
@@ -930,11 +1048,15 @@ int imap_cmd_step(struct ImapData *idata)
   if (((mutt_strncmp(idata->buf, "* ", 2) == 0) ||
        (mutt_strncmp(imap_next_word(idata->buf), "OK [", 4) == 0)) &&
       cmd_handle_untagged(idata))
+  {
     return IMAP_CMD_BAD;
+  }
 
   /* server demands a continuation response from us */
   if (idata->buf[0] == '+')
+  {
     return IMAP_CMD_RESPOND;
+  }
 
   /* Look for tagged command completions.
    *
@@ -966,14 +1088,18 @@ int imap_cmd_step(struct ImapData *idata)
         rc = cmd->state;
       }
       else
+      {
         stillrunning++;
+      }
     }
 
     c = (c + 1) % idata->cmdslots;
   } while (c != idata->nextcmd);
 
   if (stillrunning)
+  {
     rc = IMAP_CMD_CONTINUE;
+  }
   else
   {
     mutt_debug(3, "IMAP queue drained\n");
@@ -1018,7 +1144,9 @@ const char *imap_cmd_trailer(struct ImapData *idata)
 
   s = imap_next_word((char *) s);
   if (!s)
+  {
     return notrailer;
+  }
 
   return s;
 }
@@ -1052,7 +1180,9 @@ int imap_exec(struct ImapData *idata, const char *cmdstr, int flags)
   }
 
   if (flags & IMAP_CMD_QUEUE)
+  {
     return 0;
+  }
 
   if ((flags & IMAP_CMD_POLL) && (ImapPollTimeout > 0) &&
       (mutt_socket_poll(idata->conn, ImapPollTimeout)) == 0)
@@ -1066,17 +1196,22 @@ int imap_exec(struct ImapData *idata, const char *cmdstr, int flags)
   /* Allow interruptions, particularly useful if there are network problems. */
   mutt_allow_interrupt(1);
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
   mutt_allow_interrupt(0);
 
   if (rc == IMAP_CMD_NO && (flags & IMAP_CMD_FAIL_OK))
+  {
     return -2;
+  }
 
   if (rc != IMAP_CMD_OK)
   {
     if ((flags & IMAP_CMD_FAIL_OK) && idata->status != IMAP_FATAL)
+    {
       return -2;
+    }
 
     mutt_debug(1, "imap_exec: command failed: %s\n", idata->buf);
     return -1;
@@ -1102,7 +1237,9 @@ void imap_cmd_finish(struct ImapData *idata)
   }
 
   if (!(idata->state >= IMAP_SELECTED) || idata->ctx->closing)
+  {
     return;
+  }
 
   if (idata->reopen & IMAP_REOPEN_ALLOW)
   {
@@ -1124,7 +1261,9 @@ void imap_cmd_finish(struct ImapData *idata)
       imap_expunge_mailbox(idata);
       /* Detect whether we've gotten unexpected EXPUNGE messages */
       if ((idata->reopen & IMAP_EXPUNGE_PENDING) && !(idata->reopen & IMAP_EXPUNGE_EXPECTED))
+      {
         idata->check_status = IMAP_EXPUNGE_PENDING;
+      }
       idata->reopen &=
           ~(IMAP_EXPUNGE_PENDING | IMAP_NEWMAIL_PENDING | IMAP_EXPUNGE_EXPECTED);
     }
@@ -1142,8 +1281,9 @@ int imap_cmd_idle(struct ImapData *idata)
 
   imap_cmd_start(idata, "IDLE");
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc == IMAP_CMD_RESPOND)
   {

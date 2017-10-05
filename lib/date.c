@@ -153,10 +153,14 @@ static time_t compute_tz(time_t g, struct tm *utc)
   {
     /* This code is optimized to negative timezones (West of Greenwich) */
     if ((yday == -1) || /* UTC passed midnight before localtime */
-        (yday > 1))     /* UTC passed new year before localtime */
+        (yday > 1))
+    { /* UTC passed new year before localtime */
       t -= (24 * 60 * 60);
+    }
     else
+    {
       t += (24 * 60 * 60);
+    }
   }
 
   return t;
@@ -195,14 +199,20 @@ static const char *uncomment_timezone(char *buf, size_t buflen, const char *tz)
   size_t len;
 
   if (*tz != '(')
+  {
     return tz; /* no need to do anything */
+  }
   tz = skip_email_wsp(tz + 1);
   p = strpbrk(tz, " )");
   if (!p)
+  {
     return tz;
+  }
   len = p - tz;
   if (len > (buflen - 1))
+  {
     len = buflen - 1;
+  }
   memcpy(buf, tz, len);
   buf[len] = '\0';
   return buf;
@@ -222,7 +232,9 @@ time_t mutt_local_tz(time_t t)
   struct tm utc;
 
   if (!t)
+  {
     t = time(NULL);
+  }
   ptm = gmtime(&t);
   /* need to make a copy because gmtime/localtime return a pointer to
      static memory (grr!) */
@@ -250,17 +262,27 @@ time_t mutt_mktime(struct tm *t, int local)
   /* Prevent an integer overflow.
    * The time_t cast is an attempt to silence a clang range warning. */
   if ((time_t) t->tm_year > (TM_YEAR_MAX - 1900))
+  {
     return TIME_T_MAX;
+  }
   if ((time_t) t->tm_year < (TM_YEAR_MIN - 1900))
+  {
     return TIME_T_MIN;
+  }
 
   if ((t->tm_mday < 1) || (t->tm_mday > 31))
+  {
     return TIME_T_MIN;
+  }
   if ((t->tm_hour < 0) || (t->tm_hour > 23) || (t->tm_min < 0) ||
       (t->tm_min > 59) || (t->tm_sec < 0) || (t->tm_sec > 60))
+  {
     return TIME_T_MIN;
+  }
   if (t->tm_year > 9999)
+  {
     return TIME_T_MAX;
+  }
 
   /* Compute the number of days since January 1 in the same year */
   g = AccumDaysPerMonth[t->tm_mon % 12];
@@ -269,7 +291,9 @@ time_t mutt_mktime(struct tm *t, int local)
    * but this algorithm will fail after year 2099 */
   g += t->tm_mday;
   if ((t->tm_year % 4) || t->tm_mon < 2)
+  {
     g--;
+  }
   t->tm_yday = g;
 
   /* Compute the number of days since January 1, 1970 */
@@ -289,7 +313,9 @@ time_t mutt_mktime(struct tm *t, int local)
   g += t->tm_sec;
 
   if (local)
+  {
     g -= compute_tz(g, t);
+  }
 
   return g;
 }
@@ -354,7 +380,9 @@ void mutt_normalize_time(struct tm *tm)
   while (tm->tm_mday <= 0)
   {
     if (tm->tm_mon)
+    {
       tm->tm_mon--;
+    }
     else
     {
       tm->tm_mon = 11;
@@ -366,7 +394,9 @@ void mutt_normalize_time(struct tm *tm)
   {
     tm->tm_mday -= DaysPerMonth[tm->tm_mon] + nLeap;
     if (tm->tm_mon < 11)
+    {
       tm->tm_mon++;
+    }
     else
     {
       tm->tm_mon = 0;
@@ -407,8 +437,12 @@ char *mutt_make_date(char *buf, size_t buflen)
 int mutt_check_month(const char *s)
 {
   for (int i = 0; i < 12; i++)
+  {
     if (mutt_strncasecmp(s, Months[i], 3) == 0)
+    {
       return i;
+    }
+  }
 
   return -1; /* error */
 }
@@ -424,11 +458,17 @@ int mutt_check_month(const char *s)
 bool is_day_name(const char *s)
 {
   if ((strlen(s) < 3) || !*(s + 3) || !ISSPACE(*(s + 3)))
+  {
     return false;
+  }
 
   for (int i = 0; i < 7; i++)
+  {
     if (mutt_strncasecmp(s, Weekdays[i], 3) == 0)
+    {
       return true;
+    }
+  }
 
   return false;
 }
@@ -467,9 +507,13 @@ time_t mutt_parse_date(const char *s, struct Tz *tz_out)
 
   /* kill the day of the week, if it exists. */
   if ((t = strchr(scratch, ',')))
+  {
     t++;
+  }
   else
+  {
     t = scratch;
+  }
   t = skip_email_wsp(t);
 
   memset(&tm, 0, sizeof(tm));
@@ -480,41 +524,61 @@ time_t mutt_parse_date(const char *s, struct Tz *tz_out)
     {
       case 0: /* day of the month */
         if ((mutt_atoi(t, &tm.tm_mday) < 0) || (tm.tm_mday < 0))
+        {
           return -1;
+        }
         if (tm.tm_mday > 31)
+        {
           return -1;
+        }
         break;
 
       case 1: /* month of the year */
         i = mutt_check_month(t);
         if ((i < 0) || (i > 11))
+        {
           return -1;
+        }
         tm.tm_mon = i;
         break;
 
       case 2: /* year */
         if ((mutt_atoi(t, &tm.tm_year) < 0) || (tm.tm_year < 0))
+        {
           return -1;
+        }
         if ((tm.tm_year < 0) || (tm.tm_year > 9999))
+        {
           return -1;
+        }
         if (tm.tm_year < 50)
+        {
           tm.tm_year += 100;
+        }
         else if (tm.tm_year >= 1900)
+        {
           tm.tm_year -= 1900;
+        }
         break;
 
       case 3: /* time of day */
         if (sscanf(t, "%d:%d:%d", &hour, &min, &sec) == 3)
+        {
           ;
+        }
         else if (sscanf(t, "%d:%d", &hour, &min) == 2)
+        {
           sec = 0;
+        }
         else
         {
           mutt_debug(1, "parse_date: could not process time format: %s\n", t);
           return -1;
         }
         if ((hour < 0) || (hour > 23) || (min < 0) || (min > 59) || (sec < 0) || (sec > 60))
+        {
           return -1;
+        }
         tm.tm_hour = hour;
         tm.tm_min = min;
         tm.tm_sec = sec;
@@ -536,7 +600,9 @@ time_t mutt_parse_date(const char *s, struct Tz *tz_out)
             zminutes = (ptz[3] - '0') * 10 + (ptz[4] - '0');
 
             if (ptz[0] == '-')
+            {
               zoccident = true;
+            }
           }
         }
         else
@@ -561,13 +627,17 @@ time_t mutt_parse_date(const char *s, struct Tz *tz_out)
             if ((t = strtok(NULL, " \t")) != NULL)
             {
               if (mutt_strcasecmp(t, "DST") == 0)
+              {
                 zhours++;
+              }
             }
           }
         }
         tz_offset = (zhours * 3600) + (zminutes * 60);
         if (!zoccident)
+        {
           tz_offset = -tz_offset;
+        }
         break;
     }
     count++;

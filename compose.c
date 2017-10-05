@@ -190,7 +190,9 @@ static void calc_header_width_padding(int idx, const char *header, int calc_max)
   HeaderPadding[idx] = mutt_strlen(header);
   width = mutt_strwidth(header);
   if (calc_max && MaxHeaderWidth < width)
+  {
     MaxHeaderWidth = width;
+  }
   HeaderPadding[idx] -= width;
 }
 
@@ -208,11 +210,15 @@ static void init_header_padding(void)
   int i;
 
   if (done)
+  {
     return;
+  }
   done = 1;
 
   for (i = 0; i <= HDR_XCOMMENTTO; i++)
+  {
     calc_header_width_padding(i, _(Prompts[i]), 1);
+  }
 
   /* Don't include "Sign as: " in the MaxHeaderWidth calculation.  It
    * doesn't show up by default, and so can make the indentation of
@@ -223,7 +229,9 @@ static void init_header_padding(void)
   {
     HeaderPadding[i] += MaxHeaderWidth;
     if (HeaderPadding[i] < 0)
+    {
       HeaderPadding[i] = 0;
+    }
   }
 }
 
@@ -277,16 +285,24 @@ static void redraw_crypt_lines(struct Header *msg)
     if ((WithCrypto & APPLICATION_PGP) && (msg->security & APPLICATION_PGP))
     {
       if ((msg->security & INLINE))
+      {
         addstr(_(" (inline PGP)"));
+      }
       else
+      {
         addstr(_(" (PGP/MIME)"));
+      }
     }
     else if ((WithCrypto & APPLICATION_SMIME) && (msg->security & APPLICATION_SMIME))
+    {
       addstr(_(" (S/MIME)"));
+    }
   }
 
   if (option(OPT_CRYPT_OPPORTUNISTIC_ENCRYPT) && (msg->security & OPPENCRYPT))
+  {
     addstr(_(" (OppEnc mode)"));
+  }
 
   mutt_window_clrtoeol(MuttIndexWindow);
   mutt_window_move(MuttIndexWindow, HDR_CRYPTINFO, 0);
@@ -345,14 +361,20 @@ static void redraw_mix_line(struct ListHead *chain)
   {
     t = np->data;
     if (t && t[0] == '0' && t[1] == '\0')
+    {
       t = "<random>";
+    }
 
     if (c + mutt_strlen(t) + 2 >= MuttIndexWindow->cols)
+    {
       break;
+    }
 
     addstr(NONULL(t));
     if (STAILQ_NEXT(np, entries))
+    {
       addstr(", ");
+    }
 
     c += mutt_strlen(t) + 2;
   }
@@ -381,9 +403,13 @@ static int check_attachments(struct AttachCtx *actx)
       snprintf(msg, sizeof(msg), _("%s [#%d] modified. Update encoding?"), pretty, i + 1);
 
       if ((r = mutt_yesorno(msg, MUTT_YES)) == MUTT_YES)
+      {
         mutt_update_encoding(actx->idx[i]->content);
+      }
       else if (r == MUTT_ABORT)
+      {
         return -1;
+      }
     }
   }
 
@@ -447,7 +473,9 @@ static void draw_envelope(struct Header *msg, char *fcc)
   mutt_paddstr(W, fcc);
 
   if (WithCrypto)
+  {
     redraw_crypt_lines(msg);
+  }
 
 #ifdef MIXMASTER
   redraw_mix_line(&msg->chain);
@@ -515,7 +543,9 @@ static int delete_attachment(struct AttachCtx *actx, int x)
   FREE(&idx[rindex]->tree);
   FREE(&idx[rindex]);
   for (; rindex < actx->idxlen - 1; rindex++)
+  {
     idx[rindex] = idx[rindex + 1];
+  }
   idx[actx->idxlen - 1] = NULL;
   actx->idxlen--;
 
@@ -563,10 +593,14 @@ static void mutt_update_compose_menu(struct AttachCtx *actx, struct Menu *menu, 
   if (menu->max)
   {
     if (menu->current >= menu->max)
+    {
       menu->current = menu->max - 1;
+    }
   }
   else
+  {
     menu->current = 0;
+  }
 
   menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
 }
@@ -575,7 +609,9 @@ static void update_idx(struct Menu *menu, struct AttachCtx *actx, struct AttachP
 {
   new->level = (actx->idxlen > 0) ? actx->idx[actx->idxlen - 1]->level : 0;
   if (actx->idxlen)
+  {
     actx->idx[actx->idxlen - 1]->content->next = new->content;
+  }
   new->content->aptr = new;
   mutt_actx_add_attach(actx, new);
   mutt_update_compose_menu(actx, menu, 0);
@@ -601,7 +637,9 @@ static void compose_menu_redraw(struct Menu *menu)
   struct ComposeRedrawData *rd = menu->redraw_data;
 
   if (!rd)
+  {
     return;
+  }
 
   if (menu->redraw & REDRAW_FULL)
   {
@@ -627,15 +665,23 @@ static void compose_menu_redraw(struct Menu *menu)
 
 #ifdef USE_SIDEBAR
   if (menu->redraw & REDRAW_SIDEBAR)
+  {
     menu_redraw_sidebar(menu);
+  }
 #endif
 
   if (menu->redraw & REDRAW_INDEX)
+  {
     menu_redraw_index(menu);
+  }
   else if (menu->redraw & (REDRAW_MOTION | REDRAW_MOTION_RESYNCH))
+  {
     menu_redraw_motion(menu);
+  }
   else if (menu->redraw == REDRAW_CURRENT)
+  {
     menu_redraw_current(menu);
+  }
 }
 
 /**
@@ -660,7 +706,9 @@ static unsigned long cum_attachs_size(struct Menu *menu)
     b = idx[i]->content;
 
     if (!b->content)
+    {
       b->content = mutt_get_content_info(b->filename, b);
+    }
 
     if ((info = b->content))
     {
@@ -736,9 +784,13 @@ static const char *compose_format_str(char *buf, size_t buflen, size_t col, int 
   }
 
   if (optional)
+  {
     compose_status_line(buf, buflen, col, cols, menu, ifstring);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     compose_status_line(buf, buflen, col, cols, menu, elsestring);
+  }
 
   return src;
 }
@@ -781,7 +833,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
   int news = 0; /* is it a news article ? */
 
   if (option(OPT_NEWS_SEND))
+  {
     news++;
+  }
 #endif
 
   init_header_padding();
@@ -795,10 +849,14 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
   menu->tag = mutt_tag_attach;
 #ifdef USE_NNTP
   if (news)
+  {
     menu->help = mutt_compile_help(helpstr, sizeof(helpstr), MENU_COMPOSE, ComposeNewsHelp);
+  }
   else
+  {
 #endif
     menu->help = mutt_compile_help(helpstr, sizeof(helpstr), MENU_COMPOSE, ComposeHelp);
+  }
   menu->custom_menu_redraw = compose_menu_redraw;
   menu->redraw_data = &rd;
   mutt_push_current_menu(menu);
@@ -821,7 +879,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
       case OP_COMPOSE_EDIT_TO:
 #ifdef USE_NNTP
         if (news)
+        {
           break;
+        }
 #endif
         edit_address_list(HDR_TO, &msg->env->to);
         if (option(OPT_CRYPT_OPPORTUNISTIC_ENCRYPT))
@@ -834,7 +894,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
       case OP_COMPOSE_EDIT_BCC:
 #ifdef USE_NNTP
         if (news)
+        {
           break;
+        }
 #endif
         edit_address_list(HDR_BCC, &msg->env->bcc);
         if (option(OPT_CRYPT_OPPORTUNISTIC_ENCRYPT))
@@ -847,7 +909,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
       case OP_COMPOSE_EDIT_CC:
 #ifdef USE_NNTP
         if (news)
+        {
           break;
+        }
 #endif
         edit_address_list(HDR_CC, &msg->env->cc);
         if (option(OPT_CRYPT_OPPORTUNISTIC_ENCRYPT))
@@ -862,17 +926,25 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         if (news)
         {
           if (msg->env->newsgroups)
+          {
             strfcpy(buf, msg->env->newsgroups, sizeof(buf));
+          }
           else
+          {
             buf[0] = 0;
+          }
           if (mutt_get_field("Newsgroups: ", buf, sizeof(buf), 0) == 0)
           {
             mutt_str_replace(&msg->env->newsgroups, buf);
             mutt_window_move(MuttIndexWindow, HDR_TO, HDR_XOFFSET);
             if (msg->env->newsgroups)
+            {
               mutt_paddstr(W, msg->env->newsgroups);
+            }
             else
+            {
               clrtoeol();
+            }
           }
         }
         break;
@@ -880,17 +952,25 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         if (news)
         {
           if (msg->env->followup_to)
+          {
             strfcpy(buf, msg->env->followup_to, sizeof(buf));
+          }
           else
+          {
             buf[0] = 0;
+          }
           if (mutt_get_field("Followup-To: ", buf, sizeof(buf), 0) == 0)
           {
             mutt_str_replace(&msg->env->followup_to, buf);
             mutt_window_move(MuttIndexWindow, HDR_CC, HDR_XOFFSET);
             if (msg->env->followup_to)
+            {
               mutt_paddstr(W, msg->env->followup_to);
+            }
             else
+            {
               clrtoeol();
+            }
           }
         }
         break;
@@ -898,34 +978,50 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         if (news && option(OPT_X_COMMENT_TO))
         {
           if (msg->env->x_comment_to)
+          {
             strfcpy(buf, msg->env->x_comment_to, sizeof(buf));
+          }
           else
+          {
             buf[0] = 0;
+          }
           if (mutt_get_field("X-Comment-To: ", buf, sizeof(buf), 0) == 0)
           {
             mutt_str_replace(&msg->env->x_comment_to, buf);
             mutt_window_move(MuttIndexWindow, HDR_BCC, HDR_XOFFSET);
             if (msg->env->x_comment_to)
+            {
               mutt_paddstr(W, msg->env->x_comment_to);
+            }
             else
+            {
               clrtoeol();
+            }
           }
         }
         break;
 #endif
       case OP_COMPOSE_EDIT_SUBJECT:
         if (msg->env->subject)
+        {
           strfcpy(buf, msg->env->subject, sizeof(buf));
+        }
         else
+        {
           buf[0] = 0;
+        }
         if (mutt_get_field(_("Subject: "), buf, sizeof(buf), 0) == 0)
         {
           mutt_str_replace(&msg->env->subject, buf);
           mutt_window_move(MuttIndexWindow, HDR_SUBJECT, HDR_XOFFSET);
           if (msg->env->subject)
+          {
             mutt_paddstr(W, msg->env->subject);
+          }
           else
+          {
             mutt_window_clrtoeol(MuttIndexWindow);
+          }
         }
         mutt_message_hook(NULL, msg, MUTT_SEND2HOOK);
         break;
@@ -969,7 +1065,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
             FREE(&err);
           }
           if (option(OPT_CRYPT_OPPORTUNISTIC_ENCRYPT))
+          {
             crypt_opportunistic_encrypt(msg);
+          }
         }
         else
         {
@@ -994,7 +1092,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 
       case OP_COMPOSE_ATTACH_KEY:
         if (!(WithCrypto & APPLICATION_PGP))
+        {
           break;
+        }
         new = safe_calloc(1, sizeof(struct AttachPtr));
         if ((new->content = crypt_pgp_make_key_attachment(NULL)) != NULL)
         {
@@ -1002,7 +1102,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           menu->redraw |= REDRAW_INDEX;
         }
         else
+        {
           FREE(&new);
+        }
 
         menu->redraw |= REDRAW_STATUS;
 
@@ -1022,11 +1124,15 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         if (_mutt_enter_fname(prompt, fname, sizeof(fname), 0, 1, &files,
                               &numfiles, MUTT_SEL_MULTI) == -1 ||
             *fname == '\0')
+        {
           break;
+        }
 
         error = 0;
         if (numfiles > 1)
+        {
           mutt_message(_("Attaching selected files..."));
+        }
         for (i = 0; i < numfiles; i++)
         {
           char *att = files[i];
@@ -1034,7 +1140,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           new->unowned = 1;
           new->content = mutt_make_file_attach(att);
           if (new->content != NULL)
+          {
             update_idx(menu, actx, new);
+          }
           else
           {
             error = 1;
@@ -1046,7 +1154,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 
         FREE(&files);
         if (!error)
+        {
           mutt_clear_error();
+        }
 
         menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
       }
@@ -1069,7 +1179,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         if (op == OP_COMPOSE_ATTACH_NEWS_MESSAGE)
         {
           if (!(CurrentNewsSrv = nntp_select_server(NewsServer, 0)))
+          {
             break;
+          }
 
           prompt = _("Open newsgroup to attach message from");
           set_option(OPT_NEWS);
@@ -1077,6 +1189,7 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 #endif
 
         if (Context)
+        {
 #ifdef USE_NNTP
           if ((op == OP_COMPOSE_ATTACH_MESSAGE) ^ (Context->magic == MUTT_NNTP))
 #endif
@@ -1084,24 +1197,34 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
             strfcpy(fname, NONULL(Context->path), sizeof(fname));
             mutt_pretty_mailbox(fname, sizeof(fname));
           }
+        }
 
         if (mutt_enter_fname(prompt, fname, sizeof(fname), 1) == -1 || !fname[0])
+        {
           break;
+        }
 
 #ifdef USE_NNTP
         if (option(OPT_NEWS))
+        {
           nntp_expand_path(fname, sizeof(fname), &CurrentNewsSrv->conn->account);
+        }
         else
+        {
 #endif
           mutt_expand_path(fname, sizeof(fname));
+        }
 #ifdef USE_IMAP
         if (!mx_is_imap(fname))
+        {
 #endif
 #ifdef USE_POP
           if (!mx_is_pop(fname))
+          {
 #endif
 #ifdef USE_NNTP
             if (!mx_is_nntp(fname) && !option(OPT_NEWS))
+            {
 #endif
               /* check to make sure the file exists and is readable */
               if (access(fname, R_OK) == -1)
@@ -1109,6 +1232,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
                 mutt_perror(fname);
                 break;
               }
+            }
+          }
+        }
 
         menu->redraw = REDRAW_FULL;
 
@@ -1156,7 +1282,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
             new = (struct AttachPtr *) safe_calloc(1, sizeof(struct AttachPtr));
             new->content = mutt_make_message_attach(Context, h, 1);
             if (new->content != NULL)
+            {
               update_idx(menu, actx, new);
+            }
             else
             {
               mutt_error(_("Unable to attach!"));
@@ -1167,9 +1295,13 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         menu->redraw |= REDRAW_FULL;
 
         if (close == OP_QUIT)
+        {
           mx_close_mailbox(Context, NULL);
+        }
         else
+        {
           mx_fastclose_mailbox(Context);
+        }
         FREE(&Context);
 
         /* go back to the folder we started from */
@@ -1184,12 +1316,18 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
       case OP_DELETE:
         CHECK_COUNT;
         if (CURATTACH->unowned)
+        {
           CURATTACH->content->unlink = 0;
+        }
         if (delete_attachment(actx, menu->current) == -1)
+        {
           break;
+        }
         mutt_update_compose_menu(actx, menu, 0);
         if (menu->current == 0)
+        {
           msg->content = actx->idx[0]->content;
+        }
 
         mutt_message_hook(NULL, msg, MUTT_SEND2HOOK);
         break;
@@ -1204,9 +1342,13 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         }
         CURATTACH->content->noconv = !CURATTACH->content->noconv;
         if (CURATTACH->content->noconv)
+        {
           mutt_message(_("The current attachment won't be converted."));
+        }
         else
+        {
           mutt_message(_("The current attachment will be converted."));
+        }
         menu->redraw = REDRAW_CURRENT;
         mutt_message_hook(NULL, msg, MUTT_SEND2HOOK);
         break;
@@ -1233,7 +1375,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           for (top = msg->content; top; top = top->next)
           {
             if (top->tagged)
+            {
               mutt_update_encoding(top);
+            }
           }
           menu->redraw = REDRAW_FULL;
         }
@@ -1277,7 +1421,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
             mutt_clear_error();
           }
           else
+          {
             mutt_error(_("Invalid encoding."));
+          }
         }
         mutt_message_hook(NULL, msg, MUTT_SEND2HOOK);
         break;
@@ -1296,16 +1442,22 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 
 #ifdef MIXMASTER
         if (!STAILQ_EMPTY(&msg->chain) && mix_check_message(msg) != 0)
+        {
           break;
+        }
 #endif
 
         if (!fccSet && *fcc)
         {
           if ((i = query_quadoption(OPT_COPY,
                                     _("Save a copy of this message?"))) == MUTT_ABORT)
+          {
             break;
+          }
           else if (i == MUTT_NO)
+          {
             *fcc = 0;
+          }
         }
 
         loop = 0;
@@ -1336,12 +1488,16 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           for (top = msg->content; top; top = top->next)
           {
             if (top->tagged)
+            {
               mutt_get_tmp_attachment(top);
+            }
           }
           menu->redraw = REDRAW_FULL;
         }
         else if (mutt_get_tmp_attachment(CURATTACH->content) == 0)
+        {
           menu->redraw = REDRAW_CURRENT;
+        }
 
         /* No send2hook since this doesn't change the message. */
         break;
@@ -1353,9 +1509,13 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 
         CHECK_COUNT;
         if (CURATTACH->content->d_filename)
+        {
           src = CURATTACH->content->d_filename;
+        }
         else
+        {
           src = CURATTACH->content->filename;
+        }
         strfcpy(fname, mutt_basename(NONULL(src)), sizeof(fname));
         ret = mutt_get_field(_("Send attachment with name: "), fname, sizeof(fname), MUTT_FILE);
         if (ret == 0)
@@ -1387,13 +1547,17 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 
           mutt_expand_path(fname, sizeof(fname));
           if (mutt_rename_file(CURATTACH->content->filename, fname))
+          {
             break;
+          }
 
           mutt_str_replace(&CURATTACH->content->filename, fname);
           menu->redraw = REDRAW_CURRENT;
 
           if (CURATTACH->content->stamp >= st.st_mtime)
+          {
             mutt_stamp_attachment(CURATTACH->content);
+          }
         }
         mutt_message_hook(NULL, msg, MUTT_SEND2HOOK);
         break;
@@ -1409,13 +1573,17 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         fname[0] = 0;
         if (mutt_get_field(_("New file: "), fname, sizeof(fname), MUTT_FILE) != 0 ||
             !fname[0])
+        {
           continue;
+        }
         mutt_expand_path(fname, sizeof(fname));
 
         /* Call to lookup_mime_type () ?  maybe later */
         type[0] = 0;
         if (mutt_get_field("Content-Type: ", type, sizeof(type), 0) != 0 || !type[0])
+        {
           continue;
+        }
 
         if (!(p = strchr(type, '/')))
         {
@@ -1496,8 +1664,10 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         CHECK_COUNT;
         mutt_pipe_attachment_list(actx, NULL, menu->tagprefix,
                                   CURATTACH->content, op == OP_FILTER);
-        if (op == OP_FILTER) /* cte might have changed */
+        if (op == OP_FILTER)
+        { /* cte might have changed */
           menu->redraw = menu->tagprefix ? REDRAW_FULL : REDRAW_CURRENT;
+        }
         menu->redraw |= REDRAW_STATUS;
         mutt_message_hook(NULL, msg, MUTT_SEND2HOOK);
         break;
@@ -1506,8 +1676,12 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         if ((i = query_quadoption(OPT_POSTPONE, _("Postpone this message?"))) == MUTT_NO)
         {
           for (i = 0; i < actx->idxlen; i++)
+          {
             if (actx->idx[i]->unowned)
+            {
               actx->idx[i]->content->unlink = false;
+            }
+          }
 
           if (!(flags & MUTT_COMPOSE_NOFREEHEADER))
           {
@@ -1524,7 +1698,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           break;
         }
         else if (i == MUTT_ABORT)
+        {
           break; /* abort */
+        }
 
       /* fall through to postpone! */
 
@@ -1544,7 +1720,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
         endwin();
         snprintf(buf, sizeof(buf), "%s -x %s", NONULL(Ispell), msg->content->filename);
         if (mutt_system(buf) == -1)
+        {
           mutt_error(_("Error running \"%s\"!"), buf);
+        }
         else
         {
           mutt_update_encoding(msg->content);
@@ -1561,7 +1739,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           mutt_pretty_mailbox(fname, sizeof(fname));
         }
         if (actx->idxlen)
+        {
           msg->content = actx->idx[0]->content;
+        }
         if (mutt_enter_fname(_("Write message to mailbox"), fname, sizeof(fname), 1) != -1 &&
             fname[0])
         {
@@ -1569,18 +1749,26 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
           mutt_expand_path(fname, sizeof(fname));
 
           if (msg->content->next)
+          {
             msg->content = mutt_make_multipart(msg->content);
+          }
 
           if (mutt_write_fcc(fname, msg, NULL, 0, NULL, NULL) < 0)
+          {
             msg->content = mutt_remove_multipart(msg->content);
+          }
           else
+          {
             mutt_message(_("Message written."));
+          }
         }
         break;
 
       case OP_COMPOSE_PGP_MENU:
         if (!(WithCrypto & APPLICATION_PGP))
+        {
           break;
+        }
         if ((WithCrypto & APPLICATION_SMIME) && (msg->security & APPLICATION_SMIME))
         {
           if (msg->security & (ENCRYPT | SIGN))
@@ -1609,7 +1797,9 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
 
       case OP_COMPOSE_SMIME_MENU:
         if (!(WithCrypto & APPLICATION_SMIME))
+        {
           break;
+        }
 
         if ((WithCrypto & APPLICATION_PGP) && (msg->security & APPLICATION_PGP))
         {
@@ -1646,9 +1836,13 @@ int mutt_compose_menu(struct Header *msg, /* structure for new message */
   mutt_menu_destroy(&menu);
 
   if (actx->idxlen)
+  {
     msg->content = actx->idx[0]->content;
+  }
   else
+  {
     msg->content = NULL;
+  }
 
   mutt_free_attach_context(&actx);
 

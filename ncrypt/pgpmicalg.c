@@ -51,8 +51,12 @@ static const struct
 static const char *pgp_hash_to_micalg(short id)
 {
   for (int i = 0; HashAlgorithms[i].id >= 0; i++)
+  {
     if (HashAlgorithms[i].id == id)
+    {
       return HashAlgorithms[i].name;
+    }
+  }
   return "x-unknown";
 }
 
@@ -74,7 +78,9 @@ static void pgp_dearmor(FILE *in, FILE *out)
   while ((r = fgets(line, sizeof(line), in)) != NULL)
   {
     if (strncmp(line, "-----BEGIN", 10) == 0)
+    {
       break;
+    }
   }
   if (!r)
   {
@@ -88,7 +94,9 @@ static void pgp_dearmor(FILE *in, FILE *out)
   {
     SKIPWS(r);
     if (!*r)
+    {
       break;
+    }
   }
   if (!r)
   {
@@ -99,14 +107,18 @@ static void pgp_dearmor(FILE *in, FILE *out)
   /* actual data starts here */
   start = ftello(in);
   if (start < 0)
+  {
     return;
+  }
 
   /* find the checksum */
 
   while ((r = fgets(line, sizeof(line), in)) != NULL)
   {
     if (*line == '=' || (strncmp(line, "-----END", 8) == 0))
+    {
       break;
+    }
   }
   if (!r)
   {
@@ -139,11 +151,15 @@ static short pgp_mic_from_packet(unsigned char *p, size_t len)
   }
 
   if (len >= 18 && p[1] == 3)
+  {
     /* version 3 signature */
     return (short) p[17];
+  }
   else if (len >= 5 && p[1] == 4)
+  {
     /* version 4 signature */
     return (short) p[4];
+  }
   else
   {
     mutt_debug(1, "pgp_mic_from_packet: Bad signature packet.\n");

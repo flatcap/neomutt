@@ -87,7 +87,9 @@ static char *utf7_to_utf8(const char *u7, size_t u7len, char **u8, size_t *u8len
       for (; u7len; u7++, u7len--)
       {
         if ((*u7 & 0x80) || (b = Index_64u[(int) *u7]) == -1)
+        {
           break;
+        }
         if (k > 0)
         {
           ch |= b << k;
@@ -99,8 +101,10 @@ static char *utf7_to_utf8(const char *u7, size_t u7len, char **u8, size_t *u8len
           if (ch < 0x80)
           {
             if (0x20 <= ch && ch < 0x7f)
+            {
               /* Printable US-ASCII */
               goto bail;
+            }
             *p++ = ch;
           }
           else if (ch < 0x800)
@@ -119,28 +123,42 @@ static char *utf7_to_utf8(const char *u7, size_t u7len, char **u8, size_t *u8len
         }
       }
       if (ch || k < 6)
+      {
         /* Non-zero or too many extra bits */
         goto bail;
+      }
       if (!u7len || *u7 != '-')
+      {
         /* BASE64 not properly terminated */
         goto bail;
+      }
       if (u7len > 2 && u7[1] == '&' && u7[2] != '-')
+      {
         /* Adjacent BASE64 sections */
         goto bail;
+      }
     }
     else if (*u7 < 0x20 || *u7 >= 0x7f)
+    {
       /* Not printable US-ASCII */
       goto bail;
+    }
     else
+    {
       *p++ = *u7;
+    }
   }
   *p++ = '\0';
   if (u8len)
+  {
     *u8len = p - buf;
+  }
 
   safe_realloc(&buf, p - buf);
   if (u8)
+  {
     *u8 = buf;
+  }
   return buf;
 
 bail:
@@ -178,7 +196,9 @@ static char *utf8_to_utf7(const char *u8, size_t u8len, char **u7, size_t *u7len
       n = 0;
     }
     else if (c < 0xc2)
+    {
       goto bail;
+    }
     else if (c < 0xe0)
     {
       ch = c & 0x1f;
@@ -205,20 +225,28 @@ static char *utf8_to_utf7(const char *u8, size_t u8len, char **u7, size_t *u7len
       n = 5;
     }
     else
+    {
       goto bail;
+    }
 
     u8++;
     u8len--;
     if (n > u8len)
+    {
       goto bail;
+    }
     for (i = 0; i < n; i++)
     {
       if ((u8[i] & 0xc0) != 0x80)
+      {
         goto bail;
+      }
       ch = (ch << 6) | (u8[i] & 0x3f);
     }
     if (n > 1 && !(ch >> (n * 5 + 1)))
+    {
       goto bail;
+    }
     u8 += n;
     u8len -= n;
 
@@ -232,11 +260,15 @@ static char *utf8_to_utf7(const char *u8, size_t u8len, char **u7, size_t *u7len
         k = 10;
       }
       if (ch & ~0xffff)
+      {
         ch = 0xfffe;
+      }
       *p++ = B64Chars[b | ch >> k];
       k -= 6;
       for (; k >= 0; k -= 6)
+      {
         *p++ = B64Chars[(ch >> k) & 0x3f];
+      }
       b = (ch << (-k)) & 0x3f;
       k += 16;
     }
@@ -245,13 +277,17 @@ static char *utf8_to_utf7(const char *u8, size_t u8len, char **u7, size_t *u7len
       if (base64)
       {
         if (k > 10)
+        {
           *p++ = B64Chars[b];
+        }
         *p++ = '-';
         base64 = false;
       }
       *p++ = ch;
       if (ch == '&')
+      {
         *p++ = '-';
+      }
     }
   }
 
@@ -264,16 +300,22 @@ static char *utf8_to_utf7(const char *u8, size_t u8len, char **u7, size_t *u7len
   if (base64)
   {
     if (k > 10)
+    {
       *p++ = B64Chars[b];
+    }
     *p++ = '-';
   }
 
   *p++ = '\0';
   if (u7len)
+  {
     *u7len = p - buf;
+  }
   safe_realloc(&buf, p - buf);
   if (u7)
+  {
     *u7 = buf;
+  }
   return buf;
 
 bail:
@@ -290,9 +332,13 @@ void imap_utf_encode(struct ImapData *idata, char **s)
     {
       FREE(s);
       if (idata->unicode)
+      {
         *s = safe_strdup(t);
+      }
       else
+      {
         *s = utf8_to_utf7(t, strlen(t), NULL, 0);
+      }
     }
     FREE(&t);
   }
@@ -305,9 +351,13 @@ void imap_utf_decode(struct ImapData *idata, char **s)
   if (Charset)
   {
     if (idata->unicode)
+    {
       t = safe_strdup(*s);
+    }
     else
+    {
       t = utf7_to_utf8(*s, strlen(*s), 0, 0);
+    }
 
     if (t && !mutt_convert_string(&t, "utf-8", Charset, 0))
     {
@@ -315,6 +365,8 @@ void imap_utf_decode(struct ImapData *idata, char **s)
       *s = t;
     }
     else
+    {
       FREE(&t);
+    }
   }
 }

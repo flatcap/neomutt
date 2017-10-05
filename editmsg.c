@@ -162,10 +162,14 @@ static int edit_one_message(struct Context *ctx, struct Header *cur)
   if (fgets(buff, sizeof(buff), fp) && is_from(buff, NULL, 0, NULL))
   {
     if (tmpctx.magic == MUTT_MBOX || tmpctx.magic == MUTT_MMDF)
+    {
       cf = CH_FROM | CH_FORCE_FROM;
+    }
   }
   else
+  {
     of = MUTT_ADD_FROM;
+  }
 
   /* XXX - we have to play games with the message flags to avoid
    * problematic behavior with maildir folders.  */
@@ -197,10 +201,14 @@ static int edit_one_message(struct Context *ctx, struct Header *cur)
 
 bail:
   if (fp)
+  {
     safe_fclose(&fp);
+  }
 
   if (rc >= 0)
+  {
     unlink(tmp);
+  }
 
   if (rc == 0)
   {
@@ -209,10 +217,14 @@ bail:
     mutt_set_flag(Context, cur, MUTT_READ, 1);
 
     if (option(OPT_DELETE_UNTAG))
+    {
       mutt_set_flag(Context, cur, MUTT_TAG, 0);
+    }
   }
   else if (rc == -1)
+  {
     mutt_message(_("Error. Preserving temporary file: %s"), tmp);
+  }
 
   return rc;
 }
@@ -222,7 +234,9 @@ int mutt_edit_message(struct Context *ctx, struct Header *hdr)
   int j;
 
   if (hdr)
+  {
     return edit_one_message(ctx, hdr);
+  }
 
   for (int i = 0; i < ctx->vcount; i++)
   {
@@ -230,7 +244,9 @@ int mutt_edit_message(struct Context *ctx, struct Header *hdr)
     if (ctx->hdrs[j]->tagged)
     {
       if (edit_one_message(ctx, ctx->hdrs[j]) == -1)
+      {
         return -1;
+      }
     }
   }
 

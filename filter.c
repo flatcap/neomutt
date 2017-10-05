@@ -62,7 +62,9 @@ pid_t mutt_create_filter_fd(const char *cmd, FILE **in, FILE **out, FILE **err,
   {
     *in = 0;
     if (pipe(pin) == -1)
+    {
       return -1;
+    }
   }
 
   if (out)

@@ -127,17 +127,25 @@ int mutt_complete(char *s, size_t slen)
   if (*s == '=' || *s == '+' || *s == '!')
   {
     if (*s == '!')
+    {
       p = NONULL(SpoolFile);
+    }
     else
+    {
       p = NONULL(Folder);
+    }
 
     mutt_concat_path(imap_path, p, s + 1, sizeof(imap_path));
   }
   else
+  {
     strfcpy(imap_path, s, sizeof(imap_path));
+  }
 
   if (mx_is_imap(imap_path))
+  {
     return imap_complete(s, slen, imap_path);
+  }
 #endif
 
   if (*s == '=' || *s == '+' || *s == '!')
@@ -145,9 +153,13 @@ int mutt_complete(char *s, size_t slen)
     dirpart[0] = *s;
     dirpart[1] = '\0';
     if (*s == '!')
+    {
       strfcpy(exp_dirpart, NONULL(SpoolFile), sizeof(exp_dirpart));
+    }
     else
+    {
       strfcpy(exp_dirpart, NONULL(Folder), sizeof(exp_dirpart));
+    }
     if ((p = strrchr(s, '/')))
     {
       char buf[_POSIX_PATH_MAX];
@@ -161,7 +173,9 @@ int mutt_complete(char *s, size_t slen)
       strfcpy(filepart, p + 1, sizeof(filepart));
     }
     else
+    {
       strfcpy(filepart, s + 1, sizeof(filepart));
+    }
     dirp = opendir(exp_dirpart);
   }
   else
@@ -248,10 +262,14 @@ int mutt_complete(char *s, size_t slen)
           strfcpy(buf + strlen(buf), "/", sizeof(buf) - strlen(buf));
         }
         else
+        {
           buf[0] = 0;
+        }
         strfcpy(buf + strlen(buf), filepart, sizeof(buf) - strlen(buf));
         if (stat(buf, &st) != -1 && (st.st_mode & S_IFDIR))
+        {
           strfcpy(filepart + strlen(filepart), "/", sizeof(filepart) - strlen(filepart));
+        }
         init = 1;
       }
     }
@@ -262,11 +280,15 @@ int mutt_complete(char *s, size_t slen)
   {
     strfcpy(s, dirpart, slen);
     if ((mutt_strcmp("/", dirpart) != 0) && dirpart[0] != '=' && dirpart[0] != '+')
+    {
       strfcpy(s + strlen(s), "/", slen - strlen(s));
+    }
     strfcpy(s + strlen(s), filepart, slen - strlen(s));
   }
   else
+  {
     strfcpy(s, filepart, slen);
+  }
 
   return (init ? 0 : -1);
 }

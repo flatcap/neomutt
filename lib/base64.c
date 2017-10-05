@@ -112,7 +112,9 @@ size_t mutt_to_base64(char *out, const char *cin, size_t len, size_t olen)
     *out++ = B64Chars[in[0] >> 2];
     fragment = (in[0] << 4) & 0x30;
     if (len > 1)
+    {
       fragment |= in[1] >> 4;
+    }
     *out++ = B64Chars[fragment];
     *out++ = (len < 2) ? '=' : B64Chars[(in[1] << 2) & 0x3c];
     *out++ = '=';
@@ -141,16 +143,24 @@ int mutt_from_base64(char *out, const char *in)
   {
     digit1 = in[0];
     if ((digit1 > 127) || (base64val(digit1) == BAD))
+    {
       return -1;
+    }
     digit2 = in[1];
     if ((digit2 > 127) || (base64val(digit2) == BAD))
+    {
       return -1;
+    }
     digit3 = in[2];
     if ((digit3 > 127) || ((digit3 != '=') && (base64val(digit3) == BAD)))
+    {
       return -1;
+    }
     digit4 = in[3];
     if ((digit4 > 127) || ((digit4 != '=') && (base64val(digit4) == BAD)))
+    {
       return -1;
+    }
     in += 4;
 
     /* digits are already sanity-checked */

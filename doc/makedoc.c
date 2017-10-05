@@ -104,7 +104,9 @@ short Debug = 0;
 static char *skip_ws(char *s)
 {
   while (*s && isspace((unsigned char) *s))
+  {
     s++;
+  }
 
   return s;
 }
@@ -120,17 +122,23 @@ static char *get_token(char *d, size_t l, char *s)
   char *dd = d;
 
   if (Debug)
+  {
     fprintf(stderr, "%s: get_token called for `%s'.\n", Progname, s);
+  }
 
   s = skip_ws(s);
 
   if (Debug > 1)
+  {
     fprintf(stderr, "%s: argument after skip_ws():  `%s'.\n", Progname, s);
+  }
 
   if (!*s)
   {
     if (Debug)
+    {
       fprintf(stderr, "%s: no more tokens on this line.\n", Progname);
+    }
     return NULL;
   }
 
@@ -159,7 +167,9 @@ static char *get_token(char *d, size_t l, char *s)
   for (t = s; *t && --l > 0; t++)
   {
     if (*t == '\\' && !t[1])
+    {
       break;
+    }
 
     if (is_quoted && *t == '\\')
     {
@@ -189,11 +199,17 @@ static char *get_token(char *d, size_t l, char *s)
       break;
     }
     else if (!is_quoted && strchr(single_char_tokens, *t))
+    {
       break;
+    }
     else if (!is_quoted && isspace((unsigned char) *t))
+    {
       break;
+    }
     else
+    {
       *d++ = *t;
+    }
   }
 
   *d = '\0';
@@ -227,8 +243,12 @@ static int sgml_fputc(int c, FILE *out)
 static int sgml_fputs(const char *s, FILE *out)
 {
   for (; *s; s++)
+  {
     if (sgml_fputc((unsigned int) *s, out) == EOF)
+    {
       return EOF;
+    }
+  }
 
   return 0;
 }
@@ -265,14 +285,18 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_NEWLINE:
         {
           if (onl)
+          {
             docstat |= onl;
+          }
           else
           {
             fputs("\n# ", out);
             docstat |= D_NL;
           }
           if (docstat & D_DL)
+          {
             Continuation++;
+          }
           break;
         }
         case SP_NEWPAR:
@@ -284,7 +308,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
           }
 
           if (!(onl & D_NL))
+          {
             fputs("\n# ", out);
+          }
           fputs("\n# ", out);
           docstat |= D_NP;
           break;
@@ -292,7 +318,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_START_TAB:
         {
           if (!onl)
+          {
             fputs("\n# ", out);
+          }
           docstat |= D_TAB;
           break;
         }
@@ -316,7 +344,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_DD:
         {
           if (docstat & D_IL)
+          {
             fputs("- ", out);
+          }
           Continuation = 0;
           break;
         }
@@ -348,7 +378,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
           if (docstat & D_DT)
           {
             for (int i = strlen(str); i < 8; i++)
+            {
               putc(' ', out);
+            }
             docstat &= ~D_DT;
             docstat |= D_NL;
           }
@@ -393,7 +425,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_NEWLINE:
         {
           if (onl)
+          {
             docstat |= onl;
+          }
           else
           {
             fputc('\n', out);
@@ -410,7 +444,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
           }
 
           if (!(onl & D_NL))
+          {
             fputc('\n', out);
+          }
           fputs(".IP\n", out);
 
           docstat |= D_NP;
@@ -443,9 +479,13 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_DD:
         {
           if (docstat & D_IL)
+          {
             fputs(".TP\n\\(hy ", out);
+          }
           else
+          {
             fputs("\n", out);
+          }
           break;
         }
         case SP_END_DL:
@@ -473,11 +513,17 @@ static int print_it(int special, char *str, FILE *out, int docstat)
             for (; *str; str++)
             {
               if (*str == '"')
+              {
                 fputs("\"", out);
+              }
               else if (*str == '\\')
+              {
                 fputs("\\\\", out);
+              }
               else if (*str == '-')
+              {
                 fputs("\\-", out);
+              }
               else if (strncmp(str, "``", 2) == 0)
               {
                 fputs("\\(lq", out);
@@ -489,7 +535,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
                 str++;
               }
               else
+              {
                 fputc(*str, out);
+              }
             }
           }
           break;
@@ -506,11 +554,17 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_END_FT:
         {
           if (docstat & D_EM)
+          {
             fputs("</emphasis>", out);
+          }
           if (docstat & D_BF)
+          {
             fputs("</emphasis>", out);
+          }
           if (docstat & D_TT)
+          {
             fputs("</literal>", out);
+          }
           docstat &= ~(D_EM | D_BF | D_TT);
           break;
         }
@@ -538,7 +592,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_NEWLINE:
         {
           if (onl)
+          {
             docstat |= onl;
+          }
           else
           {
             fputc('\n', out);
@@ -555,9 +611,13 @@ static int print_it(int special, char *str, FILE *out, int docstat)
           }
 
           if (!(onl & D_NL))
+          {
             fputc('\n', out);
+          }
           if (docstat & D_PA)
+          {
             fputs("</para>\n", out);
+          }
           fputs("<para>\n", out);
 
           docstat |= D_NP;
@@ -609,17 +669,25 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         {
           docstat |= D_DD;
           if (docstat & D_DL)
+          {
             fputs("</entry><entry>", out);
+          }
           else
+          {
             fputs("<listitem><para>", out);
+          }
           break;
         }
         case SP_END_DD:
         {
           if (docstat & D_DL)
+          {
             fputs("</entry></row>\n", out);
+          }
           else
+          {
             fputs("</para></listitem>", out);
+          }
           docstat &= ~D_DD;
           break;
         }
@@ -654,7 +722,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
         case SP_STR:
         {
           if (docstat & D_TAB)
+          {
             sgml_fputs(str, out);
+          }
           else
           {
             while (*str)
@@ -672,7 +742,9 @@ static int print_it(int special, char *str, FILE *out, int docstat)
                   str++;
                 }
                 else
+                {
                   sgml_fputc(*str, out);
+                }
               }
             }
           }
@@ -696,7 +768,9 @@ static int fd_recurse = 0;
 static int flush_doc(int docstat, FILE *out)
 {
   if (docstat & D_INIT)
+  {
     return D_INIT;
+  }
 
   if (fd_recurse++)
   {
@@ -705,16 +779,24 @@ static int flush_doc(int docstat, FILE *out)
   }
 
   if (docstat & (D_PA))
+  {
     docstat = print_it(SP_END_PAR, NULL, out, docstat);
+  }
 
   if (docstat & (D_TAB))
+  {
     docstat = print_it(SP_END_TAB, NULL, out, docstat);
+  }
 
   if (docstat & (D_DL))
+  {
     docstat = print_it(SP_END_DL, NULL, out, docstat);
+  }
 
   if (docstat & (D_EM | D_BF | D_TT))
+  {
     docstat = print_it(SP_END_FT, NULL, out, docstat);
+  }
 
   docstat = print_it(SP_END_SECT, NULL, out, docstat);
 
@@ -773,19 +855,29 @@ static int sgml_id_fputs(const char *s, FILE *out)
   char id;
 
   if (*s == '<')
+  {
     s++;
+  }
 
   for (; *s; s++)
   {
     if (*s == '_')
+    {
       id = '-';
+    }
     else
+    {
       id = *s;
+    }
     if (*s == '>' && !*(s + 1))
+    {
       break;
+    }
 
     if (fputc((unsigned int) id, out) == EOF)
+    {
       return EOF;
+    }
   }
 
   return 0;
@@ -798,7 +890,9 @@ void print_ref(FILE *out, int output_dollar, const char *ref)
     case F_CONF:
     case F_MAN:
       if (output_dollar)
+      {
         putc('$', out);
+      }
       fputs(ref, out);
       break;
 
@@ -807,7 +901,9 @@ void print_ref(FILE *out, int output_dollar, const char *ref)
       sgml_id_fputs(ref, out);
       fputs("\">", out);
       if (output_dollar)
+      {
         fputc('$', out);
+      }
       sgml_fputs(ref, out);
       fputs("</link>", out);
       break;
@@ -824,25 +920,42 @@ static int handle_docline(char *l, FILE *out, int docstat)
   l = skip_ws(l);
 
   if (Debug)
+  {
     fprintf(stderr, "%s: handle_docline `%s'\n", Progname, l);
+  }
 
   if (strncmp(l, ".pp", 3) == 0)
+  {
     return print_it(SP_NEWPAR, NULL, out, docstat);
+  }
   else if (strncmp(l, ".ts", 3) == 0)
+  {
     return print_it(SP_START_TAB, NULL, out, docstat);
+  }
   else if (strncmp(l, ".te", 3) == 0)
+  {
     return print_it(SP_END_TAB, NULL, out, docstat);
+  }
   else if (strncmp(l, ".dl", 3) == 0)
+  {
     return print_it(SP_START_DL, NULL, out, docstat);
+  }
   else if (strncmp(l, ".de", 3) == 0)
+  {
     return print_it(SP_END_DL, NULL, out, docstat);
+  }
   else if (strncmp(l, ".il", 3) == 0)
+  {
     return print_it(SP_START_IL, NULL, out, docstat);
+  }
   else if (strncmp(l, ".ie", 3) == 0)
+  {
     return print_it(SP_END_IL, NULL, out, docstat);
+  }
   else if (strncmp(l, ". ", 2) == 0)
+  {
     *l = ' ';
-
+  }
   for (s = l, d = buff; *s; s++)
   {
     if (strncmp(s, "\\(as", 4) == 0)
@@ -921,7 +1034,9 @@ static int handle_docline(char *l, FILE *out, int docstat)
       {
         ref = s;
         while (isalnum((unsigned char) *s) || (*s && strchr("-_<>", *s)))
+        {
           s++;
+        }
 
         docstat = commit_buff(buff, &d, out, docstat);
         save = *s;
@@ -932,7 +1047,9 @@ static int handle_docline(char *l, FILE *out, int docstat)
       }
     }
     else
+    {
       *d++ = *s;
+    }
   }
 
   docstat = commit_buff(buff, &d, out, docstat);
@@ -985,8 +1102,12 @@ struct VariableTypes
 static int buff2type(const char *s)
 {
   for (int type = DT_NONE; types[type].machine; type++)
+  {
     if (strcmp(types[type].machine, s) == 0)
+    {
       return type;
+    }
+  }
 
   return DT_NONE;
 }
@@ -1001,45 +1122,65 @@ static void pretty_default(char *t, size_t l, const char *s, int type)
     case DT_QUAD:
     {
       if (strcasecmp(s, "MUTT_YES") == 0)
+      {
         strncpy(t, "yes", l);
+      }
       else if (strcasecmp(s, "MUTT_NO") == 0)
+      {
         strncpy(t, "no", l);
+      }
       else if (strcasecmp(s, "MUTT_ASKYES") == 0)
+      {
         strncpy(t, "ask-yes", l);
+      }
       else if (strcasecmp(s, "MUTT_ASKNO") == 0)
+      {
         strncpy(t, "ask-no", l);
+      }
       break;
     }
     case DT_BOOL:
     {
       if (atoi(s))
+      {
         strncpy(t, "yes", l);
+      }
       else
+      {
         strncpy(t, "no", l);
+      }
       break;
     }
     case DT_SORT:
     {
       /* heuristic! */
       if (strncmp(s, "SORT_", 5) != 0)
+      {
         fprintf(stderr, "WARNING: expected prefix of SORT_ for type DT_SORT "
                         "instead of %s\n",
                 s);
+      }
       strncpy(t, s + 5, l);
       for (; *t; t++)
+      {
         *t = tolower((unsigned char) *t);
+      }
       break;
     }
     case DT_MAGIC:
     {
       /* heuristic! */
       if (strncmp(s, "MUTT_", 5) != 0)
+      {
         fprintf(stderr, "WARNING: expected prefix of MUTT_ for type DT_MAGIC "
                         "instead of %s\n",
                 s);
+      }
       strncpy(t, s + 5, l);
       for (; *t; t++)
+      {
         *t = tolower((unsigned char) *t);
+      }
       break;
     }
     case DT_STRING:
@@ -1049,7 +1190,9 @@ static void pretty_default(char *t, size_t l, const char *s, int type)
     case DT_MBTABLE:
     {
       if (strcmp(s, "0") == 0)
+      {
         break;
+      }
       /* fallthrough */
     }
     default:
@@ -1100,7 +1243,9 @@ static void conf_print_strval(const char *v, FILE *out)
     }
 
     if (*v == '"' || *v == '\\')
+    {
       fputc('\\', out);
+    }
     fputc(*v, out);
   }
 }
@@ -1130,13 +1275,21 @@ static void man_print_strval(const char *v, FILE *out)
     }
 
     if (*v == '"')
+    {
       fputs("\"", out);
+    }
     else if (*v == '\\')
+    {
       fputs("\\\\", out);
+    }
     else if (*v == '-')
+    {
       fputs("\\-", out);
+    }
     else
+    {
       fputc(*v, out);
+    }
   }
 }
 
@@ -1158,7 +1311,9 @@ static void sgml_print_strval(const char *v, FILE *out)
 static void print_confline(const char *varname, int type, const char *val, FILE *out)
 {
   if (type == DT_SYNONYM)
+  {
     return;
+  }
 
   switch (OutputFormat)
   {
@@ -1173,7 +1328,9 @@ static void print_confline(const char *varname, int type, const char *val, FILE 
         fputs("\"", out);
       }
       else if (type != DT_SYNONYM)
+      {
         fprintf(out, "\n# set %s=%s", varname, val);
+      }
 
       fprintf(out, "\n#\n# Name: %s", varname);
       fprintf(out, "\n# Type: %s", type2human(type));
@@ -1185,7 +1342,9 @@ static void print_confline(const char *varname, int type, const char *val, FILE 
         fputs("\"", out);
       }
       else
+      {
         fprintf(out, "\n# Default: %s", val);
+      }
 
       fputs("\n# ", out);
       break;
@@ -1241,7 +1400,9 @@ static void print_confline(const char *varname, int type, const char *val, FILE 
         fputs("</literallayout>\n", out);
       }
       else
+      {
         fprintf(out, "\nDefault: %s</literallayout>\n", val);
+      }
       break;
     }
     /* make gcc happy */
@@ -1263,31 +1424,45 @@ static void handle_confline(char *s, FILE *out)
 
   /* variable name */
   if (!(s = get_token(varname, sizeof(varname), s)))
+  {
     return;
+  }
 
   /* comma */
   if (!(s = get_token(buff, sizeof(buff), s)))
+  {
     return;
+  }
 
   /* type */
   if (!(s = get_token(buff, sizeof(buff), s)))
+  {
     return;
+  }
 
   type = buff2type(buff);
 
   /* possibly a "|" or comma */
   if (!(s = get_token(buff, sizeof(buff), s)))
+  {
     return;
+  }
 
   if (strcmp(buff, "|") == 0)
   {
     if (Debug)
+    {
       fprintf(stderr, "%s: Expecting <subtype> <comma>.\n", Progname);
+    }
     /* ignore subtype and comma */
     if (!(s = get_token(buff, sizeof(buff), s)))
+    {
       return;
+    }
     if (!(s = get_token(buff, sizeof(buff), s)))
+    {
       return;
+    }
   }
 
   /* redraw, comma */
@@ -1295,34 +1470,54 @@ static void handle_confline(char *s, FILE *out)
   while (true)
   {
     if (!(s = get_token(buff, sizeof(buff), s)))
+    {
       return;
+    }
     if (strcmp(buff, ",") == 0)
+    {
       break;
+    }
   }
 
   /* option name or UL &address */
   if (!(s = get_token(buff, sizeof(buff), s)))
+  {
     return;
+  }
   if (strcmp(buff, "UL") == 0)
+  {
     if (!(s = get_token(buff, sizeof(buff), s)))
+    {
       return;
+    }
+  }
 
   /* comma */
   if (!(s = get_token(buff, sizeof(buff), s)))
+  {
     return;
+  }
 
   if (Debug)
+  {
     fprintf(stderr, "%s: Expecting default value.\n", Progname);
+  }
 
   /* <default value> or UL <default value> */
   if (!(s = get_token(buff, sizeof(buff), s)))
+  {
     return;
+  }
   if (strcmp(buff, "UL") == 0)
   {
     if (Debug)
+    {
       fprintf(stderr, "%s: Skipping UL.\n", Progname);
+    }
     if (!(s = get_token(buff, sizeof(buff), s)))
+    {
       return;
+    }
   }
 
   memset(tmp, 0, sizeof(tmp));
@@ -1330,7 +1525,9 @@ static void handle_confline(char *s, FILE *out)
   do
   {
     if (strcmp(buff, "}") == 0)
+    {
       break;
+    }
 
     strncpy(tmp + strlen(tmp), buff, sizeof(tmp) - strlen(tmp));
   } while ((s = get_token(buff, sizeof(buff), s)));
@@ -1359,10 +1556,13 @@ static void makedoc(FILE *in, FILE *out)
       exit(1);
     }
     else
+    {
       *p = '\0';
-
+    }
     if (!(p = get_token(token, sizeof(token), buffer)))
+    {
       continue;
+    }
 
     if (Debug)
     {
@@ -1370,14 +1570,18 @@ static void makedoc(FILE *in, FILE *out)
     }
 
     if (strcmp(token, "/*++*/") == 0)
+    {
       active = 1;
+    }
     else if (strcmp(token, "/*--*/") == 0)
     {
       docstat = flush_doc(docstat, out);
       active = 0;
     }
     else if (active && ((strcmp(token, "/**") == 0) || (strcmp(token, "**") == 0)))
+    {
       docstat = handle_docline(p, out, docstat);
+    }
     else if (active && (strcmp(token, "{") == 0))
     {
       docstat = flush_doc(docstat, out);
@@ -1394,9 +1598,13 @@ int main(int argc, char *argv[])
   FILE *f = NULL;
 
   if ((Progname = strrchr(argv[0], '/')))
+  {
     Progname++;
+  }
   else
+  {
     Progname = argv[0];
+  }
 
   while ((c = getopt(argc, argv, "cmsd")) != EOF)
   {
@@ -1431,7 +1639,9 @@ int main(int argc, char *argv[])
     }
   }
   else
+  {
     f = stdin;
+  }
 
   switch (OutputFormat)
   {
@@ -1448,7 +1658,9 @@ int main(int argc, char *argv[])
   }
 
   if (f != stdin)
+  {
     fclose(f);
+  }
 
   return 0;
 }

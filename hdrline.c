@@ -74,7 +74,9 @@ enum FlagChars
 bool mutt_is_mail_list(struct Address *addr)
 {
   if (!mutt_match_regex_list(addr->mailbox, UnMailLists))
+  {
     return mutt_match_regex_list(addr->mailbox, MailLists);
+  }
   return false;
 }
 
@@ -82,7 +84,9 @@ bool mutt_is_subscribed_list(struct Address *addr)
 {
   if (!mutt_match_regex_list(addr->mailbox, UnMailLists) &&
       !mutt_match_regex_list(addr->mailbox, UnSubscribedLists))
+  {
     return mutt_match_regex_list(addr->mailbox, SubscribedLists);
+  }
   return false;
 }
 
@@ -105,7 +109,9 @@ static bool check_for_mailing_list(struct Address *adr, const char *pfx, char *b
     if (mutt_is_subscribed_list(adr))
     {
       if (pfx && buf && buflen)
+      {
         snprintf(buf, buflen, "%s%s", pfx, mutt_get_name(adr));
+      }
       return true;
     }
   }
@@ -125,7 +131,9 @@ static bool check_for_mailing_list_addr(struct Address *adr, char *buf, int bufl
     if (mutt_is_subscribed_list(adr))
     {
       if (buf && buflen)
+      {
         snprintf(buf, buflen, "%s", adr->mailbox);
+      }
       return true;
     }
   }
@@ -161,11 +169,15 @@ static size_t add_index_color(char *buf, size_t buflen, enum FormatFlag flags, c
 
   /* only add color markers if we are operating on main index entries. */
   if (!(flags & MUTT_FORMAT_INDEX))
+  {
     return 0;
+  }
 
   /* this item is going to be passed to an external filter */
   if (flags & MUTT_FORMAT_NOFILTER)
+  {
     return 0;
+  }
 
   if (color == MT_COLOR_INDEX)
   { /* buf might be uninitialized other cases */
@@ -175,7 +187,9 @@ static size_t add_index_color(char *buf, size_t buflen, enum FormatFlag flags, c
   }
 
   if (buflen <= 2)
+  {
     return 0;
+  }
 
   buf[0] = MUTT_SPECIAL_INDEX;
   buf[1] = color;
@@ -209,10 +223,14 @@ enum FieldType
 static char *get_nth_wchar(struct MbTable *table, int index)
 {
   if (!table || !table->chars || (index < 0) || (index >= table->len))
+  {
     return " ";
+  }
 
   if (table->chars[index][0] == '\r')
+  {
     return "";
+  }
 
   return table->chars[index];
 }
@@ -234,11 +252,15 @@ static const char *make_from_prefix(enum FieldType disp)
   };
 
   if (!FromChars || !FromChars->chars || (FromChars->len == 0))
+  {
     return long_prefixes[disp];
+  }
 
   char *pchar = get_nth_wchar(FromChars, disp);
   if (mutt_strlen(pchar) == 0)
+  {
     return "";
+  }
 
   snprintf(padded, sizeof(padded), "%s ", pchar);
   return padded;
@@ -260,7 +282,9 @@ static const char *make_from_prefix(enum FieldType disp)
 static void make_from(struct Envelope *env, char *buf, size_t len, int do_lists)
 {
   if (!env || !buf)
+  {
     return;
+  }
 
   bool me;
   enum FieldType disp;
@@ -271,9 +295,13 @@ static void make_from(struct Envelope *env, char *buf, size_t len, int do_lists)
   if (do_lists || me)
   {
     if (check_for_mailing_list(env->to, make_from_prefix(DISP_TO), buf, len))
+    {
       return;
+    }
     if (check_for_mailing_list(env->cc, make_from_prefix(DISP_CC), buf, len))
+    {
       return;
+    }
   }
 
   if (me && env->to)
@@ -308,33 +336,51 @@ static void make_from(struct Envelope *env, char *buf, size_t len, int do_lists)
 static void make_from_addr(struct Envelope *hdr, char *buf, size_t len, int do_lists)
 {
   if (!hdr || !buf)
+  {
     return;
+  }
 
   bool me = mutt_addr_is_user(hdr->from);
 
   if (do_lists || me)
   {
     if (check_for_mailing_list_addr(hdr->to, buf, len))
+    {
       return;
+    }
     if (check_for_mailing_list_addr(hdr->cc, buf, len))
+    {
       return;
+    }
   }
 
   if (me && hdr->to)
+  {
     snprintf(buf, len, "%s", hdr->to->mailbox);
+  }
   else if (me && hdr->cc)
+  {
     snprintf(buf, len, "%s", hdr->cc->mailbox);
+  }
   else if (hdr->from)
+  {
     strfcpy(buf, hdr->from->mailbox, len);
+  }
   else
+  {
     *buf = 0;
+  }
 }
 
 static bool user_in_addr(struct Address *a)
 {
   for (; a; a = a->next)
+  {
     if (mutt_addr_is_user(a))
+    {
       return true;
+    }
+  }
   return false;
 }
 
@@ -350,7 +396,9 @@ static bool user_in_addr(struct Address *a)
 static int user_is_recipient(struct Header *h)
 {
   if (!h || !h->env)
+  {
     return 0;
+  }
 
   struct Envelope *env = h->env;
 
@@ -359,22 +407,36 @@ static int user_is_recipient(struct Header *h)
     h->recip_valid = true;
 
     if (mutt_addr_is_user(env->from))
+    {
       h->recipient = 4;
+    }
     else if (user_in_addr(env->to))
     {
       if (env->to->next || env->cc)
+      {
         h->recipient = 2; /* non-unique recipient */
+      }
       else
+      {
         h->recipient = 1; /* unique recipient */
+      }
     }
     else if (user_in_addr(env->cc))
+    {
       h->recipient = 3;
+    }
     else if (check_for_mailing_list(env->to, NULL, NULL, 0))
+    {
       h->recipient = 5;
+    }
     else if (check_for_mailing_list(env->cc, NULL, NULL, 0))
+    {
       h->recipient = 5;
+    }
     else
+    {
       h->recipient = 0;
+    }
   }
 
   return h->recipient;
@@ -395,14 +457,18 @@ static int user_is_recipient(struct Header *h)
 static bool get_initials(const char *name, char *buf, int buflen)
 {
   if (!name || !buf)
+  {
     return false;
+  }
 
   while (*name)
   {
     /* Char's length in bytes */
     int clen = mutt_charlen(name, NULL);
     if (clen < 1)
+    {
       return false;
+    }
 
     /* Ignore punctuation at the beginning of a word */
     if ((clen == 1) && ispunct(*name))
@@ -412,26 +478,36 @@ static bool get_initials(const char *name, char *buf, int buflen)
     }
 
     if (clen >= buflen)
+    {
       return false;
+    }
 
     /* Copy one multibyte character */
     buflen -= clen;
     while (clen--)
+    {
       *buf++ = *name++;
+    }
 
     /* Skip to end-of-word */
     for (; *name; name += clen)
     {
       clen = mutt_charlen(name, NULL);
       if (clen < 1)
+      {
         return false;
+      }
       else if ((clen == 1) && (isspace(*name) || (*name == '-')))
+      {
         break;
+      }
     }
 
     /* Skip any whitespace, or hyphens */
     while (*name && (isspace(*name) || (*name == '-')))
+    {
       name++;
+    }
   }
 
   *buf = 0;
@@ -441,13 +517,19 @@ static bool get_initials(const char *name, char *buf, int buflen)
 static char *apply_subject_mods(struct Envelope *env)
 {
   if (!env)
+  {
     return NULL;
+  }
 
   if (!SubjectRegexList)
+  {
     return env->subject;
+  }
 
   if (env->subject == NULL || *env->subject == '\0')
+  {
     return env->disp_subj = NULL;
+  }
 
   env->disp_subj = mutt_apply_replace(NULL, 0, env->subject, SubjectRegexList);
   return env->disp_subj;
@@ -529,7 +611,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
   ctx = hfi->ctx;
 
   if (!hdr || !hdr->env)
+  {
     return src;
+  }
   dest[0] = 0;
   switch (op)
   {
@@ -561,10 +645,14 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
     case 'a':
       colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_AUTHOR);
       if (hdr->env->from && hdr->env->from->mailbox)
+      {
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix,
                       mutt_addr_for_display(hdr->env->from));
+      }
       else
+      {
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix, "");
+      }
       add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
       break;
 
@@ -572,7 +660,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
     case 'K':
       if (!first_mailing_list(dest, destlen, hdr->env->to) &&
           !first_mailing_list(dest, destlen, hdr->env->cc))
+      {
         dest[0] = 0;
+      }
       if (dest[0])
       {
         strfcpy(buf2, dest, sizeof(buf2));
@@ -582,7 +672,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       if (op == 'K')
       {
         if (optional)
+        {
           optional = 0;
+        }
         /* break if 'K' returns nothing */
         break;
       }
@@ -592,12 +684,18 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       if (ctx)
       {
         if ((p = strrchr(ctx->path, '/')))
+        {
           strfcpy(dest, p + 1, destlen);
+        }
         else
+        {
           strfcpy(dest, ctx->path, destlen);
+        }
       }
       else
+      {
         strfcpy(dest, "(null)", destlen);
+      }
       strfcpy(buf2, dest, sizeof(buf2));
       mutt_format_s(dest, destlen, prefix, buf2);
       break;
@@ -713,10 +811,14 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
           }
 
           if (j < 0)
+          {
             j *= -1;
+          }
 
           if (((T > j) || (T < (-1 * j))) ^ invert)
+          {
             optional = 0;
+          }
           break;
         }
 
@@ -729,7 +831,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
           cp++;
         }
         else
+        {
           do_locales = 1;
+        }
 
         len = destlen - 1;
         while (len > 0 && (((op == 'd' || op == 'D') && *cp) ||
@@ -749,7 +853,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
                 len -= 5;
               }
               else
+              {
                 break; /* not enough space left */
+              }
             }
             else
             {
@@ -760,7 +866,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
                 len -= 2;
               }
               else
+              {
                 break; /* not enough space */
+              }
             }
             cp++;
           }
@@ -773,9 +881,13 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         *p = 0;
 
         if (op == '[' || op == 'D')
+        {
           tm = localtime(&hdr->date_sent);
+        }
         else if (op == '(')
+        {
           tm = localtime(&hdr->received);
+        }
         else if (op == '<')
         {
           T = time(NULL);
@@ -786,24 +898,34 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
           /* restore sender's time zone */
           T = hdr->date_sent;
           if (hdr->zoccident)
+          {
             T -= (hdr->zhours * 3600 + hdr->zminutes * 60);
+          }
           else
+          {
             T += (hdr->zhours * 3600 + hdr->zminutes * 60);
+          }
           tm = gmtime(&T);
         }
 
         if (!do_locales)
+        {
           setlocale(LC_TIME, "C");
+        }
         strftime(buf2, sizeof(buf2), dest, tm);
         if (!do_locales)
+        {
           setlocale(LC_TIME, "");
+        }
 
         colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_DATE);
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix, buf2);
         add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
 
-        if (len > 0 && op != 'd' && op != 'D') /* Skip ending op */
+        if (len > 0 && op != 'd' && op != 'D')
+        { /* Skip ending op */
           src = cp + 1;
+        }
       }
       break;
 
@@ -819,7 +941,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         snprintf(dest, destlen, fmt, mutt_messages_in_thread(ctx, hdr, 0));
       }
       else if (mutt_messages_in_thread(ctx, hdr, 0) <= 1)
+      {
         optional = 0;
+      }
       break;
 
     case 'f':
@@ -837,7 +961,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
       }
       else if (mutt_addr_is_user(hdr->env->from))
+      {
         optional = 0;
+      }
       break;
 
     case 'g':;
@@ -849,7 +975,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
       }
       else if (!tags)
+      {
         optional = 0;
+      }
       FREE(&tags);
       break;
 
@@ -885,7 +1013,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         {
           tags = driver_tags_get_transformed_for(tag, &hdr->tags);
           if (!tags)
+          {
             optional = 0;
+          }
           FREE(&tags);
         }
       }
@@ -894,12 +1024,18 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
     case 'H':
       /* (Hormel) spam score */
       if (optional)
+      {
         optional = hdr->env->spam ? 1 : 0;
+      }
 
       if (hdr->env->spam)
+      {
         mutt_format_s(dest, destlen, prefix, NONULL(hdr->env->spam->data));
+      }
       else
+      {
         mutt_format_s(dest, destlen, prefix, "");
+      }
       break;
 
     case 'i':
@@ -916,27 +1052,41 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         {
           char *parent_tags = NULL;
           if (hdr->thread->prev && hdr->thread->prev->message)
+          {
             parent_tags =
                 driver_tags_get_transformed(&hdr->thread->prev->message->tags);
+          }
           if (!parent_tags && hdr->thread->parent && hdr->thread->parent->message)
+          {
             parent_tags =
                 driver_tags_get_transformed(&hdr->thread->parent->message->tags);
+          }
           if (parent_tags && mutt_strcasecmp(tags, parent_tags) == 0)
+          {
             i = 0;
+          }
           FREE(&parent_tags);
         }
       }
       else
+      {
         i = 0;
+      }
 
       if (optional)
+      {
         optional = i;
+      }
 
       colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_TAGS);
       if (i)
+      {
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix, NONULL(tags));
+      }
       else
+      {
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix, "");
+      }
       add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
       FREE(&tags);
       break;
@@ -950,7 +1100,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
       }
       else if (hdr->lines <= 0)
+      {
         optional = 0;
+      }
       break;
 
     case 'L':
@@ -975,7 +1127,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         snprintf(dest, destlen, fmt, ctx->msgcount);
       }
       else
+      {
         strfcpy(dest, "(null)", destlen);
+      }
       break;
 
     case 'n':
@@ -1001,12 +1155,16 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
           add_index_color(dest, destlen - colorlen, flags, MT_COLOR_INDEX);
         }
         else
+        {
           *dest = '\0';
+        }
       }
       else
       {
         if (!(threads && is_index && hdr->collapsed && hdr->num_hidden > 1))
+        {
           optional = 0;
+        }
       }
       break;
 
@@ -1019,7 +1177,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       else
       {
         if (hdr->score == 0)
+        {
           optional = 0;
+        }
       }
       break;
 
@@ -1028,7 +1188,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       {
         make_from_addr(hdr->env, buf2, sizeof(buf2), 1);
         if (!option(OPT_SAVE_ADDRESS) && (p = strpbrk(buf2, "%@")))
+        {
           *p = 0;
+        }
         mutt_format_s(dest, destlen, prefix, buf2);
       }
       else if (!check_for_mailing_list_addr(hdr->env->to, NULL, 0) &&
@@ -1052,7 +1214,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       buf2[0] = 0;
       rfc822_write_address(buf2, sizeof(buf2), hdr->env->to, 1);
       if (optional && buf2[0] == '\0')
+      {
         optional = 0;
+      }
       mutt_format_s(dest, destlen, prefix, buf2);
       break;
 
@@ -1060,7 +1224,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       buf2[0] = 0;
       rfc822_write_address(buf2, sizeof(buf2), hdr->env->cc, 1);
       if (optional && buf2[0] == '\0')
+      {
         optional = 0;
+      }
       mutt_format_s(dest, destlen, prefix, buf2);
       break;
 
@@ -1068,11 +1234,17 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
     {
       char *subj = NULL;
       if (hdr->env->disp_subj)
+      {
         subj = hdr->env->disp_subj;
+      }
       else if (SubjectRegexList)
+      {
         subj = apply_subject_mods(hdr->env);
+      }
       else
+      {
         subj = hdr->env->subject;
+      }
       if (flags & MUTT_FORMAT_TREE && !hdr->collapsed)
       {
         if (flags & MUTT_FORMAT_FORCESUBJ)
@@ -1084,7 +1256,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
           mutt_format_s_tree(dest, destlen, prefix, buf2);
         }
         else
+        {
           mutt_format_s_tree(dest, destlen, prefix, hdr->tree);
+        }
       }
       else
       {
@@ -1097,21 +1271,37 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
 
     case 'S':
       if (hdr->deleted)
+      {
         wch = get_nth_wchar(FlagChars, FlagCharDeleted);
+      }
       else if (hdr->attach_del)
+      {
         wch = get_nth_wchar(FlagChars, FlagCharDeletedAttach);
+      }
       else if (hdr->tagged)
+      {
         wch = get_nth_wchar(FlagChars, FlagCharTagged);
+      }
       else if (hdr->flagged)
+      {
         wch = get_nth_wchar(FlagChars, FlagCharImportant);
+      }
       else if (hdr->replied)
+      {
         wch = get_nth_wchar(FlagChars, FlagCharReplied);
+      }
       else if (hdr->read && (ctx && ctx->msgnotreadyet != hdr->msgno))
+      {
         wch = get_nth_wchar(FlagChars, FlagCharSEmpty);
+      }
       else if (hdr->old)
+      {
         wch = get_nth_wchar(FlagChars, FlagCharOld);
+      }
       else
+      {
         wch = get_nth_wchar(FlagChars, FlagCharNew);
+      }
 
       snprintf(buf2, sizeof(buf2), "%s", wch);
       colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_FLAGS);
@@ -1125,9 +1315,13 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
           !check_for_mailing_list(hdr->env->cc, "Cc ", buf2, sizeof(buf2)))
       {
         if (hdr->env->to)
+        {
           snprintf(buf2, sizeof(buf2), "To %s", mutt_get_name(hdr->env->to));
+        }
         else if (hdr->env->cc)
+        {
           snprintf(buf2, sizeof(buf2), "Cc %s", mutt_get_name(hdr->env->cc));
+        }
       }
       mutt_format_s(dest, destlen, prefix, buf2);
       break;
@@ -1145,10 +1339,14 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       {
         strfcpy(buf2, mutt_addr_for_display(hdr->env->from), sizeof(buf2));
         if ((p = strpbrk(buf2, "%@")))
+        {
           *p = 0;
+        }
       }
       else
+      {
         buf2[0] = 0;
+      }
       mutt_format_s(dest, destlen, prefix, buf2);
       break;
 
@@ -1156,34 +1354,52 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       if (mutt_addr_is_user(hdr->env->from))
       {
         if (hdr->env->to)
+        {
           mutt_format_s(buf2, sizeof(buf2), prefix, mutt_get_name(hdr->env->to));
+        }
         else if (hdr->env->cc)
+        {
           mutt_format_s(buf2, sizeof(buf2), prefix, mutt_get_name(hdr->env->cc));
+        }
         else
+        {
           *buf2 = 0;
+        }
       }
       else
+      {
         mutt_format_s(buf2, sizeof(buf2), prefix, mutt_get_name(hdr->env->from));
+      }
       if ((p = strpbrk(buf2, " %@")))
+      {
         *p = 0;
+      }
       mutt_format_s(dest, destlen, prefix, buf2);
       break;
 
     case 'W':
       if (!optional)
+      {
         mutt_format_s(dest, destlen, prefix,
                       hdr->env->organization ? hdr->env->organization : "");
+      }
       else if (!hdr->env->organization)
+      {
         optional = 0;
+      }
       break;
 
 #ifdef USE_NNTP
     case 'x':
       if (!optional)
+      {
         mutt_format_s(dest, destlen, prefix,
                       hdr->env->x_comment_to ? hdr->env->x_comment_to : "");
+      }
       else if (!hdr->env->x_comment_to)
+      {
         optional = 0;
+      }
       break;
 #endif
 
@@ -1193,7 +1409,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
 
       /* The recursion allows messages without depth to return 0. */
       if (optional)
+      {
         optional = count != 0;
+      }
 
       snprintf(fmt, sizeof(fmt), "%%%sd", prefix);
       snprintf(dest, destlen, fmt, count);
@@ -1202,7 +1420,9 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
 
     case 'y':
       if (optional)
+      {
         optional = hdr->env->x_label ? 1 : 0;
+      }
 
       colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_LABEL);
       mutt_format_s(dest + colorlen, destlen - colorlen, prefix, NONULL(hdr->env->x_label));
@@ -1216,26 +1436,40 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
         htmp = NULL;
         if (flags & MUTT_FORMAT_TREE && (hdr->thread->prev && hdr->thread->prev->message &&
                                          hdr->thread->prev->message->env->x_label))
+        {
           htmp = hdr->thread->prev->message;
+        }
         else if (flags & MUTT_FORMAT_TREE &&
                  (hdr->thread->parent && hdr->thread->parent->message &&
                   hdr->thread->parent->message->env->x_label))
+        {
           htmp = hdr->thread->parent->message;
+        }
         if (htmp && (mutt_strcasecmp(hdr->env->x_label, htmp->env->x_label) == 0))
+        {
           i = 0;
+        }
       }
       else
+      {
         i = 0;
+      }
 
       if (optional)
+      {
         optional = i;
+      }
 
       colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_LABEL);
       if (i)
+      {
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix,
                       NONULL(hdr->env->x_label));
+      }
       else
+      {
         mutt_format_s(dest + colorlen, destlen - colorlen, prefix, "");
+      }
       add_index_color(dest + colorlen, destlen - colorlen, flags, MT_COLOR_INDEX);
       break;
 
@@ -1244,26 +1478,42 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       {
         char *ch = NULL;
         if (hdr->deleted)
+        {
           ch = get_nth_wchar(FlagChars, FlagCharDeleted);
+        }
         else if (hdr->attach_del)
+        {
           ch = get_nth_wchar(FlagChars, FlagCharDeletedAttach);
+        }
         else if (THREAD_NEW)
+        {
           ch = get_nth_wchar(FlagChars, FlagCharNewThread);
+        }
         else if (THREAD_OLD)
+        {
           ch = get_nth_wchar(FlagChars, FlagCharOldThread);
+        }
         else if (hdr->read && (ctx && (ctx->msgnotreadyet != hdr->msgno)))
         {
           if (hdr->replied)
+          {
             ch = get_nth_wchar(FlagChars, FlagCharReplied);
+          }
           else
+          {
             ch = get_nth_wchar(FlagChars, FlagCharZEmpty);
+          }
         }
         else
         {
           if (hdr->old)
+          {
             ch = get_nth_wchar(FlagChars, FlagCharOld);
+          }
           else
+          {
             ch = get_nth_wchar(FlagChars, FlagCharNew);
+          }
         }
 
         snprintf(buf2, sizeof(buf2), "%s", ch);
@@ -1273,15 +1523,25 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       {
         char *ch = NULL;
         if (WithCrypto && (hdr->security & GOODSIGN))
+        {
           ch = "S";
+        }
         else if (WithCrypto && (hdr->security & ENCRYPT))
+        {
           ch = "P";
+        }
         else if (WithCrypto && (hdr->security & SIGN))
+        {
           ch = "s";
+        }
         else if ((WithCrypto & APPLICATION_PGP) && (hdr->security & PGPKEY))
+        {
           ch = "K";
+        }
         else
+        {
           ch = " ";
+        }
 
         snprintf(buf2, sizeof(buf2), "%s", ch);
         src++;
@@ -1290,17 +1550,25 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       {
         char *ch = NULL;
         if (hdr->tagged)
+        {
           ch = get_nth_wchar(FlagChars, FlagCharTagged);
+        }
         else if (hdr->flagged)
+        {
           ch = get_nth_wchar(FlagChars, FlagCharImportant);
+        }
         else
+        {
           ch = get_nth_wchar(ToChars, user_is_recipient(hdr));
+        }
 
         snprintf(buf2, sizeof(buf2), "%s", ch);
         src++;
       }
-      else /* fallthrough */
+      else
+      { /* fallthrough */
         break;
+      }
 
       colorlen = add_index_color(dest, destlen, flags, MT_COLOR_INDEX_FLAGS);
       mutt_format_s(dest + colorlen, destlen - colorlen, prefix, buf2);
@@ -1312,49 +1580,81 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
       /* New/Old for threads; replied; New/Old for messages */
       char *first = NULL;
       if (THREAD_NEW)
+      {
         first = get_nth_wchar(FlagChars, FlagCharNewThread);
+      }
       else if (THREAD_OLD)
+      {
         first = get_nth_wchar(FlagChars, FlagCharOldThread);
+      }
       else if (hdr->read && (ctx && (ctx->msgnotreadyet != hdr->msgno)))
       {
         if (hdr->replied)
+        {
           first = get_nth_wchar(FlagChars, FlagCharReplied);
+        }
         else
+        {
           first = get_nth_wchar(FlagChars, FlagCharZEmpty);
+        }
       }
       else
       {
         if (hdr->old)
+        {
           first = get_nth_wchar(FlagChars, FlagCharOld);
+        }
         else
+        {
           first = get_nth_wchar(FlagChars, FlagCharNew);
+        }
       }
 
       /* Marked for deletion; deleted attachments; crypto */
       char *second = NULL;
       if (hdr->deleted)
+      {
         second = get_nth_wchar(FlagChars, FlagCharDeleted);
+      }
       else if (hdr->attach_del)
+      {
         second = get_nth_wchar(FlagChars, FlagCharDeletedAttach);
+      }
       else if (WithCrypto && (hdr->security & GOODSIGN))
+      {
         second = "S";
+      }
       else if (WithCrypto && (hdr->security & ENCRYPT))
+      {
         second = "P";
+      }
       else if (WithCrypto && (hdr->security & SIGN))
+      {
         second = "s";
+      }
       else if ((WithCrypto & APPLICATION_PGP) && (hdr->security & PGPKEY))
+      {
         second = "K";
+      }
       else
+      {
         second = " ";
+      }
 
       /* Tagged, flagged and recipient flag */
       char *third = NULL;
       if (hdr->tagged)
+      {
         third = get_nth_wchar(FlagChars, FlagCharTagged);
+      }
       else if (hdr->flagged)
+      {
         third = get_nth_wchar(FlagChars, FlagCharImportant);
+      }
       else
+      {
         third = get_nth_wchar(ToChars, user_is_recipient(hdr));
+      }
 
       snprintf(buf2, sizeof(buf2), "%s%s%s", first, second, third);
     }
@@ -1370,11 +1670,15 @@ static const char *hdr_format_str(char *dest, size_t destlen, size_t col, int co
   }
 
   if (optional)
+  {
     mutt_expando_format(dest, destlen, col, cols, ifstring, hdr_format_str,
                         (unsigned long) hfi, flags);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     mutt_expando_format(dest, destlen, col, cols, elsestring, hdr_format_str,
                         (unsigned long) hfi, flags);
+  }
 
   return src;
 #undef THREAD_NEW

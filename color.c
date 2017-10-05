@@ -159,11 +159,15 @@ static struct ColorLine *new_color_line(void)
 static void free_color_line(struct ColorLine *tmp, int free_colors)
 {
   if (!tmp)
+  {
     return;
+  }
 
 #ifdef HAVE_COLOR
   if (free_colors && tmp->fg != -1 && tmp->bg != -1)
+  {
     mutt_free_color(tmp->fg, tmp->bg);
+  }
 #endif
 
   /* we should really introduce a container
@@ -264,7 +268,9 @@ int mutt_alloc_color(int fg, int bg)
 
   /* check to see if there are colors left */
   if (++UserColors > COLOR_PAIRS)
+  {
     return A_NORMAL;
+  }
 
   /* find the smallest available index (object) */
   i = 1;
@@ -274,11 +280,15 @@ int mutt_alloc_color(int fg, int bg)
     while (p)
     {
       if (p->index == i)
+      {
         break;
+      }
       p = p->next;
     }
     if (!p)
+    {
       break;
+    }
     i++;
   }
 
@@ -298,9 +308,13 @@ int mutt_alloc_color(int fg, int bg)
   else
 #elif defined(HAVE_USE_DEFAULT_COLORS)
   if (fg == COLOR_DEFAULT)
+  {
     fg = -1;
+  }
   if (bg == COLOR_DEFAULT)
+  {
     bg = -1;
+  }
 #endif
 
     init_pair(i, fg, bg);
@@ -319,9 +333,13 @@ static int mutt_lookup_color(short pair, short *fg, short *bg)
     if (COLOR_PAIR(p->index) == pair)
     {
       if (fg)
+      {
         *fg = p->fg;
+      }
       if (bg)
+      {
         *bg = p->bg;
+      }
       return 0;
     }
     p = p->next;
@@ -337,7 +355,9 @@ int mutt_combine_color(int fg_attr, int bg_attr)
   mutt_lookup_color(fg_attr, &fg, NULL);
   mutt_lookup_color(bg_attr, NULL, &bg);
   if ((fg == COLOR_DEFAULT) && (bg == COLOR_DEFAULT))
+  {
     return A_NORMAL;
+  }
   return mutt_alloc_color(fg, bg);
 }
 
@@ -352,7 +372,9 @@ void mutt_free_color(int fg, int bg)
     {
       (p->count)--;
       if (p->count > 0)
+      {
         return;
+      }
 
       UserColors--;
       mutt_debug(1, "mutt_free_color(): Color pairs used so far: %d\n", UserColors);
@@ -472,9 +494,13 @@ static void do_uncolor(struct Buffer *buf, struct Buffer *s,
           }
           mutt_debug(1, "Freeing pattern \"%s\" from ColorList\n", tmp->pattern);
           if (tmp)
+          {
             STAILQ_REMOVE_AFTER(cl, tmp, entries);
+          }
           else
+          {
             STAILQ_REMOVE_HEAD(cl, entries);
+          }
           free_color_line(np, parse_uncolor);
           break;
         }
@@ -543,35 +569,54 @@ static int _mutt_parse_uncolor(struct Buffer *buf, struct Buffer *s, unsigned lo
   {
     /* just eat the command, but don't do anything real about it */
     do
+    {
       mutt_extract_token(buf, s, 0);
-    while (MoreArgs(s));
+    } while (MoreArgs(s));
 
     return 0;
   }
 
   if (object == MT_COLOR_BODY)
+  {
     do_uncolor(buf, s, &ColorBodyList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_HEADER)
+  {
     do_uncolor(buf, s, &ColorHdrList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_ATTACH_HEADERS)
+  {
     do_uncolor(buf, s, &ColorAttachList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_INDEX)
+  {
     do_uncolor(buf, s, &ColorIndexList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_INDEX_AUTHOR)
+  {
     do_uncolor(buf, s, &ColorIndexAuthorList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_INDEX_FLAGS)
+  {
     do_uncolor(buf, s, &ColorIndexFlagsList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_INDEX_SUBJECT)
+  {
     do_uncolor(buf, s, &ColorIndexSubjectList, &do_cache, parse_uncolor);
+  }
   else if (object == MT_COLOR_INDEX_TAG)
+  {
     do_uncolor(buf, s, &ColorIndexTagList, &do_cache, parse_uncolor);
+  }
 
   if (do_cache && !option(OPT_NO_CURSES))
   {
     mutt_set_menu_redraw_full(MENU_MAIN);
     /* force re-caching of index colors */
     for (int i = 0; Context && i < Context->msgcount; i++)
+    {
       Context->hdrs[i]->pair = 0;
+    }
   }
   return 0;
 }
@@ -606,12 +651,16 @@ static int add_pattern(struct ColorLineHead *top, const char *s, int sensitive, 
     if (sensitive)
     {
       if (mutt_strcmp(s, tmp->pattern) == 0)
+      {
         break;
+      }
     }
     else
     {
       if (mutt_strcasecmp(s, tmp->pattern) == 0)
+      {
         break;
+      }
     }
   }
 
@@ -628,7 +677,9 @@ static int add_pattern(struct ColorLineHead *top, const char *s, int sensitive, 
         attr |= mutt_alloc_color(fg, bg);
       }
       else
+      {
         attr |= (tmp->pair & ~A_BOLD);
+      }
     }
 #endif /* HAVE_COLOR */
     tmp->pair = attr;
@@ -650,7 +701,9 @@ static int add_pattern(struct ColorLineHead *top, const char *s, int sensitive, 
       }
       /* force re-caching of index colors */
       for (int i = 0; Context && i < Context->msgcount; i++)
+      {
         Context->hdrs[i]->pair = 0;
+      }
     }
     else if ((r = REGCOMP(&tmp->regex, s, (sensitive ? mutt_which_case(s) : REG_ICASE))) != 0)
     {
@@ -700,7 +753,9 @@ static int parse_object(struct Buffer *buf, struct Buffer *s, int *o, int *ql,
       }
     }
     else
+    {
       *ql = 0;
+    }
 
     *o = MT_COLOR_QUOTED;
   }
@@ -746,7 +801,9 @@ static int parse_color_pair(struct Buffer *buf, struct Buffer *s, int *fg,
   mutt_extract_token(buf, s, 0);
 
   if (parse_color_name(buf->data, fg, attr, 1, err) != 0)
+  {
     return -1;
+  }
 
   if (!MoreArgs(s))
   {
@@ -757,7 +814,9 @@ static int parse_color_pair(struct Buffer *buf, struct Buffer *s, int *fg,
   mutt_extract_token(buf, s, 0);
 
   if (parse_color_name(buf->data, bg, attr, 0, err) != 0)
+  {
     return -1;
+  }
 
   return 0;
 }
@@ -768,9 +827,13 @@ static int parse_attr_spec(struct Buffer *buf, struct Buffer *s, int *fg,
                            int *bg, int *attr, struct Buffer *err)
 {
   if (fg)
+  {
     *fg = -1;
+  }
   if (bg)
+  {
     *bg = -1;
+  }
 
   if (!MoreArgs(s))
   {
@@ -781,17 +844,29 @@ static int parse_attr_spec(struct Buffer *buf, struct Buffer *s, int *fg,
   mutt_extract_token(buf, s, 0);
 
   if (mutt_strcasecmp("bold", buf->data) == 0)
+  {
     *attr |= A_BOLD;
+  }
   else if (mutt_strcasecmp("underline", buf->data) == 0)
+  {
     *attr |= A_UNDERLINE;
+  }
   else if (mutt_strcasecmp("none", buf->data) == 0)
+  {
     *attr = A_NORMAL;
+  }
   else if (mutt_strcasecmp("reverse", buf->data) == 0)
+  {
     *attr |= A_REVERSE;
+  }
   else if (mutt_strcasecmp("standout", buf->data) == 0)
+  {
     *attr |= A_STANDOUT;
+  }
   else if (mutt_strcasecmp("normal", buf->data) == 0)
+  {
     *attr = A_NORMAL; /* needs use = instead of |= to clear other bits */
+  }
   else
   {
     snprintf(err->data, err->dsize, _("%s: no such attribute"), buf->data);
@@ -805,10 +880,14 @@ static int fgbgattr_to_color(int fg, int bg, int attr)
 {
 #ifdef HAVE_COLOR
   if (fg != -1 && bg != -1)
+  {
     return attr | mutt_alloc_color(fg, bg);
+  }
   else
+  {
 #endif
     return attr;
+  }
 }
 
 /**
@@ -824,10 +903,14 @@ static int _mutt_parse_color(struct Buffer *buf, struct Buffer *s, struct Buffer
   int r = 0, match = 0;
 
   if (parse_object(buf, s, &object, &q_level, err) == -1)
+  {
     return -1;
+  }
 
   if (callback(buf, s, &fg, &bg, &attr, err) == -1)
+  {
     return -1;
+  }
 
   /* extract a regular expression if needed */
 
@@ -878,11 +961,17 @@ static int _mutt_parse_color(struct Buffer *buf, struct Buffer *s, struct Buffer
 #endif
 
   if (object == MT_COLOR_HEADER)
+  {
     r = add_pattern(&ColorHdrList, buf->data, 0, fg, bg, attr, err, 0, match);
+  }
   else if (object == MT_COLOR_BODY)
+  {
     r = add_pattern(&ColorBodyList, buf->data, 1, fg, bg, attr, err, 0, match);
+  }
   else if (object == MT_COLOR_ATTACH_HEADERS)
+  {
     r = add_pattern(&ColorAttachList, buf->data, 1, fg, bg, attr, err, 0, match);
+  }
   else if ((object == MT_COLOR_STATUS) && MoreArgs(s))
   {
     /* 'color status fg bg' can have up to 2 arguments:
@@ -943,7 +1032,9 @@ static int _mutt_parse_color(struct Buffer *buf, struct Buffer *s, struct Buffer
       ColorQuote[ColorQuoteSize - 1] = ColorDefs[MT_COLOR_QUOTED];
     }
     if (q_level >= ColorQuoteUsed)
+    {
       ColorQuoteUsed = q_level + 1;
+    }
     if (q_level == 0)
     {
       ColorDefs[MT_COLOR_QUOTED] = fgbgattr_to_color(fg, bg, attr);
@@ -952,17 +1043,23 @@ static int _mutt_parse_color(struct Buffer *buf, struct Buffer *s, struct Buffer
       for (q_level = 1; q_level < ColorQuoteUsed; q_level++)
       {
         if (ColorQuote[q_level] == A_NORMAL)
+        {
           ColorQuote[q_level] = ColorDefs[MT_COLOR_QUOTED];
+        }
       }
     }
     else
+    {
       ColorQuote[q_level] = fgbgattr_to_color(fg, bg, attr);
+    }
   }
   else
   {
     ColorDefs[object] = fgbgattr_to_color(fg, bg, attr);
     if (object > MT_COLOR_INDEX_AUTHOR)
+    {
       mutt_set_menu_redraw_full(MENU_MAIN);
+    }
   }
 
   return r;
@@ -976,7 +1073,9 @@ int mutt_parse_color(struct Buffer *buff, struct Buffer *s, unsigned long data,
   bool dry_run = false;
 
   if (option(OPT_NO_CURSES) || !has_colors())
+  {
     dry_run = true;
+  }
 
   return _mutt_parse_color(buff, s, err, parse_color_pair, dry_run);
 }
@@ -990,7 +1089,9 @@ int mutt_parse_mono(struct Buffer *buff, struct Buffer *s, unsigned long data,
 
 #ifdef HAVE_COLOR
   if (option(OPT_NO_CURSES) || has_colors())
+  {
     dry_run = true;
+  }
 #else
   if (option(OPT_NO_CURSES))
     dry_run = true;

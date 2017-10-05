@@ -39,7 +39,9 @@
 void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int upd_ctx)
 {
   if (!ctx || !h)
+  {
     return;
+  }
 
   bool changed = h->changed;
   int deleted = ctx->deleted;
@@ -48,14 +50,18 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
   int update = false;
 
   if (ctx->readonly && flag != MUTT_TAG)
+  {
     return; /* don't modify anything if we are read-only */
+  }
 
   switch (flag)
   {
     case MUTT_DELETE:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_DELETE))
+      {
         return;
+      }
 
       if (bf)
       {
@@ -64,7 +70,9 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           h->deleted = true;
           update = true;
           if (upd_ctx)
+          {
             ctx->deleted++;
+          }
 #ifdef USE_IMAP
           /* deleted messages aren't treated as changed elsewhere so that the
            * purge-on-sync option works correctly. This isn't applicable here */
@@ -72,7 +80,9 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           {
             h->changed = true;
             if (upd_ctx)
+            {
               ctx->changed = true;
+            }
           }
 #endif
         }
@@ -82,14 +92,18 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
         h->deleted = false;
         update = true;
         if (upd_ctx)
+        {
           ctx->deleted--;
+        }
 #ifdef USE_IMAP
         /* see my comment above */
         if (ctx->magic == MUTT_IMAP)
         {
           h->changed = true;
           if (upd_ctx)
+          {
             ctx->changed = true;
+          }
         }
 #endif
         /*
@@ -101,28 +115,38 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
          * driver.
          */
         if (ctx->magic == MUTT_MAILDIR && upd_ctx && h->trash)
+        {
           ctx->changed = true;
+        }
       }
       break;
 
     case MUTT_PURGE:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_DELETE))
+      {
         return;
+      }
 
       if (bf)
       {
         if (!h->purge && !ctx->readonly)
+        {
           h->purge = true;
+        }
       }
       else if (h->purge)
+      {
         h->purge = false;
+      }
       break;
 
     case MUTT_NEW:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_SEEN))
+      {
         return;
+      }
 
       if (bf)
       {
@@ -131,37 +155,53 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           update = true;
           h->old = false;
           if (upd_ctx)
+          {
             ctx->new ++;
+          }
           if (h->read)
           {
             h->read = false;
             if (upd_ctx)
+            {
               ctx->unread++;
+            }
           }
           h->changed = true;
           if (upd_ctx)
+          {
             ctx->changed = true;
+          }
         }
       }
       else if (!h->read)
       {
         update = true;
         if (!h->old)
+        {
           if (upd_ctx)
+          {
             ctx->new --;
+          }
+        }
         h->read = true;
         if (upd_ctx)
+        {
           ctx->unread--;
+        }
         h->changed = true;
         if (upd_ctx)
+        {
           ctx->changed = true;
+        }
       }
       break;
 
     case MUTT_OLD:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_SEEN))
+      {
         return;
+      }
 
       if (bf)
       {
@@ -170,11 +210,17 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           update = true;
           h->old = true;
           if (!h->read)
+          {
             if (upd_ctx)
+            {
               ctx->new --;
+            }
+          }
           h->changed = true;
           if (upd_ctx)
+          {
             ctx->changed = true;
+          }
         }
       }
       else if (h->old)
@@ -182,18 +228,26 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
         update = true;
         h->old = false;
         if (!h->read)
+        {
           if (upd_ctx)
+          {
             ctx->new ++;
+          }
+        }
         h->changed = true;
         if (upd_ctx)
+        {
           ctx->changed = true;
+        }
       }
       break;
 
     case MUTT_READ:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_SEEN))
+      {
         return;
+      }
 
       if (bf)
       {
@@ -202,13 +256,21 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           update = true;
           h->read = true;
           if (upd_ctx)
+          {
             ctx->unread--;
+          }
           if (!h->old)
+          {
             if (upd_ctx)
+            {
               ctx->new --;
+            }
+          }
           h->changed = true;
           if (upd_ctx)
+          {
             ctx->changed = true;
+          }
         }
       }
       else if (h->read)
@@ -216,20 +278,30 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
         update = true;
         h->read = false;
         if (upd_ctx)
+        {
           ctx->unread++;
+        }
         if (!h->old)
+        {
           if (upd_ctx)
+          {
             ctx->new ++;
+          }
+        }
         h->changed = true;
         if (upd_ctx)
+        {
           ctx->changed = true;
+        }
       }
       break;
 
     case MUTT_REPLIED:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_WRITE))
+      {
         return;
+      }
 
       if (bf)
       {
@@ -241,14 +313,22 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           {
             h->read = true;
             if (upd_ctx)
+            {
               ctx->unread--;
+            }
             if (!h->old)
+            {
               if (upd_ctx)
+              {
                 ctx->new --;
+              }
+            }
           }
           h->changed = true;
           if (upd_ctx)
+          {
             ctx->changed = true;
+          }
         }
       }
       else if (h->replied)
@@ -257,14 +337,18 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
         h->replied = false;
         h->changed = true;
         if (upd_ctx)
+        {
           ctx->changed = true;
+        }
       }
       break;
 
     case MUTT_FLAG:
 
       if (!mutt_bit_isset(ctx->rights, MUTT_ACL_WRITE))
+      {
         return;
+      }
 
       if (bf)
       {
@@ -273,10 +357,14 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           update = true;
           h->flagged = bf;
           if (upd_ctx)
+          {
             ctx->flagged++;
+          }
           h->changed = true;
           if (upd_ctx)
+          {
             ctx->changed = true;
+          }
         }
       }
       else if (h->flagged)
@@ -284,10 +372,14 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
         update = true;
         h->flagged = false;
         if (upd_ctx)
+        {
           ctx->flagged--;
+        }
         h->changed = true;
         if (upd_ctx)
+        {
           ctx->changed = true;
+        }
       }
       break;
 
@@ -299,7 +391,9 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
           update = true;
           h->tagged = true;
           if (upd_ctx)
+          {
             ctx->tagged++;
+          }
         }
       }
       else if (h->tagged)
@@ -307,7 +401,9 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
         update = true;
         h->tagged = false;
         if (upd_ctx)
+        {
           ctx->tagged--;
+        }
       }
       break;
   }
@@ -326,7 +422,9 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
    */
   if (h->searched && (changed != h->changed || deleted != ctx->deleted ||
                       tagged != ctx->tagged || flagged != ctx->flagged))
+  {
     h->searched = false;
+  }
 }
 
 /**
@@ -335,8 +433,12 @@ void _mutt_set_flag(struct Context *ctx, struct Header *h, int flag, int bf, int
 void mutt_tag_set_flag(int flag, int bf)
 {
   for (int j = 0; j < Context->vcount; j++)
+  {
     if (Context->hdrs[Context->v2r[j]]->tagged)
+    {
       mutt_set_flag(Context, Context->hdrs[Context->v2r[j]], flag, bf);
+    }
+  }
 }
 
 int mutt_thread_set_flag(struct Header *hdr, int flag, int bf, int subthread)
@@ -350,32 +452,48 @@ int mutt_thread_set_flag(struct Header *hdr, int flag, int bf, int subthread)
   }
 
   if (!subthread)
+  {
     while (cur->parent)
+    {
       cur = cur->parent;
+    }
+  }
   start = cur;
 
   if (cur->message && cur != hdr->thread)
+  {
     mutt_set_flag(Context, cur->message, flag, bf);
+  }
 
   if ((cur = cur->child) == NULL)
+  {
     goto done;
+  }
 
   while (true)
   {
     if (cur->message && cur != hdr->thread)
+    {
       mutt_set_flag(Context, cur->message, flag, bf);
+    }
 
     if (cur->child)
+    {
       cur = cur->child;
+    }
     else if (cur->next)
+    {
       cur = cur->next;
+    }
     else
     {
       while (!cur->next)
       {
         cur = cur->parent;
         if (cur == start)
+        {
           goto done;
+        }
       }
       cur = cur->next;
     }
@@ -383,7 +501,9 @@ int mutt_thread_set_flag(struct Header *hdr, int flag, int bf, int subthread)
 done:
   cur = hdr->thread;
   if (cur->message)
+  {
     mutt_set_flag(Context, cur->message, flag, bf);
+  }
   return 0;
 }
 
@@ -413,9 +533,13 @@ int mutt_change_flag(struct Header *h, int bf)
       if (!bf)
       {
         if (h)
+        {
           mutt_set_flag(Context, h, MUTT_PURGE, bf);
+        }
         else
+        {
           mutt_tag_set_flag(MUTT_PURGE, bf);
+        }
       }
       flag = MUTT_DELETE;
       break;
@@ -428,9 +552,13 @@ int mutt_change_flag(struct Header *h, int bf)
     case 'o':
     case 'O':
       if (h)
+      {
         mutt_set_flag(Context, h, MUTT_READ, !bf);
+      }
       else
+      {
         mutt_tag_set_flag(MUTT_READ, !bf);
+      }
       flag = MUTT_OLD;
       break;
 
@@ -453,9 +581,13 @@ int mutt_change_flag(struct Header *h, int bf)
   }
 
   if (h)
+  {
     mutt_set_flag(Context, h, flag, bf);
+  }
   else
+  {
     mutt_tag_set_flag(flag, bf);
+  }
 
   return 0;
 }

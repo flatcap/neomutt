@@ -86,11 +86,14 @@ static void mutt_update_v2r(struct AttachCtx *actx)
     {
       curlevel = actx->idx[rindex]->level;
       do
+      {
         rindex++;
-      while ((rindex < actx->idxlen) && (actx->idx[rindex]->level > curlevel));
+      } while ((rindex < actx->idxlen) && (actx->idx[rindex]->level > curlevel));
     }
     else
+    {
       rindex++;
+    }
   }
 
   actx->vcount = vindex;
@@ -118,17 +121,23 @@ void mutt_update_tree(struct AttachCtx *actx)
         *s++ = MUTT_TREE_RARROW;
       }
       else
+      {
         s = buf;
+      }
       *s = 0;
     }
 
     if (actx->idx[rindex]->tree)
     {
       if (mutt_strcmp(actx->idx[rindex]->tree, buf) != 0)
+      {
         mutt_str_replace(&actx->idx[rindex]->tree, buf);
+      }
     }
     else
+    {
       actx->idx[rindex]->tree = safe_strdup(buf);
+    }
 
     if (2 * (actx->idx[rindex]->level + 2) < sizeof(buf) && actx->idx[rindex]->level)
     {
@@ -179,13 +188,19 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
       {
         if (mutt_is_text_part(aptr->content) &&
             mutt_get_body_charset(charset, sizeof(charset), aptr->content))
+        {
           mutt_format_s(dest, destlen, prefix, charset);
+        }
         else
+        {
           mutt_format_s(dest, destlen, prefix, "");
+        }
       }
       else if (!mutt_is_text_part(aptr->content) ||
                !mutt_get_body_charset(charset, sizeof(charset), aptr->content))
+      {
         optional = 0;
+      }
       break;
     case 'c':
       /* XXX */
@@ -196,7 +211,9 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
                  aptr->content->type != TYPETEXT || aptr->content->noconv ? 'n' : 'c');
       }
       else if (aptr->content->type != TYPETEXT || aptr->content->noconv)
+      {
         optional = 0;
+      }
       break;
     case 'd':
       if (!optional)
@@ -227,7 +244,9 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
       else if (aptr->content->description ||
                (mutt_is_message_type(aptr->content->type, aptr->content->subtype) &&
                 MessageFormat && aptr->content->hdr))
+      {
         break;
+      }
     /* FALLS THROUGH TO 'F' */
     case 'F':
       if (!optional)
@@ -256,20 +275,30 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
           mutt_format_s(dest, destlen, prefix, path);
         }
         else
+        {
           mutt_format_s(dest, destlen, prefix, NONULL(aptr->content->filename));
+        }
       }
       else if (!aptr->content->filename)
+      {
         optional = 0;
+      }
       break;
     case 'D':
       if (!optional)
+      {
         snprintf(dest, destlen, "%c", aptr->content->deleted ? 'D' : ' ');
+      }
       else if (!aptr->content->deleted)
+      {
         optional = 0;
+      }
       break;
     case 'e':
       if (!optional)
+      {
         mutt_format_s(dest, destlen, prefix, ENCODING(aptr->content->encoding));
+      }
       break;
     case 'I':
       if (!optional)
@@ -278,7 +307,9 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
         char ch;
 
         if (aptr->content->disposition < sizeof(dispchar))
+        {
           ch = dispchar[aptr->content->disposition];
+        }
         else
         {
           mutt_debug(1, "ERROR: invalid content-disposition %d\n", aptr->content->disposition);
@@ -289,13 +320,19 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
       break;
     case 'm':
       if (!optional)
+      {
         mutt_format_s(dest, destlen, prefix, TYPE(aptr->content));
+      }
       break;
     case 'M':
       if (!optional)
+      {
         mutt_format_s(dest, destlen, prefix, aptr->content->subtype);
+      }
       else if (!aptr->content->subtype)
+      {
         optional = 0;
+      }
       break;
     case 'n':
       if (!optional)
@@ -306,7 +343,9 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
       break;
     case 'Q':
       if (optional)
+      {
         optional = aptr->content->attach_qualifies;
+      }
       else
       {
         snprintf(fmt, sizeof(fmt), "%%%sc", prefix);
@@ -321,7 +360,9 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
         l = st.st_size;
       }
       else
+      {
         l = aptr->content->length;
+      }
 
       if (!optional)
       {
@@ -329,30 +370,46 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
         mutt_format_s(dest, destlen, prefix, tmp);
       }
       else if (l == 0)
+      {
         optional = 0;
+      }
 
       break;
     case 't':
       if (!optional)
+      {
         snprintf(dest, destlen, "%c", aptr->content->tagged ? '*' : ' ');
+      }
       else if (!aptr->content->tagged)
+      {
         optional = 0;
+      }
       break;
     case 'T':
       if (!optional)
+      {
         mutt_format_s_tree(dest, destlen, prefix, NONULL(aptr->tree));
+      }
       else if (!aptr->tree)
+      {
         optional = 0;
+      }
       break;
     case 'u':
       if (!optional)
+      {
         snprintf(dest, destlen, "%c", aptr->content->unlink ? '-' : ' ');
+      }
       else if (!aptr->content->unlink)
+      {
         optional = 0;
+      }
       break;
     case 'X':
       if (optional)
+      {
         optional = (aptr->content->attach_count + aptr->content->attach_qualifies) != 0;
+      }
       else
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prefix);
@@ -365,9 +422,13 @@ const char *mutt_attach_fmt(char *dest, size_t destlen, size_t col, int cols,
   }
 
   if (optional)
+  {
     mutt_expando_format(dest, destlen, col, cols, ifstring, mutt_attach_fmt, data, 0);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     mutt_expando_format(dest, destlen, col, cols, elsestring, mutt_attach_fmt, data, 0);
+  }
   return src;
 }
 
@@ -400,7 +461,9 @@ int mutt_tag_attach(struct Menu *menu, int n, int m)
 bool mutt_is_message_type(int type, const char *subtype)
 {
   if (type != TYPEMESSAGE)
+  {
     return false;
+  }
 
   subtype = NONULL(subtype);
   return ((mutt_strcasecmp(subtype, "rfc822") == 0) ||
@@ -414,7 +477,9 @@ static void prepend_curdir(char *dst, size_t dstlen)
   if (!dst || !*dst || *dst == '/' || dstlen < 3 ||
       /* XXX bad modularization, these are special to mutt_expand_path() */
       !strchr("~=+@<>!-^", *dst))
+  {
     return;
+  }
 
   dstlen -= 3;
   l = strlen(dst) + 2;
@@ -437,15 +502,23 @@ static int query_save_attachment(FILE *fp, struct Body *body,
   if (body->filename)
   {
     if (directory && *directory)
+    {
       mutt_concat_path(buf, *directory, mutt_basename(body->filename), sizeof(buf));
+    }
     else
+    {
       strfcpy(buf, body->filename, sizeof(buf));
+    }
   }
   else if (body->hdr && body->encoding != ENCBASE64 && body->encoding != ENCQUOTEDPRINTABLE &&
            mutt_is_message_type(body->type, body->subtype))
+  {
     mutt_default_save(buf, sizeof(buf), body->hdr);
+  }
   else
+  {
     buf[0] = 0;
+  }
 
   prepend_curdir(buf, sizeof(buf));
 
@@ -476,14 +549,18 @@ static int query_save_attachment(FILE *fp, struct Body *body,
         continue;
       }
       else if (rc == -1)
+      {
         return -1;
+      }
       strfcpy(tfile, buf, sizeof(tfile));
     }
     else
     {
       if ((rc = mutt_check_overwrite(body->filename, buf, tfile, sizeof(tfile),
                                      &append, directory)) == -1)
+      {
         return -1;
+      }
       else if (rc == 1)
       {
         prompt = _("Save to file: ");
@@ -538,10 +615,14 @@ void mutt_save_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
 
           if (mutt_get_field(_("Save to file: "), buf, sizeof(buf), MUTT_FILE | MUTT_CLEAR) != 0 ||
               !buf[0])
+          {
             return;
+          }
           mutt_expand_path(buf, sizeof(buf));
           if (mutt_check_overwrite(top->filename, buf, tfile, sizeof(tfile), &append, NULL))
+          {
             return;
+          }
           rc = mutt_save_attachment(fp, top, tfile, append, hdr);
           if (rc == 0 && AttachSep && (fpout = fopen(tfile, "a")) != NULL)
           {
@@ -571,11 +652,15 @@ void mutt_save_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
           menu_redraw(menu);
         }
         if (query_save_attachment(fp, top, hdr, &directory) == -1)
+        {
           break;
+        }
       }
     }
     if (!tag)
+    {
       break;
+    }
   }
 
   FREE(&directory);
@@ -589,7 +674,9 @@ void mutt_save_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
   }
 
   if (!option(OPT_ATTACH_SPLIT) && (rc == 0))
+  {
     mutt_message(_("Attachment saved."));
+  }
 }
 
 static void query_pipe_attachment(char *command, FILE *fp, struct Body *body, bool filter)
@@ -609,7 +696,9 @@ static void query_pipe_attachment(char *command, FILE *fp, struct Body *body, bo
     mutt_mktemp(tfile, sizeof(tfile));
   }
   else
+  {
     tfile[0] = 0;
+  }
 
   if (mutt_pipe_attachment(fp, body, command, tfile))
   {
@@ -624,7 +713,9 @@ static void query_pipe_attachment(char *command, FILE *fp, struct Body *body, bo
   else
   {
     if (filter && tfile[0])
+    {
       mutt_unlink(tfile);
+    }
   }
 }
 
@@ -637,7 +728,9 @@ static void pipe_attachment(FILE *fp, struct Body *b, struct State *state)
     state->fpin = fp;
     mutt_decode_attachment(b, state);
     if (AttachSep)
+    {
       state_puts(AttachSep, state);
+    }
   }
   else
   {
@@ -649,7 +742,9 @@ static void pipe_attachment(FILE *fp, struct Body *b, struct State *state)
     mutt_copy_stream(ifp, state->fpout);
     safe_fclose(&ifp);
     if (AttachSep)
+    {
       state_puts(AttachSep, state);
+    }
   }
 }
 
@@ -668,12 +763,18 @@ static void pipe_attachment_list(char *command, struct AttachCtx *actx, FILE *fp
     if (!tag || top->tagged)
     {
       if (!filter && !option(OPT_ATTACH_SPLIT))
+      {
         pipe_attachment(fp, top, state);
+      }
       else
+      {
         query_pipe_attachment(command, fp, top, filter);
+      }
     }
     if (!tag)
+    {
       break;
+    }
   }
 }
 
@@ -685,7 +786,9 @@ void mutt_pipe_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
   pid_t thepid;
 
   if (fp)
+  {
     filter = false; /* sanity check: we can't filter in the recv case yet */
+  }
 
   buf[0] = 0;
   memset(&state, 0, sizeof(struct State));
@@ -695,7 +798,9 @@ void mutt_pipe_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
   if (mutt_get_field((filter ? _("Filter through: ") : _("Pipe to: ")), buf,
                      sizeof(buf), MUTT_CMD) != 0 ||
       !buf[0])
+  {
     return;
+  }
 
   mutt_expand_path(buf, sizeof(buf));
 
@@ -706,10 +811,14 @@ void mutt_pipe_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
     pipe_attachment_list(buf, actx, fp, tag, top, filter, &state);
     safe_fclose(&state.fpout);
     if (mutt_wait_filter(thepid) != 0 || option(OPT_WAIT_KEY))
+    {
       mutt_any_key_to_continue(NULL);
+    }
   }
   else
+  {
     pipe_attachment_list(buf, actx, fp, tag, top, filter, &state);
+  }
 }
 
 static bool can_print(struct AttachCtx *actx, struct Body *top, bool tag)
@@ -719,7 +828,9 @@ static bool can_print(struct AttachCtx *actx, struct Body *top, bool tag)
   for (int i = 0; !tag || i < actx->idxlen; i++)
   {
     if (tag)
+    {
       top = actx->idx[i]->content;
+    }
     snprintf(type, sizeof(type), "%s/%s", TYPE(top), top->subtype);
     if (!tag || top->tagged)
     {
@@ -737,7 +848,9 @@ static bool can_print(struct AttachCtx *actx, struct Body *top, bool tag)
       }
     }
     if (!tag)
+    {
       break;
+    }
   }
   return true;
 }
@@ -761,7 +874,9 @@ static void print_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
       {
         if ((mutt_strcasecmp("text/plain", top->subtype) == 0) ||
             (mutt_strcasecmp("application/postscript", top->subtype) == 0))
+        {
           pipe_attachment(fp, top, state);
+        }
         else if (mutt_can_decode(top))
         {
           /* decode and print */
@@ -777,17 +892,23 @@ static void print_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
               mutt_copy_stream(ifp, state->fpout);
               safe_fclose(&ifp);
               if (AttachSep)
+              {
                 state_puts(AttachSep, state);
+              }
             }
           }
           mutt_unlink(newfile);
         }
       }
       else
+      {
         mutt_print_attachment(fp, top);
+      }
     }
     if (!tag)
+    {
       break;
+    }
   }
 }
 
@@ -799,22 +920,30 @@ void mutt_print_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag, stru
   if (query_quadoption(OPT_PRINT,
                        tag ? _("Print tagged attachment(s)?") :
                              _("Print attachment?")) != MUTT_YES)
+  {
     return;
+  }
 
   if (!option(OPT_ATTACH_SPLIT))
   {
     if (!can_print(actx, top, tag))
+    {
       return;
+    }
     mutt_endwin(NULL);
     memset(&state, 0, sizeof(struct State));
     thepid = mutt_create_filter(NONULL(PrintCommand), &state.fpout, NULL, NULL);
     print_attachment_list(actx, fp, tag, top, &state);
     safe_fclose(&state.fpout);
     if (mutt_wait_filter(thepid) != 0 || option(OPT_WAIT_KEY))
+    {
       mutt_any_key_to_continue(NULL);
+    }
   }
   else
+  {
     print_attachment_list(actx, fp, tag, top, &state);
+  }
 }
 
 static void recvattach_extract_pgp_keys(struct AttachCtx *actx, struct Menu *menu)
@@ -822,13 +951,19 @@ static void recvattach_extract_pgp_keys(struct AttachCtx *actx, struct Menu *men
   int i;
 
   if (!menu->tagprefix)
+  {
     crypt_pgp_extract_keys_from_attachment_list(CURATTACH->fp, 0, CURATTACH->content);
+  }
   else
   {
     for (i = 0; i < actx->idxlen; i++)
+    {
       if (actx->idx[i]->content->tagged)
+      {
         crypt_pgp_extract_keys_from_attachment_list(actx->idx[i]->fp, 0,
                                                     actx->idx[i]->content);
+      }
+    }
   }
 }
 
@@ -837,12 +972,18 @@ static int recvattach_pgp_check_traditional(struct AttachCtx *actx, struct Menu 
   int i, rv = 0;
 
   if (!menu->tagprefix)
+  {
     rv = crypt_pgp_check_traditional(CURATTACH->fp, CURATTACH->content, 1);
+  }
   else
   {
     for (i = 0; i < actx->idxlen; i++)
+    {
       if (actx->idx[i]->content->tagged)
+      {
         rv = rv || crypt_pgp_check_traditional(actx->idx[i]->fp, actx->idx[i]->content, 1);
+      }
+    }
   }
 
   return rv;
@@ -863,7 +1004,9 @@ static void recvattach_edit_content_type(struct AttachCtx *actx,
     }
     /* Editing the content type can rewrite the body structure. */
     for (int i = 0; i < actx->idxlen; i++)
+    {
       actx->idx[i]->content = NULL;
+    }
     mutt_actx_free_entries(actx);
     mutt_update_recvattach_menu(actx, menu, 1);
   }
@@ -892,7 +1035,9 @@ int mutt_attach_display_loop(struct Menu *menu, int op, struct Header *hdr,
           op = OP_VIEW_ATTACH;
         }
         else
+        {
           op = OP_NULL;
+        }
         break;
       case OP_PREV_ENTRY:
       case OP_MAIN_PREV_UNDELETED: /* hack */
@@ -902,16 +1047,22 @@ int mutt_attach_display_loop(struct Menu *menu, int op, struct Header *hdr,
           op = OP_VIEW_ATTACH;
         }
         else
+        {
           op = OP_NULL;
+        }
         break;
       case OP_EDIT_TYPE:
         /* when we edit the content-type, we should redisplay the attachment
            immediately */
         mutt_edit_content_type(hdr, CURATTACH->content, CURATTACH->fp);
         if (recv)
+        {
           recvattach_edit_content_type(actx, menu, hdr);
+        }
         else
+        {
           mutt_edit_content_type(hdr, CURATTACH->content, CURATTACH->fp);
+        }
 
         menu->redraw |= REDRAW_INDEX;
         op = OP_VIEW_ATTACH;
@@ -926,7 +1077,9 @@ int mutt_attach_display_loop(struct Menu *menu, int op, struct Header *hdr,
       /* fall through */
       case OP_ATTACH_COLLAPSE:
         if (recv)
+        {
           return op;
+        }
       /* fall through */
       default:
         op = OP_NULL;
@@ -954,10 +1107,14 @@ static void mutt_generate_recvattach_list(struct AttachCtx *actx, struct Header 
       need_secured = 1;
 
       if (!crypt_valid_passphrase(APPLICATION_SMIME))
+      {
         goto decrypt_failed;
+      }
 
       if (hdr->env)
+      {
         crypt_smime_getkeys(hdr->env);
+      }
 
       secured = !crypt_smime_decrypt_mime(fp, &new_fp, m, &new_body);
 
@@ -977,7 +1134,9 @@ static void mutt_generate_recvattach_list(struct AttachCtx *actx, struct Header 
       }
 
       if (secured)
+      {
         hdr->security |= SMIMEENCRYPT;
+      }
     }
 
     if ((WithCrypto & APPLICATION_PGP) &&
@@ -986,12 +1145,16 @@ static void mutt_generate_recvattach_list(struct AttachCtx *actx, struct Header 
       need_secured = 1;
 
       if (!crypt_valid_passphrase(APPLICATION_PGP))
+      {
         goto decrypt_failed;
+      }
 
       secured = !crypt_pgp_decrypt_mime(fp, &new_fp, m, &new_body);
 
       if (secured)
+      {
         hdr->security |= PGPENCRYPT;
+      }
     }
 
     if (need_secured && secured)
@@ -1005,7 +1168,9 @@ static void mutt_generate_recvattach_list(struct AttachCtx *actx, struct Header 
   decrypt_failed:
     /* Fall through and show the original parts if decryption fails */
     if (need_secured && !secured)
+    {
       mutt_error(_("Can't decrypt encrypted message!"));
+    }
 
     /* Strip out the top level multipart */
     if (m->type == TYPEMULTIPART && m->parts && !need_secured &&
@@ -1026,7 +1191,9 @@ static void mutt_generate_recvattach_list(struct AttachCtx *actx, struct Header 
       new->decrypted = decrypted;
 
       if (m->type == TYPEMULTIPART)
+      {
         mutt_generate_recvattach_list(actx, hdr, m->parts, fp, m->type, level + 1, decrypted);
+      }
       else if (mutt_is_message_type(m->type, m->subtype))
       {
         mutt_generate_recvattach_list(actx, m->hdr, m->parts, fp, m->type,
@@ -1071,7 +1238,9 @@ static void mutt_update_recvattach_menu(struct AttachCtx *actx, struct Menu *men
   menu->max = actx->vcount;
 
   if (menu->current >= menu->max)
+  {
     menu->current = menu->max - 1;
+  }
   menu_check_recenter(menu);
   menu->redraw |= REDRAW_INDEX;
 }
@@ -1083,7 +1252,9 @@ static void attach_collapse(struct AttachCtx *actx, struct Menu *menu)
   CURATTACH->content->collapsed = !CURATTACH->content->collapsed;
   /* When expanding, expand all the children too */
   if (CURATTACH->content->collapsed)
+  {
     return;
+  }
 
   curlevel = CURATTACH->level;
   rindex = actx->v2r[menu->current] + 1;
@@ -1092,9 +1263,13 @@ static void attach_collapse(struct AttachCtx *actx, struct Menu *menu)
   {
     if (option(OPT_DIGEST_COLLAPSE) && actx->idx[rindex]->content->type == TYPEMULTIPART &&
         !mutt_strcasecmp(actx->idx[rindex]->content->subtype, "digest"))
+    {
       actx->idx[rindex]->content->collapsed = true;
+    }
     else
+    {
       actx->idx[rindex]->content->collapsed = false;
+    }
     rindex++;
   }
 }
@@ -1127,7 +1302,9 @@ void mutt_view_attachments(struct Header *hdr)
   mutt_message_hook(Context, hdr, MUTT_MESSAGEHOOK);
 
   if ((msg = mx_open_message(Context, hdr->msgno)) == NULL)
+  {
     return;
+  }
 
   menu = mutt_new_menu(MENU_ATTACH);
   menu->title = _("Attachments");
@@ -1144,9 +1321,13 @@ void mutt_view_attachments(struct Header *hdr)
   while (true)
   {
     if (op == OP_NULL)
+    {
       op = mutt_menu_loop(menu);
+    }
     if (!Context)
+    {
       return;
+    }
     switch (op)
     {
       case OP_ATTACH_VIEW_MAILCAP:
@@ -1210,7 +1391,9 @@ void mutt_view_attachments(struct Header *hdr)
                                   CURATTACH->content, hdr, menu);
 
         if (!menu->tagprefix && option(OPT_RESOLVE) && menu->current < menu->max - 1)
+        {
           menu->current++;
+        }
 
         menu->redraw = REDRAW_MOTION_RESYNCH | REDRAW_FULL;
         break;
@@ -1258,11 +1441,15 @@ void mutt_view_attachments(struct Header *hdr)
               menu->redraw = REDRAW_MOTION_RESYNCH;
             }
             else
+            {
               menu->redraw = REDRAW_CURRENT;
+            }
           }
           else
+          {
             mutt_message(
                 _("Only deletion of multipart attachments is supported."));
+          }
         }
         else
         {
@@ -1278,8 +1465,10 @@ void mutt_view_attachments(struct Header *hdr)
                 menu->redraw = REDRAW_INDEX;
               }
               else
+              {
                 mutt_message(
                     _("Only deletion of multipart attachments is supported."));
+              }
             }
           }
         }
@@ -1296,7 +1485,9 @@ void mutt_view_attachments(struct Header *hdr)
             menu->redraw = REDRAW_MOTION_RESYNCH;
           }
           else
+          {
             menu->redraw = REDRAW_CURRENT;
+          }
         }
         else
         {
@@ -1382,13 +1573,17 @@ void mutt_view_attachments(struct Header *hdr)
 
         hdr->attach_del = false;
         for (i = 0; i < actx->idxlen; i++)
+        {
           if (actx->idx[i]->content && actx->idx[i]->content->deleted)
           {
             hdr->attach_del = true;
             break;
           }
+        }
         if (hdr->attach_del)
+        {
           hdr->changed = true;
+        }
 
         mutt_free_attach_context(&actx);
 

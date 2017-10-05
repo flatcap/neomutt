@@ -207,7 +207,9 @@ void sha1_update(struct Sha1Ctx *context, const unsigned char *data, uint32_t le
 
   j = context->count[0];
   if ((context->count[0] += len << 3) < j)
+  {
     context->count[1]++;
+  }
   context->count[1] += (len >> 29);
   j = (j >> 3) & 63;
   if ((j + len) > 63)
@@ -221,7 +223,9 @@ void sha1_update(struct Sha1Ctx *context, const unsigned char *data, uint32_t le
     j = 0;
   }
   else
+  {
     i = 0;
+  }
   memcpy(&context->buffer[j], &data[i], len - i);
 }
 

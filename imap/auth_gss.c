@@ -61,7 +61,9 @@ static void print_gss_error(OM_uint32 err_maj, OM_uint32 err_min)
     maj_stat = gss_display_status(&min_stat, err_maj, GSS_C_GSS_CODE,
                                   GSS_C_NO_OID, &msg_ctx, &status_string);
     if (GSS_ERROR(maj_stat))
+    {
       break;
+    }
     strfcpy(buf_maj, (char *) status_string.value, sizeof(buf_maj));
     gss_release_buffer(&min_stat, &status_string);
 
@@ -98,10 +100,14 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
   int rc;
 
   if (!mutt_bit_isset(idata->capabilities, AGSSAPI))
+  {
     return IMAP_AUTH_UNAVAIL;
+  }
 
   if (mutt_account_getuser(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
 
   /* get an IMAP service ticket for the server */
   snprintf(buf1, sizeof(buf1), "imap@%s", idata->conn->account.host);
@@ -146,8 +152,9 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
 
   /* expect a null continuation response ("+") */
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc != IMAP_CMD_RESPOND)
   {
@@ -167,8 +174,9 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
   {
     /* Read server data */
     do
+    {
       rc = imap_cmd_step(idata);
-    while (rc == IMAP_CMD_CONTINUE);
+    } while (rc == IMAP_CMD_CONTINUE);
 
     if (rc != IMAP_CMD_RESPOND)
     {
@@ -204,8 +212,9 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
 
   /* get security flags and buffer size */
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc != IMAP_CMD_RESPOND)
   {
@@ -269,8 +278,9 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
 
   /* Joy of victory or agony of defeat? */
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
   if (rc == IMAP_CMD_RESPOND)
   {
     mutt_debug(1, "Unexpected server continuation request.\n");
@@ -282,7 +292,9 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
     mutt_debug(2, "Releasing GSS credentials\n");
     maj_stat = gss_delete_sec_context(&min_stat, &context, &send_token);
     if (maj_stat != GSS_S_COMPLETE)
+    {
       mutt_debug(1, "Error releasing credentials\n");
+    }
 
     /* send_token may contain a notification to the server to flush
      * credentials. RFC1731 doesn't specify what to do, and since this
@@ -293,13 +305,16 @@ enum ImapAuthRes imap_auth_gss(struct ImapData *idata, const char *method)
     return IMAP_AUTH_SUCCESS;
   }
   else
+  {
     goto bail;
+  }
 
 err_abort_cmd:
   mutt_socket_write(idata->conn, "*\r\n");
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
 bail:
   mutt_error(_("GSSAPI authentication failed."));

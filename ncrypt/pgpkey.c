@@ -77,19 +77,29 @@ static char *pgp_key_abilities(int flags)
   static char buff[3];
 
   if (!(flags & KEYFLAG_CANENCRYPT))
+  {
     buff[0] = '-';
+  }
   else if (flags & KEYFLAG_PREFER_SIGNING)
+  {
     buff[0] = '.';
+  }
   else
+  {
     buff[0] = 'e';
-
+  }
   if (!(flags & KEYFLAG_CANSIGN))
+  {
     buff[1] = '-';
+  }
   else if (flags & KEYFLAG_PREFER_ENCRYPTION)
+  {
     buff[1] = '.';
+  }
   else
+  {
     buff[1] = 's';
-
+  }
   buff[2] = '\0';
 
   return buff;
@@ -98,23 +108,37 @@ static char *pgp_key_abilities(int flags)
 static char pgp_flags(int flags)
 {
   if (flags & KEYFLAG_REVOKED)
+  {
     return 'R';
+  }
   else if (flags & KEYFLAG_EXPIRED)
+  {
     return 'X';
+  }
   else if (flags & KEYFLAG_DISABLED)
+  {
     return 'd';
+  }
   else if (flags & KEYFLAG_CRITICAL)
+  {
     return 'c';
+  }
   else
+  {
     return ' ';
+  }
 }
 
 static struct PgpKeyInfo *pgp_principal_key(struct PgpKeyInfo *key)
 {
   if (key->flags & KEYFLAG_SUBKEY && key->parent)
+  {
     return key->parent;
+  }
   else
+  {
     return key;
+  }
 }
 
 /*
@@ -158,7 +182,9 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
   pkey = pgp_principal_key(key);
 
   if (isupper((unsigned char) op))
+  {
     key = pkey;
+  }
 
   kflags = key->flags | (pkey->flags & KEYFLAG_RESTRICTIONS) | uid->flags;
 
@@ -182,7 +208,9 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
         cp++;
       }
       else
+      {
         do_locales = 1;
+      }
 
       len = destlen - 1;
       while (len > 0 && *cp != ']')
@@ -197,7 +225,9 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
             len -= 2;
           }
           else
+          {
             break; /* not enough space */
+          }
           cp++;
         }
         else
@@ -211,15 +241,21 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
       tm = localtime(&key->gen_time);
 
       if (!do_locales)
+      {
         setlocale(LC_TIME, "C");
+      }
       strftime(buf2, sizeof(buf2), dest, tm);
       if (!do_locales)
+      {
         setlocale(LC_TIME, "");
+      }
 
       snprintf(fmt, sizeof(fmt), "%%%ss", prefix);
       snprintf(dest, destlen, fmt, buf2);
       if (len > 0)
+      {
         src = cp + 1;
+      }
     }
     break;
     case 'n':
@@ -264,7 +300,9 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, pgp_flags(kflags));
       }
       else if (!(kflags & (KEYFLAG_RESTRICTIONS)))
+      {
         optional = 0;
+      }
       break;
     case 'c':
       if (!optional)
@@ -273,7 +311,9 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, pgp_key_abilities(kflags));
       }
       else if (!(kflags & (KEYFLAG_ABILITIES)))
+      {
         optional = 0;
+      }
       break;
     case 't':
       if (!optional)
@@ -282,17 +322,23 @@ static const char *pgp_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, trust_flags[uid->trust & 0x03]);
       }
       else if (!(uid->trust & 0x03))
+      {
         /* undefined trust */
         optional = 0;
+      }
       break;
     default:
       *dest = '\0';
   }
 
   if (optional)
+  {
     mutt_expando_format(dest, destlen, col, cols, ifstring, mutt_attach_fmt, data, 0);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     mutt_expando_format(dest, destlen, col, cols, elsestring, mutt_attach_fmt, data, 0);
+  }
   return src;
 }
 
@@ -316,10 +362,14 @@ static int _pgp_compare_address(const void *a, const void *b)
   struct PgpUid **t = (struct PgpUid **) b;
 
   if ((r = mutt_strcasecmp((*s)->addr, (*t)->addr)))
+  {
     return r > 0;
+  }
   else
+  {
     return (mutt_strcasecmp(pgp_fpr_or_lkeyid((*s)->parent),
                             pgp_fpr_or_lkeyid((*t)->parent)) > 0);
+  }
 }
 
 static int pgp_compare_address(const void *a, const void *b)
@@ -336,9 +386,13 @@ static int _pgp_compare_keyid(const void *a, const void *b)
   struct PgpUid **t = (struct PgpUid **) b;
 
   if ((r = mutt_strcasecmp(pgp_fpr_or_lkeyid((*s)->parent), pgp_fpr_or_lkeyid((*t)->parent))))
+  {
     return r > 0;
+  }
   else
+  {
     return (mutt_strcasecmp((*s)->addr, (*t)->addr) > 0);
+  }
 }
 
 static int pgp_compare_keyid(const void *a, const void *b)
@@ -354,7 +408,9 @@ static int _pgp_compare_date(const void *a, const void *b)
   struct PgpUid **t = (struct PgpUid **) b;
 
   if ((r = ((*s)->parent->gen_time - (*t)->parent->gen_time)))
+  {
     return r > 0;
+  }
   return (mutt_strcasecmp((*s)->addr, (*t)->addr) > 0);
 }
 
@@ -373,15 +429,25 @@ static int _pgp_compare_trust(const void *a, const void *b)
 
   if ((r = (((*s)->parent->flags & (KEYFLAG_RESTRICTIONS)) -
             ((*t)->parent->flags & (KEYFLAG_RESTRICTIONS)))))
+  {
     return r > 0;
+  }
   if ((r = ((*s)->trust - (*t)->trust)))
+  {
     return r < 0;
+  }
   if ((r = ((*s)->parent->keylen - (*t)->parent->keylen)))
+  {
     return r < 0;
+  }
   if ((r = ((*s)->parent->gen_time - (*t)->parent->gen_time)))
+  {
     return r < 0;
+  }
   if ((r = mutt_strcasecmp((*s)->addr, (*t)->addr)))
+  {
     return r > 0;
+  }
   return (mutt_strcasecmp(pgp_fpr_or_lkeyid((*s)->parent),
                           pgp_fpr_or_lkeyid((*t)->parent)) > 0);
 }
@@ -396,9 +462,13 @@ static bool pgp_key_is_valid(struct PgpKeyInfo *k)
 {
   struct PgpKeyInfo *pk = pgp_principal_key(k);
   if (k->flags & KEYFLAG_CANTUSE)
+  {
     return false;
+  }
   if (pk->flags & KEYFLAG_CANTUSE)
+  {
     return false;
+  }
 
   return true;
 }
@@ -406,7 +476,9 @@ static bool pgp_key_is_valid(struct PgpKeyInfo *k)
 static bool pgp_id_is_strong(struct PgpUid *uid)
 {
   if ((uid->trust & 3) < 3)
+  {
     return false;
+  }
   /* else */
   return true;
 }
@@ -414,9 +486,13 @@ static bool pgp_id_is_strong(struct PgpUid *uid)
 static bool pgp_id_is_valid(struct PgpUid *uid)
 {
   if (!pgp_key_is_valid(uid->parent))
+  {
     return false;
+  }
   if (uid->flags & KEYFLAG_CANTUSE)
+  {
     return false;
+  }
   /* else */
   return true;
 }
@@ -433,18 +509,26 @@ static int pgp_id_matches_addr(struct Address *addr, struct Address *u_addr, str
   int rv = 0;
 
   if (pgp_id_is_valid(uid))
+  {
     rv |= PGP_KV_VALID;
+  }
 
   if (pgp_id_is_strong(uid))
+  {
     rv |= PGP_KV_STRONGID;
+  }
 
   if (addr->mailbox && u_addr->mailbox &&
       (mutt_strcasecmp(addr->mailbox, u_addr->mailbox) == 0))
+  {
     rv |= PGP_KV_ADDR;
+  }
 
   if (addr->personal && u_addr->personal &&
       (mutt_strcasecmp(addr->personal, u_addr->personal) == 0))
+  {
     rv |= PGP_KV_STRING;
+  }
 
   return rv;
 }
@@ -539,9 +623,13 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
   mutt_push_current_menu(menu);
 
   if (p)
+  {
     snprintf(buf, sizeof(buf), _("PGP keys matching <%s>."), p->mailbox);
+  }
   else
+  {
     snprintf(buf, sizeof(buf), _("PGP keys matching \"%s\"."), s);
+  }
 
   menu->title = buf;
 
@@ -603,11 +691,13 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
         /* XXX make error reporting more verbose */
 
         if (option(OPT_PGP_CHECK_TRUST))
+        {
           if (!pgp_key_is_valid(KeyTable[menu->current]->parent))
           {
             mutt_error(_("This key can't be used: expired/disabled/revoked."));
             break;
           }
+        }
 
         if (option(OPT_PGP_CHECK_TRUST) && (!pgp_id_is_valid(KeyTable[menu->current]) ||
                                             !pgp_id_is_strong(KeyTable[menu->current])))
@@ -616,8 +706,11 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
           char buff[LONG_STRING];
 
           if (KeyTable[menu->current]->flags & KEYFLAG_CANTUSE)
+          {
             str = N_("ID is expired/disabled/revoked.");
+          }
           else
+          {
             switch (KeyTable[menu->current]->trust & 0x03)
             {
               case 0:
@@ -630,6 +723,7 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
                 str = N_("ID is only marginally valid.");
                 break;
             }
+          }
 
           snprintf(buff, sizeof(buff),
                    _("%s Do you really want to use the key?"), _(str));
@@ -672,23 +766,29 @@ struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, short abilities, en
   if (whatfor)
   {
     for (l = id_defaults; l; l = l->next)
+    {
       if (mutt_strcasecmp(whatfor, l->what) == 0)
       {
         strfcpy(resp, NONULL(l->dflt), sizeof(resp));
         break;
       }
+    }
   }
 
   while (true)
   {
     resp[0] = 0;
     if (mutt_get_field(tag, resp, sizeof(resp), MUTT_CLEAR) != 0)
+    {
       return NULL;
+    }
 
     if (whatfor)
     {
       if (l)
+      {
         mutt_str_replace(&l->dflt, resp);
+      }
       else
       {
         l = safe_malloc(sizeof(struct PgpCache));
@@ -700,7 +800,9 @@ struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, short abilities, en
     }
 
     if ((key = pgp_getkeybystr(resp, abilities, keyring)))
+    {
       return key;
+    }
 
     BEEP();
   }
@@ -725,7 +827,9 @@ struct Body *pgp_make_key_attachment(char *tempf)
   key = pgp_ask_for_key(_("Please enter the key ID: "), NULL, 0, PGP_PUBRING);
 
   if (!key)
+  {
     return NULL;
+  }
 
   snprintf(tmp, sizeof(tmp), "0x%s", pgp_fpr_or_lkeyid(pgp_principal_key(key)));
   pgp_free_key(&key);
@@ -747,7 +851,9 @@ struct Body *pgp_make_key_attachment(char *tempf)
     mutt_perror(_("Can't open /dev/null"));
     safe_fclose(&tempfp);
     if (tempf == tempfb)
+    {
       unlink(tempf);
+    }
     return NULL;
   }
 
@@ -790,12 +896,16 @@ static void pgp_add_string_to_hints(struct ListHead *hints, const char *str)
   char *t = NULL;
 
   if ((scratch = safe_strdup(str)) == NULL)
+  {
     return;
+  }
 
   for (t = strtok(scratch, " ,.:\"()<>\n"); t; t = strtok(NULL, " ,.:\"()<>\n"))
   {
     if (strlen(t) > 3)
+    {
       mutt_list_insert_tail(hints, safe_strdup(t));
+    }
   }
 
   FREE(&scratch);
@@ -804,8 +914,12 @@ static void pgp_add_string_to_hints(struct ListHead *hints, const char *str)
 static struct PgpKeyInfo **pgp_get_lastp(struct PgpKeyInfo *p)
 {
   for (; p; p = p->next)
+  {
     if (!p->next)
+    {
       return &p->next;
+    }
+  }
 
   return NULL;
 }
@@ -826,18 +940,26 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
   struct PgpUid *q = NULL;
 
   if (a && a->mailbox)
+  {
     pgp_add_string_to_hints(&hints, a->mailbox);
+  }
   if (a && a->personal)
+  {
     pgp_add_string_to_hints(&hints, a->personal);
+  }
 
   if (!oppenc_mode)
+  {
     mutt_message(_("Looking for keys matching \"%s\"..."), a ? a->mailbox : "");
+  }
   keys = pgp_get_candidates(keyring, &hints);
 
   mutt_list_free(&hints);
 
   if (!keys)
+  {
     return NULL;
+  }
 
   mutt_debug(5, "pgp_getkeybyaddr: looking for %s <%s>.\n", a->personal, a->mailbox);
 
@@ -863,15 +985,19 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
       {
         int validity = pgp_id_matches_addr(a, p, q);
 
-        if (validity & PGP_KV_MATCH) /* something matches */
+        if (validity & PGP_KV_MATCH)
+        { /* something matches */
           match = true;
+        }
 
         if ((validity & PGP_KV_VALID) && (validity & PGP_KV_ADDR))
         {
           if (validity & PGP_KV_STRONGID)
           {
             if (the_strong_valid_key && the_strong_valid_key != k)
+            {
               multi = true;
+            }
             the_strong_valid_key = k;
           }
           else
@@ -909,7 +1035,9 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
         k = a_valid_addrmatch_key;
       }
       else
+      {
         k = NULL;
+      }
     }
     else if (the_strong_valid_key && !multi)
     {
@@ -927,7 +1055,9 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
        * Else: Ask the user.
        */
       if ((k = pgp_select_key(matches, a, NULL)))
+      {
         pgp_remove_key(&matches, k);
+      }
     }
 
     pgp_free_key(&matches);
@@ -950,7 +1080,9 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, enum PgpRing keyrin
   const char *ps = NULL, *pl = NULL, *pfcopy = NULL, *phint = NULL;
 
   if ((l = mutt_strlen(p)) && p[l - 1] == '!')
+  {
     p[l - 1] = 0;
+  }
 
   mutt_message(_("Looking for keys matching \"%s\"..."), p);
 
@@ -960,19 +1092,25 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, enum PgpRing keyrin
   mutt_list_free(&hints);
 
   if (!keys)
+  {
     goto out;
+  }
 
   for (k = keys; k; k = kn)
   {
     kn = k->next;
     if (abilities && !(k->flags & abilities))
+    {
       continue;
+    }
 
     /* This shouldn't happen, but keys without any addresses aren't selectable
      * in pgp_select_key().
      */
     if (!k->address)
+    {
       continue;
+    }
 
     bool match = false;
 
@@ -1015,18 +1153,24 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, enum PgpRing keyrin
   if (matches)
   {
     if ((k = pgp_select_key(matches, NULL, p)))
+    {
       pgp_remove_key(&matches, k);
+    }
 
     pgp_free_key(&matches);
     FREE(&pfcopy);
     if (l && !p[l - 1])
+    {
       p[l - 1] = '!';
+    }
     return k;
   }
 
 out:
   FREE(&pfcopy);
   if (l && !p[l - 1])
+  {
     p[l - 1] = '!';
+  }
   return NULL;
 }

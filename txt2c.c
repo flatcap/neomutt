@@ -34,10 +34,14 @@ static void txt2c(char *sym, FILE *fp)
   {
     sz = fread(buf, sizeof(unsigned char), PER_LINE, fp);
     if (sz == 0)
+    {
       break;
+    }
     printf("\t");
     for (i = 0; i < sz; i++)
+    {
       printf("0x%02x, ", buf[i]);
+    }
     printf("\n");
   }
 

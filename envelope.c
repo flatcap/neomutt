@@ -40,7 +40,9 @@ struct Envelope *mutt_new_envelope(void)
 void mutt_free_envelope(struct Envelope **p)
 {
   if (!*p)
+  {
     return;
+  }
   rfc822_free_address(&(*p)->return_path);
   rfc822_free_address(&(*p)->from);
   rfc822_free_address(&(*p)->to);

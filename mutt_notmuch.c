@@ -226,7 +226,9 @@ static bool url_parse_query(const char *url, char **filename, struct UriTag **ta
   *tags = NULL;
 
   if (!p || !*(p + 3))
+  {
     return false;
+  }
 
   p += 3;
   *filename = p;
@@ -235,10 +237,14 @@ static bool url_parse_query(const char *url, char **filename, struct UriTag **ta
 
   *filename = e ? (e == p) ? NULL : mutt_substrdup(p, e) : safe_strdup(p);
   if (!e)
+  {
     return true; /* only filename */
+  }
 
   if (*filename && (url_pct_decode(*filename) < 0))
+  {
     goto err;
+  }
 
   e++; /* skip '?' */
   p = e;
@@ -248,7 +254,9 @@ static bool url_parse_query(const char *url, char **filename, struct UriTag **ta
     tag = safe_calloc(1, sizeof(struct UriTag));
 
     if (!*tags)
+    {
       last = *tags = tag;
+    }
     else
     {
       last->next = tag;
@@ -257,24 +265,36 @@ static bool url_parse_query(const char *url, char **filename, struct UriTag **ta
 
     e = strchr(p, '=');
     if (!e)
+    {
       e = strchr(p, '&');
+    }
     tag->name = e ? mutt_substrdup(p, e) : safe_strdup(p);
     if (!tag->name || (url_pct_decode(tag->name) < 0))
+    {
       goto err;
+    }
     if (!e)
+    {
       break;
+    }
 
     p = e + 1;
 
     if (*e == '&')
+    {
       continue;
+    }
 
     e = strchr(p, '&');
     tag->value = e ? mutt_substrdup(p, e) : safe_strdup(p);
     if (!tag->value || (url_pct_decode(tag->value) < 0))
+    {
       goto err;
+    }
     if (!e)
+    {
       break;
+    }
     p = e + 1;
   }
 
@@ -288,7 +308,9 @@ err:
 static void free_hdrdata(struct NmHdrData *data)
 {
   if (!data)
+  {
     return;
+  }
 
   mutt_debug(2, "nm: freeing header %p\n", (void *) data);
   FREE(&data->folder);
@@ -308,13 +330,17 @@ static void free_hdrdata(struct NmHdrData *data)
 static void free_ctxdata(struct NmCtxData *data)
 {
   if (!data)
+  {
     return;
+  }
 
   mutt_debug(1, "nm: freeing context data %p\n", (void *) data);
 
   if (data->db)
+  {
 #ifdef NOTMUCH_API_3
     notmuch_database_destroy(data->db);
+  }
 #else
     notmuch_database_close(data->db);
 #endif
@@ -339,7 +365,9 @@ static struct NmCtxData *new_ctxdata(char *uri)
   struct NmCtxData *data = NULL;
 
   if (!uri)
+  {
     return NULL;
+  }
 
   data = safe_calloc(1, sizeof(struct NmCtxData));
   mutt_debug(1, "nm: initialize context data %p\n", (void *) data);
@@ -369,14 +397,20 @@ static struct NmCtxData *new_ctxdata(char *uri)
 static int init_context(struct Context *ctx)
 {
   if (!ctx || (ctx->magic != MUTT_NOTMUCH))
+  {
     return -1;
+  }
 
   if (ctx->data)
+  {
     return 0;
+  }
 
   ctx->data = new_ctxdata(ctx->path);
   if (!ctx->data)
+  {
     return -1;
+  }
 
   return 0;
 }
@@ -395,7 +429,9 @@ static char *header_get_fullpath(struct Header *h, char *buf, size_t bufsz)
 static struct NmCtxData *get_ctxdata(struct Context *ctx)
 {
   if (ctx && (ctx->magic == MUTT_NOTMUCH))
+  {
     return ctx->data;
+  }
 
   return NULL;
 }
@@ -403,9 +439,13 @@ static struct NmCtxData *get_ctxdata(struct Context *ctx)
 static enum NmQueryType string_to_query_type(const char *str)
 {
   if (mutt_strcmp(str, "threads") == 0)
+  {
     return NM_QUERY_TYPE_THREADS;
+  }
   else if (mutt_strcmp(str, "messages") == 0)
+  {
     return NM_QUERY_TYPE_MESGS;
+  }
 
   mutt_error(_("failed to parse notmuch query type: %s"), NONULL(str));
   return NM_QUERY_TYPE_MESGS;
@@ -414,9 +454,13 @@ static enum NmQueryType string_to_query_type(const char *str)
 static char *query_type_to_string(enum NmQueryType query_type)
 {
   if (query_type == NM_QUERY_TYPE_THREADS)
+  {
     return "threads";
+  }
   else
+  {
     return "messages";
+  }
 }
 
 /**
@@ -434,7 +478,9 @@ static bool query_window_check_timebase(const char *timebase)
   if ((strcmp(timebase, "hour") == 0) || (strcmp(timebase, "day") == 0) ||
       (strcmp(timebase, "week") == 0) || (strcmp(timebase, "month") == 0) ||
       (strcmp(timebase, "year") == 0))
+  {
     return true;
+  }
   return false;
 }
 
@@ -507,7 +553,9 @@ static bool windowed_query_from_query(const char *query, char *buf, size_t bufsz
 
   /* if the query has changed, reset the window position */
   if (NmQueryWindowCurrentSearch == NULL || (strcmp(query, NmQueryWindowCurrentSearch) != 0))
+  {
     query_window_reset();
+  }
 
   if (!query_window_check_timebase(NmQueryWindowTimebase))
   {
@@ -518,11 +566,15 @@ static bool windowed_query_from_query(const char *query, char *buf, size_t bufsz
   }
 
   if (end == 0)
+  {
     snprintf(buf, bufsz, "date:%d%s..now and %s", beg, NmQueryWindowTimebase,
              NmQueryWindowCurrentSearch);
+  }
   else
+  {
     snprintf(buf, bufsz, "date:%d%s..%d%s and %s", beg, NmQueryWindowTimebase,
              end, NmQueryWindowTimebase, NmQueryWindowCurrentSearch);
+  }
 
   mutt_debug(2, "nm: windowed_query_from_query (%s) -> %s\n", query, buf);
 
@@ -552,31 +604,44 @@ static char *get_query_string(struct NmCtxData *data, bool window)
   struct UriTag *item = NULL;
 
   if (!data)
+  {
     return NULL;
+  }
   if (data->db_query)
+  {
     return data->db_query;
+  }
 
   data->query_type = string_to_query_type(NmQueryType); /* user's default */
 
   for (item = data->query_items; item; item = item->next)
   {
     if (!item->value || !item->name)
+    {
       continue;
+    }
 
     if (strcmp(item->name, "limit") == 0)
     {
       if (mutt_atoi(item->value, &data->db_limit))
+      {
         mutt_error(_("failed to parse notmuch limit: %s"), item->value);
+      }
     }
     else if (strcmp(item->name, "type") == 0)
+    {
       data->query_type = string_to_query_type(item->value);
-
+    }
     else if (strcmp(item->name, "query") == 0)
+    {
       data->db_query = safe_strdup(item->value);
+    }
   }
 
   if (!data->db_query)
+  {
     return NULL;
+  }
 
   if (window)
   {
@@ -589,12 +654,16 @@ static char *get_query_string(struct NmCtxData *data, bool window)
      */
     if (!strstr(data->db_query, "date:") &&
         windowed_query_from_query(data->db_query, buf, sizeof(buf)))
+    {
       data->db_query = safe_strdup(buf);
+    }
 
     mutt_debug(2, "nm: query (windowed) '%s'\n", data->db_query);
   }
   else
+  {
     mutt_debug(2, "nm: query '%s'\n", data->db_query);
+  }
 
   return data->db_query;
 }
@@ -609,15 +678,23 @@ static const char *get_db_filename(struct NmCtxData *data)
   char *db_filename = NULL;
 
   if (!data)
+  {
     return NULL;
+  }
 
   db_filename = data->db_filename ? data->db_filename : NmDefaultUri;
   if (!db_filename)
+  {
     db_filename = Folder;
+  }
   if (!db_filename)
+  {
     return NULL;
+  }
   if (strncmp(db_filename, "notmuch://", 10) == 0)
+  {
     db_filename += 10;
+  }
 
   mutt_debug(2, "nm: db filename '%s'\n", db_filename);
   return db_filename;
@@ -637,15 +714,19 @@ static notmuch_database_t *do_database_open(const char *filename, bool writable,
     st = notmuch_database_open(filename, writable ? NOTMUCH_DATABASE_MODE_READ_WRITE : NOTMUCH_DATABASE_MODE_READ_ONLY,
                                &db);
 #else
-    db = notmuch_database_open(filename,
-                               writable ? NOTMUCH_DATABASE_MODE_READ_WRITE :
-                                          NOTMUCH_DATABASE_MODE_READ_ONLY);
+      db = notmuch_database_open(filename,
+                                 writable ? NOTMUCH_DATABASE_MODE_READ_WRITE :
+                                            NOTMUCH_DATABASE_MODE_READ_ONLY);
 #endif
     if (db || !NmOpenTimeout || ((ct / 2) > NmOpenTimeout))
+    {
       break;
+    }
 
     if (verbose && ct && ((ct % 2) == 0))
+    {
       mutt_error(_("Waiting for notmuch DB... (%d sec)"), ct / 2);
+    }
     usleep(500000);
     ct++;
   } while (true);
@@ -653,10 +734,14 @@ static notmuch_database_t *do_database_open(const char *filename, bool writable,
   if (verbose)
   {
     if (!db)
+    {
       mutt_error(_("Cannot open notmuch database: %s: %s"), filename,
                  st ? notmuch_status_to_string(st) : _("unknown reason"));
+    }
     else if (ct > 1)
+    {
       mutt_clear_error();
+    }
   }
   return db;
 }
@@ -664,13 +749,17 @@ static notmuch_database_t *do_database_open(const char *filename, bool writable,
 static notmuch_database_t *get_db(struct NmCtxData *data, bool writable)
 {
   if (!data)
+  {
     return NULL;
+  }
   if (!data->db)
   {
     const char *db_filename = get_db_filename(data);
 
     if (db_filename)
+    {
       data->db = do_database_open(db_filename, writable, true);
+    }
   }
   return data->db;
 }
@@ -683,7 +772,7 @@ static int release_db(struct NmCtxData *data)
 #ifdef NOTMUCH_API_3
     notmuch_database_destroy(data->db);
 #else
-    notmuch_database_close(data->db);
+      notmuch_database_close(data->db);
 #endif
     data->db = NULL;
     data->longrun = false;
@@ -703,13 +792,17 @@ static int release_db(struct NmCtxData *data)
 static int db_trans_begin(struct NmCtxData *data)
 {
   if (!data || !data->db)
+  {
     return -1;
+  }
 
   if (!data->trans)
   {
     mutt_debug(2, "nm: db trans start\n");
     if (notmuch_database_begin_atomic(data->db))
+    {
       return -1;
+    }
     data->trans = true;
     return 1;
   }
@@ -720,14 +813,18 @@ static int db_trans_begin(struct NmCtxData *data)
 static int db_trans_end(struct NmCtxData *data)
 {
   if (!data || !data->db)
+  {
     return -1;
+  }
 
   if (data->trans)
   {
     mutt_debug(2, "nm: db trans end\n");
     data->trans = false;
     if (notmuch_database_end_atomic(data->db))
+    {
       return -1;
+    }
   }
 
   return 0;
@@ -759,16 +856,22 @@ static int get_database_mtime(struct NmCtxData *data, time_t *mtime)
   struct stat st;
 
   if (!data)
+  {
     return -1;
+  }
 
   snprintf(path, sizeof(path), "%s/.notmuch/xapian", get_db_filename(data));
   mutt_debug(2, "nm: checking '%s' mtime\n", path);
 
   if (stat(path, &st))
+  {
     return -1;
+  }
 
   if (mtime)
+  {
     *mtime = st.st_mtime;
+  }
 
   return 0;
 }
@@ -778,23 +881,37 @@ static void apply_exclude_tags(notmuch_query_t *query)
   char *buf = NULL, *p = NULL, *end = NULL, *tag = NULL;
 
   if (!NmExcludeTags || !*NmExcludeTags)
+  {
     return;
+  }
   buf = safe_strdup(NmExcludeTags);
 
   for (p = buf; p && *p; p++)
   {
     if (!tag && isspace(*p))
+    {
       continue;
+    }
     if (!tag)
+    {
       tag = p; /* begin of the tag */
+    }
     if ((*p == ',') || (*p == ' '))
+    {
       end = p; /* terminate the tag */
+    }
     else if (*(p + 1) == '\0')
+    {
       end = p + 1; /* end of optstr */
+    }
     if (!tag || !end)
+    {
       continue;
+    }
     if (tag >= end)
+    {
       break;
+    }
     *end = '\0';
 
     mutt_debug(2, "nm: query exclude tag '%s'\n", tag);
@@ -812,17 +929,23 @@ static notmuch_query_t *get_query(struct NmCtxData *data, bool writable)
   const char *str = NULL;
 
   if (!data)
+  {
     return NULL;
+  }
 
   db = get_db(data, writable);
   str = get_query_string(data, true);
 
   if (!db || !str)
+  {
     goto err;
+  }
 
   q = notmuch_query_create(db, str);
   if (!q)
+  {
     goto err;
+  }
 
   apply_exclude_tags(q);
   notmuch_query_set_sort(q, NOTMUCH_SORT_NEWEST_FIRST);
@@ -830,7 +953,9 @@ static notmuch_query_t *get_query(struct NmCtxData *data, bool writable)
   return q;
 err:
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
   return NULL;
 }
 
@@ -851,7 +976,9 @@ static int update_header_tags(struct Header *h, notmuch_message_t *msg)
     const char *t = notmuch_tags_get(tags);
 
     if (!t || !*t)
+    {
       continue;
+    }
 
     mutt_str_append_item(&new_tags, t, ' ');
   }
@@ -902,7 +1029,9 @@ static int update_message_path(struct Header *h, const char *path)
     h->path = safe_strdup(p);
 
     for (; (p > path) && (*(p - 1) == '/'); p--)
+    {
       ;
+    }
 
     data->folder = mutt_substrdup(path, p);
 
@@ -923,7 +1052,9 @@ static char *get_folder_from_path(const char *path)
   {
     p -= 3;
     for (; (p > path) && (*(p - 1) == '/'); p--)
+    {
       ;
+    }
 
     return mutt_substrdup(path, p);
   }
@@ -953,7 +1084,9 @@ static char *nm2mutt_message_id(const char *id)
   char *mid = NULL;
 
   if (!id)
+  {
     return NULL;
+  }
   sz = strlen(id) + 3;
   mid = safe_malloc(sz);
 
@@ -966,7 +1099,9 @@ static int init_header(struct Header *h, const char *path, notmuch_message_t *ms
   const char *id = NULL;
 
   if (h->data)
+  {
     return 0;
+  }
 
   id = notmuch_message_get_message_id(msg);
 
@@ -983,10 +1118,14 @@ static int init_header(struct Header *h, const char *path, notmuch_message_t *ms
              (void *) h, (void *) h->data, id);
 
   if (!h->env->message_id)
+  {
     h->env->message_id = nm2mutt_message_id(id);
+  }
 
   if (update_message_path(h, path))
+  {
     return -1;
+  }
 
   update_header_tags(h, msg);
 
@@ -1012,11 +1151,15 @@ static void progress_reset(struct Context *ctx)
   struct NmCtxData *data = NULL;
 
   if (ctx->quiet)
+  {
     return;
+  }
 
   data = get_ctxdata(ctx);
   if (!data)
+  {
     return;
+  }
 
   memset(&data->progress, 0, sizeof(data->progress));
   data->oldmsgcount = ctx->msgcount;
@@ -1030,7 +1173,9 @@ static void progress_update(struct Context *ctx, notmuch_query_t *q)
   struct NmCtxData *data = get_ctxdata(ctx);
 
   if (ctx->quiet || !data || data->noprogress)
+  {
     return;
+  }
 
   if (!data->progress_ready && q)
   {
@@ -1040,20 +1185,24 @@ static void progress_update(struct Context *ctx, notmuch_query_t *q)
 
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
     if (notmuch_query_count_messages(q, &count) != NOTMUCH_STATUS_SUCCESS)
+    {
       count = 0; /* may not be defined on error */
+    }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-    if (notmuch_query_count_messages_st(q, &count) != NOTMUCH_STATUS_SUCCESS)
-      count = 0; /* may not be defined on error */
+      if (notmuch_query_count_messages_st(q, &count) != NOTMUCH_STATUS_SUCCESS)
+        count = 0; /* may not be defined on error */
 #else
-    count = notmuch_query_count_messages(q);
+      count = notmuch_query_count_messages(q);
 #endif
     mutt_progress_init(&data->progress, msg, MUTT_PROGRESS_MSG, ReadInc, count);
     data->progress_ready = true;
   }
 
   if (data->progress_ready)
+  {
     mutt_progress_update(&data->progress,
                          ctx->msgcount + data->ignmsgcount - data->oldmsgcount, -1);
+  }
 }
 
 static struct Header *get_mutt_header(struct Context *ctx, notmuch_message_t *msg)
@@ -1063,11 +1212,15 @@ static struct Header *get_mutt_header(struct Context *ctx, notmuch_message_t *ms
   struct Header *h = NULL;
 
   if (!ctx || !msg)
+  {
     return NULL;
+  }
 
   id = notmuch_message_get_message_id(msg);
   if (!id)
+  {
     return NULL;
+  }
 
   mutt_debug(2, "nm: neomutt header, id='%s'\n", id);
 
@@ -1076,7 +1229,9 @@ static struct Header *get_mutt_header(struct Context *ctx, notmuch_message_t *ms
     mutt_debug(2, "nm: init hash\n");
     ctx->id_hash = mutt_make_id_hash(ctx);
     if (!ctx->id_hash)
+    {
       return NULL;
+    }
   }
 
   mid = nm2mutt_message_id(id);
@@ -1096,7 +1251,9 @@ static void append_message(struct Context *ctx, notmuch_query_t *q,
 
   struct NmCtxData *data = get_ctxdata(ctx);
   if (!data)
+  {
     return;
+  }
 
   /* deduplicate */
   if (dedup && get_mutt_header(ctx, msg))
@@ -1110,7 +1267,9 @@ static void append_message(struct Context *ctx, notmuch_query_t *q,
 
   path = get_message_last_filename(msg);
   if (!path)
+  {
     return;
+  }
 
   mutt_debug(2, "nm: appending message, i=%d, id=%s, path=%s\n", ctx->msgcount,
              notmuch_message_get_message_id(msg), path);
@@ -1121,7 +1280,9 @@ static void append_message(struct Context *ctx, notmuch_query_t *q,
     mx_alloc_memory(ctx);
   }
   if (access(path, F_OK) == 0)
+  {
     h = maildir_parse_message(MUTT_MAILDIR, path, 0, NULL);
+  }
   else
   {
     /* maybe moved try find it... */
@@ -1224,18 +1385,22 @@ static bool read_mesgs_query(struct Context *ctx, notmuch_query_t *q, bool dedup
   notmuch_messages_t *msgs = NULL;
 
   if (!data)
+  {
     return false;
+  }
 
   limit = get_limit(data);
 
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
   if (notmuch_query_search_messages(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
+  {
     return false;
+  }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-  if (notmuch_query_search_messages_st(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
-    return false;
+    if (notmuch_query_search_messages_st(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
+      return false;
 #else
-  msgs = notmuch_query_search_messages(q);
+    msgs = notmuch_query_search_messages(q);
 #endif
 
   for (; notmuch_messages_valid(msgs) && ((limit == 0) || (ctx->msgcount < limit));
@@ -1259,16 +1424,20 @@ static bool read_threads_query(struct Context *ctx, notmuch_query_t *q, bool ded
   notmuch_threads_t *threads = NULL;
 
   if (!data)
+  {
     return false;
+  }
 
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
   if (notmuch_query_search_threads(q, &threads) != NOTMUCH_STATUS_SUCCESS)
+  {
     return false;
+  }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-  if (notmuch_query_search_threads_st(q, &threads) != NOTMUCH_STATUS_SUCCESS)
-    return false;
+    if (notmuch_query_search_threads_st(q, &threads) != NOTMUCH_STATUS_SUCCESS)
+      return false;
 #else
-  threads = notmuch_query_search_threads(q);
+    threads = notmuch_query_search_threads(q);
 #endif
 
   for (; notmuch_threads_valid(threads) && ((limit == 0) || (ctx->msgcount < limit));
@@ -1294,7 +1463,9 @@ static notmuch_message_t *get_nm_message(notmuch_database_t *db, struct Header *
   mutt_debug(2, "nm: find message (%s)\n", id);
 
   if (id && db)
+  {
     notmuch_database_find_message(db, id, &msg);
+  }
 
   return msg;
 }
@@ -1322,24 +1493,38 @@ static int update_tags(notmuch_message_t *msg, const char *tags)
   char *buf = safe_strdup(tags);
 
   if (!buf)
+  {
     return -1;
+  }
 
   notmuch_message_freeze(msg);
 
   for (p = buf; p && *p; p++)
   {
     if (!tag && isspace(*p))
+    {
       continue;
+    }
     if (!tag)
+    {
       tag = p; /* begin of the tag */
+    }
     if ((*p == ',') || (*p == ' '))
+    {
       end = p; /* terminate the tag */
+    }
     else if (*(p + 1) == '\0')
+    {
       end = p + 1; /* end of optstr */
+    }
     if (!tag || !end)
+    {
       continue;
+    }
     if (tag >= end)
+    {
       break;
+    }
 
     *end = '\0';
 
@@ -1386,22 +1571,36 @@ static int update_header_flags(struct Context *ctx, struct Header *hdr, const ch
   char *buf = safe_strdup(tags);
 
   if (!buf)
+  {
     return -1;
+  }
 
   for (p = buf; p && *p; p++)
   {
     if (!tag && isspace(*p))
+    {
       continue;
+    }
     if (!tag)
+    {
       tag = p; /* begin of the tag */
+    }
     if ((*p == ',') || (*p == ' '))
+    {
       end = p; /* terminate the tag */
+    }
     else if (*(p + 1) == '\0')
+    {
       end = p + 1; /* end of optstr */
+    }
     if (!tag || !end)
+    {
       continue;
+    }
     if (tag >= end)
+    {
       break;
+    }
 
     *end = '\0';
 
@@ -1409,21 +1608,33 @@ static int update_header_flags(struct Context *ctx, struct Header *hdr, const ch
     {
       tag = tag + 1;
       if (strcmp(tag, "unread") == 0)
+      {
         mutt_set_flag(ctx, hdr, MUTT_READ, 1);
+      }
       else if (strcmp(tag, "replied") == 0)
+      {
         mutt_set_flag(ctx, hdr, MUTT_REPLIED, 0);
+      }
       else if (strcmp(tag, "flagged") == 0)
+      {
         mutt_set_flag(ctx, hdr, MUTT_FLAG, 0);
+      }
     }
     else
     {
       tag = (*tag == '+') ? tag + 1 : tag;
       if (strcmp(tag, "unread") == 0)
+      {
         mutt_set_flag(ctx, hdr, MUTT_READ, 0);
+      }
       else if (strcmp(tag, "replied") == 0)
+      {
         mutt_set_flag(ctx, hdr, MUTT_REPLIED, 1);
+      }
       else if (strcmp(tag, "flagged") == 0)
+      {
         mutt_set_flag(ctx, hdr, MUTT_FLAG, 1);
+      }
     }
     end = tag = NULL;
   }
@@ -1448,28 +1659,36 @@ static int rename_maildir_filename(const char *old, char *newpath, size_t newsz,
     p++;
   }
   else
+  {
     p = folder;
+  }
 
   strfcpy(filename, p, sizeof(filename));
 
   /* remove (new,cur,...) from folder path */
   p = strrchr(folder, '/');
   if (p)
+  {
     *p = '\0';
 
-  /* remove old flags from filename */
+    /* remove old flags from filename */
+  }
   p = strchr(filename, ':');
   if (p)
+  {
     *p = '\0';
 
-  /* compose new flags */
+    /* compose new flags */
+  }
   maildir_flags(suffix, sizeof(suffix), h);
 
   snprintf(newpath, newsz, "%s/%s/%s%s", folder,
            (h->read || h->old) ? "cur" : "new", filename, suffix);
 
   if (strcmp(old, newpath) == 0)
+  {
     return 1;
+  }
 
   if (rename(old, newpath) != 0)
   {
@@ -1491,13 +1710,19 @@ static int remove_filename(struct NmCtxData *data, const char *path)
   mutt_debug(2, "nm: remove filename '%s'\n", path);
 
   if (!db)
+  {
     return -1;
+  }
   st = notmuch_database_find_message_by_filename(db, path, &msg);
   if (st || !msg)
+  {
     return -1;
+  }
   trans = db_trans_begin(data);
   if (trans < 0)
+  {
     return -1;
+  }
 
   /*
    * note that unlink() is probably unnecessary here, it's already removed
@@ -1530,7 +1755,9 @@ static int remove_filename(struct NmCtxData *data, const char *path)
 
   notmuch_message_destroy(msg);
   if (trans)
+  {
     db_trans_end(data);
+  }
   return 0;
 }
 
@@ -1545,12 +1772,16 @@ static int rename_filename(struct NmCtxData *data, const char *old,
   int trans;
 
   if (!db || !new || !old || (access(new, F_OK) != 0))
+  {
     return -1;
+  }
 
   mutt_debug(1, "nm: rename filename, %s -> %s\n", old, new);
   trans = db_trans_begin(data);
   if (trans < 0)
+  {
     return -1;
+  }
 
   mutt_debug(2, "nm: rename: add '%s'\n", new);
   st = notmuch_database_add_message(db, new, &msg);
@@ -1580,7 +1811,9 @@ static int rename_filename(struct NmCtxData *data, const char *old,
         char newpath[_POSIX_PATH_MAX];
 
         if (strcmp(new, path) == 0)
+        {
           continue;
+        }
 
         mutt_debug(2, "nm: rename: syncing duplicate: %s\n", path);
 
@@ -1614,9 +1847,13 @@ static int rename_filename(struct NmCtxData *data, const char *old,
   rc = 0;
 done:
   if (msg)
+  {
     notmuch_message_destroy(msg);
+  }
   if (trans)
+  {
     db_trans_end(data);
+  }
   return rc;
 }
 
@@ -1630,12 +1867,14 @@ static unsigned count_query(notmuch_database_t *db, const char *qstr)
     apply_exclude_tags(q);
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
     if (notmuch_query_count_messages(q, &res) != NOTMUCH_STATUS_SUCCESS)
+    {
       res = 0; /* may not be defined on error */
+    }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-    if (notmuch_query_count_messages_st(q, &res) != NOTMUCH_STATUS_SUCCESS)
-      res = 0; /* may not be defined on error */
+      if (notmuch_query_count_messages_st(q, &res) != NOTMUCH_STATUS_SUCCESS)
+        res = 0; /* may not be defined on error */
 #else
-    res = notmuch_query_count_messages(q);
+      res = notmuch_query_count_messages(q);
 #endif
     notmuch_query_destroy(q);
     mutt_debug(1, "nm: count '%s', result=%d\n", qstr, res);
@@ -1664,14 +1903,18 @@ void nm_longrun_done(struct Context *ctx)
   struct NmCtxData *data = get_ctxdata(ctx);
 
   if (data && (release_db(data) == 0))
+  {
     mutt_debug(2, "nm: long run deinitialized\n");
+  }
 }
 
 void nm_debug_check(struct Context *ctx)
 {
   struct NmCtxData *data = get_ctxdata(ctx);
   if (!data)
+  {
     return;
+  }
 
   if (data->db)
   {
@@ -1691,23 +1934,31 @@ int nm_read_entire_thread(struct Context *ctx, struct Header *h)
   int rc = -1;
 
   if (!data)
+  {
     return -1;
+  }
   if (!(db = get_db(data, false)) || !(msg = get_nm_message(db, h)))
+  {
     goto done;
+  }
 
   mutt_debug(1, "nm: reading entire-thread messages...[current count=%d]\n", ctx->msgcount);
 
   progress_reset(ctx);
   id = notmuch_message_get_thread_id(msg);
   if (!id)
+  {
     goto done;
+  }
   mutt_str_append_item(&qstr, "thread:", '\0');
   mutt_str_append_item(&qstr, id, '\0');
 
   q = notmuch_query_create(db, qstr);
   FREE(&qstr);
   if (!q)
+  {
     goto done;
+  }
   apply_exclude_tags(q);
   notmuch_query_set_sort(q, NOTMUCH_SORT_NEWEST_FIRST);
 
@@ -1716,15 +1967,23 @@ int nm_read_entire_thread(struct Context *ctx, struct Header *h)
   rc = 0;
 
   if (ctx->msgcount > data->oldmsgcount)
+  {
     mx_update_context(ctx, ctx->msgcount - data->oldmsgcount);
+  }
 done:
   if (q)
+  {
     notmuch_query_destroy(q);
+  }
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
 
   if (ctx->msgcount == data->oldmsgcount)
+  {
     mutt_message(_("No more messages in the thread."));
+  }
 
   data->oldmsgcount = 0;
   mutt_debug(1,
@@ -1741,17 +2000,25 @@ char *nm_uri_from_query(struct Context *ctx, char *buf, size_t bufsz)
   int added;
 
   if (data)
+  {
     added = snprintf(uri, sizeof(uri),
                      "notmuch://%s?type=%s&query=", get_db_filename(data),
                      query_type_to_string(data->query_type));
+  }
   else if (NmDefaultUri)
+  {
     added = snprintf(uri, sizeof(uri), "%s?type=%s&query=", NmDefaultUri,
                      query_type_to_string(string_to_query_type(NmQueryType)));
+  }
   else if (Folder)
+  {
     added = snprintf(uri, sizeof(uri), "notmuch://%s?type=%s&query=", Folder,
                      query_type_to_string(string_to_query_type(NmQueryType)));
+  }
   else
+  {
     return NULL;
+  }
 
   if (added >= sizeof(uri))
   {
@@ -1841,7 +2108,9 @@ bool nm_normalize_uri(char *new_uri, const char *orig_uri, size_t new_uri_sz)
 void nm_query_window_forward(void)
 {
   if (NmQueryWindowCurrentPosition != 0)
+  {
     NmQueryWindowCurrentPosition--;
+  }
 
   mutt_debug(2, "nm_query_window_forward (%d)\n", NmQueryWindowCurrentPosition);
 }
@@ -1871,7 +2140,9 @@ static int nm_edit_message_tags(struct Context *ctx, const char *tags, char *buf
 {
   *buf = '\0';
   if (mutt_get_field("Add/remove labels: ", buf, buflen, MUTT_NM_TAG) != 0)
+  {
     return -1;
+  }
   return 1;
 }
 
@@ -1883,10 +2154,14 @@ static int nm_commit_message_tags(struct Context *ctx, struct Header *hdr, char 
   int rc = -1;
 
   if (!buf || !*buf || !data)
+  {
     return -1;
+  }
 
   if (!(db = get_db(data, true)) || !(msg = get_nm_message(db, hdr)))
+  {
     goto done;
+  }
 
   mutt_debug(1, "nm: tags modify: '%s'\n", buf);
 
@@ -1899,9 +2174,13 @@ static int nm_commit_message_tags(struct Context *ctx, struct Header *hdr, char 
   hdr->changed = true;
 done:
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
   if (hdr->changed)
+  {
     ctx->mtime = time(NULL);
+  }
   mutt_debug(1, "nm: tags modify done [rc=%d]\n", rc);
   return rc;
 }
@@ -1919,10 +2198,14 @@ bool nm_message_is_still_queried(struct Context *ctx, struct Header *hdr)
   orig_str = get_query_string(data, true);
 
   if (!db || !orig_str)
+  {
     return false;
+  }
 
   if (safe_asprintf(&new_str, "id:%s and (%s)", header_get_id(hdr), orig_str) < 0)
+  {
     return false;
+  }
 
   mutt_debug(2, "nm: checking if message is still queried: %s\n", new_str);
 
@@ -1935,12 +2218,14 @@ bool nm_message_is_still_queried(struct Context *ctx, struct Header *hdr)
       notmuch_messages_t *messages = NULL;
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
       if (notmuch_query_search_messages(q, &messages) != NOTMUCH_STATUS_SUCCESS)
+      {
         return false;
+      }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-      if (notmuch_query_search_messages_st(q, &messages) != NOTMUCH_STATUS_SUCCESS)
-        return false;
+        if (notmuch_query_search_messages_st(q, &messages) != NOTMUCH_STATUS_SUCCESS)
+          return false;
 #else
-      messages = notmuch_query_search_messages(q);
+        messages = notmuch_query_search_messages(q);
 #endif
       result = notmuch_messages_valid(messages);
       notmuch_messages_destroy(messages);
@@ -1951,12 +2236,14 @@ bool nm_message_is_still_queried(struct Context *ctx, struct Header *hdr)
       notmuch_threads_t *threads = NULL;
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
       if (notmuch_query_search_threads(q, &threads) != NOTMUCH_STATUS_SUCCESS)
+      {
         return false;
+      }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-      if (notmuch_query_search_threads_st(q, &threads) != NOTMUCH_STATUS_SUCCESS)
-        return false;
+        if (notmuch_query_search_threads_st(q, &threads) != NOTMUCH_STATUS_SUCCESS)
+          return false;
 #else
-      threads = notmuch_query_search_threads(q);
+        threads = notmuch_query_search_threads(q);
 #endif
       result = notmuch_threads_valid(threads);
       notmuch_threads_destroy(threads);
@@ -1980,7 +2267,9 @@ int nm_update_filename(struct Context *ctx, const char *old, const char *new,
   struct NmCtxData *data = get_ctxdata(ctx);
 
   if (!data || !new)
+  {
     return -1;
+  }
 
   if (!old && h && h->data)
   {
@@ -1991,7 +2280,9 @@ int nm_update_filename(struct Context *ctx, const char *old, const char *new,
   rc = rename_filename(data, old, new, h);
 
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
   ctx->mtime = time(NULL);
   return rc;
 }
@@ -2012,7 +2303,9 @@ int nm_nonctx_get_count(char *path, int *all, int *new)
     goto done;
   }
   if (!query_items)
+  {
     goto done;
+  }
 
   for (item = query_items; item; item = item->next)
   {
@@ -2024,19 +2317,27 @@ int nm_nonctx_get_count(char *path, int *all, int *new)
   }
 
   if (!db_query)
+  {
     goto done;
+  }
 
   if (!db_filename)
   {
     if (NmDefaultUri)
     {
       if (strncmp(NmDefaultUri, "notmuch://", 10) == 0)
+      {
         db_filename = NmDefaultUri + 10;
+      }
       else
+      {
         db_filename = NmDefaultUri;
+      }
     }
     else if (Folder)
+    {
       db_filename = Folder;
+    }
     dflt = true;
   }
 
@@ -2044,11 +2345,15 @@ int nm_nonctx_get_count(char *path, int *all, int *new)
    * sidebar/buffy very often */
   db = do_database_open(db_filename, false, false);
   if (!db)
+  {
     goto done;
+  }
 
   /* all emails */
   if (all)
+  {
     *all = count_query(db, db_query);
+  }
 
   /* new messages */
   if (new)
@@ -2067,12 +2372,14 @@ done:
 #ifdef NOTMUCH_API_3
     notmuch_database_destroy(db);
 #else
-    notmuch_database_close(db);
+      notmuch_database_close(db);
 #endif
     mutt_debug(1, "nm: count close DB\n");
   }
   if (!dflt)
+  {
     FREE(&db_filename);
+  }
   url_free_tags(query_items);
 
   mutt_debug(1, "nm: count done [rc=%d]\n", rc);
@@ -2082,8 +2389,12 @@ done:
 char *nm_get_description(struct Context *ctx)
 {
   for (struct Buffy *b = Incoming; b; b = b->next)
+  {
     if (b->desc && (strcmp(b->path, ctx->path) == 0))
+    {
       return b->desc;
+    }
+  }
 
   return NULL;
 }
@@ -2091,7 +2402,9 @@ char *nm_get_description(struct Context *ctx)
 int nm_description_to_path(const char *desc, char *buf, size_t bufsz)
 {
   if (!desc || !buf || !bufsz)
+  {
     return -EINVAL;
+  }
 
   for (struct Buffy *b = Incoming; b; b = b->next)
   {
@@ -2115,15 +2428,21 @@ int nm_record_message(struct Context *ctx, char *path, struct Header *h)
   struct NmCtxData *data = get_ctxdata(ctx);
 
   if (!path || !data || (access(path, F_OK) != 0))
+  {
     return 0;
+  }
   db = get_db(data, true);
   if (!db)
+  {
     return -1;
+  }
 
   mutt_debug(1, "nm: record message: %s\n", path);
   trans = db_trans_begin(data);
   if (trans < 0)
+  {
     goto done;
+  }
 
   st = notmuch_database_add_message(db, path, &msg);
 
@@ -2143,17 +2462,25 @@ int nm_record_message(struct Context *ctx, char *path, struct Header *h)
       FREE(&tags);
     }
     if (NmRecordTags)
+    {
       update_tags(msg, NmRecordTags);
+    }
   }
 
   rc = 0;
 done:
   if (msg)
+  {
     notmuch_message_destroy(msg);
+  }
   if (trans == 1)
+  {
     db_trans_end(data);
+  }
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
   return rc;
 }
 
@@ -2171,10 +2498,14 @@ int nm_get_all_tags(struct Context *ctx, char **tag_list, int *tag_count)
   int rc = -1;
 
   if (!data)
+  {
     return -1;
+  }
 
   if (!(db = get_db(data, false)) || !(tags = notmuch_database_get_all_tags(db)))
+  {
     goto done;
+  }
 
   *tag_count = 0;
   mutt_debug(1, "nm: get all tags\n");
@@ -2186,7 +2517,9 @@ int nm_get_all_tags(struct Context *ctx, char **tag_list, int *tag_count)
     if (*tag)
     {
       if (tag_list)
+      {
         tag_list[*tag_count] = safe_strdup(tag);
+      }
       (*tag_count)++;
     }
     notmuch_tags_move_to_next(tags);
@@ -2195,10 +2528,14 @@ int nm_get_all_tags(struct Context *ctx, char **tag_list, int *tag_count)
   rc = 0;
 done:
   if (tags)
+  {
     notmuch_tags_destroy(tags);
+  }
 
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
 
   mutt_debug(1, "nm: get all tags done [rc=%d tag_count=%u]\n", rc, *tag_count);
   return rc;
@@ -2218,11 +2555,15 @@ static int nm_open_mailbox(struct Context *ctx)
   int rc = -1;
 
   if (init_context(ctx) != 0)
+  {
     return -1;
+  }
 
   data = get_ctxdata(ctx);
   if (!data)
+  {
     return -1;
+  }
 
   mutt_debug(1, "nm: reading messages...[current count=%d]\n", ctx->msgcount);
 
@@ -2236,18 +2577,24 @@ static int nm_open_mailbox(struct Context *ctx)
     {
       case NM_QUERY_TYPE_MESGS:
         if (!read_mesgs_query(ctx, q, false))
+        {
           rc = -2;
+        }
         break;
       case NM_QUERY_TYPE_THREADS:
         if (!read_threads_query(ctx, q, false, get_limit(data)))
+        {
           rc = -2;
+        }
         break;
     }
     notmuch_query_destroy(q);
   }
 
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
 
   ctx->mtime = time(NULL);
 
@@ -2267,7 +2614,9 @@ static int nm_open_mailbox(struct Context *ctx)
 static int nm_close_mailbox(struct Context *ctx)
 {
   if (!ctx || (ctx->magic != MUTT_NOTMUCH))
+  {
     return -1;
+  }
 
   for (int i = 0; i < ctx->msgcount; i++)
   {
@@ -2305,7 +2654,9 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
   bool occult = false;
 
   if (!data || (get_database_mtime(data, &mtime) != 0))
+  {
     return -1;
+  }
 
   if (ctx->mtime >= mtime)
   {
@@ -2317,25 +2668,31 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
 
   q = get_query(data, false);
   if (!q)
+  {
     goto done;
+  }
 
   mutt_debug(1, "nm: start checking (count=%d)\n", ctx->msgcount);
   data->oldmsgcount = ctx->msgcount;
   data->noprogress = true;
 
   for (i = 0; i < ctx->msgcount; i++)
+  {
     ctx->hdrs[i]->active = false;
+  }
 
   limit = get_limit(data);
 
 #if LIBNOTMUCH_CHECK_VERSION(5, 0, 0)
   if (notmuch_query_search_messages(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
+  {
     return false;
+  }
 #elif LIBNOTMUCH_CHECK_VERSION(4, 3, 0)
-  if (notmuch_query_search_messages_st(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
-    goto done;
+    if (notmuch_query_search_messages_st(q, &msgs) != NOTMUCH_STATUS_SUCCESS)
+      goto done;
 #else
-  msgs = notmuch_query_search_messages(q);
+    msgs = notmuch_query_search_messages(q);
 #endif
 
   for (i = 0; notmuch_messages_valid(msgs) && ((limit == 0) || (i < limit));
@@ -2365,7 +2722,9 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
     header_get_fullpath(h, old, sizeof(old));
 
     if (mutt_strcmp(old, new) != 0)
+    {
       update_message_path(h, new);
+    }
 
     if (!h->changed)
     {
@@ -2380,7 +2739,9 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
     }
 
     if (update_header_tags(h, m) == 0)
+    {
       new_flags++;
+    }
 
     notmuch_message_destroy(m);
   }
@@ -2395,13 +2756,19 @@ static int nm_check_mailbox(struct Context *ctx, int *index_hint)
   }
 
   if (ctx->msgcount > data->oldmsgcount)
+  {
     mx_update_context(ctx, ctx->msgcount - data->oldmsgcount);
+  }
 done:
   if (q)
+  {
     notmuch_query_destroy(q);
+  }
 
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
 
   ctx->mtime = time(NULL);
 
@@ -2428,7 +2795,9 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
   bool changed = false;
 
   if (!data)
+  {
     return -1;
+  }
 
   mutt_debug(1, "nm: sync start ...\n");
 
@@ -2446,7 +2815,9 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
     struct NmHdrData *hd = h->data;
 
     if (!ctx->quiet)
+    {
       mutt_progress_update(&progress, i, -1);
+    }
 
     *old = *new = '\0';
 
@@ -2457,30 +2828,40 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
       mutt_debug(2, "nm: fixing obsolete path '%s'\n", old);
     }
     else
+    {
       header_get_fullpath(h, old, sizeof(old));
+    }
 
     ctx->path = hd->folder;
     ctx->magic = hd->magic;
 #ifdef USE_HCACHE
     rc = mh_sync_mailbox_message(ctx, i, NULL);
 #else
-    rc = mh_sync_mailbox_message(ctx, i);
+      rc = mh_sync_mailbox_message(ctx, i);
 #endif
     ctx->path = uri;
     ctx->magic = MUTT_NOTMUCH;
 
     if (rc)
+    {
       break;
+    }
 
     if (!h->deleted)
+    {
       header_get_fullpath(h, new, sizeof(new));
+    }
 
     if (h->deleted || (strcmp(old, new) != 0))
     {
       if (h->deleted && (remove_filename(data, old) == 0))
+      {
         changed = true;
+      }
       else if (*new &&*old && (rename_filename(data, old, new, h) == 0))
+      {
         changed = true;
+      }
     }
 
     FREE(&hd->oldpath);
@@ -2490,9 +2871,13 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
   ctx->magic = MUTT_NOTMUCH;
 
   if (!is_longrun(data))
+  {
     release_db(data);
+  }
   if (changed)
+  {
     ctx->mtime = time(NULL);
+  }
 
   mutt_debug(1, "nm: .... sync done [rc=%d]\n", rc);
   return rc;
@@ -2509,7 +2894,9 @@ static int nm_sync_mailbox(struct Context *ctx, int *index_hint)
 static int nm_open_message(struct Context *ctx, struct Message *msg, int msgno)
 {
   if (!ctx || !msg)
+  {
     return 1;
+  }
   struct Header *cur = ctx->hdrs[msgno];
   char *folder = ctx->path;
   char path[_POSIX_PATH_MAX];
@@ -2520,7 +2907,9 @@ static int nm_open_message(struct Context *ctx, struct Message *msg, int msgno)
   msg->fp = fopen(path, "r");
   if (!msg->fp && (errno == ENOENT) &&
       ((ctx->magic == MUTT_MAILDIR) || (ctx->magic == MUTT_NOTMUCH)))
+  {
     msg->fp = maildir_open_find_message(folder, cur->path, NULL);
+  }
 
   mutt_debug(1, "%s\n", __func__);
   return !msg->fp;
@@ -2536,7 +2925,9 @@ static int nm_open_message(struct Context *ctx, struct Message *msg, int msgno)
 static int nm_close_message(struct Context *ctx, struct Message *msg)
 {
   if (!msg)
+  {
     return 1;
+  }
   safe_fclose(&(msg->fp));
   return 0;
 }

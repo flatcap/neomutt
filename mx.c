@@ -123,14 +123,20 @@ bool mx_is_imap(const char *p)
   enum UrlScheme scheme;
 
   if (!p)
+  {
     return false;
+  }
 
   if (*p == '{')
+  {
     return true;
+  }
 
   scheme = url_check_scheme(p);
   if (scheme == U_IMAP || scheme == U_IMAPS)
+  {
     return true;
+  }
 
   return false;
 }
@@ -148,11 +154,15 @@ bool mx_is_pop(const char *p)
   enum UrlScheme scheme;
 
   if (!p)
+  {
     return false;
+  }
 
   scheme = url_check_scheme(p);
   if (scheme == U_POP || scheme == U_POPS)
+  {
     return true;
+  }
 
   return false;
 }
@@ -169,11 +179,15 @@ bool mx_is_nntp(const char *p)
   enum UrlScheme scheme;
 
   if (!p)
+  {
     return false;
+  }
 
   scheme = url_check_scheme(p);
   if (scheme == U_NNTP || scheme == U_NNTPS)
+  {
     return true;
+  }
 
   return false;
 }
@@ -190,11 +204,15 @@ bool mx_is_notmuch(const char *p)
   enum UrlScheme scheme;
 
   if (!p)
+  {
     return false;
+  }
 
   scheme = url_check_scheme(p);
   if (scheme == U_NOTMUCH)
+  {
     return true;
+  }
 
   return false;
 }
@@ -216,22 +234,30 @@ int mx_get_magic(const char *path)
 
 #ifdef USE_IMAP
   if (mx_is_imap(path))
+  {
     return MUTT_IMAP;
+  }
 #endif /* USE_IMAP */
 
 #ifdef USE_POP
   if (mx_is_pop(path))
+  {
     return MUTT_POP;
+  }
 #endif /* USE_POP */
 
 #ifdef USE_NNTP
   if (mx_is_nntp(path))
+  {
     return MUTT_NNTP;
+  }
 #endif /* USE_NNTP */
 
 #ifdef USE_NOTMUCH
   if (mx_is_notmuch(path))
+  {
     return MUTT_NOTMUCH;
+  }
 #endif
 
   if (stat(path, &st) == -1)
@@ -245,19 +271,27 @@ int mx_get_magic(const char *path)
   {
     /* check for maildir-style mailbox */
     if (mx_is_maildir(path))
+    {
       return MUTT_MAILDIR;
+    }
 
     /* check for mh-style mailbox */
     if (mx_is_mh(path))
+    {
       return MUTT_MH;
+    }
   }
   else if (st.st_size == 0)
   {
     /* hard to tell what zero-length files are, so assume the default magic */
     if (MboxType == MUTT_MBOX || MboxType == MUTT_MMDF)
+    {
       return MboxType;
+    }
     else
+    {
       return MUTT_MBOX;
+    }
   }
   else if ((f = fopen(path, "r")) != NULL)
   {
@@ -279,9 +313,13 @@ int mx_get_magic(const char *path)
     if (fgets(tmp, sizeof(tmp), f))
     {
       if (mutt_strncmp("From ", tmp, 5) == 0)
+      {
         magic = MUTT_MBOX;
+      }
       else if (mutt_strcmp(MMDF_SEP, tmp) == 0)
+      {
         magic = MUTT_MMDF;
+      }
     }
     safe_fclose(&f);
 
@@ -306,7 +344,9 @@ int mx_get_magic(const char *path)
   /* If there are no other matches, see if there are any
    * compress hooks that match */
   if ((magic == 0) && mutt_comp_can_read(path))
+  {
     return MUTT_COMPRESSED;
+  }
 #endif
   return magic;
 }
@@ -317,15 +357,25 @@ int mx_get_magic(const char *path)
 int mx_set_magic(const char *s)
 {
   if (mutt_strcasecmp(s, "mbox") == 0)
+  {
     MboxType = MUTT_MBOX;
+  }
   else if (mutt_strcasecmp(s, "mmdf") == 0)
+  {
     MboxType = MUTT_MMDF;
+  }
   else if (mutt_strcasecmp(s, "mh") == 0)
+  {
     MboxType = MUTT_MH;
+  }
   else if (mutt_strcasecmp(s, "maildir") == 0)
+  {
     MboxType = MUTT_MAILDIR;
+  }
   else
+  {
     return -1;
+  }
 
   return 0;
 }
@@ -340,7 +390,9 @@ int mx_access(const char *path, int flags)
 {
 #ifdef USE_IMAP
   if (mx_is_imap(path))
+  {
     return imap_access(path);
+  }
 #endif
 
   return access(path, flags);
@@ -366,10 +418,14 @@ static int mx_open_mailbox_append(struct Context *ctx, int flags)
       {
 #ifdef USE_COMPRESSED
         if (mutt_comp_can_append(ctx))
+        {
           ctx->magic = MUTT_COMPRESSED;
+        }
         else
+        {
 #endif
           ctx->magic = MboxType;
+        }
         flags |= MUTT_APPENDNEW;
       }
       else
@@ -379,12 +435,16 @@ static int mx_open_mailbox_append(struct Context *ctx, int flags)
       }
     }
     else
+    {
       return -1;
+    }
   }
 
   ctx->mx_ops = mx_get_ops(ctx->magic);
   if (!ctx->mx_ops || !ctx->mx_ops->open_append)
+  {
     return -1;
+  }
 
   return ctx->mx_ops->open_append(ctx, flags);
 }
@@ -408,34 +468,50 @@ struct Context *mx_open_mailbox(const char *path, int flags, struct Context *pct
   int rc;
 
   if (!path || !path[0])
+  {
     return NULL;
+  }
 
   if (!ctx)
+  {
     ctx = safe_malloc(sizeof(struct Context));
+  }
   memset(ctx, 0, sizeof(struct Context));
 
   ctx->path = safe_strdup(path);
   if (!ctx->path)
   {
     if (!pctx)
+    {
       FREE(&ctx);
+    }
     return NULL;
   }
   if (!(ctx->realpath = realpath(ctx->path, NULL)))
+  {
     ctx->realpath = safe_strdup(ctx->path);
+  }
 
   ctx->msgnotreadyet = -1;
   ctx->collapsed = false;
 
   for (rc = 0; rc < RIGHTSMAX; rc++)
+  {
     mutt_bit_set(ctx->rights, rc);
+  }
 
   if (flags & MUTT_QUIET)
+  {
     ctx->quiet = true;
+  }
   if (flags & MUTT_READONLY)
+  {
     ctx->readonly = true;
+  }
   if (flags & MUTT_PEEK)
+  {
     ctx->peekonly = true;
+  }
 
   if (flags & (MUTT_APPEND | MUTT_NEWFOLDER))
   {
@@ -443,7 +519,9 @@ struct Context *mx_open_mailbox(const char *path, int flags, struct Context *pct
     {
       mx_fastclose_mailbox(ctx);
       if (!pctx)
+      {
         FREE(&ctx);
+      }
       return NULL;
     }
     return ctx;
@@ -455,13 +533,19 @@ struct Context *mx_open_mailbox(const char *path, int flags, struct Context *pct
   if (ctx->magic <= 0 || !ctx->mx_ops)
   {
     if (ctx->magic == -1)
+    {
       mutt_perror(path);
+    }
     else if (ctx->magic == 0 || !ctx->mx_ops)
+    {
       mutt_error(_("%s is not a mailbox."), path);
+    }
 
     mx_fastclose_mailbox(ctx);
     if (!pctx)
+    {
       FREE(&ctx);
+    }
     return NULL;
   }
 
@@ -475,7 +559,9 @@ struct Context *mx_open_mailbox(const char *path, int flags, struct Context *pct
   set_option(OPT_FORCE_REFRESH);
 
   if (!ctx->quiet)
+  {
     mutt_message(_("Reading %s..."), ctx->path);
+  }
 
   rc = ctx->mx_ops->open(ctx);
 
@@ -490,15 +576,21 @@ struct Context *mx_open_mailbox(const char *path, int flags, struct Context *pct
       mutt_sort_headers(ctx, 1);
     }
     if (!ctx->quiet)
+    {
       mutt_clear_error();
+    }
     if (rc == -2)
+    {
       mutt_error(_("Reading from %s interrupted..."), ctx->path);
+    }
   }
   else
   {
     mx_fastclose_mailbox(ctx);
     if (!pctx)
+    {
       FREE(&ctx);
+    }
   }
 
   unset_option(OPT_FORCE_REFRESH);
@@ -513,7 +605,9 @@ void mx_fastclose_mailbox(struct Context *ctx)
   struct utimbuf ut;
 
   if (!ctx)
+  {
     return;
+  }
 
   /* fix up the times so buffy won't get confused */
   if (ctx->peekonly && ctx->path && (ctx->mtime > ctx->atime))
@@ -526,26 +620,38 @@ void mx_fastclose_mailbox(struct Context *ctx)
   /* never announce that a mailbox we've just left has new mail. #3290
    * XXX: really belongs in mx_close_mailbox, but this is a nice hook point */
   if (!ctx->peekonly)
+  {
     mutt_buffy_setnotified(ctx->path);
+  }
 
   if (ctx->mx_ops)
+  {
     ctx->mx_ops->close(ctx);
+  }
 
   if (ctx->subj_hash)
+  {
     hash_destroy(&ctx->subj_hash, NULL);
+  }
   if (ctx->id_hash)
+  {
     hash_destroy(&ctx->id_hash, NULL);
+  }
   hash_destroy(&ctx->label_hash, NULL);
   mutt_clear_threads(ctx);
   for (int i = 0; i < ctx->msgcount; i++)
+  {
     mutt_free_header(&ctx->hdrs[i]);
+  }
   FREE(&ctx->hdrs);
   FREE(&ctx->v2r);
   FREE(&ctx->path);
   FREE(&ctx->realpath);
   FREE(&ctx->pattern);
   if (ctx->limit_pattern)
+  {
     mutt_pattern_free(&ctx->limit_pattern);
+  }
   safe_fclose(&ctx->fp);
   memset(ctx, 0, sizeof(struct Context));
 }
@@ -556,10 +662,14 @@ void mx_fastclose_mailbox(struct Context *ctx)
 static int sync_mailbox(struct Context *ctx, int *index_hint)
 {
   if (!ctx->mx_ops || !ctx->mx_ops->sync)
+  {
     return -1;
+  }
 
   if (!ctx->quiet)
+  {
     mutt_message(_("Writing %s..."), ctx->path);
+  }
 
   return ctx->mx_ops->sync(ctx, index_hint);
 }
@@ -575,21 +685,33 @@ static int trash_append(struct Context *ctx)
   int opt_confappend, rc;
 
   if (!Trash || !ctx->deleted || (ctx->magic == MUTT_MAILDIR && option(OPT_MAILDIR_TRASH)))
+  {
     return 0;
+  }
 
   for (i = 0; i < ctx->msgcount; i++)
+  {
     if (ctx->hdrs[i]->deleted && (!ctx->hdrs[i]->purge))
+    {
       break;
+    }
+  }
   if (i == ctx->msgcount)
+  {
     return 0; /* nothing to be done */
+  }
 
   /* avoid the "append messages" prompt */
   opt_confappend = option(OPT_CONFIRMAPPEND);
   if (opt_confappend)
+  {
     unset_option(OPT_CONFIRMAPPEND);
+  }
   rc = mutt_save_confirm(Trash, &st);
   if (opt_confappend)
+  {
     set_option(OPT_CONFIRMAPPEND);
+  }
   if (rc != 0)
   {
     mutt_error(_("message(s) not deleted"));
@@ -598,13 +720,17 @@ static int trash_append(struct Context *ctx)
 
   if (lstat(ctx->path, &stc) == 0 && stc.st_ino == st.st_ino &&
       stc.st_dev == st.st_dev && stc.st_rdev == st.st_rdev)
+  {
     return 0; /* we are in the trash folder: simple sync */
+  }
 
 #ifdef USE_IMAP
   if (Context->magic == MUTT_IMAP && mx_is_imap(Trash))
   {
     if (!imap_fast_trash(Context, Trash))
+    {
       return 0;
+    }
   }
 #endif
 
@@ -612,6 +738,7 @@ static int trash_append(struct Context *ctx)
   {
     /* continue from initial scan above */
     for (; i < ctx->msgcount; i++)
+    {
       if (ctx->hdrs[i]->deleted && (!ctx->hdrs[i]->purge))
       {
         if (mutt_append_message(&ctx_trash, ctx, ctx->hdrs[i], 0, 0) == -1)
@@ -620,6 +747,7 @@ static int trash_append(struct Context *ctx)
           return -1;
         }
       }
+    }
 
     mx_close_mailbox(&ctx_trash, NULL);
   }
@@ -645,7 +773,9 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
   char buf[SHORT_STRING];
 
   if (!ctx)
+  {
     return 0;
+  }
 
   ctx->closing = true;
 
@@ -670,7 +800,9 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
         return -1;
       }
       else if (rc == MUTT_YES)
+      {
         mutt_newsgroup_catchup(nntp_data->nserv, nntp_data->group);
+      }
     }
   }
 #endif
@@ -679,13 +811,17 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
   {
     if (!ctx->hdrs[i]->deleted && ctx->hdrs[i]->read &&
         !(ctx->hdrs[i]->flagged && option(OPT_KEEP_FLAGGED)))
+    {
       read_msgs++;
+    }
   }
 
 #ifdef USE_NNTP
   /* don't need to move articles from newsgroup */
   if (ctx->magic == MUTT_NNTP)
+  {
     read_msgs = 0;
+  }
 #endif
 
   if (read_msgs && quadoption(OPT_MOVE) != MUTT_NO)
@@ -737,14 +873,18 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
     for (i = 0; i < ctx->msgcount; i++)
     {
       if (!ctx->hdrs[i]->deleted && !ctx->hdrs[i]->old && !ctx->hdrs[i]->read)
+      {
         mutt_set_flag(ctx, ctx->hdrs[i], MUTT_OLD, 1);
+      }
     }
   }
 
   if (move_messages)
   {
     if (!ctx->quiet)
+    {
       mutt_message(_("Moving read messages to %s..."), mbox);
+    }
 
 #ifdef USE_IMAP
     /* try to use server-side copy first */
@@ -754,17 +894,25 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
     {
       /* tag messages for moving, and clear old tags, if any */
       for (i = 0; i < ctx->msgcount; i++)
+      {
         if (ctx->hdrs[i]->read && !ctx->hdrs[i]->deleted &&
             !(ctx->hdrs[i]->flagged && option(OPT_KEEP_FLAGGED)))
+        {
           ctx->hdrs[i]->tagged = true;
+        }
         else
+        {
           ctx->hdrs[i]->tagged = false;
+        }
+      }
 
       i = imap_copy_messages(ctx, NULL, mbox, 1);
     }
 
-    if (i == 0) /* success */
+    if (i == 0)
+    { /* success */
       mutt_clear_error();
+    }
     else if (i == -1) /* horrible error, bail */
     {
       ctx->closing = false;
@@ -804,9 +952,13 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
   else if (!ctx->changed && ctx->deleted == 0)
   {
     if (!ctx->quiet)
+    {
       mutt_message(_("Mailbox is unchanged."));
+    }
     if (ctx->magic == MUTT_MBOX || ctx->magic == MUTT_MMDF)
+    {
       mbox_reset_atime(ctx, NULL);
+    }
     mx_fastclose_mailbox(ctx);
     return 0;
   }
@@ -857,15 +1009,21 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
   if (!ctx->quiet)
   {
     if (move_messages)
+    {
       mutt_message(_("%d kept, %d moved, %d deleted."),
                    ctx->msgcount - ctx->deleted, read_msgs, ctx->deleted);
+    }
     else
+    {
       mutt_message(_("%d kept, %d deleted."), ctx->msgcount - ctx->deleted, ctx->deleted);
+    }
   }
 
   if (ctx->msgcount == ctx->deleted && (ctx->magic == MUTT_MMDF || ctx->magic == MUTT_MBOX) &&
       !mutt_is_spool(ctx->path) && !option(OPT_SAVE_EMPTY))
+  {
     mutt_unlink_empty(ctx->path);
+  }
 
 #ifdef USE_SIDEBAR
   if (purge && ctx->deleted)
@@ -875,9 +1033,13 @@ int mx_close_mailbox(struct Context *ctx, int *index_hint)
     for (i = 0; i < ctx->msgcount; i++)
     {
       if (ctx->hdrs[i]->deleted && !ctx->hdrs[i]->read)
+      {
         ctx->unread--;
+      }
       if (ctx->hdrs[i]->deleted && ctx->hdrs[i]->flagged)
+      {
         ctx->flagged--;
+      }
     }
     ctx->msgcount -= ctx->deleted;
     mutt_sb_set_buffystats(ctx);
@@ -928,25 +1090,37 @@ void mx_update_tables(struct Context *ctx, int committing)
       }
 
       if (committing)
+      {
         ctx->hdrs[j]->changed = false;
+      }
       else if (ctx->hdrs[j]->changed)
+      {
         ctx->changed = true;
+      }
 
       if (!committing || (ctx->magic == MUTT_MAILDIR && option(OPT_MAILDIR_TRASH)))
       {
         if (ctx->hdrs[j]->deleted)
+        {
           ctx->deleted++;
+        }
       }
 
       if (ctx->hdrs[j]->tagged)
+      {
         ctx->tagged++;
+      }
       if (ctx->hdrs[j]->flagged)
+      {
         ctx->flagged++;
+      }
       if (!ctx->hdrs[j]->read)
       {
         ctx->unread++;
         if (!ctx->hdrs[j]->old)
+        {
           ctx->new ++;
+        }
       }
 
       j++;
@@ -954,13 +1128,19 @@ void mx_update_tables(struct Context *ctx, int committing)
     else
     {
       if (ctx->magic == MUTT_MH || ctx->magic == MUTT_MAILDIR)
+      {
         ctx->size -= (ctx->hdrs[i]->content->length + ctx->hdrs[i]->content->offset -
                       ctx->hdrs[i]->content->hdr_offset);
+      }
       /* remove message from the hash tables */
       if (ctx->subj_hash && ctx->hdrs[i]->env->real_subj)
+      {
         hash_delete(ctx->subj_hash, ctx->hdrs[i]->env->real_subj, ctx->hdrs[i], NULL);
+      }
       if (ctx->id_hash && ctx->hdrs[i]->env->message_id)
+      {
         hash_delete(ctx->id_hash, ctx->hdrs[i]->env->message_id, ctx->hdrs[i], NULL);
+      }
       mutt_label_hash_remove(ctx, ctx->hdrs[i]);
       /* The path mx_check_mailbox() -> imap_check_mailbox() ->
        *          imap_expunge_mailbox() -> mx_update_tables()
@@ -968,7 +1148,9 @@ void mx_update_tables(struct Context *ctx, int committing)
        * last_tag being stale if it's not reset here.
        */
       if (ctx->last_tag == ctx->hdrs[i])
+      {
         ctx->last_tag = NULL;
+      }
       mutt_free_header(&ctx->hdrs[i]);
     }
   }
@@ -993,9 +1175,13 @@ int mx_sync_mailbox(struct Context *ctx, int *index_hint)
   {
     char buf[STRING], tmp[STRING];
     if (km_expand_key(buf, sizeof(buf), km_find_func(MENU_MAIN, OP_TOGGLE_WRITE)))
+    {
       snprintf(tmp, sizeof(tmp), _(" Press '%s' to toggle write"), buf);
+    }
     else
+    {
       strfcpy(tmp, _("Use 'toggle-write' to re-enable write!"), sizeof(tmp));
+    }
 
     mutt_error(_("Mailbox is marked unwritable. %s"), tmp);
     return -1;
@@ -1009,7 +1195,9 @@ int mx_sync_mailbox(struct Context *ctx, int *index_hint)
   if (!ctx->changed && !ctx->deleted)
   {
     if (!ctx->quiet)
+    {
       mutt_message(_("Mailbox is unchanged."));
+    }
     return 0;
   }
 
@@ -1022,11 +1210,15 @@ int mx_sync_mailbox(struct Context *ctx, int *index_hint)
                                  _("Purge %d deleted messages?"),
              ctx->deleted);
     if ((purge = query_quadoption(OPT_DELETE, buf)) == MUTT_ABORT)
+    {
       return -1;
+    }
     else if (purge == MUTT_NO)
     {
       if (!ctx->changed)
+      {
         return 0; /* nothing to do! */
+      }
       /* let IMAP servers hold on to D flags */
       if (ctx->magic != MUTT_IMAP)
       {
@@ -1039,7 +1231,9 @@ int mx_sync_mailbox(struct Context *ctx, int *index_hint)
       }
     }
     else if (ctx->last_tag && ctx->last_tag->deleted)
+    {
       ctx->last_tag = NULL; /* reset last tagged msg now useless */
+    }
   }
 
   /* really only for IMAP - imap_sync_mailbox results in a call to
@@ -1050,28 +1244,38 @@ int mx_sync_mailbox(struct Context *ctx, int *index_hint)
   if (purge && ctx->deleted && (mutt_strcmp(ctx->path, Trash) != 0))
   {
     if (trash_append(ctx) != 0)
+    {
       return -1;
+    }
   }
 
 #ifdef USE_IMAP
   if (ctx->magic == MUTT_IMAP)
+  {
     rc = imap_sync_mailbox(ctx, purge);
+  }
   else
+  {
 #endif
     rc = sync_mailbox(ctx, index_hint);
+  }
   if (rc == 0)
   {
 #ifdef USE_IMAP
     if (ctx->magic == MUTT_IMAP && !purge)
     {
       if (!ctx->quiet)
+      {
         mutt_message(_("Mailbox checkpointed."));
+      }
     }
     else
 #endif
     {
       if (!ctx->quiet)
+      {
         mutt_message(_("%d kept, %d deleted."), msgcount - deleted, deleted);
+      }
     }
 
     mutt_sleep(0);
@@ -1140,23 +1344,33 @@ struct Message *mx_open_new_message(struct Context *dest, struct Header *hdr, in
   }
 
   if (msg->received == 0)
+  {
     time(&msg->received);
+  }
 
   if (dest->mx_ops->open_new_msg(msg, dest, hdr) == 0)
   {
     if (dest->magic == MUTT_MMDF)
+    {
       fputs(MMDF_SEP, msg->fp);
+    }
 
     if ((dest->magic == MUTT_MBOX || dest->magic == MUTT_MMDF) && flags & MUTT_ADD_FROM)
     {
       if (hdr)
       {
         if (hdr->env->return_path)
+        {
           p = hdr->env->return_path;
+        }
         else if (hdr->env->sender)
+        {
           p = hdr->env->sender;
+        }
         else
+        {
           p = hdr->env->from;
+        }
       }
 
       fprintf(msg->fp, "From %s %s", p ? p->mailbox : NONULL(Username),
@@ -1164,7 +1378,9 @@ struct Message *mx_open_new_message(struct Context *dest, struct Header *hdr, in
     }
   }
   else
+  {
     FREE(&msg);
+  }
 
   return msg;
 }
@@ -1199,7 +1415,9 @@ struct Message *mx_open_message(struct Context *ctx, int msgno)
 
   msg = safe_calloc(1, sizeof(struct Message));
   if (ctx->mx_ops->open_msg(ctx, msg, msgno))
+  {
     FREE(&msg);
+  }
 
   return msg;
 }
@@ -1210,7 +1428,9 @@ struct Message *mx_open_message(struct Context *ctx, int msgno)
 int mx_commit_message(struct Message *msg, struct Context *ctx)
 {
   if (!ctx->mx_ops || !ctx->mx_ops->commit_msg)
+  {
     return -1;
+  }
 
   if (!(msg->write && ctx->append))
   {
@@ -1228,11 +1448,15 @@ int mx_commit_message(struct Message *msg, struct Context *ctx)
 int mx_close_message(struct Context *ctx, struct Message **msg)
 {
   if (!ctx || !msg || !*msg)
+  {
     return 0;
+  }
   int r = 0;
 
   if (ctx->mx_ops && ctx->mx_ops->close_msg)
+  {
     r = ctx->mx_ops->close_msg(ctx, *msg);
+  }
 
   if ((*msg)->path)
   {
@@ -1299,7 +1523,9 @@ void mx_update_context(struct Context *ctx, int new_messages)
       h->virtual = ctx->vcount++;
     }
     else
+    {
       h->virtual = -1;
+    }
     h->msgno = msgno;
 
     if (h->env->supersedes)
@@ -1307,38 +1533,56 @@ void mx_update_context(struct Context *ctx, int new_messages)
       struct Header *h2 = NULL;
 
       if (!ctx->id_hash)
+      {
         ctx->id_hash = mutt_make_id_hash(ctx);
+      }
 
       h2 = hash_find(ctx->id_hash, h->env->supersedes);
       if (h2)
       {
         h2->superseded = true;
         if (option(OPT_SCORE))
+        {
           mutt_score_message(ctx, h2, 1);
+        }
       }
     }
 
     /* add this message to the hash tables */
     if (ctx->id_hash && h->env->message_id)
+    {
       hash_insert(ctx->id_hash, h->env->message_id, h);
+    }
     if (ctx->subj_hash && h->env->real_subj)
+    {
       hash_insert(ctx->subj_hash, h->env->real_subj, h);
+    }
     mutt_label_hash_add(ctx, h);
 
     if (option(OPT_SCORE))
+    {
       mutt_score_message(ctx, h, 0);
+    }
 
     if (h->changed)
+    {
       ctx->changed = true;
+    }
     if (h->flagged)
+    {
       ctx->flagged++;
+    }
     if (h->deleted)
+    {
       ctx->deleted++;
+    }
     if (!h->read)
     {
       ctx->unread++;
       if (!h->old)
+      {
         ctx->new ++;
+      }
     }
   }
 }
@@ -1375,7 +1619,9 @@ int mx_check_empty(const char *path)
 int mx_tags_editor(struct Context *ctx, const char *tags, char *buf, size_t buflen)
 {
   if (ctx->mx_ops->edit_msg_tags)
+  {
     return ctx->mx_ops->edit_msg_tags(ctx, tags, buf, buflen);
+  }
 
   mutt_message(_("Folder doesn't support tagging, aborting."));
   return -1;
@@ -1387,7 +1633,9 @@ int mx_tags_editor(struct Context *ctx, const char *tags, char *buf, size_t bufl
 int mx_tags_commit(struct Context *ctx, struct Header *h, char *tags)
 {
   if (ctx->mx_ops->commit_msg_tags)
+  {
     return ctx->mx_ops->commit_msg_tags(ctx, h, tags);
+  }
 
   mutt_message(_("Folder doesn't support tagging, aborting."));
   return -1;

@@ -117,7 +117,9 @@ void mutt_edit_headers(const char *editor, const char *body, struct Header *msg,
 
   n = mutt_read_rfc822_header(ifp, NULL, 1, 0);
   while ((i = fread(buffer, 1, sizeof(buffer), ifp)) > 0)
+  {
     fwrite(buffer, 1, i, ofp);
+  }
   safe_fclose(&ofp);
   safe_fclose(&ifp);
   mutt_unlink(path);
@@ -128,12 +130,16 @@ void mutt_edit_headers(const char *editor, const char *body, struct Header *msg,
      multiple Message-Ids in IRT anyways */
 #ifdef USE_NNTP
   if (!option(OPT_NEWS_SEND))
+  {
 #endif
     if (!STAILQ_EMPTY(&msg->env->in_reply_to) &&
         (STAILQ_EMPTY(&n->in_reply_to) ||
          (mutt_strcmp(STAILQ_FIRST(&n->in_reply_to)->data,
                       STAILQ_FIRST(&msg->env->in_reply_to)->data) != 0)))
+    {
       mutt_list_free(&msg->env->references);
+    }
+  }
 
   /* restore old info. */
   mutt_list_free(&n->references);
@@ -178,11 +184,15 @@ void mutt_edit_headers(const char *editor, const char *body, struct Header *msg,
           if (*p == '\\')
           {
             if (!*(p + 1))
+            {
               break;
+            }
             p++;
           }
           if (l < sizeof(path) - 1)
+          {
             path[l++] = *p;
+          }
         }
         p = skip_email_wsp(p);
         path[l] = '\0';
@@ -192,7 +202,9 @@ void mutt_edit_headers(const char *editor, const char *body, struct Header *msg,
         {
           body2->description = safe_strdup(p);
           for (parts = msg->content; parts->next; parts = parts->next)
+          {
             ;
+          }
           parts->next = body2;
         }
         else
@@ -207,7 +219,9 @@ void mutt_edit_headers(const char *editor, const char *body, struct Header *msg,
     {
       msg->security = mutt_parse_crypt_hdr(np->data + 4, 0, APPLICATION_PGP);
       if (msg->security)
+      {
         msg->security |= APPLICATION_PGP;
+      }
       keep = false;
     }
 
@@ -227,7 +241,9 @@ static void label_ref_dec(struct Context *ctx, char *label)
 
   elem = hash_find_elem(ctx->label_hash, label);
   if (!elem)
+  {
     return;
+  }
 
   count = (uintptr_t) elem->data;
   if (count <= 1)
@@ -264,15 +280,23 @@ static void label_ref_inc(struct Context *ctx, char *label)
 static int label_message(struct Context *ctx, struct Header *hdr, char *new)
 {
   if (!hdr)
+  {
     return 0;
+  }
   if (mutt_strcmp(hdr->env->x_label, new) == 0)
+  {
     return 0;
+  }
 
   if (hdr->env->x_label != NULL)
+  {
     label_ref_dec(ctx, hdr->env->x_label);
+  }
   mutt_str_replace(&hdr->env->x_label, new);
   if (hdr->env->x_label != NULL)
+  {
     label_ref_inc(ctx, hdr->env->x_label);
+  }
 
   return hdr->changed = hdr->xlabel_changed = true;
 }
@@ -284,7 +308,9 @@ int mutt_label_message(struct Header *hdr)
   int changed;
 
   if (!Context || !Context->label_hash)
+  {
     return 0;
+  }
 
   *buf = '\0';
   if (hdr != NULL && hdr->env->x_label != NULL)
@@ -293,12 +319,16 @@ int mutt_label_message(struct Header *hdr)
   }
 
   if (mutt_get_field("Label: ", buf, sizeof(buf), MUTT_LABEL /* | MUTT_CLEAR */) != 0)
+  {
     return 0;
+  }
 
   new = buf;
   SKIPWS(new);
   if (*new == '\0')
+  {
     new = NULL;
+  }
 
   changed = 0;
   if (hdr)
@@ -315,12 +345,14 @@ int mutt_label_message(struct Header *hdr)
     for (i = 0; i < Context->vcount; ++i)
     {
       if (HDR_OF(i)->tagged)
+      {
         if (label_message(Context, HDR_OF(i), new))
         {
           changed++;
           mutt_set_flag(Context, HDR_OF(i), MUTT_TAG, 0);
           /* mutt_set_flag re-evals the header color */
         }
+      }
     }
   }
 
@@ -338,15 +370,23 @@ void mutt_make_label_hash(struct Context *ctx)
 void mutt_label_hash_add(struct Context *ctx, struct Header *hdr)
 {
   if (!ctx || !ctx->label_hash)
+  {
     return;
+  }
   if (hdr->env->x_label)
+  {
     label_ref_inc(ctx, hdr->env->x_label);
+  }
 }
 
 void mutt_label_hash_remove(struct Context *ctx, struct Header *hdr)
 {
   if (!ctx || !ctx->label_hash)
+  {
     return;
+  }
   if (hdr->env->x_label)
+  {
     label_ref_dec(ctx, hdr->env->x_label);
+  }
 }

@@ -171,16 +171,24 @@ static void collapse_all(struct Menu *menu, int toggle)
   int final;
 
   if (!Context || (Context->msgcount == 0))
+  {
     return;
+  }
 
   /* Figure out what the current message would be after folding / unfolding,
    * so that we can restore the cursor in a sane way afterwards. */
   if (CURHDR->collapsed && toggle)
+  {
     final = mutt_uncollapse_thread(Context, CURHDR);
+  }
   else if (CAN_COLLAPSE(CURHDR))
+  {
     final = mutt_collapse_thread(Context, CURHDR);
+  }
   else
+  {
     final = CURHDR->virtual;
+  }
 
   base = Context->hdrs[Context->v2r[final]];
 
@@ -190,15 +198,21 @@ static void collapse_all(struct Menu *menu, int toggle)
   while ((thread = top) != NULL)
   {
     while (!thread->message)
+    {
       thread = thread->child;
+    }
     h = thread->message;
 
     if (h->collapsed != Context->collapsed)
     {
       if (h->collapsed)
+      {
         mutt_uncollapse_thread(Context, h);
+      }
       else if (CAN_COLLAPSE(h))
+      {
         mutt_collapse_thread(Context, h);
+      }
     }
     top = top->next;
   }
@@ -223,8 +237,12 @@ static int ci_next_undeleted(int msgno)
   int i;
 
   for (i = msgno + 1; i < Context->vcount; i++)
+  {
     if (!Context->hdrs[Context->v2r[i]]->deleted)
+    {
       return i;
+    }
+  }
   return -1;
 }
 
@@ -233,8 +251,12 @@ static int ci_previous_undeleted(int msgno)
   int i;
 
   for (i = msgno - 1; i >= 0; i--)
+  {
     if (!Context->hdrs[Context->v2r[i]]->deleted)
+    {
       return i;
+    }
+  }
   return -1;
 }
 
@@ -256,13 +278,19 @@ static int ci_first_message(void)
           !Context->hdrs[Context->v2r[i]]->deleted)
       {
         if (!Context->hdrs[Context->v2r[i]]->old)
+        {
           return i;
+        }
         else if (old == -1)
+        {
           old = i;
+        }
       }
     }
     if (old != -1)
+    {
       return old;
+    }
 
     /* If Sort is reverse and not threaded, the latest message is first.
      * If Sort is threaded, the latest message is first iff exactly one
@@ -270,9 +298,13 @@ static int ci_first_message(void)
      */
     if (((Sort & SORT_REVERSE) && (Sort & SORT_MASK) != SORT_THREADS) ||
         ((Sort & SORT_MASK) == SORT_THREADS && ((Sort ^ SortAux) & SORT_REVERSE)))
+    {
       return 0;
+    }
     else
+    {
       return (Context->vcount ? Context->vcount - 1 : 0);
+    }
   }
   return 0;
 }
@@ -285,7 +317,9 @@ static int ci_first_message(void)
 static int mx_toggle_write(struct Context *ctx)
 {
   if (!ctx)
+  {
     return -1;
+  }
 
   if (ctx->readonly)
   {
@@ -326,10 +360,14 @@ static void resort_index(struct Menu *menu)
   }
 
   if ((Sort & SORT_MASK) == SORT_THREADS && menu->current < 0)
+  {
     menu->current = mutt_parent_message(Context, current, 0);
+  }
 
   if (menu->current < 0)
+  {
     menu->current = ci_first_message();
+  }
 
   menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
 }
@@ -341,15 +379,21 @@ void update_index(struct Menu *menu, struct Context *ctx, int check, int oldcoun
   int j;
 
   if (!menu || !ctx)
+  {
     return;
+  }
 
   /* take note of the current message */
   if (oldcount)
   {
     if (menu->current < ctx->vcount)
+    {
       menu->oldcurrent = index_hint;
+    }
     else
+    {
       oldcount = 0; /* invalid message number! */
+    }
   }
 
   /* We are in a limited view. Check if the new message(s) satisfy
@@ -361,7 +405,9 @@ void update_index(struct Menu *menu, struct Context *ctx, int check, int oldcoun
     for (j = (check == MUTT_REOPENED) ? 0 : oldcount; j < ctx->msgcount; j++)
     {
       if (!j)
+      {
         ctx->vcount = 0;
+      }
 
       if (mutt_pattern_exec(ctx->limit_pattern, MUTT_MATCH_FULL_ADDRESS, ctx,
                             ctx->hdrs[j], NULL))
@@ -383,7 +429,9 @@ void update_index(struct Menu *menu, struct Context *ctx, int check, int oldcoun
   {
     save_new = safe_malloc(sizeof(struct Header *) * (ctx->msgcount - oldcount));
     for (j = oldcount; j < ctx->msgcount; j++)
+    {
       save_new[j - oldcount] = ctx->hdrs[j];
+    }
   }
 
   /* if the mailbox was reopened, need to rethread from scratch */
@@ -401,7 +449,9 @@ void update_index(struct Menu *menu, struct Context *ctx, int check, int oldcoun
       for (h = ctx->tree; h; h = h->next)
       {
         for (k = h; !k->message; k = k->child)
+        {
           ;
+        }
         mutt_uncollapse_thread(ctx, k->message);
       }
       mutt_set_virtual(ctx);
@@ -416,7 +466,9 @@ void update_index(struct Menu *menu, struct Context *ctx, int check, int oldcoun
         {
           struct Header *h = ctx->hdrs[k];
           if (h == save_new[j] && (!ctx->pattern || h->limited))
+          {
             mutt_uncollapse_thread(ctx, h);
+          }
         }
       }
       FREE(&save_new);
@@ -439,7 +491,9 @@ void update_index(struct Menu *menu, struct Context *ctx, int check, int oldcoun
   }
 
   if (menu->current < 0)
+  {
     menu->current = ci_first_message();
+  }
 }
 
 static int main_change_folder(struct Menu *menu, int op, char *buf, size_t bufsz,
@@ -452,8 +506,10 @@ static int main_change_folder(struct Menu *menu, int op, char *buf, size_t bufsz
     nntp_expand_path(buf, bufsz, &CurrentNewsSrv->conn->account);
   }
   else
+  {
 #endif
     mutt_expand_path(buf, bufsz);
+  }
   if (mx_get_magic(buf) <= 0)
   {
     mutt_error(_("%s is not a mailbox."), buf);
@@ -462,7 +518,9 @@ static int main_change_folder(struct Menu *menu, int op, char *buf, size_t bufsz
 
   /* keepalive failure in mutt_enter_fname may kill connection. #3028 */
   if (Context && !Context->path)
+  {
     FREE(&Context);
+  }
 
   if (Context)
   {
@@ -471,16 +529,22 @@ static int main_change_folder(struct Menu *menu, int op, char *buf, size_t bufsz
 
 #ifdef USE_COMPRESSED
     if (Context->compress_info && Context->realpath)
+    {
       new_last_folder = safe_strdup(Context->realpath);
+    }
     else
+    {
 #endif
       new_last_folder = safe_strdup(Context->path);
+    }
     *oldcount = Context ? Context->msgcount : 0;
 
     if ((check = mx_close_mailbox(Context, index_hint)) != 0)
     {
       if (check == MUTT_NEW_MAIL || check == MUTT_REOPENED)
+      {
         update_index(menu, Context, check, *oldcount, *index_hint);
+      }
 
       FREE(&new_last_folder);
       set_option(OPT_SEARCH_INVALID);
@@ -512,10 +576,14 @@ static int main_change_folder(struct Menu *menu, int op, char *buf, size_t bufsz
     menu->current = ci_first_message();
   }
   else
+  {
     menu->current = 0;
+  }
 
   if (((Sort & SORT_MASK) == SORT_THREADS) && option(OPT_COLLAPSE_ALL))
+  {
     collapse_all(menu, 0);
+  }
 
 #ifdef USE_SIDEBAR
   mutt_sb_set_open_buffy();
@@ -556,7 +624,9 @@ bool mutt_ts_capability(void)
 
     tcaps = tigetstr("fsl");
     if (tcaps && tcaps != (char *) -1 && *tcaps)
+    {
       fsl = tcaps;
+    }
 
     return true;
   }
@@ -567,7 +637,9 @@ bool mutt_ts_capability(void)
   use_extended_names(true);
   tcapi = tigetflag("XT");
   if (tcapi == 1)
+  {
     return true;
+  }
 #endif /* HAVE_USE_EXTENDED_NAMES */
 
   /* Check term types that are known to support the standard escape without
@@ -575,7 +647,9 @@ bool mutt_ts_capability(void)
   for (termp = known; termp; termp++)
   {
     if (term && *termp && (mutt_strncasecmp(term, *termp, strlen(*termp)) != 0))
+    {
       return true;
+    }
   }
 
   /* not supported */
@@ -586,7 +660,9 @@ void mutt_ts_status(char *str)
 {
   /* If empty, do not set.  To clear, use a single space. */
   if (str == NULL || *str == '\0')
+  {
     return;
+  }
   fprintf(stderr, "%s%s%s", tsl, str, fsl);
 }
 
@@ -594,7 +670,9 @@ void mutt_ts_icon(char *str)
 {
   /* If empty, do not set.  To clear, use a single space. */
   if (str == NULL || *str == '\0')
+  {
     return;
+  }
 
   /* icon setting is not supported in terminfo, so hardcode the escape - yuck */
   fprintf(stderr, "\033]1;%s\007", str);
@@ -603,11 +681,15 @@ void mutt_ts_icon(char *str)
 void index_make_entry(char *s, size_t l, struct Menu *menu, int num)
 {
   if (!Context || !menu || (num < 0) || (num >= Context->hdrmax))
+  {
     return;
+  }
 
   struct Header *h = Context->hdrs[Context->v2r[num]];
   if (!h)
+  {
     return;
+  }
 
   enum FormatFlag flag = MUTT_FORMAT_MAKEPRINT | MUTT_FORMAT_ARROWCURSOR | MUTT_FORMAT_INDEX;
   int edgemsgno, reverse = Sort & SORT_REVERSE;
@@ -617,23 +699,33 @@ void index_make_entry(char *s, size_t l, struct Menu *menu, int num)
   {
     flag |= MUTT_FORMAT_TREE; /* display the thread tree */
     if (h->display_subject)
+    {
       flag |= MUTT_FORMAT_FORCESUBJ;
+    }
     else
     {
       if (reverse)
       {
         if (menu->top + menu->pagelen > menu->max)
+        {
           edgemsgno = Context->v2r[menu->max - 1];
+        }
         else
+        {
           edgemsgno = Context->v2r[menu->top + menu->pagelen - 1];
+        }
       }
       else
+      {
         edgemsgno = Context->v2r[menu->top];
+      }
 
       for (tmp = h->thread->parent; tmp; tmp = tmp->parent)
       {
         if (!tmp->message)
+        {
           continue;
+        }
 
         /* if no ancestor is visible on current screen, provisionally force
          * subject... */
@@ -643,18 +735,24 @@ void index_make_entry(char *s, size_t l, struct Menu *menu, int num)
           break;
         }
         else if (tmp->message->virtual >= 0)
+        {
           break;
+        }
       }
       if (flag & MUTT_FORMAT_FORCESUBJ)
       {
         for (tmp = h->thread->prev; tmp; tmp = tmp->prev)
         {
           if (!tmp->message)
+          {
             continue;
+          }
 
           /* ...but if a previous sibling is available, don't force it */
           if (reverse ? tmp->message->msgno > edgemsgno : tmp->message->msgno < edgemsgno)
+          {
             break;
+          }
           else if (tmp->message->virtual >= 0)
           {
             flag &= ~MUTT_FORMAT_FORCESUBJ;
@@ -671,16 +769,22 @@ void index_make_entry(char *s, size_t l, struct Menu *menu, int num)
 int index_color(int index_no)
 {
   if (!Context || (index_no < 0))
+  {
     return 0;
+  }
 
   struct Header *h = Context->hdrs[Context->v2r[index_no]];
 
   if (h && h->pair)
+  {
     return h->pair;
+  }
 
   mutt_set_header_color(Context, h);
   if (h)
+  {
     return h->pair;
+  }
 
   return 0;
 }
@@ -713,7 +817,9 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
   } *syntax = NULL;
 
   if (!buf)
+  {
     return;
+  }
 
   do
   {
@@ -721,7 +827,9 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
     found = false;
 
     if (!buf[offset])
+    {
       break;
+    }
 
     /* loop through each "color status regex" */
     STAILQ_FOREACH(cl, &ColorStatusList, entries)
@@ -729,13 +837,17 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
       regmatch_t pmatch[cl->match + 1];
 
       if (regexec(&cl->regex, buf + offset, cl->match + 1, pmatch, 0) != 0)
+      {
         continue; /* regex doesn't match the status bar */
+      }
 
       int first = pmatch[cl->match].rm_so + offset;
       int last = pmatch[cl->match].rm_eo + offset;
 
       if (first == last)
+      {
         continue; /* ignore an empty regex */
+      }
 
       if (!found)
       {
@@ -771,7 +883,9 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
     addnstr(buf, MIN(len, syntax[0].first));
     attrset(ColorDefs[MT_COLOR_STATUS]);
     if (len <= syntax[0].first)
+    {
       goto dsl_finish; /* no more room */
+    }
 
     offset = syntax[0].first;
   }
@@ -782,7 +896,9 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
     attrset(syntax[i].color);
     addnstr(buf + offset, MIN(len, syntax[i].last) - offset);
     if (len <= syntax[i].last)
+    {
       goto dsl_finish; /* no more room */
+    }
 
     int next;
     if ((i + 1) == chunks)
@@ -800,7 +916,9 @@ void mutt_draw_statusline(int cols, const char *buf, int buflen)
 
     offset = next;
     if (offset >= len)
+    {
       goto dsl_finish; /* no more room */
+    }
   }
 
   attrset(ColorDefs[MT_COLOR_STATUS]);
@@ -874,9 +992,13 @@ static void index_menu_redraw(struct Menu *menu)
       menu->redraw |= REDRAW_STATUS;
     }
     else if (menu->redraw & (REDRAW_MOTION_RESYNCH | REDRAW_MOTION))
+    {
       menu_redraw_motion(menu);
+    }
     else if (menu->redraw & REDRAW_CURRENT)
+    {
       menu_redraw_current(menu);
+    }
   }
 
   if (menu->redraw & REDRAW_STATUS)
@@ -937,7 +1059,9 @@ int mutt_index_menu(void)
   mutt_push_current_menu(menu);
 
   if (!attach_msg)
+  {
     mutt_buffy_check(true); /* force the buffy check after we enter the folder */
+  }
 
   if (((Sort & SORT_MASK) == SORT_THREADS) && option(OPT_COLLAPSE_ALL))
   {
@@ -951,14 +1075,18 @@ int mutt_index_menu(void)
      * the prefix on a timeout (op==-2), but do clear on an abort (op==-1)
      */
     if (tag && op != OP_TAG_PREFIX && op != OP_TAG_PREFIX_COND && op != -2)
+    {
       tag = false;
+    }
 
     /* check if we need to resort the index because just about
      * any 'op' below could do mutt_enter_command(), either here or
      * from any new menu launched, and change $sort/$sort_aux
      */
     if (option(OPT_NEED_RESORT) && Context && Context->msgcount && menu->current >= 0)
+    {
       resort_index(menu);
+    }
 
     menu->max = Context ? Context->vcount : 0;
     oldcount = Context ? Context->msgcount : 0;
@@ -971,7 +1099,9 @@ int mutt_index_menu(void)
     }
 
     if (Context)
+    {
       Context->menu = menu;
+    }
 
     if (Context && !attach_msg)
     {
@@ -1001,8 +1131,10 @@ int mutt_index_menu(void)
       {
         /* notify the user of new mail */
         if (check == MUTT_REOPENED)
+        {
           mutt_error(
               _("Mailbox was externally modified.  Flags may be wrong."));
+        }
         else if (check == MUTT_NEW_MAIL)
         {
           for (i = oldcount; i < Context->msgcount; i++)
@@ -1011,7 +1143,9 @@ int mutt_index_menu(void)
             {
               mutt_message(_("New mail in this mailbox."));
               if (option(OPT_BEEP_NEW))
+              {
                 beep();
+              }
               if (NewMailCommand)
               {
                 char cmd[LONG_STRING];
@@ -1023,7 +1157,9 @@ int mutt_index_menu(void)
           }
         }
         else if (check == MUTT_FLAGS)
+        {
           mutt_message(_("Mailbox was externally modified."));
+        }
 
         /* avoid the message being overwritten by buffy */
         do_buffy_notify = false;
@@ -1045,14 +1181,18 @@ int mutt_index_menu(void)
       /* check for new mail in the incoming folders */
       oldcount = newcount;
       if ((newcount = mutt_buffy_check(false)) != oldcount)
+      {
         menu->redraw |= REDRAW_STATUS;
+      }
       if (do_buffy_notify)
       {
         if (mutt_buffy_notify())
         {
           menu->redraw |= REDRAW_STATUS;
           if (option(OPT_BEEP_NEW))
+          {
             beep();
+          }
           if (NewMailCommand)
           {
             char cmd[LONG_STRING];
@@ -1062,11 +1202,15 @@ int mutt_index_menu(void)
         }
       }
       else
+      {
         do_buffy_notify = true;
+      }
     }
 
     if (op >= 0)
+    {
       mutt_curs_set(0);
+    }
 
     if (menu->menu == MENU_MAIN)
     {
@@ -1080,17 +1224,27 @@ int mutt_index_menu(void)
       }
 
       if (menu->current < menu->max)
+      {
         menu->oldcurrent = menu->current;
+      }
       else
+      {
         menu->oldcurrent = -1;
+      }
 
       if (option(OPT_ARROW_CURSOR))
+      {
         mutt_window_move(MuttIndexWindow, menu->current - menu->top + menu->offset, 2);
+      }
       else if (option(OPT_BRAILLE_FRIENDLY))
+      {
         mutt_window_move(MuttIndexWindow, menu->current - menu->top + menu->offset, 0);
+      }
       else
+      {
         mutt_window_move(MuttIndexWindow, menu->current - menu->top + menu->offset,
                          MuttIndexWindow->cols - 1);
+      }
       mutt_refresh();
 
 #if defined(USE_SLANG_CURSES) || defined(HAVE_RESIZETERM)
@@ -1118,7 +1272,9 @@ int mutt_index_menu(void)
       {
         mutt_timeout_hook();
         if (tag)
+        {
           mutt_window_clearline(MuttMessageWindow, 0);
+        }
         continue;
       }
 
@@ -1144,7 +1300,9 @@ int mutt_index_menu(void)
         if (!Context->tagged)
         {
           if (op == OP_TAG_PREFIX)
+          {
             mutt_error(_("No tagged messages."));
+          }
           else if (op == OP_TAG_PREFIX_COND)
           {
             mutt_flush_macro_to_endcond();
@@ -1158,16 +1316,22 @@ int mutt_index_menu(void)
         continue;
       }
       else if (option(OPT_AUTO_TAG) && Context && Context->tagged)
+      {
         tag = true;
+      }
 
       mutt_clear_error();
     }
     else
     {
       if (menu->current < menu->max)
+      {
         menu->oldcurrent = menu->current;
+      }
       else
+      {
         menu->oldcurrent = -1;
+      }
 
       mutt_curs_set(1); /* fallback from the pager */
     }
@@ -1178,7 +1342,9 @@ int mutt_index_menu(void)
 
 #ifdef USE_NOTMUCH
     if (Context)
+    {
       nm_debug_check(Context);
+    }
 #endif
 
     switch (op)
@@ -1248,7 +1414,9 @@ int mutt_index_menu(void)
             buf[0] = 0;
             if (mutt_get_field(_("Enter Message-Id: "), buf, sizeof(buf), 0) != 0 ||
                 !buf[0])
+            {
               break;
+            }
           }
           else
           {
@@ -1260,7 +1428,9 @@ int mutt_index_menu(void)
             strfcpy(buf, STAILQ_FIRST(&CURHDR->env->references)->data, sizeof(buf));
           }
           if (!Context->id_hash)
+          {
             Context->id_hash = mutt_make_id_hash(Context);
+          }
           hdr = hash_find(Context->id_hash, buf);
           if (hdr)
           {
@@ -1277,7 +1447,9 @@ int mutt_index_menu(void)
               menu->redraw = REDRAW_MOTION_RESYNCH;
             }
             else
+            {
               mutt_error(_("Message is not visible in limited view."));
+            }
           }
           else
           {
@@ -1293,7 +1465,9 @@ int mutt_index_menu(void)
               menu->redraw = REDRAW_FULL;
             }
             else if (rc2 > 0)
+            {
               mutt_error(_("Article %s not found on the server."), buf);
+            }
           }
         }
         break;
@@ -1318,7 +1492,9 @@ int mutt_index_menu(void)
 
           mutt_message(_("Fetching message headers..."));
           if (!Context->id_hash)
+          {
             Context->id_hash = mutt_make_id_hash(Context);
+          }
           strfcpy(buf, CURHDR->env->message_id, sizeof(buf));
 
           /* trying to find msgid of the root message */
@@ -1331,18 +1507,24 @@ int mutt_index_menu(void)
               {
                 rc2 = nntp_check_msgid(Context, ref->data);
                 if (rc2 < 0)
+                {
                   break;
+                }
               }
 
               /* the last msgid in References is the root message */
               if (!STAILQ_NEXT(ref, entries))
+              {
                 strfcpy(buf, ref->data, sizeof(buf));
+              }
             }
           }
 
           /* fetching all child messages */
           if (rc2 >= 0)
+          {
             rc2 = nntp_check_children(Context, buf);
+          }
 
           /* at least one message has been loaded */
           if (Context->msgcount > oldmsgcount)
@@ -1353,7 +1535,9 @@ int mutt_index_menu(void)
             bool quiet = Context->quiet;
 
             if (rc2 < 0)
+            {
               Context->quiet = true;
+            }
             mutt_sort_headers(Context, (op == OP_RECONSTRUCT_THREAD));
             Context->quiet = quiet;
 
@@ -1370,9 +1554,11 @@ int mutt_index_menu(void)
             /* if the root message was retrieved, move to it */
             hdr = hash_find(Context->id_hash, buf);
             if (hdr)
+            {
               menu->current = hdr->virtual;
 
-            /* try to restore old position */
+              /* try to restore old position */
+            }
             else
             {
               for (k = 0; k < Context->msgcount; k++)
@@ -1409,7 +1595,9 @@ int mutt_index_menu(void)
         CHECK_MSGCOUNT;
         CHECK_VISIBLE;
         if (isdigit(LastKey))
+        {
           mutt_unget_event(LastKey, 0);
+        }
         buf[0] = 0;
         if (mutt_get_field(_("Jump to message: "), buf, sizeof(buf), 0) != 0 || !buf[0])
         {
@@ -1432,14 +1620,18 @@ int mutt_index_menu(void)
           for (j = i - 1; j < Context->msgcount; j++)
           {
             if (Context->hdrs[j]->virtual != -1)
+            {
               break;
+            }
           }
           if (j >= Context->msgcount)
           {
             for (j = i - 2; j >= 0; j--)
             {
               if (Context->hdrs[j]->virtual != -1)
+              {
                 break;
+              }
             }
           }
 
@@ -1452,13 +1644,19 @@ int mutt_index_menu(void)
               continue;
             }
             else
+            {
               menu->redraw = REDRAW_MOTION;
+            }
           }
           else
+          {
             mutt_error(_("That message is not visible."));
+          }
         }
         else
+        {
           mutt_error(_("Invalid message number."));
+        }
 
         break;
 
@@ -1497,7 +1695,9 @@ int mutt_index_menu(void)
       case OP_MAIN_SHOW_LIMIT:
         CHECK_IN_MAILBOX;
         if (!Context->pattern)
+        {
           mutt_message(_("No limit pattern is in effect."));
+        }
         else
         {
           char buf2[STRING];
@@ -1530,7 +1730,9 @@ int mutt_index_menu(void)
           {
             strfcpy(buf2, Context->pattern + 8, sizeof(buf2));
             if (!*buf2 || (strncmp(buf2, ".*", 2) == 0))
+            {
               snprintf(buf2, sizeof(buf2), "~A");
+            }
             unset_option(OPT_HIDE_READ);
           }
           FREE(&Context->pattern);
@@ -1547,22 +1749,32 @@ int mutt_index_menu(void)
             /* try to find what used to be the current message */
             menu->current = -1;
             for (i = 0; i < Context->vcount; i++)
+            {
               if (Context->hdrs[Context->v2r[i]]->index == menu->oldcurrent)
               {
                 menu->current = i;
                 break;
               }
+            }
             if (menu->current < 0)
+            {
               menu->current = 0;
+            }
           }
           else
+          {
             menu->current = 0;
+          }
           if (Context->msgcount && (Sort & SORT_MASK) == SORT_THREADS)
+          {
             mutt_draw_tree(Context);
+          }
           menu->redraw = REDRAW_FULL;
         }
         if (Context->pattern)
+        {
           mutt_message(_("To view all messages, limit to \"all\"."));
+        }
         break;
 
       case OP_QUIT:
@@ -1583,11 +1795,15 @@ int mutt_index_menu(void)
           mutt_startup_shutdown_hook(MUTT_SHUTDOWNHOOK);
 
           if (!Context || (check = mx_close_mailbox(Context, &index_hint)) == 0)
+          {
             done = true;
+          }
           else
           {
             if (check == MUTT_NEW_MAIL || check == MUTT_REOPENED)
+            {
               update_index(menu, Context, check, oldcount, index_hint);
+            }
 
             menu->redraw = REDRAW_FULL; /* new mail arrived? */
             set_option(OPT_SEARCH_INVALID);
@@ -1609,9 +1825,13 @@ int mutt_index_menu(void)
         CHECK_MSGCOUNT;
         CHECK_VISIBLE;
         if ((menu->current = mutt_search_command(menu->current, op)) == -1)
+        {
           menu->current = menu->oldcurrent;
+        }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_SORT:
@@ -1640,7 +1860,9 @@ int mutt_index_menu(void)
         if (tag && !option(OPT_AUTO_TAG))
         {
           for (j = 0; j < Context->vcount; j++)
+          {
             mutt_set_flag(Context, Context->hdrs[Context->v2r[j]], MUTT_TAG, 0);
+          }
           menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
         }
         else
@@ -1659,7 +1881,9 @@ int mutt_index_menu(void)
             menu->redraw |= REDRAW_MOTION_RESYNCH;
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
         }
         break;
 
@@ -1681,7 +1905,9 @@ int mutt_index_menu(void)
 
         if (mutt_pattern_func(MUTT_UNDELETE,
                               _("Undelete messages matching: ")) == 0)
+        {
           menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
+        }
         break;
 
       case OP_MAIN_UNTAG_PATTERN:
@@ -1689,7 +1915,9 @@ int mutt_index_menu(void)
         CHECK_MSGCOUNT;
         CHECK_VISIBLE;
         if (mutt_pattern_func(MUTT_UNTAG, _("Untag messages matching: ")) == 0)
+        {
           menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
+        }
         break;
 
       case OP_COMPOSE_TO_SENDER:
@@ -1707,7 +1935,9 @@ int mutt_index_menu(void)
 #ifdef USE_IMAP
       case OP_MAIN_IMAP_FETCH:
         if (Context && Context->magic == MUTT_IMAP)
+        {
           imap_check_mailbox(Context, 1);
+        }
         break;
 
       case OP_MAIN_IMAP_LOGOUT_ALL:
@@ -1731,7 +1961,9 @@ int mutt_index_menu(void)
       case OP_MAIN_SYNC_FOLDER:
 
         if (Context && !Context->msgcount)
+        {
           break;
+        }
 
         CHECK_MSGCOUNT;
         CHECK_READONLY;
@@ -1748,16 +1980,23 @@ int mutt_index_menu(void)
              * should be on. #3092 */
             newidx = menu->current;
             if (CURHDR->deleted)
+            {
               newidx = ci_next_undeleted(menu->current);
+            }
             if (newidx < 0)
+            {
               newidx = ci_previous_undeleted(menu->current);
+            }
             if (newidx >= 0)
+            {
               newhdr = Context->hdrs[Context->v2r[newidx]];
+            }
           }
 
           if ((check = mx_sync_mailbox(Context, &index_hint)) == 0)
           {
             if (newhdr && Context->vcount != ovc)
+            {
               for (j = 0; j < Context->vcount; j++)
               {
                 if (Context->hdrs[Context->v2r[j]] == newhdr)
@@ -1766,22 +2005,29 @@ int mutt_index_menu(void)
                   break;
                 }
               }
+            }
             set_option(OPT_SEARCH_INVALID);
           }
           else if (check == MUTT_NEW_MAIL || check == MUTT_REOPENED)
+          {
             update_index(menu, Context, check, oc, index_hint);
+          }
 
           /*
            * do a sanity check even if mx_sync_mailbox failed.
            */
 
           if (menu->current < 0 || menu->current >= Context->vcount)
+          {
             menu->current = ci_first_message();
+          }
         }
 
         /* check for a fatal error, or all messages deleted */
         if (!Context->path)
+        {
           FREE(&Context);
+        }
 
         /* if we were in the pager, redisplay the message */
         if (menu->menu == MENU_PAGER)
@@ -1790,7 +2036,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_FULL;
+        }
         break;
 
       case OP_MAIN_QUASI_DELETE:
@@ -1835,7 +2083,9 @@ int mutt_index_menu(void)
           struct Header *oldcur = CURHDR;
 
           if ((Sort & SORT_MASK) == SORT_THREADS)
+          {
             mutt_sort_headers(Context, 0);
+          }
           menu->current = oldcur->virtual;
           menu->redraw = REDRAW_STATUS | REDRAW_INDEX;
 
@@ -1867,11 +2117,15 @@ int mutt_index_menu(void)
         CHECK_READONLY;
         char *tags = NULL;
         if (!tag)
+        {
           tags = driver_tags_get_with_hidden(&CURHDR->tags);
+        }
         rc = mx_tags_editor(Context, tags, buf, sizeof(buf));
         FREE(&tags);
         if (rc < 0)
+        {
           break;
+        }
         else if (rc == 0)
         {
           mutt_message(_("No tag specified, aborting."));
@@ -1892,22 +2146,28 @@ int mutt_index_menu(void)
 
 #ifdef USE_NOTMUCH
           if (Context->magic == MUTT_NOTMUCH)
+          {
             nm_longrun_init(Context, true);
+          }
 #endif
           for (px = 0, j = 0; j < Context->vcount; j++)
           {
             if (Context->hdrs[Context->v2r[j]]->tagged)
             {
               if (!Context->quiet)
+              {
                 mutt_progress_update(&progress, ++px, -1);
+              }
               mx_tags_commit(Context, Context->hdrs[Context->v2r[j]], buf);
               if (op == OP_MAIN_MODIFY_TAGS_THEN_HIDE)
               {
                 bool still_queried = false;
 #ifdef USE_NOTMUCH
                 if (Context->magic == MUTT_NOTMUCH)
+                {
                   still_queried = nm_message_is_still_queried(
                       Context, Context->hdrs[Context->v2r[j]]);
+                }
 #endif
                 Context->hdrs[Context->v2r[j]]->quasi_deleted = !still_queried;
                 Context->changed = true;
@@ -1916,7 +2176,9 @@ int mutt_index_menu(void)
           }
 #ifdef USE_NOTMUCH
           if (Context->magic == MUTT_NOTMUCH)
+          {
             nm_longrun_done(Context);
+          }
 #endif
           menu->redraw = REDRAW_STATUS | REDRAW_INDEX;
         }
@@ -1945,10 +2207,14 @@ int mutt_index_menu(void)
               menu->redraw = REDRAW_CURRENT;
             }
             else
+            {
               menu->redraw = REDRAW_MOTION_RESYNCH;
+            }
           }
           else
+          {
             menu->redraw = REDRAW_CURRENT;
+          }
         }
         menu->redraw |= REDRAW_STATUS;
         break;
@@ -1963,9 +2229,13 @@ int mutt_index_menu(void)
           break;
         }
         if (!nm_uri_from_query(Context, buf, sizeof(buf)))
+        {
           mutt_message(_("Failed to create query, aborting."));
+        }
         else
+        {
           main_change_folder(menu, op, buf, sizeof(buf), &oldcount, &index_hint, 0);
+        }
         break;
 
       case OP_MAIN_WINDOWED_VFOLDER_BACKWARD:
@@ -1983,9 +2253,13 @@ int mutt_index_menu(void)
         nm_query_window_backward();
         strncpy(buf, NmQueryWindowCurrentSearch, sizeof(buf));
         if (!nm_uri_from_query(Context, buf, sizeof(buf)))
+        {
           mutt_message(_("Failed to create query, aborting."));
+        }
         else
+        {
           main_change_folder(menu, op, buf, sizeof(buf), &oldcount, &index_hint, 0);
+        }
         break;
 
       case OP_MAIN_WINDOWED_VFOLDER_FORWARD:
@@ -2002,7 +2276,9 @@ int mutt_index_menu(void)
         nm_query_window_forward();
         strncpy(buf, NmQueryWindowCurrentSearch, sizeof(buf));
         if (!nm_uri_from_query(Context, buf, sizeof(buf)))
+        {
           mutt_message(_("Failed to create query, aborting."));
+        }
         else
         {
           mutt_debug(2, "nm: + windowed query (%s)\n", buf);
@@ -2029,18 +2305,28 @@ int mutt_index_menu(void)
             op == OP_MAIN_CHANGE_GROUP_READONLY ||
 #endif
             op == OP_MAIN_CHANGE_FOLDER_READONLY)
+        {
           flags = MUTT_READONLY;
+        }
         else
+        {
           flags = 0;
+        }
 
         if (flags)
+        {
           cp = _("Open mailbox in read-only mode");
 #ifdef USE_NOTMUCH
+        }
         else if (op == OP_MAIN_CHANGE_VFOLDER)
+        {
           cp = _("Open virtual folder");
 #endif
+        }
         else
+        {
           cp = _("Open mailbox");
+        }
 
         buf[0] = '\0';
         if ((op == OP_MAIN_NEXT_UNREAD_MAILBOX) && Context && Context->path)
@@ -2059,7 +2345,9 @@ int mutt_index_menu(void)
         {
           const char *path = mutt_sb_get_highlight();
           if (!path || !*path)
+          {
             break;
+          }
           strncpy(buf, path, sizeof(buf));
 
           /* Mark the selected dir for the neomutt browser */
@@ -2090,18 +2378,26 @@ int mutt_index_menu(void)
             set_option(OPT_NEWS);
             CurrentNewsSrv = nntp_select_server(NewsServer, 0);
             if (!CurrentNewsSrv)
+            {
               break;
+            }
             if (flags)
+            {
               cp = _("Open newsgroup in read-only mode");
+            }
             else
+            {
               cp = _("Open newsgroup");
+            }
             nntp_buffy(buf, sizeof(buf));
           }
           else
+          {
 #endif
             /* By default, fill buf with the next mailbox that contains unread
            * mail */
             mutt_buffy(buf, sizeof(buf));
+          }
 
           if (mutt_enter_fname(cp, buf, sizeof(buf), 1) == -1)
           {
@@ -2111,7 +2407,9 @@ int mutt_index_menu(void)
               continue;
             }
             else
+            {
               break;
+            }
           }
 
           /* Selected directory is okay, let's save it. */
@@ -2147,7 +2445,9 @@ int mutt_index_menu(void)
          * again while reading the message.
          */
         if (op == OP_DISPLAY_HEADERS)
+        {
           toggle_option(OPT_WEED);
+        }
 
         unset_option(OPT_NEED_RESORT);
 
@@ -2156,12 +2456,16 @@ int mutt_index_menu(void)
           mutt_uncollapse_thread(Context, CURHDR);
           mutt_set_virtual(Context);
           if (option(OPT_UNCOLLAPSE_JUMP))
+          {
             menu->current = mutt_thread_next_unread(Context, CURHDR);
+          }
         }
 
         if (option(OPT_PGP_AUTO_DECODE) &&
             (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
         int hint = Context->hdrs[Context->v2r[menu->current]]->index;
 
         /* If we are returning to the pager via an index menu redirection, we
@@ -2181,7 +2485,9 @@ int mutt_index_menu(void)
         menu->menu = MENU_PAGER;
         menu->oldcurrent = menu->current;
         if (Context)
+        {
           update_index(menu, Context, MUTT_NEW_MAIL, Context->msgcount, hint);
+        }
 
         continue;
 
@@ -2214,7 +2520,9 @@ int mutt_index_menu(void)
         CHECK_ACL(MUTT_ACL_WRITE, _("Cannot break thread"));
 
         if ((Sort & SORT_MASK) != SORT_THREADS)
+        {
           mutt_error(_("Threading is not enabled."));
+        }
         else if (!STAILQ_EMPTY(&CURHDR->env->in_reply_to) ||
                  !STAILQ_EMPTY(&CURHDR->env->references))
         {
@@ -2235,11 +2543,15 @@ int mutt_index_menu(void)
             continue;
           }
           else
+          {
             menu->redraw |= REDRAW_INDEX;
+          }
         }
         else
+        {
           mutt_error(
               _("Thread cannot be broken, message is not part of a thread"));
+        }
 
         break;
 
@@ -2252,11 +2564,17 @@ int mutt_index_menu(void)
         CHECK_ACL(MUTT_ACL_WRITE, _("Cannot link threads"));
 
         if ((Sort & SORT_MASK) != SORT_THREADS)
+        {
           mutt_error(_("Threading is not enabled."));
+        }
         else if (!CURHDR->env->message_id)
+        {
           mutt_error(_("No Message-ID: header available to link thread"));
+        }
         else if (!tag && (!Context->last_tag || !Context->last_tag->tagged))
+        {
           mutt_error(_("First, please tag a message to be linked here"));
+        }
         else
         {
           struct Header *oldcur = CURHDR;
@@ -2270,7 +2588,9 @@ int mutt_index_menu(void)
             mutt_message(_("Threads linked"));
           }
           else
+          {
             mutt_error(_("No thread linked"));
+          }
         }
 
         if (menu->menu == MENU_PAGER)
@@ -2279,7 +2599,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
+        }
 
         break;
 
@@ -2296,7 +2618,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_CURRENT;
+        }
         break;
 
       case OP_MAIN_NEXT_UNDELETED:
@@ -2306,14 +2630,18 @@ int mutt_index_menu(void)
         if (menu->current >= Context->vcount - 1)
         {
           if (menu->menu == MENU_MAIN)
+          {
             mutt_error(_("You are on the last message."));
+          }
           break;
         }
         if ((menu->current = ci_next_undeleted(menu->current)) == -1)
         {
           menu->current = menu->oldcurrent;
           if (menu->menu == MENU_MAIN)
+          {
             mutt_error(_("No undeleted messages."));
+          }
         }
         else if (menu->menu == MENU_PAGER)
         {
@@ -2321,7 +2649,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_NEXT_ENTRY:
@@ -2331,7 +2661,9 @@ int mutt_index_menu(void)
         if (menu->current >= Context->vcount - 1)
         {
           if (menu->menu == MENU_MAIN)
+          {
             mutt_error(_("You are on the last message."));
+          }
           break;
         }
         menu->current++;
@@ -2341,7 +2673,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_MAIN_PREV_UNDELETED:
@@ -2357,7 +2691,9 @@ int mutt_index_menu(void)
         {
           menu->current = menu->oldcurrent;
           if (menu->menu == MENU_MAIN)
+          {
             mutt_error(_("No undeleted messages."));
+          }
         }
         else if (menu->menu == MENU_PAGER)
         {
@@ -2365,7 +2701,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_PREV_ENTRY:
@@ -2375,7 +2713,9 @@ int mutt_index_menu(void)
         if (menu->current < 1)
         {
           if (menu->menu == MENU_MAIN)
+          {
             mutt_error(_("You are on the first message."));
+          }
           break;
         }
         menu->current--;
@@ -2385,13 +2725,17 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_DECRYPT_COPY:
       case OP_DECRYPT_SAVE:
         if (!WithCrypto)
+        {
           break;
+        }
       /* fall thru */
       case OP_COPY_MESSAGE:
       case OP_SAVE:
@@ -2407,7 +2751,9 @@ int mutt_index_menu(void)
         {
           menu->redraw |= REDRAW_STATUS;
           if (tag)
+          {
             menu->redraw |= REDRAW_INDEX;
+          }
           else if (option(OPT_RESOLVE))
           {
             if ((menu->current = ci_next_undeleted(menu->current)) == -1)
@@ -2416,10 +2762,14 @@ int mutt_index_menu(void)
               menu->redraw |= REDRAW_CURRENT;
             }
             else
+            {
               menu->redraw |= REDRAW_MOTION_RESYNCH;
+            }
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
         }
         break;
 
@@ -2464,34 +2814,50 @@ int mutt_index_menu(void)
           if (CURHDRi->collapsed && (Sort & SORT_MASK) == SORT_THREADS)
           {
             if (UNREAD(CURHDRi) && first_unread == -1)
+            {
               first_unread = i;
+            }
             if (UNREAD(CURHDRi) == 1 && first_new == -1)
+            {
               first_new = i;
+            }
           }
           else if ((!CURHDRi->deleted && !CURHDRi->read))
           {
             if (first_unread == -1)
+            {
               first_unread = i;
+            }
             if ((!CURHDRi->old) && first_new == -1)
+            {
               first_new = i;
+            }
           }
 
           if ((op == OP_MAIN_NEXT_UNREAD || op == OP_MAIN_PREV_UNREAD) && first_unread != -1)
+          {
             break;
+          }
           if ((op == OP_MAIN_NEXT_NEW || op == OP_MAIN_PREV_NEW ||
                op == OP_MAIN_NEXT_NEW_THEN_UNREAD || op == OP_MAIN_PREV_NEW_THEN_UNREAD) &&
               first_new != -1)
+          {
             break;
+          }
         }
 #undef CURHDRi
         if ((op == OP_MAIN_NEXT_NEW || op == OP_MAIN_PREV_NEW ||
              op == OP_MAIN_NEXT_NEW_THEN_UNREAD || op == OP_MAIN_PREV_NEW_THEN_UNREAD) &&
             first_new != -1)
+        {
           menu->current = first_new;
+        }
         else if ((op == OP_MAIN_NEXT_UNREAD || op == OP_MAIN_PREV_UNREAD ||
                   op == OP_MAIN_NEXT_NEW_THEN_UNREAD || op == OP_MAIN_PREV_NEW_THEN_UNREAD) &&
                  first_unread != -1)
+        {
           menu->current = first_unread;
+        }
 
         if (menu->current == -1)
         {
@@ -2499,16 +2865,24 @@ int mutt_index_menu(void)
           if (op == OP_MAIN_NEXT_NEW || op == OP_MAIN_PREV_NEW)
           {
             if (Context->pattern)
+            {
               mutt_error(_("No new messages in this limited view."));
+            }
             else
+            {
               mutt_error(_("No new messages."));
+            }
           }
           else
           {
             if (Context->pattern)
+            {
               mutt_error(_("No unread messages in this limited view."));
+            }
             else
+            {
               mutt_error(_("No unread messages."));
+            }
           }
         }
         else if (menu->menu == MENU_PAGER)
@@ -2517,7 +2891,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
       }
       case OP_FLAG_MESSAGE:
@@ -2533,8 +2909,10 @@ int mutt_index_menu(void)
           for (j = 0; j < Context->vcount; j++)
           {
             if (Context->hdrs[Context->v2r[j]]->tagged)
+            {
               mutt_set_flag(Context, Context->hdrs[Context->v2r[j]], MUTT_FLAG,
                             !Context->hdrs[Context->v2r[j]]->flagged);
+            }
           }
 
           menu->redraw |= REDRAW_INDEX;
@@ -2550,10 +2928,14 @@ int mutt_index_menu(void)
               menu->redraw |= REDRAW_CURRENT;
             }
             else
+            {
               menu->redraw |= REDRAW_MOTION_RESYNCH;
+            }
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
         }
         menu->redraw |= REDRAW_STATUS;
         break;
@@ -2574,9 +2956,13 @@ int mutt_index_menu(void)
             {
               if (Context->hdrs[Context->v2r[j]]->read ||
                   Context->hdrs[Context->v2r[j]]->old)
+              {
                 mutt_set_flag(Context, Context->hdrs[Context->v2r[j]], MUTT_NEW, 1);
+              }
               else
+              {
                 mutt_set_flag(Context, Context->hdrs[Context->v2r[j]], MUTT_READ, 1);
+              }
             }
           }
           menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
@@ -2584,9 +2970,13 @@ int mutt_index_menu(void)
         else
         {
           if (CURHDR->read || CURHDR->old)
+          {
             mutt_set_flag(Context, CURHDR, MUTT_NEW, 1);
+          }
           else
+          {
             mutt_set_flag(Context, CURHDR, MUTT_READ, 1);
+          }
 
           if (option(OPT_RESOLVE))
           {
@@ -2596,10 +2986,14 @@ int mutt_index_menu(void)
               menu->redraw |= REDRAW_CURRENT;
             }
             else
+            {
               menu->redraw |= REDRAW_MOTION_RESYNCH;
+            }
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
           menu->redraw |= REDRAW_STATUS;
         }
         break;
@@ -2608,7 +3002,9 @@ int mutt_index_menu(void)
 
         CHECK_IN_MAILBOX;
         if (mx_toggle_write(Context) == 0)
+        {
           menu->redraw |= REDRAW_STATUS;
+        }
         break;
 
       case OP_MAIN_NEXT_THREAD:
@@ -2641,9 +3037,13 @@ int mutt_index_menu(void)
         {
           menu->current = menu->oldcurrent;
           if (op == OP_MAIN_NEXT_THREAD || op == OP_MAIN_NEXT_SUBTHREAD)
+          {
             mutt_error(_("No more threads."));
+          }
           else
+          {
             mutt_error(_("You are on the first thread."));
+          }
         }
         else if (menu->menu == MENU_PAGER)
         {
@@ -2651,7 +3051,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_MAIN_ROOT_MESSAGE:
@@ -2670,7 +3072,9 @@ int mutt_index_menu(void)
           continue;
         }
         else
+        {
           menu->redraw = REDRAW_MOTION;
+        }
         break;
 
       case OP_MAIN_SET_FLAG:
@@ -2685,7 +3089,9 @@ int mutt_index_menu(void)
         {
           menu->redraw |= REDRAW_STATUS;
           if (tag)
+          {
             menu->redraw |= REDRAW_INDEX;
+          }
           else if (option(OPT_RESOLVE))
           {
             if ((menu->current = ci_next_undeleted(menu->current)) == -1)
@@ -2694,10 +3100,14 @@ int mutt_index_menu(void)
               menu->redraw |= REDRAW_CURRENT;
             }
             else
+            {
               menu->redraw |= REDRAW_MOTION_RESYNCH;
+            }
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
         }
         break;
 
@@ -2716,7 +3126,9 @@ int mutt_index_menu(void)
           menu->current = mutt_uncollapse_thread(Context, CURHDR);
           mutt_set_virtual(Context);
           if (option(OPT_UNCOLLAPSE_JUMP))
+          {
             menu->current = mutt_thread_next_unread(Context, CURHDR);
+          }
         }
         else if (CAN_COLLAPSE(CURHDR))
         {
@@ -2782,7 +3194,9 @@ int mutt_index_menu(void)
           mutt_tag_set_flag(MUTT_DELETE, 1);
           mutt_tag_set_flag(MUTT_PURGE, (op == OP_PURGE_MESSAGE));
           if (option(OPT_DELETE_UNTAG))
+          {
             mutt_tag_set_flag(MUTT_TAG, 0);
+          }
           menu->redraw |= REDRAW_INDEX;
         }
         else
@@ -2790,7 +3204,9 @@ int mutt_index_menu(void)
           mutt_set_flag(Context, CURHDR, MUTT_DELETE, 1);
           mutt_set_flag(Context, CURHDR, MUTT_PURGE, (op == OP_PURGE_MESSAGE));
           if (option(OPT_DELETE_UNTAG))
+          {
             mutt_set_flag(Context, CURHDR, MUTT_TAG, 0);
+          }
           if (option(OPT_RESOLVE))
           {
             if ((menu->current = ci_next_undeleted(menu->current)) == -1)
@@ -2804,10 +3220,14 @@ int mutt_index_menu(void)
               continue;
             }
             else
+            {
               menu->redraw |= REDRAW_MOTION_RESYNCH;
+            }
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
         }
         menu->redraw |= REDRAW_STATUS;
         break;
@@ -2826,19 +3246,29 @@ int mutt_index_menu(void)
           int subthread = (op == OP_DELETE_SUBTHREAD);
           rc = mutt_thread_set_flag(CURHDR, MUTT_DELETE, 1, subthread);
           if (rc == -1)
+          {
             break;
+          }
           if (op == OP_PURGE_THREAD)
           {
             rc = mutt_thread_set_flag(CURHDR, MUTT_PURGE, 1, subthread);
             if (rc == -1)
+            {
               break;
+            }
           }
 
           if (option(OPT_DELETE_UNTAG))
+          {
             mutt_thread_set_flag(CURHDR, MUTT_TAG, 0, subthread);
+          }
           if (option(OPT_RESOLVE))
+          {
             if ((menu->current = ci_next_undeleted(menu->current)) == -1)
+            {
               menu->current = menu->oldcurrent;
+            }
+          }
           menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
         }
         break;
@@ -2852,7 +3282,9 @@ int mutt_index_menu(void)
         {
           struct NntpData *nntp_data = Context->data;
           if (mutt_newsgroup_catchup(nntp_data->nserv, nntp_data->group))
+          {
             menu->redraw = REDRAW_INDEX | REDRAW_STATUS;
+          }
         }
         break;
 #endif
@@ -2881,7 +3313,9 @@ int mutt_index_menu(void)
 
         if (option(OPT_PGP_AUTO_DECODE) &&
             (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
         mutt_edit_message(Context, tag ? NULL : CURHDR);
         menu->redraw = REDRAW_FULL;
 
@@ -2894,7 +3328,9 @@ int mutt_index_menu(void)
         CHECK_ATTACH;
         if (option(OPT_PGP_AUTO_DECODE) &&
             (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
         ci_send_message(SENDFORWARD, NULL, NULL, Context, tag ? NULL : CURHDR);
         menu->redraw = REDRAW_FULL;
         break;
@@ -2910,7 +3346,9 @@ int mutt_index_menu(void)
         CHECK_ATTACH;
         if (option(OPT_PGP_AUTO_DECODE) &&
             (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
         ci_send_message(SENDREPLY | SENDGROUPREPLY, NULL, NULL, Context, tag ? NULL : CURHDR);
         menu->redraw = REDRAW_FULL;
         break;
@@ -2945,7 +3383,9 @@ int mutt_index_menu(void)
         CHECK_VISIBLE;
         if (option(OPT_PGP_AUTO_DECODE) &&
             (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
         ci_send_message(SENDREPLY | SENDLISTREPLY, NULL, NULL, Context, tag ? NULL : CURHDR);
         menu->redraw = REDRAW_FULL;
         break;
@@ -2959,7 +3399,9 @@ int mutt_index_menu(void)
 
       case OP_MAIL_KEY:
         if (!(WithCrypto & APPLICATION_PGP))
+        {
           break;
+        }
         CHECK_ATTACH;
         ci_send_message(SENDKEY, NULL, NULL, NULL, NULL);
         menu->redraw = REDRAW_FULL;
@@ -2967,7 +3409,9 @@ int mutt_index_menu(void)
 
       case OP_EXTRACT_KEYS:
         if (!WithCrypto)
+        {
           break;
+        }
         CHECK_MSGCOUNT;
         CHECK_VISIBLE;
         crypt_extract_keys_from_messages(tag ? NULL : CURHDR);
@@ -2976,11 +3420,15 @@ int mutt_index_menu(void)
 
       case OP_CHECK_TRADITIONAL:
         if (!(WithCrypto & APPLICATION_PGP))
+        {
           break;
+        }
         CHECK_MSGCOUNT;
         CHECK_VISIBLE;
         if (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
 
         if (menu->menu == MENU_PAGER)
         {
@@ -3043,7 +3491,9 @@ int mutt_index_menu(void)
             if ((menu->current = (op == OP_MAIN_READ_THREAD ?
                                       mutt_next_thread(CURHDR) :
                                       mutt_next_subthread(CURHDR))) == -1)
+            {
               menu->current = menu->oldcurrent;
+            }
             else if (menu->menu == MENU_PAGER)
             {
               op = OP_DISPLAY_MESSAGE;
@@ -3085,9 +3535,11 @@ int mutt_index_menu(void)
           }
         }
         else
+        {
           /* L10N: This error is printed if <mark-message> cannot find a
              Message-ID for the currently selected message in the index. */
           mutt_error(_("No message ID to macro."));
+        }
         break;
 
       case OP_RECALL_MESSAGE:
@@ -3108,11 +3560,15 @@ int mutt_index_menu(void)
           for (j = 0; j < Context->vcount; j++)
           {
             if (Context->hdrs[Context->v2r[j]]->tagged)
+            {
               mutt_resend_message(NULL, Context, Context->hdrs[Context->v2r[j]]);
+            }
           }
         }
         else
+        {
           mutt_resend_message(NULL, Context, CURHDR);
+        }
 
         menu->redraw = REDRAW_FULL;
         break;
@@ -3134,9 +3590,13 @@ int mutt_index_menu(void)
         {
           if (Context && Context->magic == MUTT_NNTP &&
               !((struct NntpData *) Context->data)->allowed && query_quadoption(OPT_POST_MODERATED, _("Posting to this group not allowed, may be moderated. Continue?")) != MUTT_YES)
+          {
             break;
+          }
           if (op == OP_POST)
+          {
             ci_send_message(SENDNEWS, NULL, NULL, Context, NULL);
+          }
           else
           {
             CHECK_MSGCOUNT;
@@ -3155,7 +3615,9 @@ int mutt_index_menu(void)
         CHECK_VISIBLE;
         if (option(OPT_PGP_AUTO_DECODE) &&
             (tag || !(CURHDR->security & PGP_TRADITIONAL_CHECKED)))
+        {
           mutt_check_traditional_pgp(tag ? NULL : CURHDR, &menu->redraw);
+        }
         ci_send_message(SENDREPLY, NULL, NULL, Context, tag ? NULL : CURHDR);
         menu->redraw = REDRAW_FULL;
         break;
@@ -3178,12 +3640,18 @@ int mutt_index_menu(void)
           if (option(OPT_RESOLVE))
           {
             if (op == OP_TAG_THREAD)
+            {
               menu->current = mutt_next_thread(CURHDR);
+            }
             else
+            {
               menu->current = mutt_next_subthread(CURHDR);
+            }
 
             if (menu->current == -1)
+            {
               menu->current = menu->oldcurrent;
+            }
           }
           menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
         }
@@ -3213,7 +3681,9 @@ int mutt_index_menu(void)
             menu->redraw |= REDRAW_MOTION_RESYNCH;
           }
           else
+          {
             menu->redraw |= REDRAW_CURRENT;
+          }
         }
         menu->redraw |= REDRAW_STATUS;
         break;
@@ -3229,19 +3699,27 @@ int mutt_index_menu(void)
 
         rc = mutt_thread_set_flag(CURHDR, MUTT_DELETE, 0, op == OP_UNDELETE_THREAD ? 0 : 1);
         if (rc != -1)
+        {
           rc = mutt_thread_set_flag(CURHDR, MUTT_PURGE, 0,
                                     op == OP_UNDELETE_THREAD ? 0 : 1);
+        }
         if (rc != -1)
         {
           if (option(OPT_RESOLVE))
           {
             if (op == OP_UNDELETE_THREAD)
+            {
               menu->current = mutt_next_thread(CURHDR);
+            }
             else
+            {
               menu->current = mutt_next_subthread(CURHDR);
+            }
 
             if (menu->current == -1)
+            {
               menu->current = menu->oldcurrent;
+            }
           }
           menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
         }
@@ -3260,7 +3738,9 @@ int mutt_index_menu(void)
         CHECK_VISIBLE;
         mutt_view_attachments(CURHDR);
         if (Context && CURHDR->attach_del)
+        {
           Context->changed = true;
+        }
         menu->redraw = REDRAW_FULL;
         break;
 
@@ -3292,12 +3772,16 @@ int mutt_index_menu(void)
 #endif
       default:
         if (menu->menu == MENU_MAIN)
+        {
           km_error_key(MENU_MAIN);
+        }
     }
 
 #ifdef USE_NOTMUCH
     if (Context)
+    {
       nm_debug_check(Context);
+    }
 #endif
 
     if (menu->menu == MENU_PAGER)
@@ -3308,7 +3792,9 @@ int mutt_index_menu(void)
     }
 
     if (done)
+    {
       break;
+    }
   }
 
   mutt_pop_current_menu(menu);
@@ -3322,7 +3808,9 @@ void mutt_set_header_color(struct Context *ctx, struct Header *curhdr)
   struct PatternCache cache;
 
   if (!curhdr)
+  {
     return;
+  }
 
   memset(&cache, 0, sizeof(cache));
 

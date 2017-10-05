@@ -52,7 +52,9 @@ static bool check_msg(struct Body *b, bool err)
   if (!mutt_is_message_type(b->type, b->subtype))
   {
     if (err)
+    {
       mutt_error(_("You may only bounce message/rfc822 parts."));
+    }
     return false;
   }
   return true;
@@ -61,7 +63,9 @@ static bool check_msg(struct Body *b, bool err)
 static bool check_all_msg(struct AttachCtx *actx, struct Body *cur, bool err)
 {
   if (cur && !check_msg(cur, err))
+  {
     return false;
+  }
   else if (!cur)
   {
     for (short i = 0; i < actx->idxlen; i++)
@@ -69,7 +73,9 @@ static bool check_all_msg(struct AttachCtx *actx, struct Body *cur, bool err)
       if (actx->idx[i]->content->tagged)
       {
         if (!check_msg(actx->idx[i]->content, err))
+        {
           return false;
+        }
       }
     }
   }
@@ -82,11 +88,17 @@ static bool check_all_msg(struct AttachCtx *actx, struct Body *cur, bool err)
 static bool check_can_decode(struct AttachCtx *actx, struct Body *cur)
 {
   if (cur)
+  {
     return mutt_can_decode(cur);
+  }
 
   for (short i = 0; i < actx->idxlen; i++)
+  {
     if (actx->idx[i]->content->tagged && !mutt_can_decode(actx->idx[i]->content))
+    {
       return false;
+    }
+  }
 
   return true;
 }
@@ -95,8 +107,12 @@ static short count_tagged(struct AttachCtx *actx)
 {
   short count = 0;
   for (short i = 0; i < actx->idxlen; i++)
+  {
     if (actx->idx[i]->content->tagged)
+    {
       count++;
+    }
+  }
 
   return count;
 }
@@ -110,8 +126,12 @@ static short count_tagged_children(struct AttachCtx *actx, short i)
   short count = 0;
 
   while ((++i < actx->idxlen) && (level < actx->idx[i]->level))
+  {
     if (actx->idx[i]->content->tagged)
+    {
       count++;
+    }
+  }
 
   return count;
 }
@@ -129,7 +149,9 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachCtx *actx, st
   int p = 0;
 
   if (!check_all_msg(actx, cur, true))
+  {
     return;
+  }
 
   /* one or more messages? */
   p = (cur || count_tagged(actx) == 1);
@@ -163,13 +185,19 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachCtx *actx, st
   }
 
   if (p)
+  {
     strfcpy(prompt, _("Bounce message to: "), sizeof(prompt));
+  }
   else
+  {
     strfcpy(prompt, _("Bounce tagged messages to: "), sizeof(prompt));
+  }
 
   buf[0] = '\0';
   if (mutt_get_field(prompt, buf, sizeof(buf), MUTT_ALIAS) || buf[0] == '\0')
+  {
     return;
+  }
 
   if (!(adr = rfc822_parse_adrlist(adr, buf)))
   {
@@ -204,7 +232,9 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachCtx *actx, st
     safe_strcat(prompt, sizeof(prompt), "...?");
   }
   else
+  {
     safe_strcat(prompt, sizeof(prompt), "?");
+  }
 
   if (query_quadoption(OPT_BOUNCE, prompt) != MUTT_YES)
   {
@@ -217,22 +247,32 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachCtx *actx, st
   mutt_window_clearline(MuttMessageWindow, 0);
 
   if (cur)
+  {
     ret = mutt_bounce_message(fp, cur->hdr, adr);
+  }
   else
   {
     for (short i = 0; i < actx->idxlen; i++)
     {
       if (actx->idx[i]->content->tagged)
+      {
         if (mutt_bounce_message(actx->idx[i]->fp, actx->idx[i]->content->hdr, adr))
+        {
           ret = 1;
+        }
+      }
     }
   }
 
   if (!ret)
+  {
     mutt_message(p ? _("Message bounced.") : _("Messages bounced."));
+  }
   else
+  {
     mutt_error(p ? _("Error bouncing message!") :
                    _("Error bouncing messages!"));
+  }
 
   rfc822_free_address(&adr);
 }
@@ -243,15 +283,23 @@ void mutt_attach_bounce(FILE *fp, struct Header *hdr, struct AttachCtx *actx, st
 void mutt_attach_resend(FILE *fp, struct Header *hdr, struct AttachCtx *actx, struct Body *cur)
 {
   if (!check_all_msg(actx, cur, true))
+  {
     return;
+  }
 
   if (cur)
+  {
     mutt_resend_message(fp, Context, cur->hdr);
+  }
   else
   {
     for (short i = 0; i < actx->idxlen; i++)
+    {
       if (actx->idx[i]->content->tagged)
+      {
         mutt_resend_message(actx->idx[i]->fp, Context, actx->idx[i]->content->hdr);
+      }
+    }
   }
 }
 
@@ -268,8 +316,12 @@ static struct AttachPtr *find_common_parent(struct AttachCtx *actx, short nattac
   short nchildren;
 
   for (i = 0; i < actx->idxlen; i++)
+  {
     if (actx->idx[i]->content->tagged)
+    {
       break;
+    }
+  }
 
   while (--i >= 0)
   {
@@ -277,7 +329,9 @@ static struct AttachPtr *find_common_parent(struct AttachCtx *actx, short nattac
     {
       nchildren = count_tagged_children(actx, i);
       if (nchildren == nattach)
+      {
         return actx->idx[i];
+      }
     }
   }
 
@@ -299,7 +353,9 @@ static int is_parent(short i, struct AttachCtx *actx, struct Body *cur)
   while ((++i < actx->idxlen) && actx->idx[i]->level > level)
   {
     if (actx->idx[i]->content == cur)
+    {
       return true;
+    }
   }
 
   return false;
@@ -316,13 +372,19 @@ static struct AttachPtr *find_parent(struct AttachCtx *actx, struct Body *cur, s
       if (mutt_is_message_type(actx->idx[i]->content->type,
                                actx->idx[i]->content->subtype) &&
           is_parent(i, actx, cur))
+      {
         parent = actx->idx[i];
+      }
       if (actx->idx[i]->content == cur)
+      {
         break;
+      }
     }
   }
   else if (nattach)
+  {
     parent = find_common_parent(actx, nattach);
+  }
 
   return parent;
 }
@@ -333,16 +395,24 @@ static void include_header(int quote, FILE *ifp, struct Header *hdr, FILE *ofp, 
   char prefix[SHORT_STRING];
 
   if (option(OPT_WEED))
+  {
     chflags |= CH_WEED | CH_REORDER;
+  }
 
   if (quote)
   {
     if (_prefix)
+    {
       strfcpy(prefix, _prefix, sizeof(prefix));
+    }
     else if (!option(OPT_TEXT_FLOWED))
+    {
       _mutt_make_string(prefix, sizeof(prefix), NONULL(IndentString), Context, hdr, 0);
+    }
     else
+    {
       strfcpy(prefix, ">", sizeof(prefix));
+    }
 
     chflags |= CH_PREFIX;
   }
@@ -363,7 +433,9 @@ static struct Body **copy_problematic_attachments(struct Body **last,
     if (actx->idx[i]->content->tagged && (force || !mutt_can_decode(actx->idx[i]->content)))
     {
       if (mutt_copy_body(actx->idx[i]->fp, last, actx->idx[i]->content) == -1)
+      {
         return NULL; /* XXXXX - may lead to crashes */
+      }
       last = &((*last)->next);
     }
   }
@@ -431,10 +503,14 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr, struct AttachCtx
   if (option(OPT_FORWARD_QUOTE))
   {
     if (!option(OPT_TEXT_FLOWED))
+    {
       _mutt_make_string(prefix, sizeof(prefix), NONULL(IndentString), Context,
                         parent_hdr, 0);
+    }
     else
+    {
       strfcpy(prefix, ">", sizeof(prefix));
+    }
   }
 
   include_header(option(OPT_FORWARD_QUOTE), parent_fp, parent_hdr, tmpfp, prefix);
@@ -449,9 +525,13 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr, struct AttachCtx
 
   if ((!cur || mutt_can_decode(cur)) &&
       (rc = query_quadoption(OPT_MIME_FORWARD, _("Forward as attachments?"))) == MUTT_YES)
+  {
     mime_fwd_all = true;
+  }
   else if (rc == -1)
+  {
     goto bail;
+  }
 
   /*
    * shortcut MIMEFWDREST when there is only one attachment.  Is
@@ -463,9 +543,13 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr, struct AttachCtx
     if ((rc = query_quadoption(OPT_MIME_FORWARD_REST,
                                _("Can't decode all tagged attachments.  "
                                  "MIME-forward the others?"))) == MUTT_ABORT)
+    {
       goto bail;
+    }
     else if (rc == MUTT_NO)
+    {
       mime_fwd_any = false;
+    }
   }
 
   /* initialize a state structure */
@@ -473,10 +557,14 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr, struct AttachCtx
   memset(&st, 0, sizeof(st));
 
   if (option(OPT_FORWARD_QUOTE))
+  {
     st.prefix = prefix;
+  }
   st.flags = MUTT_CHARCONV;
   if (option(OPT_WEED))
+  {
     st.flags |= MUTT_WEED;
+  }
   st.fpout = tmpfp;
 
   /* where do we append new MIME parts? */
@@ -495,7 +583,9 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr, struct AttachCtx
     else
     {
       if (mutt_copy_body(fp, last, cur) == -1)
+      {
         goto bail;
+      }
       last = &((*last)->next);
     }
   }
@@ -517,7 +607,9 @@ static void attach_forward_bodies(FILE *fp, struct Header *hdr, struct AttachCtx
     }
 
     if (mime_fwd_any && copy_problematic_attachments(last, actx, mime_fwd_all) == NULL)
+    {
       goto bail;
+    }
   }
 
   mutt_forward_trailer(Context, parent_hdr, tmpfp);
@@ -565,15 +657,19 @@ static void attach_forward_msgs(FILE *fp, struct Header *hdr,
   int chflags = CH_XMIT;
 
   if (cur)
+  {
     curhdr = cur->hdr;
+  }
   else
   {
     for (short i = 0; i < actx->idxlen; i++)
+    {
       if (actx->idx[i]->content->tagged)
       {
         curhdr = actx->idx[i]->content->hdr;
         break;
       }
+    }
   }
 
   tmphdr = mutt_new_header();
@@ -636,19 +732,25 @@ static void attach_forward_msgs(FILE *fp, struct Header *hdr,
   {
     last = &tmphdr->content;
     if (cur)
+    {
       mutt_copy_body(fp, last, cur);
+    }
     else
     {
       for (short i = 0; i < actx->idxlen; i++)
+      {
         if (actx->idx[i]->content->tagged)
         {
           mutt_copy_body(actx->idx[i]->fp, last, actx->idx[i]->content);
           last = &((*last)->next);
         }
+      }
     }
   }
   else
+  {
     mutt_free_header(&tmphdr);
+  }
 
   ci_send_message(flags, tmphdr, *tmpbody ? tmpbody : NULL, NULL, curhdr);
 }
@@ -659,7 +761,9 @@ void mutt_attach_forward(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
   short nattach;
 
   if (check_all_msg(actx, cur, false))
+  {
     attach_forward_msgs(fp, hdr, actx, cur, flags);
+  }
   else
   {
     nattach = count_tagged(actx);
@@ -720,7 +824,9 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachCtx
     /* in case followup set Newsgroups: with Followup-To: if it present */
     if (!env->newsgroups && curenv &&
         (mutt_strcasecmp(curenv->followup_to, "poster") != 0))
+    {
       env->newsgroups = safe_strdup(curenv->followup_to);
+    }
   }
   else
 #endif
@@ -728,7 +834,9 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachCtx
     if (parent)
     {
       if (mutt_fetch_recips(env, curenv, flags) == -1)
+      {
         return -1;
+      }
     }
     else
     {
@@ -736,7 +844,9 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachCtx
       {
         if (actx->idx[i]->content->tagged &&
             mutt_fetch_recips(env, actx->idx[i]->content->hdr->env, flags) == -1)
+        {
           return -1;
+        }
       }
     }
 
@@ -751,13 +861,17 @@ static int attach_reply_envelope_defaults(struct Envelope *env, struct AttachCtx
   mutt_make_misc_reply_headers(env, Context, curhdr, curenv);
 
   if (parent)
+  {
     mutt_add_to_reference_headers(env, curenv);
+  }
   else
   {
     for (short i = 0; i < actx->idxlen; i++)
     {
       if (actx->idx[i]->content->tagged)
+      {
         mutt_add_to_reference_headers(env, actx->idx[i]->content->hdr->env);
+      }
     }
   }
 
@@ -775,7 +889,9 @@ static void attach_include_reply(FILE *fp, FILE *tmpfp, struct Header *cur, int 
   mutt_make_attribution(Context, cur, tmpfp);
 
   if (!option(OPT_HEADER))
+  {
     cmflags |= MUTT_CM_NOHEADER;
+  }
   if (option(OPT_WEED))
   {
     chflags |= CH_WEED;
@@ -806,9 +922,13 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
 
 #ifdef USE_NNTP
   if (flags & SENDNEWS)
+  {
     set_option(OPT_NEWS_SEND);
+  }
   else
+  {
     unset_option(OPT_NEWS_SEND);
+  }
 #endif
 
   if (!check_all_msg(actx, cur, false))
@@ -831,12 +951,18 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
     if ((rc = query_quadoption(OPT_MIME_FORWARD_REST,
                                _("Can't decode all tagged attachments.  "
                                  "MIME-encapsulate the others?"))) == MUTT_ABORT)
+    {
       return;
+    }
     else if (rc == MUTT_YES)
+    {
       mime_reply_any = true;
+    }
   }
   else if (nattach == 1)
+  {
     mime_reply_any = true;
+  }
 
   tmphdr = mutt_new_header();
   tmphdr->env = mutt_new_envelope();
@@ -859,13 +985,17 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
   if (!parent_hdr)
   {
     if (cur)
+    {
       attach_include_reply(fp, tmpfp, cur->hdr, flags);
+    }
     else
     {
       for (short i = 0; i < actx->idxlen; i++)
       {
         if (actx->idx[i]->content->tagged)
+        {
           attach_include_reply(actx->idx[i]->fp, tmpfp, actx->idx[i]->content->hdr, flags);
+        }
       }
     }
   }
@@ -877,19 +1007,27 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
     st.fpout = tmpfp;
 
     if (!option(OPT_TEXT_FLOWED))
+    {
       _mutt_make_string(prefix, sizeof(prefix), NONULL(IndentString), Context,
                         parent_hdr, 0);
+    }
     else
+    {
       strfcpy(prefix, ">", sizeof(prefix));
+    }
 
     st.prefix = prefix;
     st.flags = MUTT_CHARCONV;
 
     if (option(OPT_WEED))
+    {
       st.flags |= MUTT_WEED;
+    }
 
     if (option(OPT_HEADER))
+    {
       include_header(1, parent_fp, parent_hdr, tmpfp, prefix);
+    }
 
     if (cur)
     {
@@ -900,7 +1038,9 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
         state_putc('\n', &st);
       }
       else
+      {
         mutt_copy_body(fp, &tmphdr->content, cur);
+      }
     }
     else
     {
@@ -930,5 +1070,7 @@ void mutt_attach_reply(FILE *fp, struct Header *hdr, struct AttachCtx *actx,
 
   if (ci_send_message(flags, tmphdr, tmpbody, NULL,
                       parent_hdr ? parent_hdr : (cur ? cur->hdr : NULL)) == 0)
+  {
     mutt_set_flag(Context, hdr, MUTT_REPLIED, 1);
+  }
 }

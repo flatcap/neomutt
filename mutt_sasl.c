@@ -106,7 +106,9 @@ static int iptostring(const struct sockaddr *addr, socklen_t addrlen, char *out,
   int ret;
 
   if (!addr || !out)
+  {
     return SASL_BADPARAM;
+  }
 
   ret = getnameinfo(addr, addrlen, hbuf, sizeof(hbuf), pbuf, sizeof(pbuf),
                     NI_NUMERICHOST |
@@ -115,10 +117,14 @@ static int iptostring(const struct sockaddr *addr, socklen_t addrlen, char *out,
 #endif
                         NI_NUMERICSERV);
   if (ret)
+  {
     return getnameinfo_err(ret);
+  }
 
   if (outlen < strlen(hbuf) + strlen(pbuf) + 2)
+  {
     return SASL_BUFOVER;
+  }
 
   snprintf(out, outlen, "%s;%s", hbuf, pbuf);
 
@@ -148,7 +154,9 @@ static int mutt_sasl_start(void)
   int rc;
 
   if (sasl_init)
+  {
     return SASL_OK;
+  }
 
   /* set up default logging callback */
   callbacks[0].id = SASL_CB_LOG;
@@ -180,14 +188,20 @@ static int mutt_sasl_cb_authname(void *context, int id, const char **result, uns
   struct Account *account = (struct Account *) context;
 
   if (!result)
+  {
     return SASL_FAIL;
+  }
 
   *result = NULL;
   if (len)
+  {
     *len = 0;
+  }
 
   if (!account)
+  {
     return SASL_BADPARAM;
+  }
 
   mutt_debug(2, "mutt_sasl_cb_authname: getting %s for %s:%u\n",
              id == SASL_CB_AUTHNAME ? "authname" : "user", account->host,
@@ -196,18 +210,24 @@ static int mutt_sasl_cb_authname(void *context, int id, const char **result, uns
   if (id == SASL_CB_AUTHNAME)
   {
     if (mutt_account_getlogin(account))
+    {
       return SASL_FAIL;
+    }
     *result = account->login;
   }
   else
   {
     if (mutt_account_getuser(account))
+    {
       return SASL_FAIL;
+    }
     *result = account->user;
   }
 
   if (len)
+  {
     *len = strlen(*result);
+  }
 
   return SASL_OK;
 }
@@ -218,13 +238,17 @@ static int mutt_sasl_cb_pass(sasl_conn_t *conn, void *context, int id, sasl_secr
   int len;
 
   if (!account || !psecret)
+  {
     return SASL_BADPARAM;
+  }
 
   mutt_debug(2, "mutt_sasl_cb_pass: getting password for %s@%s:%u\n",
              account->login, account->host, account->port);
 
   if (mutt_account_getpass(account))
+  {
     return SASL_FAIL;
+  }
 
   len = strlen(account->pass);
 
@@ -287,7 +311,9 @@ int mutt_sasl_client_new(struct Connection *conn, sasl_conn_t **saslconn)
   int rc;
 
   if (mutt_sasl_start() != SASL_OK)
+  {
     return -1;
+  }
 
   switch (conn->account.type)
   {
@@ -314,23 +340,35 @@ int mutt_sasl_client_new(struct Connection *conn, sasl_conn_t **saslconn)
   if (!getsockname(conn->fd, (struct sockaddr *) &local, &size))
   {
     if (iptostring((struct sockaddr *) &local, size, iplocalport, IP_PORT_BUFLEN) == SASL_OK)
+    {
       plp = iplocalport;
+    }
     else
+    {
       mutt_debug(2, "SASL failed to parse local IP address\n");
+    }
   }
   else
+  {
     mutt_debug(2, "SASL failed to get local IP address\n");
+  }
 
   size = sizeof(remote);
   if (!getpeername(conn->fd, (struct sockaddr *) &remote, &size))
   {
     if (iptostring((struct sockaddr *) &remote, size, ipremoteport, IP_PORT_BUFLEN) == SASL_OK)
+    {
       prp = ipremoteport;
+    }
     else
+    {
       mutt_debug(2, "SASL failed to parse remote IP address\n");
+    }
   }
   else
+  {
     mutt_debug(2, "SASL failed to get remote IP address\n");
+  }
 
   mutt_debug(2, "SASL local ip: %s, remote ip:%s\n", NONULL(plp), NONULL(prp));
 
@@ -390,7 +428,9 @@ int mutt_sasl_interact(sasl_interact_t *interaction)
     snprintf(prompt, sizeof(prompt), "%s: ", interaction->prompt);
     resp[0] = '\0';
     if (option(OPT_NO_CURSES) || mutt_get_field(prompt, resp, sizeof(resp), 0))
+    {
       return SASL_FAIL;
+    }
 
     interaction->len = mutt_strlen(resp) + 1;
     interaction->result = safe_malloc(interaction->len);
@@ -487,7 +527,9 @@ static int mutt_sasl_conn_read(struct Connection *conn, char *buf, size_t len)
       /* call the underlying read function to fill the buffer */
       rc = (sasldata->msasl_read)(conn, buf, len);
       if (rc <= 0)
+      {
         goto out;
+      }
 
       rc = sasl_decode(sasldata->saslconn, buf, rc, &sasldata->buf, &sasldata->blen);
       if (rc != SASL_OK)
@@ -506,7 +548,9 @@ static int mutt_sasl_conn_read(struct Connection *conn, char *buf, size_t len)
     rc = olen;
   }
   else
+  {
     rc = (sasldata->msasl_read)(conn, buf, len);
+  }
 
 out:
   conn->sockdata = sasldata;
@@ -542,15 +586,19 @@ static int mutt_sasl_conn_write(struct Connection *conn, const char *buf, size_t
 
       rc = (sasldata->msasl_write)(conn, pbuf, plen);
       if (rc != plen)
+      {
         goto fail;
+      }
 
       len -= olen;
       buf += olen;
     } while (len > *sasldata->pbufsize);
   }
   else
+  {
     /* just write using the underlying socket function */
     rc = (sasldata->msasl_write)(conn, buf, len);
+  }
 
   conn->sockdata = sasldata;
 

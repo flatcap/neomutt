@@ -66,18 +66,28 @@ static int mdb_get_r_txn(struct HcacheLmdbCtx *ctx)
   int rc;
 
   if (ctx->txn && (ctx->txn_mode == TXN_READ || ctx->txn_mode == TXN_WRITE))
+  {
     return MDB_SUCCESS;
+  }
 
   if (ctx->txn)
+  {
     rc = mdb_txn_renew(ctx->txn);
+  }
   else
+  {
     rc = mdb_txn_begin(ctx->env, NULL, MDB_RDONLY, &ctx->txn);
+  }
 
   if (rc == MDB_SUCCESS)
+  {
     ctx->txn_mode = TXN_READ;
+  }
   else
+  {
     mutt_debug(2, "mdb_get_r_txn: %s: %s\n",
                ctx->txn ? "mdb_txn_renew" : "mdb_txn_begin", mdb_strerror(rc));
+  }
 
   return rc;
 }
@@ -89,7 +99,9 @@ static int mdb_get_w_txn(struct HcacheLmdbCtx *ctx)
   if (ctx->txn)
   {
     if (ctx->txn_mode == TXN_WRITE)
+    {
       return MDB_SUCCESS;
+    }
 
     /* Free up the memory for readonly or reset transactions */
     mdb_txn_abort(ctx->txn);
@@ -97,9 +109,13 @@ static int mdb_get_w_txn(struct HcacheLmdbCtx *ctx)
 
   rc = mdb_txn_begin(ctx->env, NULL, 0, &ctx->txn);
   if (rc == MDB_SUCCESS)
+  {
     ctx->txn_mode = TXN_WRITE;
+  }
   else
+  {
     mutt_debug(2, "mdb_get_w_txn: mdb_txn_begin: %s\n", mdb_strerror(rc));
+  }
 
   return rc;
 }
@@ -165,7 +181,9 @@ static void *hcache_lmdb_fetch(void *vctx, const char *key, size_t keylen)
   int rc;
 
   if (!vctx)
+  {
     return NULL;
+  }
 
   struct HcacheLmdbCtx *ctx = vctx;
 
@@ -206,7 +224,9 @@ static int hcache_lmdb_store(void *vctx, const char *key, size_t keylen, void *d
   int rc;
 
   if (!vctx)
+  {
     return -1;
+  }
 
   struct HcacheLmdbCtx *ctx = vctx;
 
@@ -237,7 +257,9 @@ static int hcache_lmdb_delete(void *vctx, const char *key, size_t keylen)
   int rc;
 
   if (!vctx)
+  {
     return -1;
+  }
 
   struct HcacheLmdbCtx *ctx = vctx;
 
@@ -264,7 +286,9 @@ static int hcache_lmdb_delete(void *vctx, const char *key, size_t keylen)
 static void hcache_lmdb_close(void **vctx)
 {
   if (!vctx || !*vctx)
+  {
     return;
+  }
 
   struct HcacheLmdbCtx *ctx = *vctx;
 

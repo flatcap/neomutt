@@ -80,7 +80,9 @@ static int space_quotes(struct State *s)
    * but obviously not when replying.
    */
   if (option(OPT_TEXT_FLOWED) && (s->flags & MUTT_REPLYING))
+  {
     return 0;
+  }
 
   return option(OPT_REFLOW_SPACE_QUOTES);
 }
@@ -96,17 +98,25 @@ static int space_quotes(struct State *s)
 static bool add_quote_suffix(struct State *s, int ql)
 {
   if (s->flags & MUTT_REPLYING)
+  {
     return false;
+  }
 
   if (space_quotes(s))
+  {
     return false;
+  }
 
   if (!ql && !s->prefix)
+  {
     return false;
+  }
 
   /* The prefix will add its own space */
   if (!option(OPT_TEXT_FLOWED) && !ql && s->prefix)
+  {
     return false;
+  }
 
   return true;
 }
@@ -121,7 +131,9 @@ static size_t print_indent(int ql, struct State *s, int add_suffix)
      * for format=flowed replies to format=flowed, use '>' indentation
      */
     if (option(OPT_TEXT_FLOWED))
+    {
       ql++;
+    }
     else
     {
       state_puts(s->prefix, s);
@@ -132,13 +144,19 @@ static size_t print_indent(int ql, struct State *s, int add_suffix)
   {
     state_putc('>', s);
     if (space_quotes(s))
+    {
       state_putc(' ', s);
+    }
   }
   if (add_suffix)
+  {
     state_putc(' ', s);
+  }
 
   if (space_quotes(s))
+  {
     ql *= 2;
+  }
 
   return ql + add_suffix + wid;
 }
@@ -167,7 +185,9 @@ static int quote_width(struct State *s, int ql)
     /* When replying, force a wrap at FLOWED_MAX to comply with RFC3676
      * guidelines */
     if (width > FLOWED_MAX)
+    {
       width = FLOWED_MAX;
+    }
     ql++; /* When replying, we will add an additional quote level */
   }
   /* adjust the paragraph width subtracting the number of prefix chars */
@@ -175,10 +195,14 @@ static int quote_width(struct State *s, int ql)
   /* When displaying (not replying), there may be a space between the prefix
    * string and the paragraph */
   if (add_quote_suffix(s, ql))
+  {
     width--;
+  }
   /* failsafe for really long quotes */
   if (width <= 0)
+  {
     width = FLOWED_MAX; /* arbitrary, since the line will wrap */
+  }
   return width;
 }
 
@@ -217,7 +241,9 @@ static void print_flowed_line(char *line, struct State *s, int ql,
     }
     /* there's exactly one space prior to every but the first word */
     if (words)
+    {
       fst->spaces++;
+    }
 
     w = mutt_strwidth(p);
     /* see if we need to break the line but make sure the first
@@ -231,8 +257,12 @@ static void print_flowed_line(char *line, struct State *s, int ql,
       mutt_debug(4, "f=f: break line at %lu, %lu spaces left\n", fst->width, fst->spaces);
       /* only honor trailing spaces for format=flowed replies */
       if (option(OPT_TEXT_FLOWED))
+      {
         for (; fst->spaces; fst->spaces--)
+        {
           state_putc(' ', s);
+        }
+      }
       state_putc('\n', s);
       fst->width = 0;
       fst->spaces = 0;
@@ -240,23 +270,31 @@ static void print_flowed_line(char *line, struct State *s, int ql,
     }
 
     if (!words && !fst->width)
+    {
       fst->width = print_indent(ql, s, add_quote_suffix(s, ql));
+    }
     fst->width += w + fst->spaces;
     for (; fst->spaces; fst->spaces--)
+    {
       state_putc(' ', s);
+    }
     state_puts(p, s);
     words++;
   }
 
   if (term)
+  {
     flush_par(s, fst);
+  }
 }
 
 static void print_fixed_line(const char *line, struct State *s, int ql, struct FlowedState *fst)
 {
   print_indent(ql, s, add_quote_suffix(s, ql));
   if (line && *line)
+  {
     state_puts(line, s);
+  }
   state_putc('\n', s);
 
   fst->width = 0;
@@ -295,14 +333,18 @@ int rfc3676_handler(struct Body *a, struct State *s)
      * changes (should not but can happen, see RFC3676, sec. 4.5.)
      */
     if (newql != quotelevel)
+    {
       flush_par(s, &fst);
+    }
 
     quotelevel = newql;
     buf_off = newql;
 
     /* respect sender's space-stuffing by removing one leading space */
     if (buf[buf_off] == ' ')
+    {
       buf_off++;
+    }
 
     /* test for signature separator */
     sigsep = (mutt_strcmp(buf + buf_off, "-- ") == 0);
@@ -323,8 +365,9 @@ int rfc3676_handler(struct Body *a, struct State *s)
 
     /* for DelSp=yes, we need to strip one SP prior to CRLF on flowed lines */
     if (delsp && !fixed)
+    {
       buf[--buf_len] = '\0';
-
+    }
     print_flowed_line(buf + buf_off, s, quotelevel, &fst, fixed);
   }
 
@@ -361,12 +404,16 @@ void rfc3676_space_stuff(struct Header *hdr)
   char tmpfile[_POSIX_PATH_MAX];
 
   if (!hdr || !hdr->content || !hdr->content->filename)
+  {
     return;
+  }
 
   mutt_debug(2, "f=f: postprocess %s\n", hdr->content->filename);
 
   if ((in = safe_fopen(hdr->content->filename, "r")) == NULL)
+  {
     return;
+  }
 
   mutt_mktemp(tmpfile, sizeof(tmpfile));
   if ((out = safe_fopen(tmpfile, "w+")) == NULL)
@@ -390,7 +437,9 @@ void rfc3676_space_stuff(struct Header *hdr)
       }
       mutt_debug(4, "f=f: line %d needs space-stuffing: '%s'\n", lc, buf);
       if (len > 0)
+      {
         buf[len - 1] = c;
+      }
 #endif
     }
     fputs(buf, out);

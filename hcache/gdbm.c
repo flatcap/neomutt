@@ -42,11 +42,15 @@ static void *hcache_gdbm_open(const char *path)
   int pagesize;
 
   if (mutt_atoi(HeaderCachePageSize, &pagesize) < 0 || pagesize <= 0)
+  {
     pagesize = 16384;
+  }
 
   GDBM_FILE db = gdbm_open((char *) path, pagesize, GDBM_WRCREAT, 00600, NULL);
   if (db)
+  {
     return db;
+  }
 
   /* if rw failed try ro */
   return gdbm_open((char *) path, pagesize, GDBM_READER, 00600, NULL);
@@ -58,7 +62,9 @@ static void *hcache_gdbm_fetch(void *ctx, const char *key, size_t keylen)
   datum data;
 
   if (!ctx)
+  {
     return NULL;
+  }
 
   GDBM_FILE db = ctx;
 
@@ -79,7 +85,9 @@ static int hcache_gdbm_store(void *ctx, const char *key, size_t keylen, void *da
   datum databuf;
 
   if (!ctx)
+  {
     return -1;
+  }
 
   GDBM_FILE db = ctx;
 
@@ -97,7 +105,9 @@ static int hcache_gdbm_delete(void *ctx, const char *key, size_t keylen)
   datum dkey;
 
   if (!ctx)
+  {
     return -1;
+  }
 
   GDBM_FILE db = ctx;
 
@@ -110,7 +120,9 @@ static int hcache_gdbm_delete(void *ctx, const char *key, size_t keylen)
 static void hcache_gdbm_close(void **ctx)
 {
   if (!ctx)
+  {
     return;
+  }
 
   GDBM_FILE db = *ctx;
   gdbm_close(db);

@@ -93,7 +93,9 @@ static void pgp_free_sig(struct PgpSignature **sigp)
   struct PgpSignature *sp = NULL, *q = NULL;
 
   if (!sigp || !*sigp)
+  {
     return;
+  }
 
   for (sp = *sigp; sp; sp = q)
   {
@@ -109,7 +111,9 @@ static void pgp_free_uid(struct PgpUid **upp)
   struct PgpUid *up = NULL, *q = NULL;
 
   if (!upp || !*upp)
+  {
     return;
+  }
   for (up = *upp; up; up = q)
   {
     q = up->next;
@@ -144,7 +148,9 @@ static void _pgp_free_key(struct PgpKeyInfo **kpp)
   struct PgpKeyInfo *kp = NULL;
 
   if (!kpp || !*kpp)
+  {
     return;
+  }
 
   kp = *kpp;
 
@@ -160,23 +166,35 @@ struct PgpKeyInfo *pgp_remove_key(struct PgpKeyInfo **klist, struct PgpKeyInfo *
   struct PgpKeyInfo *p = NULL, *q = NULL, *r = NULL;
 
   if (!klist || !*klist || !key)
+  {
     return NULL;
+  }
 
   if (key->parent && key->parent != key)
+  {
     key = key->parent;
+  }
 
   last = klist;
   for (p = *klist; p && p != key; p = p->next)
+  {
     last = &p->next;
+  }
 
   if (!p)
+  {
     return NULL;
+  }
 
   for (q = p->next, r = p; q && q->parent == p; q = q->next)
+  {
     r = q;
+  }
 
   if (r)
+  {
     r->next = NULL;
+  }
 
   *last = q;
   return q;
@@ -187,10 +205,14 @@ void pgp_free_key(struct PgpKeyInfo **kpp)
   struct PgpKeyInfo *p = NULL, *q = NULL, *r = NULL;
 
   if (!kpp || !*kpp)
+  {
     return;
+  }
 
   if ((*kpp)->parent && (*kpp)->parent != *kpp)
+  {
     *kpp = (*kpp)->parent;
+  }
 
   /* Order is important here:
    *
@@ -208,7 +230,9 @@ void pgp_free_key(struct PgpKeyInfo **kpp)
       _pgp_free_key(&q);
     }
     if (p->parent)
+    {
       _pgp_free_key(&p->parent);
+    }
 
     _pgp_free_key(&p);
   }

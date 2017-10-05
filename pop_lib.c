@@ -76,16 +76,21 @@ int pop_parse_path(const char *path, struct Account *acct)
   }
 
   if (url.scheme == U_POPS)
+  {
     acct->flags |= MUTT_ACCT_SSL;
+  }
 
   service = getservbyname(url.scheme == U_POP ? "pop3" : "pop3s", "tcp");
   if (!acct->port)
   {
     if (service)
+    {
       acct->port = ntohs(service->s_port);
+    }
     else
+    {
       acct->port = url.scheme == U_POP ? POP_PORT : POP_SSL_PORT;
-    ;
+    };
   }
 
   FREE(&c);
@@ -109,7 +114,9 @@ static void pop_error(struct PopData *pop_data, char *msg)
     c2 = skip_email_wsp(msg + 5);
 
     if (*c2)
+    {
       c = c2;
+    }
   }
 
   strfcpy(t, c, sizeof(pop_data->err_msg) - strlen(pop_data->err_msg));
@@ -135,16 +142,21 @@ static int fetch_capa(char *line, void *data)
   }
 
   else if (mutt_strncasecmp(line, "STLS", 4) == 0)
+  {
     pop_data->cmd_stls = true;
-
+  }
   else if (mutt_strncasecmp(line, "USER", 4) == 0)
+  {
     pop_data->cmd_user = 1;
-
+  }
   else if (mutt_strncasecmp(line, "UIDL", 4) == 0)
+  {
     pop_data->cmd_uidl = 1;
-
+  }
   else if (mutt_strncasecmp(line, "TOP", 3) == 0)
+  {
     pop_data->cmd_top = 1;
+  }
 
   return 0;
 }
@@ -188,7 +200,9 @@ static int pop_capabilities(struct PopData *pop_data, int mode)
 
   /* don't check capabilities on reconnect */
   if (pop_data->capabilities)
+  {
     return 0;
+  }
 
   /* init capabilities */
   if (mode == 0)
@@ -229,7 +243,9 @@ static int pop_capabilities(struct PopData *pop_data, int mode)
 
     strfcpy(buf, "AUTH\r\n", sizeof(buf));
     if (pop_fetch_data(pop_data, buf, NULL, fetch_auth, pop_data) == -1)
+    {
       return -1;
+    }
   }
 
   /* Check capabilities */
@@ -238,11 +254,17 @@ static int pop_capabilities(struct PopData *pop_data, int mode)
     char *msg = NULL;
 
     if (!pop_data->expire)
+    {
       msg = _("Unable to leave messages on server.");
+    }
     if (!pop_data->cmd_top)
+    {
       msg = _("Command TOP is not supported by server.");
+    }
     if (!pop_data->cmd_uidl)
+    {
       msg = _("Command UIDL is not supported by server.");
+    }
     if (msg && pop_data->cmd_capa)
     {
       mutt_error(msg);
@@ -311,7 +333,9 @@ int pop_open_connection(struct PopData *pop_data)
 
   ret = pop_capabilities(pop_data, 0);
   if (ret == -1)
+  {
     goto err_conn;
+  }
   if (ret == -2)
   {
     mutt_sleep(2);
@@ -323,23 +347,31 @@ int pop_open_connection(struct PopData *pop_data)
   if (!pop_data->conn->ssf && (pop_data->cmd_stls || option(OPT_SSL_FORCE_TLS)))
   {
     if (option(OPT_SSL_FORCE_TLS))
+    {
       pop_data->use_stls = 2;
+    }
     if (pop_data->use_stls == 0)
     {
       ret =
           query_quadoption(OPT_SSL_STARTTLS, _("Secure connection with TLS?"));
       if (ret == MUTT_ABORT)
+      {
         return -2;
+      }
       pop_data->use_stls = 1;
       if (ret == MUTT_YES)
+      {
         pop_data->use_stls = 2;
+      }
     }
     if (pop_data->use_stls == 2)
     {
       strfcpy(buf, "STLS\r\n", sizeof(buf));
       ret = pop_query(pop_data, buf, sizeof(buf));
       if (ret == -1)
+      {
         goto err_conn;
+      }
       if (ret != 0)
       {
         mutt_error("%s", pop_data->err_msg);
@@ -356,7 +388,9 @@ int pop_open_connection(struct PopData *pop_data)
         /* recheck capabilities after STLS completes */
         ret = pop_capabilities(pop_data, 1);
         if (ret == -1)
+        {
           goto err_conn;
+        }
         if (ret == -2)
         {
           mutt_sleep(2);
@@ -376,16 +410,24 @@ int pop_open_connection(struct PopData *pop_data)
 
   ret = pop_authenticate(pop_data);
   if (ret == -1)
+  {
     goto err_conn;
+  }
   if (ret == -3)
+  {
     mutt_clear_error();
+  }
   if (ret != 0)
+  {
     return ret;
+  }
 
   /* recheck capabilities after authentication */
   ret = pop_capabilities(pop_data, 2);
   if (ret == -1)
+  {
     goto err_conn;
+  }
   if (ret == -2)
   {
     mutt_sleep(2);
@@ -396,7 +438,9 @@ int pop_open_connection(struct PopData *pop_data)
   strfcpy(buf, "STAT\r\n", sizeof(buf));
   ret = pop_query(pop_data, buf, sizeof(buf));
   if (ret == -1)
+  {
     goto err_conn;
+  }
   if (ret == -2)
   {
     mutt_error("%s", pop_data->err_msg);
@@ -442,7 +486,9 @@ void pop_logout(struct Context *ctx)
     }
 
     if (ret < 0)
+    {
       mutt_debug(1, "Error closing POP connection\n");
+    }
 
     mutt_clear_error();
   }
@@ -467,7 +513,9 @@ int pop_query_d(struct PopData *pop_data, char *buf, size_t buflen, char *msg)
   char *c = NULL;
 
   if (pop_data->status != POP_CONNECTED)
+  {
     return -1;
+  }
 
 #ifdef DEBUG
   /* print msg instead of real command */
@@ -482,7 +530,9 @@ int pop_query_d(struct PopData *pop_data, char *buf, size_t buflen, char *msg)
 
   c = strpbrk(buf, " \r\n");
   if (c)
+  {
     *c = '\0';
+  }
   snprintf(pop_data->err_msg, sizeof(pop_data->err_msg), "%s: ", buf);
 
   if (mutt_socket_readln(buf, buflen, pop_data->conn) < 0)
@@ -491,7 +541,9 @@ int pop_query_d(struct PopData *pop_data, char *buf, size_t buflen, char *msg)
     return -1;
   }
   if (mutt_strncmp(buf, "+OK", 3) == 0)
+  {
     return 0;
+  }
 
   pop_error(pop_data, buf);
   return -2;
@@ -520,7 +572,9 @@ int pop_fetch_data(struct PopData *pop_data, char *query, struct Progress *progr
   strfcpy(buf, query, sizeof(buf));
   ret = pop_query(pop_data, buf, sizeof(buf));
   if (ret < 0)
+  {
     return ret;
+  }
 
   inbuf = safe_malloc(sizeof(buf));
 
@@ -538,7 +592,9 @@ int pop_fetch_data(struct PopData *pop_data, char *query, struct Progress *progr
     if (!lenbuf && buf[0] == '.')
     {
       if (buf[1] != '.')
+      {
         break;
+      }
       p++;
     }
 
@@ -553,9 +609,13 @@ int pop_fetch_data(struct PopData *pop_data, char *query, struct Progress *progr
     else
     {
       if (progressbar)
+      {
         mutt_progress_update(progressbar, pos, -1);
+      }
       if (ret == 0 && funct(inbuf, data) < 0)
+      {
         ret = -3;
+      }
       lenbuf = 0;
     }
 
@@ -582,9 +642,13 @@ static int check_uidl(char *line, void *data)
   errno = 0;
   index = strtoul(line, &endp, 10);
   if (errno)
+  {
     return -1;
+  }
   while (*endp == ' ')
+  {
     endp++;
+  }
   memmove(line, endp, strlen(endp) + 1);
 
   for (int i = 0; i < ctx->msgcount; i++)
@@ -612,9 +676,13 @@ int pop_reconnect(struct Context *ctx)
   struct Progress progressbar;
 
   if (pop_data->status == POP_CONNECTED)
+  {
     return 0;
+  }
   if (pop_data->status == POP_BYE)
+  {
     return -1;
+  }
 
   while (true)
   {
@@ -629,7 +697,9 @@ int pop_reconnect(struct Context *ctx)
                          MUTT_PROGRESS_SIZE, NetInc, 0);
 
       for (i = 0; i < ctx->msgcount; i++)
+      {
         ctx->hdrs[i]->refno = -1;
+      }
 
       ret = pop_fetch_data(pop_data, "UIDL\r\n", &progressbar, check_uidl, ctx);
       if (ret == -2)
@@ -639,15 +709,21 @@ int pop_reconnect(struct Context *ctx)
       }
     }
     if (ret == 0)
+    {
       return 0;
+    }
 
     pop_logout(ctx);
 
     if (ret < -1)
+    {
       return -1;
+    }
 
     if (query_quadoption(OPT_POP_RECONNECT,
                          _("Connection lost. Reconnect to POP server?")) != MUTT_YES)
+    {
       return -1;
+    }
   }
 }

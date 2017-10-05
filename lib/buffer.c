@@ -99,7 +99,9 @@ struct Buffer *mutt_buffer_from(char *seed)
   struct Buffer *b = NULL;
 
   if (!seed)
+  {
     return NULL;
+  }
 
   b = mutt_buffer_new();
   b->data = safe_strdup(seed);
@@ -121,7 +123,9 @@ struct Buffer *mutt_buffer_from(char *seed)
 static void mutt_buffer_add(struct Buffer *buf, const char *s, size_t len)
 {
   if (!buf || !s)
+  {
     return;
+  }
 
   if ((buf->dptr + len + 1) > (buf->data + buf->dsize))
   {
@@ -131,7 +135,9 @@ static void mutt_buffer_add(struct Buffer *buf, const char *s, size_t len)
     buf->dptr = buf->data + offset;
   }
   if (!buf->dptr)
+  {
     return;
+  }
   memcpy(buf->dptr, s, len);
   buf->dptr += len;
   *(buf->dptr) = '\0';
@@ -144,7 +150,9 @@ static void mutt_buffer_add(struct Buffer *buf, const char *s, size_t len)
 void mutt_buffer_free(struct Buffer **p)
 {
   if (!p || !*p)
+  {
     return;
+  }
 
   FREE(&(*p)->data);
   /* dptr is just an offset to data and shouldn't be freed */
@@ -161,7 +169,9 @@ void mutt_buffer_free(struct Buffer **p)
 int mutt_buffer_printf(struct Buffer *buf, const char *fmt, ...)
 {
   if (!buf)
+  {
     return 0;
+  }
 
   va_list ap, ap_retry;
   int len, blen, doff;
@@ -170,7 +180,9 @@ int mutt_buffer_printf(struct Buffer *buf, const char *fmt, ...)
   va_copy(ap_retry, ap);
 
   if (!buf->dptr)
+  {
     buf->dptr = buf->data;
+  }
 
   doff = buf->dptr - buf->data;
   blen = buf->dsize - doff;
@@ -187,14 +199,18 @@ int mutt_buffer_printf(struct Buffer *buf, const char *fmt, ...)
   {
     blen = ++len - blen;
     if (blen < 128)
+    {
       blen = 128;
+    }
     buf->dsize += blen;
     safe_realloc(&buf->data, buf->dsize);
     buf->dptr = buf->data + doff;
     len = vsnprintf(buf->dptr, len, fmt, ap_retry);
   }
   if (len > 0)
+  {
     buf->dptr += len;
+  }
 
   va_end(ap);
   va_end(ap_retry);

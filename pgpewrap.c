@@ -53,7 +53,9 @@ int main(int argc, char **argv)
       pfx = argv[i - 1];
     }
     if (pfx)
+    {
       *opt++ = pfx;
+    }
     *opt++ = argv[i++];
   }
   *opt = NULL;

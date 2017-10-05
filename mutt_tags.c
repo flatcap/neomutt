@@ -38,7 +38,9 @@
 void driver_tags_free(struct TagHead *head)
 {
   if (!head)
+  {
     return;
+  }
 
   struct TagNode *np = STAILQ_FIRST(head), *next = NULL;
   while (np)
@@ -62,20 +64,31 @@ static char *driver_tags_getter(struct TagHead *head, bool show_hidden,
                                 bool show_tranformed, char *filter)
 {
   if (!head)
+  {
     return NULL;
+  }
 
   char *tags = NULL;
   struct TagNode *np;
   STAILQ_FOREACH(np, head, entries)
   {
     if (filter && mutt_strcmp(np->name, filter) != 0)
+<<<<<<< HEAD
+=======
+    {
+>>>>>>> clang-tidy
       continue;
+    }
     if (show_hidden || !np->hidden)
     {
       if (show_tranformed && np->transformed)
+      {
         mutt_str_append_item(&tags, np->transformed, ' ');
+      }
       else
+      {
         mutt_str_append_item(&tags, np->name, ' ');
+      }
     }
   }
   return tags;
@@ -146,7 +159,9 @@ static void driver_tags_add(struct TagHead *head, char *new_tag)
   np->name = safe_strdup(new_tag);
   np->hidden = false;
   if (new_tag_transformed)
+  {
     np->transformed = safe_strdup(new_tag_transformed);
+  }
 
   /* filter out hidden tags */
   if (HiddenTags)
@@ -156,7 +171,9 @@ static void driver_tags_add(struct TagHead *head, char *new_tag)
 
     if (p && ((p == HiddenTags) || (*(p - 1) == ',') || (*(p - 1) == ' ')) &&
         ((*(p + xsz) == '\0') || (*(p + xsz) == ',') || (*(p + xsz) == ' ')))
+    {
       np->hidden = true;
+    }
   }
 
   STAILQ_INSERT_TAIL(head, np, entries);
@@ -176,7 +193,9 @@ static void driver_tags_add(struct TagHead *head, char *new_tag)
 int driver_tags_replace(struct TagHead *head, char *tags)
 {
   if (!head)
+  {
     return 0;
+  }
 
   driver_tags_free(head);
 
@@ -184,7 +203,9 @@ int driver_tags_replace(struct TagHead *head, char *tags)
   {
     char *tag;
     while ((tag = strsep(&tags, " ")))
+    {
       driver_tags_add(head, tag);
+    }
     FREE(&tags);
   }
   return 1;

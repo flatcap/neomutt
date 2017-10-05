@@ -86,7 +86,9 @@ static void fix_uid(char *uid)
       s += 4;
     }
     else
+    {
       *d++ = *s++;
+    }
   }
   *d = '\0';
 
@@ -112,7 +114,9 @@ static void fix_uid(char *uid)
         uid[ob - buf] = '\0';
       }
       else if (n >= 0 && ob - buf == n && (buf[n] = 0, strlen(buf) < (size_t) n))
+      {
         memcpy(uid, buf, n);
+      }
     }
     FREE(&buf);
     iconv_close(cd);
@@ -133,28 +137,40 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
 
   *is_subkey = 0;
   if (!*buf)
+  {
     return NULL;
+  }
 
   /* if we're given a key, merge our parsing results, else
    * start with a fresh one to work with so that we don't
    * mess up the real key in case we find parsing errors. */
   if (k)
+  {
     memcpy(&tmp, k, sizeof(tmp));
+  }
   else
+  {
     memset(&tmp, 0, sizeof(tmp));
+  }
 
   mutt_debug(2, "parse_pub_line: buf = `%s'\n", buf);
 
   for (p = buf; p; p = pend)
   {
     if ((pend = strchr(p, ':')))
+    {
       *pend++ = 0;
+    }
     field++;
     if (!*p && (field != 1) && (field != 10))
+    {
       continue;
+    }
 
     if (is_fpr && (field != 10))
+    {
       continue;
+    }
 
     switch (field)
     {
@@ -163,22 +179,38 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         mutt_debug(2, "record type: %s\n", p);
 
         if (mutt_strcmp(p, "pub") == 0)
+        {
           is_pub = true;
+        }
         else if (mutt_strcmp(p, "sub") == 0)
+        {
           *is_subkey = 1;
+        }
         else if (mutt_strcmp(p, "sec") == 0)
+        {
           ;
+        }
         else if (mutt_strcmp(p, "ssb") == 0)
+        {
           *is_subkey = 1;
+        }
         else if (mutt_strcmp(p, "uid") == 0)
+        {
           is_uid = true;
+        }
         else if (mutt_strcmp(p, "fpr") == 0)
+        {
           is_fpr = true;
+        }
         else
+        {
           return NULL;
+        }
 
         if (!(is_uid || is_fpr || (*is_subkey && option(OPT_PGP_IGNORE_SUBKEYS))))
+        {
           memset(&tmp, 0, sizeof(tmp));
+        }
 
         break;
       }
@@ -212,7 +244,9 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         }
 
         if (!is_uid && !(*is_subkey && option(OPT_PGP_IGNORE_SUBKEYS)))
+        {
           tmp.flags |= flags;
+        }
 
         break;
       }
@@ -221,7 +255,9 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         mutt_debug(2, "key len: %s\n", p);
 
         if (!(*is_subkey && option(OPT_PGP_IGNORE_SUBKEYS)) && mutt_atos(p, &tmp.keylen) < 0)
+        {
           goto bail;
+        }
         break;
       }
       case 4: /* pubkey algo */
@@ -232,7 +268,9 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         {
           int x = 0;
           if (mutt_atoi(p, &x) < 0)
+          {
             goto bail;
+          }
           tmp.numalg = x;
           tmp.algorithm = pgp_pkalgbytype(x);
         }
@@ -243,7 +281,9 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         mutt_debug(2, "key id: %s\n", p);
 
         if (!(*is_subkey && option(OPT_PGP_IGNORE_SUBKEYS)))
+        {
           mutt_str_replace(&tmp.keyid, p);
+        }
         break;
       }
       case 6: /* timestamp (1998-02-28) */
@@ -254,7 +294,9 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         mutt_debug(2, "time stamp: %s\n", p);
 
         if (!p)
+        {
           break;
+        }
         time.tm_sec = 0;
         time.tm_min = 0;
         time.tm_hour = 12;
@@ -296,19 +338,25 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
          * use the key in neomutt.
          */
         if (!(pend && (*p || is_pub)))
+        {
           break;
+        }
 
         if (is_fpr)
         {
           /* don't let a subkey fpr overwrite an existing primary key fpr */
           if (!tmp.fingerprint)
+          {
             tmp.fingerprint = safe_strdup(p);
+          }
           break;
         }
 
         /* ignore user IDs on subkeys */
         if (!is_uid && (*is_subkey && option(OPT_PGP_IGNORE_SUBKEYS)))
+        {
           break;
+        }
 
         mutt_debug(2, "user ID: %s\n", NONULL(p));
 
@@ -321,9 +369,13 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         tmp.address = uid;
 
         if (strstr(p, "ENCR"))
+        {
           tmp.flags |= KEYFLAG_PREFER_ENCRYPTION;
+        }
         if (strstr(p, "SIGN"))
+        {
           tmp.flags |= KEYFLAG_PREFER_SIGNING;
+        }
 
         break;
       }
@@ -353,7 +405,9 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
         if (!is_uid && (!*is_subkey || !option(OPT_PGP_IGNORE_SUBKEYS) ||
                         !((flags & KEYFLAG_DISABLED) || (flags & KEYFLAG_REVOKED) ||
                           (flags & KEYFLAG_EXPIRED))))
+        {
           tmp.flags |= flags;
+        }
 
         break;
 
@@ -364,14 +418,18 @@ static struct PgpKeyInfo *parse_pub_line(char *buf, int *is_subkey, struct PgpKe
 
   /* merge temp key back into real key */
   if (!(is_uid || is_fpr || (*is_subkey && option(OPT_PGP_IGNORE_SUBKEYS))))
+  {
     k = safe_malloc(sizeof(*k));
+  }
   memcpy(k, &tmp, sizeof(*k));
   /* fixup parentship of uids after merging the temp key into
    * the real key */
   if (tmp.address)
   {
     for (uid = k->address; uid; uid = uid->next)
+    {
       uid->parent = k;
+    }
   }
 
   return k;
@@ -391,7 +449,9 @@ struct PgpKeyInfo *pgp_get_candidates(enum PgpRing keyring, struct ListHead *hin
   int devnull;
 
   if ((devnull = open("/dev/null", O_RDWR)) == -1)
+  {
     return NULL;
+  }
 
   mutt_str_replace(&_chs, Charset);
 
@@ -407,13 +467,17 @@ struct PgpKeyInfo *pgp_get_candidates(enum PgpRing keyring, struct ListHead *hin
   while (fgets(buf, sizeof(buf) - 1, fp))
   {
     if (!(kk = parse_pub_line(buf, &is_sub, k)))
+    {
       continue;
+    }
 
     /* Only append kk to the list if it's new. */
     if (kk != k)
     {
       if (k)
+      {
         kend = &k->next;
+      }
       *kend = k = kk;
 
       if (is_sub)
@@ -423,16 +487,22 @@ struct PgpKeyInfo *pgp_get_candidates(enum PgpRing keyring, struct ListHead *hin
         k->flags |= KEYFLAG_SUBKEY;
         k->parent = mainkey;
         for (l = &k->address; *l; l = &(*l)->next)
+        {
           ;
+        }
         *l = pgp_copy_uids(mainkey->address, k);
       }
       else
+      {
         mainkey = k;
+      }
     }
   }
 
   if (ferror(fp))
+  {
     mutt_perror("fgets");
+  }
 
   safe_fclose(&fp);
   mutt_wait_filter(thepid);

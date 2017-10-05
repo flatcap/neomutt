@@ -59,7 +59,9 @@ static void imap_add_folder(char delim, char *folder, int noselect, int noinferi
   struct Buffy *b = NULL;
 
   if (imap_parse_path(state->folder, &mx))
+  {
     return;
+  }
 
   if (state->entrylen + 1 == state->entrymax)
   {
@@ -70,12 +72,18 @@ static void imap_add_folder(char delim, char *folder, int noselect, int noinferi
 
   /* render superiors as unix-standard ".." */
   if (isparent)
+  {
     strfcpy(relpath, "../", sizeof(relpath));
-  /* strip current folder from target, to render a relative path */
+    /* strip current folder from target, to render a relative path */
+  }
   else if (mutt_strncmp(mx.mbox, folder, mutt_strlen(mx.mbox)) == 0)
+  {
     strfcpy(relpath, folder + mutt_strlen(mx.mbox), sizeof(relpath));
+  }
   else
+  {
     strfcpy(relpath, folder, sizeof(relpath));
+  }
 
   /* apply filemask filter. This should really be done at menu setup rather
    * than at scan, since it's so expensive to scan. But that's big changes
@@ -101,14 +109,18 @@ static void imap_add_folder(char delim, char *folder, int noselect, int noinferi
   (state->entry)[state->entrylen].imap = true;
   /* delimiter at the root is useless. */
   if (folder[0] == '\0')
+  {
     delim = '\0';
+  }
   (state->entry)[state->entrylen].delim = delim;
   (state->entry)[state->entrylen].selectable = !noselect;
   (state->entry)[state->entrylen].inferiors = !noinferiors;
 
   b = Incoming;
   while (b && (mutt_strcmp(tmp, b->path) != 0))
+  {
     b = b->next;
+  }
   if (b)
   {
     if (Context && (mutt_strcmp(b->realpath, Context->realpath) == 0))
@@ -153,11 +165,15 @@ static int browse_add_list_result(struct ImapData *idata, const char *cmd,
     {
       /* Let a parent folder never be selectable for navigation */
       if (isparent)
+      {
         list.noselect = true;
+      }
       /* prune current folder from output */
       if (isparent || (mutt_strncmp(list.name, mx.mbox, strlen(list.name)) != 0))
+      {
         imap_add_folder(list.delim, list.name, list.noselect, list.noinferiors,
                         state, isparent);
+      }
     }
   } while (rc == IMAP_CMD_CONTINUE);
   idata->cmddata = NULL;
@@ -196,7 +212,9 @@ int imap_browse(char *path, struct BrowserState *state)
   strfcpy(list_cmd, option(OPT_IMAP_LIST_SUBSCRIBED) ? "LSUB" : "LIST", sizeof(list_cmd));
 
   if (!(idata = imap_conn_find(&(mx.account), 0)))
+  {
     goto fail;
+  }
 
   mutt_message(_("Getting folder list..."));
 
@@ -256,7 +274,9 @@ int imap_browse(char *path, struct BrowserState *state)
      * Further note: UW-IMAP servers return nothing when asked for
      *  NAMESPACES without delimiters at the end. Argh! */
     for (n--; n >= 0 && mbox[n] != list.delim; n--)
+    {
       ;
+    }
     if (n > 0) /* "aaaa/bbbb/" -> "aaaa" */
     {
       /* forget the check, it is too delicate (see above). Have we ever
@@ -289,7 +309,9 @@ int imap_browse(char *path, struct BrowserState *state)
       /* folder may be "/" */
       snprintf(relpath, sizeof(relpath), "%c", n < 0 ? '\0' : idata->delim);
       if (showparents)
+      {
         imap_add_folder(idata->delim, relpath, 1, 0, state, 1);
+      }
       if (!state->folder)
       {
         imap_qualify_path(buf, sizeof(buf), &mx, relpath);
@@ -311,7 +333,9 @@ int imap_browse(char *path, struct BrowserState *state)
   mutt_debug(3, "%s\n", munged_mbox);
   snprintf(buf, sizeof(buf), "%s \"\" %s", list_cmd, munged_mbox);
   if (browse_add_list_result(idata, buf, state, 0))
+  {
     goto fail;
+  }
 
   if (!state->entrylen)
   {
@@ -322,14 +346,18 @@ int imap_browse(char *path, struct BrowserState *state)
   mutt_clear_error();
 
   if (save_lsub)
+  {
     set_option(OPT_IMAP_CHECK_SUBSCRIBED);
+  }
 
   FREE(&mx.mbox);
   return 0;
 
 fail:
   if (save_lsub)
+  {
     set_option(OPT_IMAP_CHECK_SUBSCRIBED);
+  }
   FREE(&mx.mbox);
   return -1;
 }
@@ -370,7 +398,9 @@ int imap_mailbox_create(const char *folder)
   }
 
   if (mutt_get_field(_("Create mailbox: "), buf, sizeof(buf), MUTT_FILE) < 0)
+  {
     goto fail;
+  }
 
   if (!mutt_strlen(buf))
   {
@@ -380,7 +410,9 @@ int imap_mailbox_create(const char *folder)
   }
 
   if (imap_create_mailbox(idata, buf) < 0)
+  {
     goto fail;
+  }
 
   mutt_message(_("Mailbox created."));
   mutt_sleep(0);
@@ -423,7 +455,9 @@ int imap_mailbox_rename(const char *mailbox)
   strfcpy(newname, mx.mbox, sizeof(newname));
 
   if (mutt_get_field(buf, newname, sizeof(newname), MUTT_FILE) < 0)
+  {
     goto fail;
+  }
 
   if (!mutt_strlen(newname))
   {

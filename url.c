@@ -53,7 +53,9 @@ int url_pct_decode(char *s)
   char *d = NULL;
 
   if (!s)
+  {
     return -1;
+  }
 
   for (d = s; *s; s++)
   {
@@ -66,10 +68,14 @@ int url_pct_decode(char *s)
         s += 2;
       }
       else
+      {
         return -1;
+      }
     }
     else
+    {
       *d++ = *s;
+    }
   }
   *d = '\0';
   return 0;
@@ -82,18 +88,28 @@ enum UrlScheme url_check_scheme(const char *s)
   int i;
 
   if (!s || !(t = strchr(s, ':')))
+  {
     return U_UNKNOWN;
+  }
   if ((size_t)(t - s) >= sizeof(sbuf) - 1)
+  {
     return U_UNKNOWN;
+  }
 
   strfcpy(sbuf, s, t - s + 1);
   for (t = sbuf; *t; t++)
+  {
     *t = tolower(*t);
+  }
 
   if ((i = mutt_getvaluebyname(sbuf, UrlMap)) == -1)
+  {
     return U_UNKNOWN;
+  }
   else
+  {
     return (enum UrlScheme) i;
+  }
 }
 
 /**
@@ -120,8 +136,9 @@ static int parse_userhost(struct Url *u, char *src)
   src += 2;
 
   if ((u->path = strchr(src, '/')))
+  {
     *u->path++ = '\0';
-
+  }
   if ((t = strrchr(src, '@')))
   {
     *t = '\0';
@@ -130,11 +147,15 @@ static int parse_userhost(struct Url *u, char *src)
       *p = '\0';
       u->pass = p + 1;
       if (url_pct_decode(u->pass) < 0)
+      {
         return -1;
+      }
     }
     u->user = src;
     if (url_pct_decode(u->user) < 0)
+    {
       return -1;
+    }
     src = t + 1;
   }
 
@@ -147,18 +168,24 @@ static int parse_userhost(struct Url *u, char *src)
     *t++ = '\0';
   }
   else
+  {
     t = src;
+  }
 
   if ((p = strchr(t, ':')))
   {
     int num;
     *p++ = '\0';
     if (mutt_atoi(p, &num) < 0 || num < 0 || num > 0xffff)
+    {
       return -1;
+    }
     u->port = (unsigned short) num;
   }
   else
+  {
     u->port = 0;
+  }
 
   u->host = src;
   return url_pct_decode(u->host) >= 0 && (!u->path || url_pct_decode(u->path) >= 0) ? 0 : -1;
@@ -175,7 +202,9 @@ int url_parse(struct Url *u, char *src)
   char *tmp = NULL;
 
   if ((u->scheme = url_check_scheme(src)) == U_UNKNOWN)
+  {
     return -1;
+  }
 
   tmp = strchr(src, ':') + 1;
 
@@ -211,14 +240,18 @@ int url_tostring(struct Url *u, char *dest, size_t len, int flags)
   long l;
 
   if (u->scheme == U_UNKNOWN)
+  {
     return -1;
+  }
 
   snprintf(dest, len, "%s:", mutt_getnamebyvalue(u->scheme, UrlMap));
 
   if (u->host)
   {
     if (!(flags & U_PATH))
+    {
       safe_strcat(dest, len, "//");
+    }
     len -= (l = strlen(dest));
     dest += l;
 
@@ -234,28 +267,40 @@ int url_tostring(struct Url *u, char *dest, size_t len, int flags)
         snprintf(dest, len, "%s:%s@", str, p);
       }
       else
+      {
         snprintf(dest, len, "%s@", str);
+      }
 
       len -= (l = strlen(dest));
       dest += l;
     }
 
     if (strchr(u->host, ':'))
+    {
       snprintf(dest, len, "[%s]", u->host);
+    }
     else
+    {
       snprintf(dest, len, "%s", u->host);
+    }
 
     len -= (l = strlen(dest));
     dest += l;
 
     if (u->port)
+    {
       snprintf(dest, len, ":%hu/", u->port);
+    }
     else
+    {
       snprintf(dest, len, "/");
+    }
   }
 
   if (u->path)
+  {
     safe_strcat(dest, len, u->path);
+  }
 
   return 0;
 }
@@ -270,17 +315,24 @@ int url_parse_mailto(struct Envelope *e, char **body, const char *src)
   int rc = -1;
 
   if (!(t = strchr(src, ':')))
+  {
     return -1;
+  }
 
   /* copy string for safe use of strtok() */
   if ((tmp = safe_strdup(t + 1)) == NULL)
+  {
     return -1;
+  }
 
   if ((headers = strchr(tmp, '?')))
+  {
     *headers++ = '\0';
-
+  }
   if (url_pct_decode(tmp) < 0)
+  {
     goto out;
+  }
 
   e->to = rfc822_parse_adrlist(e->to, tmp);
 
@@ -289,14 +341,22 @@ int url_parse_mailto(struct Envelope *e, char **body, const char *src)
   for (; tag; tag = strtok_r(NULL, "&", &p))
   {
     if ((value = strchr(tag, '=')))
+    {
       *value++ = '\0';
+    }
     if (!value || !*value)
+    {
       continue;
+    }
 
     if (url_pct_decode(tag) < 0)
+    {
       goto out;
+    }
     if (url_pct_decode(value) < 0)
+    {
       goto out;
+    }
 
     /* Determine if this header field is on the allowed list.  Since NeoMutt
      * interprets some header fields specially (such as
@@ -314,7 +374,9 @@ int url_parse_mailto(struct Envelope *e, char **body, const char *src)
       if (mutt_strcasecmp(tag, "body") == 0)
       {
         if (body)
+        {
           mutt_str_replace(body, value);
+        }
       }
       else
       {

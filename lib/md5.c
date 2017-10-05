@@ -131,7 +131,9 @@ void *md5_finish_ctx(struct Md5Ctx *ctx, void *resbuf)
   /* Now count remaining bytes. */
   ctx->total[0] += bytes;
   if (ctx->total[0] < bytes)
+  {
     ctx->total[1]++;
+  }
 
   /* Put the 64-bit file length in *bits* at the end of the buffer. */
   ctx->buffer[size - 2] = SWAP(ctx->total[0] << 3);
@@ -181,14 +183,18 @@ int md5_stream(FILE *stream, void *resblock)
       sum += n;
 
       if (sum == BLOCKSIZE)
+      {
         break;
+      }
 
       if (n == 0)
       {
         /* Check for the error flag IFF N == 0, so that we don't exit the loop
          * after a partial read due to e.g., EAGAIN or EWOULDBLOCK. */
         if (ferror(stream))
+        {
           return 1;
+        }
         goto process_partial_block;
       }
 
@@ -196,7 +202,9 @@ int md5_stream(FILE *stream, void *resblock)
        * EOF, since feof may be true even though N > 0.  Otherwise, we could
        * end up calling fread after EOF. */
       if (feof(stream))
+      {
         goto process_partial_block;
+      }
     }
 
     /* Process buffer with BLOCKSIZE bytes.
@@ -208,7 +216,9 @@ process_partial_block:
 
   /* Process any remaining bytes. */
   if (sum > 0)
+  {
     md5_process_bytes(buffer, sum, &ctx);
+  }
 
   /* Construct result in desired memory. */
   md5_finish_ctx(&ctx, resblock);
@@ -282,12 +292,14 @@ void md5_process_bytes(const void *buffer, size_t len, struct Md5Ctx *ctx)
 #define alignof(type) offsetof(struct { char c; type x; }, x)
 #define UNALIGNED_P(p) (((size_t) p) % alignof(md5_uint32) != 0)
     if (UNALIGNED_P(buffer))
+    {
       while (len > 64)
       {
         md5_process_block(memcpy(ctx->buffer, buffer, 64), 64, ctx);
         buffer = (const char *) buffer + 64;
         len -= 64;
       }
+    }
     else
 #endif
     {
@@ -348,7 +360,9 @@ void md5_process_block(const void *buffer, size_t len, struct Md5Ctx *ctx)
    * double word increment. */
   ctx->total[0] += len;
   if (ctx->total[0] < len)
+  {
     ctx->total[1]++;
+  }
 
   /* Process all bytes in the buffer with 64 bytes in each round of the loop. */
   while (words < endp)

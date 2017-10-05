@@ -128,8 +128,12 @@ static const struct HcacheOps *hcache_get_backend_ops(const char *backend)
   }
 
   for (; *ops; ++ops)
+  {
     if (strcmp(backend, (*ops)->name) == 0)
+    {
       break;
+    }
+  }
 
   return *ops;
 }
@@ -139,7 +143,9 @@ static const struct HcacheOps *hcache_get_backend_ops(const char *backend)
 static void *lazy_malloc(size_t siz)
 {
   if (siz < 4096)
+  {
     siz = 4096;
+  }
 
   return safe_malloc(siz);
 }
@@ -149,7 +155,9 @@ static void lazy_realloc(void *ptr, size_t siz)
   void **p = (void **) ptr;
 
   if (p != NULL && siz < 4096)
+  {
     return;
+  }
 
   safe_realloc(ptr, siz);
 }
@@ -175,7 +183,9 @@ static inline bool is_ascii(const char *p, size_t len)
   while (s && (unsigned) (s - p) < len)
   {
     if ((*s & 0x80) != 0)
+    {
       return false;
+    }
     s++;
   }
   return true;
@@ -209,7 +219,9 @@ static unsigned char *dump_char_size(char *c, unsigned char *d, int *off,
   *off += size;
 
   if (p != c)
+  {
     FREE(&p);
+  }
 
   return d;
 }
@@ -329,7 +341,9 @@ static unsigned char *dump_buffer(struct Buffer *b, unsigned char *d, int *off, 
     return d;
   }
   else
+  {
     d = dump_int(1, d, off);
+  }
 
   d = dump_char_size(b->data, d, off, b->dsize + 1, convert);
   d = dump_int(b->dptr - b->data, d, off);
@@ -462,9 +476,13 @@ static unsigned char *dump_envelope(struct Envelope *e, unsigned char *d, int *o
   d = dump_char(e->subject, d, off, convert);
 
   if (e->real_subj)
+  {
     d = dump_int(e->real_subj - e->subject, d, off);
+  }
   else
+  {
     d = dump_int(-1, d, off);
+  }
 
   d = dump_char(e->message_id, d, off, false);
   d = dump_char(e->supersedes, d, off, false);
@@ -504,9 +522,13 @@ static void restore_envelope(struct Envelope *e, const unsigned char *d, int *of
   restore_int((unsigned int *) (&real_subj_off), d, off);
 
   if (0 <= real_subj_off)
+  {
     e->real_subj = e->subject + real_subj_off;
+  }
   else
+  {
     e->real_subj = NULL;
+  }
 
   restore_char(&e->message_id, d, off, false);
   restore_char(&e->supersedes, d, off, false);
@@ -532,7 +554,9 @@ static int crc_matches(const char *d, unsigned int crc)
   unsigned int mycrc = 0;
 
   if (!d)
+  {
     return 0;
+  }
 
   restore_int(&mycrc, (unsigned char *) d, &off);
 
@@ -548,18 +572,24 @@ static int crc_matches(const char *d, unsigned int crc)
 static bool create_hcache_dir(const char *path)
 {
   if (!path)
+  {
     return false;
+  }
 
   static char dir[_POSIX_PATH_MAX];
   strfcpy(dir, path, sizeof(dir));
 
   char *p = strrchr(dir, '/');
   if (!p)
+  {
     return true;
+  }
 
   *p = '\0';
   if (mutt_mkdir(dir, S_IRWXU | S_IRWXG | S_IRWXO) == 0)
+  {
     return true;
+  }
 
   mutt_error(_("Can't create %s: %s."), dir, strerror(errno));
   mutt_sleep(2);
@@ -614,7 +644,9 @@ static const char *hcache_per_folder(const char *path, const char *folder, hcach
     /* We have a mailbox-specific namer function */
     snprintf(hcpath, sizeof(hcpath), "%s%s", path, slash ? "" : "/");
     if (!slash)
+    {
       plen++;
+    }
 
     ret = namer(folder, hcpath + plen, sizeof(hcpath) - plen);
   }
@@ -632,8 +664,10 @@ static const char *hcache_per_folder(const char *path, const char *folder, hcach
     ret = snprintf(hcpath, sizeof(hcpath), "%s%s%s%s", path, slash ? "" : "/", name, suffix);
   }
 
-  if (ret < 0) /* namer or fprintf failed.. should not happen */
+  if (ret < 0)
+  { /* namer or fprintf failed.. should not happen */
     return path;
+  }
 
   create_hcache_dir(hcpath);
   return hcpath;
@@ -662,7 +696,9 @@ static void *hcache_dump(header_cache_t *h, struct Header *header, int *off,
     memcpy(d, &now, sizeof(struct timeval));
   }
   else
+  {
     memcpy(d, &uidvalidity, sizeof(uidvalidity));
+  }
   *off += sizeof(union Validate);
 
   d = dump_int(h->crc, d, off);
@@ -741,7 +777,9 @@ static char *get_foldername(const char *folder)
    * to ensure equivalent paths share the hcache */
   p = safe_malloc(PATH_MAX + 1);
   if (!realpath(path, p))
+  {
     mutt_str_replace(&p, path);
+  }
 
   return p;
 }
@@ -750,7 +788,9 @@ header_cache_t *mutt_hcache_open(const char *path, const char *folder, hcache_na
 {
   const struct HcacheOps *ops = hcache_get_ops();
   if (!ops)
+  {
     return NULL;
+  }
 
   header_cache_t *h = safe_calloc(1, sizeof(header_cache_t));
 
@@ -804,7 +844,9 @@ header_cache_t *mutt_hcache_open(const char *path, const char *folder, hcache_na
 
   h->ctx = ops->open(path);
   if (h->ctx)
+  {
     return h;
+  }
   else
   {
     /* remove a possibly incompatible version */
@@ -812,7 +854,9 @@ header_cache_t *mutt_hcache_open(const char *path, const char *folder, hcache_na
     {
       h->ctx = ops->open(path);
       if (h->ctx)
+      {
         return h;
+      }
     }
     FREE(&h->folder);
     FREE(&h);
@@ -825,7 +869,9 @@ void mutt_hcache_close(header_cache_t *h)
 {
   const struct HcacheOps *ops = hcache_get_ops();
   if (!h || !ops)
+  {
     return;
+  }
 
   ops->close(&h->ctx);
   FREE(&h->folder);
@@ -857,7 +903,9 @@ void *mutt_hcache_fetch_raw(header_cache_t *h, const char *key, size_t keylen)
   const struct HcacheOps *ops = hcache_get_ops();
 
   if (!h || !ops)
+  {
     return NULL;
+  }
 
   keylen = snprintf(path, sizeof(path), "%s%s", h->folder, key);
 
@@ -869,7 +917,9 @@ void mutt_hcache_free(header_cache_t *h, void **data)
   const struct HcacheOps *ops = hcache_get_ops();
 
   if (!h || !ops)
+  {
     return;
+  }
 
   ops->free(h->ctx, data);
 }
@@ -882,7 +932,9 @@ int mutt_hcache_store(header_cache_t *h, const char *key, size_t keylen,
   int ret;
 
   if (!h)
+  {
     return -1;
+  }
 
   data = hcache_dump(h, header, &dlen, uidvalidity);
   ret = mutt_hcache_store_raw(h, key, keylen, data, dlen);
@@ -899,7 +951,9 @@ int mutt_hcache_store_raw(header_cache_t *h, const char *key, size_t keylen,
   const struct HcacheOps *ops = hcache_get_ops();
 
   if (!h || !ops)
+  {
     return -1;
+  }
 
   keylen = snprintf(path, sizeof(path), "%s%s", h->folder, key);
 
@@ -912,7 +966,9 @@ int mutt_hcache_delete(header_cache_t *h, const char *key, size_t keylen)
   const struct HcacheOps *ops = hcache_get_ops();
 
   if (!h)
+  {
     return -1;
+  }
 
   keylen = snprintf(path, sizeof(path), "%s%s", h->folder, key);
 

@@ -82,9 +82,13 @@ static void print_part_line(struct State *s, struct Body *b, int n)
   state_mark_attach(s);
   char *charset = mutt_get_parameter("charset", b->parameter);
   if (n != 0)
+  {
     state_printf(s, _("[-- Alternative Type #%d: "), n);
+  }
   else
+  {
     state_printf(s, _("[-- Type: "));
+  }
   state_printf(s, _("%s/%s%s%s, Encoding: %s, Size: %s --]\n"), TYPE(b),
                b->subtype, charset ? "; charset=" : "", charset ? charset : "",
                ENCODING(b->encoding), length);
@@ -104,7 +108,9 @@ static void convert_to_state(iconv_t cd, char *bufi, size_t *l, struct State *s)
       ob = bufo, obl = sizeof(bufo);
       iconv(cd, 0, 0, &ob, &obl);
       if (ob != bufo)
+      {
         state_prefix_put(bufo, ob - bufo, s);
+      }
     }
     return;
   }
@@ -123,7 +129,9 @@ static void convert_to_state(iconv_t cd, char *bufi, size_t *l, struct State *s)
     ob = bufo, obl = sizeof(bufo);
     mutt_iconv(cd, &ib, &ibl, &ob, &obl, 0, "?");
     if (ob == bufo)
+    {
       break;
+    }
     state_prefix_put(bufo, ob - bufo, s);
   }
   memmove(bufi, ib, ibl);
@@ -150,12 +158,16 @@ static void decode_xbit(struct State *s, long len, int istext, iconv_t cd)
           len--;
         }
         else
+        {
           ungetc(ch, s->fpin);
+        }
       }
 
       bufi[l++] = c;
       if (l == sizeof(bufi))
+      {
         convert_to_state(cd, bufi, &l, s);
+      }
     }
 
     convert_to_state(cd, bufi, &l, s);
@@ -164,14 +176,18 @@ static void decode_xbit(struct State *s, long len, int istext, iconv_t cd)
     state_reset_prefix(s);
   }
   else
+  {
     mutt_copy_bytes(s->fpin, s->fpout, len);
+  }
 }
 
 static int qp_decode_triple(char *s, char *d)
 {
   /* soft line break */
   if (*s == '=' && !(*(s + 1)))
+  {
     return 1;
+  }
 
   /* quoted-printable triple */
   if (*s == '=' && isxdigit((unsigned char) *(s + 1)) &&
@@ -219,9 +235,13 @@ static void qp_decode_line(char *dest, char *src, size_t *l, int last)
      * may be qp-encoded, so remove \r and \n-terminate;
      * see RfC2045, sect. 6.7, (1): General 8bit representation */
     if (kind == 0 && c == '\r')
+    {
       *(d - 1) = '\n';
+    }
     else
+    {
       *d++ = '\n';
+    }
   }
 
   *d = '\0';
@@ -260,7 +280,9 @@ static void decode_quoted(struct State *s, long len, int istext, iconv_t cd)
   int last; /* store the last character in the input line */
 
   if (istext)
+  {
     state_set_prefix(s);
+  }
 
   while (len > 0)
   {
@@ -274,7 +296,9 @@ static void decode_quoted(struct State *s, long len, int istext, iconv_t cd)
      * we accept.
      */
     if (fgets(line, MIN((ssize_t) sizeof(line), len + 1), s->fpin) == NULL)
+    {
       break;
+    }
 
     linelen = strlen(line);
     len -= linelen;
@@ -289,7 +313,9 @@ static void decode_quoted(struct State *s, long len, int istext, iconv_t cd)
     if (last == '\n')
     {
       while (linelen > 0 && ISSPACE(line[linelen - 1]))
+      {
         linelen--;
+      }
       line[linelen] = '\0';
     }
 
@@ -313,24 +339,32 @@ void mutt_decode_base64(struct State *s, long len, int istext, iconv_t cd)
   buf[4] = '\0';
 
   if (istext)
+  {
     state_set_prefix(s);
+  }
 
   while (len > 0)
   {
     for (i = 0; i < 4 && len > 0; len--)
     {
       if ((ch = fgetc(s->fpin)) == EOF)
+      {
         break;
+      }
       if (ch >= 0 && ch < 128 && (base64val(ch) != -1 || ch == '='))
+      {
         buf[i++] = ch;
+      }
     }
     if (i != 4)
     {
       /* "i" may be zero if there is trailing whitespace, which is not an error */
       if (i != 0)
+      {
         mutt_debug(2, "%s:%d [mutt_decode_base64()]: "
                       "didn't get a multiple of 4 chars.\n",
                    __FILE__, __LINE__);
+      }
       break;
     }
 
@@ -339,51 +373,74 @@ void mutt_decode_base64(struct State *s, long len, int istext, iconv_t cd)
     ch = (c1 << 2) | (c2 >> 4);
 
     if (cr && ch != '\n')
+    {
       bufi[l++] = '\r';
-
+    }
     cr = 0;
 
     if (istext && ch == '\r')
+    {
       cr = 1;
+    }
     else
+    {
       bufi[l++] = ch;
+    }
 
     if (buf[2] == '=')
+    {
       break;
+    }
     c3 = base64val(buf[2]);
     ch = ((c2 & 0xf) << 4) | (c3 >> 2);
 
     if (cr && ch != '\n')
+    {
       bufi[l++] = '\r';
-
+    }
     cr = 0;
 
     if (istext && ch == '\r')
+    {
       cr = 1;
+    }
     else
+    {
       bufi[l++] = ch;
+    }
 
     if (buf[3] == '=')
+    {
       break;
+    }
     c4 = base64val(buf[3]);
     ch = ((c3 & 0x3) << 6) | c4;
 
     if (cr && ch != '\n')
+    {
       bufi[l++] = '\r';
+    }
     cr = 0;
 
     if (istext && ch == '\r')
+    {
       cr = 1;
+    }
     else
+    {
       bufi[l++] = ch;
+    }
 
     if (l + 8 >= sizeof(bufi))
+    {
       convert_to_state(cd, bufi, &l, s);
+    }
   }
 
   if (cr)
+  {
     bufi[l++] = '\r';
-
+  }
   convert_to_state(cd, bufi, &l, s);
   convert_to_state(cd, 0, 0, s);
 
@@ -393,7 +450,9 @@ void mutt_decode_base64(struct State *s, long len, int istext, iconv_t cd)
 static unsigned char decode_byte(char ch)
 {
   if (ch == 96)
+  {
     return 0;
+  }
   return ch - 32;
 }
 
@@ -406,23 +465,33 @@ static void decode_uuencoded(struct State *s, long len, int istext, iconv_t cd)
   size_t k = 0;
 
   if (istext)
+  {
     state_set_prefix(s);
+  }
 
   while (len > 0)
   {
     if ((fgets(tmps, sizeof(tmps), s->fpin)) == NULL)
+    {
       return;
+    }
     len -= mutt_strlen(tmps);
     if ((mutt_strncmp(tmps, "begin", 5) == 0) && ISSPACE(tmps[5]))
+    {
       break;
+    }
   }
   while (len > 0)
   {
     if ((fgets(tmps, sizeof(tmps), s->fpin)) == NULL)
+    {
       return;
+    }
     len -= mutt_strlen(tmps);
     if (mutt_strncmp(tmps, "end", 3) == 0)
+    {
       break;
+    }
     pt = tmps;
     linelen = decode_byte(*pt);
     pt++;
@@ -436,7 +505,9 @@ static void decode_uuencoded(struct State *s, long len, int istext, iconv_t cd)
         bufi[k++] = out;
         c++;
         if (c == linelen)
+        {
           break;
+        }
       }
       convert_to_state(cd, bufi, &k, s);
       pt++;
@@ -544,7 +615,9 @@ static void enriched_wrap(struct EnrichedState *stte)
         y = 0;
 
         while (stte->line[y] && iswspace(stte->line[y]))
+        {
           y++;
+        }
         if (y)
         {
           for (size_t z = y; z <= stte->line_used; z++)
@@ -614,7 +687,9 @@ static void enriched_wrap(struct EnrichedState *stte)
     }
   }
   else
+  {
     stte->indent_len = 0;
+  }
   if (stte->tag_level[RICH_INDENT])
   {
     x = stte->tag_level[RICH_INDENT] * INDENT_SIZE;
@@ -632,7 +707,9 @@ static void enriched_flush(struct EnrichedState *stte, int wrap)
   if (!stte->tag_level[RICH_NOFILL] &&
       (stte->line_len + stte->word_len >
        (stte->wrap_margin - (stte->tag_level[RICH_INDENT_RIGHT] * INDENT_SIZE) - stte->indent_len)))
+  {
     enriched_wrap(stte);
+  }
 
   if (stte->buff_used)
   {
@@ -649,7 +726,9 @@ static void enriched_flush(struct EnrichedState *stte, int wrap)
     stte->buff_used = 0;
   }
   if (wrap)
+  {
     enriched_wrap(stte);
+  }
   fflush(stte->s->fpout);
 }
 
@@ -660,7 +739,9 @@ static void enriched_putwc(wchar_t c, struct EnrichedState *stte)
     if (stte->tag_level[RICH_COLOR])
     {
       if (stte->param_used + 1 >= stte->param_len)
+      {
         safe_realloc(&stte->param, (stte->param_len += STRING) * sizeof(wchar_t));
+      }
 
       stte->param[stte->param_used++] = c;
     }
@@ -677,9 +758,13 @@ static void enriched_putwc(wchar_t c, struct EnrichedState *stte)
   if ((!stte->tag_level[RICH_NOFILL] && iswspace(c)) || c == (wchar_t) '\0')
   {
     if (c == (wchar_t) '\t')
+    {
       stte->word_len += 8 - (stte->line_len + stte->word_len) % 8;
+    }
     else
+    {
       stte->word_len++;
+    }
 
     stte->buffer[stte->buff_used++] = c;
     enriched_flush(stte, 0);
@@ -742,24 +827,32 @@ static void enriched_set_flags(const wchar_t *tag, struct EnrichedState *stte)
   int i, j;
 
   if (*tagptr == (wchar_t) '/')
+  {
     tagptr++;
+  }
 
   for (i = 0, j = -1; EnrichedTags[i].tag_name; i++)
+  {
     if (wcscasecmp(EnrichedTags[i].tag_name, tagptr) == 0)
     {
       j = EnrichedTags[i].index;
       break;
     }
+  }
 
   if (j != -1)
   {
     if (j == RICH_CENTER || j == RICH_FLUSHLEFT || j == RICH_FLUSHRIGHT)
+    {
       enriched_flush(stte, 1);
+    }
 
     if (*tag == (wchar_t) '/')
     {
-      if (stte->tag_level[j]) /* make sure not to go negative */
+      if (stte->tag_level[j])
+      { /* make sure not to go negative */
         stte->tag_level[j]--;
+      }
       if ((stte->s->flags & MUTT_DISPLAY) && j == RICH_PARAM && stte->tag_level[RICH_COLOR])
       {
         stte->param[stte->param_used] = (wchar_t) '\0';
@@ -809,10 +902,14 @@ static void enriched_set_flags(const wchar_t *tag, struct EnrichedState *stte)
       }
     }
     else
+    {
       stte->tag_level[j]++;
+    }
 
     if (j == RICH_EXCERPT)
+    {
       enriched_flush(stte, 1);
+    }
   }
 }
 
@@ -859,9 +956,13 @@ static int text_enriched_handler(struct Body *a, struct State *s)
     if (state != ST_EOF)
     {
       if (!bytes || (wc = fgetwc(s->fpin)) == WEOF)
+      {
         state = ST_EOF;
+      }
       else
+      {
         bytes--;
+      }
     }
 
     switch (state)
@@ -910,20 +1011,28 @@ static int text_enriched_handler(struct Body *a, struct State *s)
           enriched_set_flags(tag, &stte);
           state = TEXT;
         }
-        else if (tag_len < LONG_STRING) /* ignore overly long tags */
+        else if (tag_len < LONG_STRING)
+        { /* ignore overly long tags */
           tag[tag_len++] = wc;
+        }
         else
+        {
           state = BOGUS_TAG;
+        }
         break;
 
       case BOGUS_TAG:
         if (wc == (wchar_t) '>')
+        {
           state = TEXT;
+        }
         break;
 
       case NEWLINE:
         if (wc == (wchar_t) '\n')
+        {
           enriched_flush(&stte, 1);
+        }
         else
         {
           ungetwc(wc, s->fpin);
@@ -963,7 +1072,9 @@ static int is_mmnoask(const char *buf)
   if ((p = getenv("MM_NOASK")) != NULL && *p)
   {
     if (mutt_strcmp(p, "1") == 0)
+    {
       return 1;
+    }
 
     strfcpy(tmp, p, sizeof(tmp));
     p = tmp;
@@ -975,19 +1086,25 @@ static int is_mmnoask(const char *buf)
         if (*(q + 1) == '*')
         {
           if (mutt_strncasecmp(buf, p, q - p) == 0)
+          {
             return 1;
+          }
         }
         else
         {
           if (mutt_strcasecmp(buf, p) == 0)
+          {
             return 1;
+          }
         }
       }
       else
       {
         lng = mutt_strlen(p);
         if (buf[lng] == '/' && (mutt_strncasecmp(buf, p, lng) == 0))
+        {
           return 1;
+        }
       }
 
       p = NULL;
@@ -1033,14 +1150,18 @@ static int is_autoview(struct Body *b)
     }
 
     if (is_mmnoask(type))
+    {
       is_av = 1;
+    }
   }
 
   /* determine if there is a mailcap entry suitable for auto_view
    *
    * WARNING: type is altered by this call as a result of `mime_lookup' support */
   if (is_av)
+  {
     return rfc1524_mailcap_lookup(b, type, NULL, MUTT_AUTOVIEW);
+  }
 
   return 0;
 }
@@ -1070,7 +1191,9 @@ static int alternative_handler(struct Body *a, struct State *s)
                                     (mutt_strcasecmp("digest", a->subtype) == 0));
   }
   else
+  {
     b = a;
+  }
 
   a = b;
 
@@ -1095,9 +1218,13 @@ static int alternative_handler(struct Body *a, struct State *s)
     }
 
     if (a->parts)
+    {
       b = a->parts;
+    }
     else
+    {
       b = a;
+    }
     while (b)
     {
       const char *bt = TYPE(b);
@@ -1113,20 +1240,28 @@ static int alternative_handler(struct Body *a, struct State *s)
     }
 
     if (choice)
+    {
       break;
+    }
   }
 
   /* Next, look for an autoviewable type */
   if (!choice)
   {
     if (a->parts)
+    {
       b = a->parts;
+    }
     else
+    {
       b = a;
+    }
     while (b)
     {
       if (is_autoview(b))
+      {
         choice = b;
+      }
       b = b->next;
     }
   }
@@ -1135,9 +1270,13 @@ static int alternative_handler(struct Body *a, struct State *s)
   if (!choice)
   {
     if (a->parts)
+    {
       b = a->parts;
+    }
     else
+    {
       b = a;
+    }
     while (b)
     {
       if (b->type == TYPETEXT)
@@ -1166,13 +1305,19 @@ static int alternative_handler(struct Body *a, struct State *s)
   if (!choice)
   {
     if (a->parts)
+    {
       b = a->parts;
+    }
     else
+    {
       b = a;
+    }
     while (b)
     {
       if (mutt_can_decode(b))
+      {
         choice = b;
+      }
       b = b->next;
     }
   }
@@ -1194,16 +1339,22 @@ static int alternative_handler(struct Body *a, struct State *s)
     if (mutt_strcmp("info", ShowMultipartAlternative) == 0)
     {
       if (a->parts)
+      {
         b = a->parts;
+      }
       else
+      {
         b = a;
+      }
       while (b)
       {
         if (choice != b)
         {
           count += 1;
           if (count == 1)
+          {
             state_putc('\n', s);
+          }
 
           print_part_line(s, b, count);
         }
@@ -1222,7 +1373,9 @@ static int alternative_handler(struct Body *a, struct State *s)
   }
 
   if (mustfree)
+  {
     mutt_free_body(&a);
+  }
 
   return rc;
 }
@@ -1239,7 +1392,9 @@ static int message_handler(struct Body *a, struct State *s)
 
   off_start = ftello(s->fpin);
   if (off_start < 0)
+  {
     return -1;
+  }
 
   if (a->encoding == ENCBASE64 || a->encoding == ENCQUOTEDPRINTABLE || a->encoding == ENCUUENCODED)
   {
@@ -1249,7 +1404,9 @@ static int message_handler(struct Body *a, struct State *s)
     b->parts = mutt_parse_message_rfc822(s->fpin, b);
   }
   else
+  {
     b = a;
+  }
 
   if (b->parts)
   {
@@ -1263,14 +1420,18 @@ static int message_handler(struct Body *a, struct State *s)
                   s->prefix);
 
     if (s->prefix)
+    {
       state_puts(s->prefix, s);
+    }
     state_putc('\n', s);
 
     rc = mutt_body_handler(b->parts, s);
   }
 
   if (a->encoding == ENCBASE64 || a->encoding == ENCQUOTEDPRINTABLE || a->encoding == ENCUUENCODED)
+  {
     mutt_free_body(&b);
+  }
 
   return rc;
 }
@@ -1282,11 +1443,17 @@ static int message_handler(struct Body *a, struct State *s)
 int mutt_can_decode(struct Body *a)
 {
   if (is_autoview(a))
+  {
     return 1;
+  }
   else if (a->type == TYPETEXT)
+  {
     return 1;
+  }
   else if (a->type == TYPEMESSAGE)
+  {
     return 1;
+  }
   else if (a->type == TYPEMULTIPART)
   {
     struct Body *p = NULL;
@@ -1295,21 +1462,29 @@ int mutt_can_decode(struct Body *a)
     {
       if ((mutt_strcasecmp(a->subtype, "signed") == 0) ||
           (mutt_strcasecmp(a->subtype, "encrypted") == 0))
+      {
         return 1;
+      }
     }
 
     for (p = a->parts; p; p = p->next)
     {
       if (mutt_can_decode(p))
+      {
         return 1;
+      }
     }
   }
   else if (WithCrypto && a->type == TYPEAPPLICATION)
   {
     if ((WithCrypto & APPLICATION_PGP) && mutt_is_application_pgp(a))
+    {
       return 1;
+    }
     if ((WithCrypto & APPLICATION_SMIME) && mutt_is_application_smime(a))
+    {
       return 1;
+    }
   }
 
   return 0;
@@ -1332,7 +1507,9 @@ static int multipart_handler(struct Body *a, struct State *s)
                                     (mutt_strcasecmp("digest", a->subtype) == 0));
   }
   else
+  {
     b = a;
+  }
 
   for (p = b->parts, count = 1; p; p = p->next, count++)
   {
@@ -1353,7 +1530,9 @@ static int multipart_handler(struct Body *a, struct State *s)
         mutt_copy_bytes(s->fpin, s->fpout, p->offset - p->hdr_offset);
       }
       else
+      {
         state_putc('\n', s);
+      }
     }
 
     rc = mutt_body_handler(p, s);
@@ -1368,15 +1547,21 @@ static int multipart_handler(struct Body *a, struct State *s)
 
     if ((s->flags & MUTT_REPLYING) && (option(OPT_INCLUDE_ONLYFIRST)) &&
         (s->flags & MUTT_FIRSTDONE))
+    {
       break;
+    }
   }
 
   if (a->encoding == ENCBASE64 || a->encoding == ENCQUOTEDPRINTABLE || a->encoding == ENCUUENCODED)
+  {
     mutt_free_body(&b);
+  }
 
   /* make failure of a single part non-fatal */
   if (rc < 0)
+  {
     rc = 1;
+  }
   return rc;
 }
 
@@ -1499,12 +1684,18 @@ static int autoview_handler(struct Body *a, struct State *s)
 
     mutt_wait_filter(thepid);
     if (piped)
+    {
       safe_fclose(&fpin);
+    }
     else
+    {
       mutt_unlink(tempfile);
+    }
 
     if (s->flags & MUTT_DISPLAY)
+    {
       mutt_clear_error();
+    }
   }
   rfc1524_free_entry(&entry);
 
@@ -1529,14 +1720,20 @@ static int external_body_handler(struct Body *b, struct State *s)
       return 0;
     }
     else
+    {
       return -1;
+    }
   }
 
   expiration = mutt_get_parameter("expiration", b->parameter);
   if (expiration)
+  {
     expire = mutt_parse_date(expiration, NULL);
+  }
   else
+  {
     expire = -1;
+  }
 
   if (mutt_strcasecmp(access_type, "x-mutt-deleted") == 0)
   {
@@ -1614,12 +1811,18 @@ void mutt_decode_attachment(struct Body *b, struct State *s)
   {
     char *charset = mutt_get_parameter("charset", b->parameter);
     if (!charset && AssumedCharset && *AssumedCharset)
+    {
       charset = mutt_get_default_charset();
+    }
     if (charset && Charset)
+    {
       cd = mutt_iconv_open(Charset, charset, MUTT_ICONV_HOOK_FROM);
+    }
   }
   else if (istext && b->charset)
+  {
     cd = mutt_iconv_open(Charset, b->charset, MUTT_ICONV_HOOK_FROM);
+  }
 
   fseeko(s->fpin, b->offset, SEEK_SET);
   switch (b->encoding)
@@ -1647,7 +1850,9 @@ void mutt_decode_attachment(struct Body *b, struct State *s)
   }
 
   if (cd != (iconv_t)(-1))
+  {
     iconv_close(cd);
+  }
 }
 
 /**
@@ -1668,10 +1873,14 @@ static int text_plain_handler(struct Body *b, struct State *s)
     {
       l = mutt_strlen(buf);
       while (l > 0 && buf[l - 1] == ' ')
+      {
         buf[--l] = '\0';
+      }
     }
     if (s->prefix)
+    {
       state_puts(s->prefix, s);
+    }
     state_puts(buf, s);
     state_putc('\n', s);
   }
@@ -1747,7 +1956,9 @@ static int run_decode_and_handler(struct Body *b, struct State *s,
       decode = 1;
     }
     else
+    {
       b->type = TYPETEXT;
+    }
 
     mutt_decode_attachment(b, s);
 
@@ -1847,7 +2058,9 @@ static int malformed_pgp_encrypted_handler(struct Body *b, struct State *s)
 int mutt_body_handler(struct Body *b, struct State *s)
 {
   if (!b || !s)
+  {
     return -1;
+  }
 
   bool plaintext = false;
   handler_t handler = NULL;
@@ -1870,26 +2083,42 @@ int mutt_body_handler(struct Body *b, struct State *s)
        * the only operation needed.
        */
       if ((WithCrypto & APPLICATION_PGP) && mutt_is_application_pgp(b))
+      {
         handler = crypt_pgp_application_pgp_handler;
+      }
       else if (option(OPT_REFLOW_TEXT) &&
                (mutt_strcasecmp("flowed", mutt_get_parameter("format", b->parameter)) == 0))
+      {
         handler = rfc3676_handler;
+      }
       else
+      {
         handler = text_plain_handler;
+      }
     }
     else if (mutt_strcasecmp("enriched", b->subtype) == 0)
+    {
       handler = text_enriched_handler;
-    else /* text body type without a handler */
+    }
+    else
+    { /* text body type without a handler */
       plaintext = false;
+    }
   }
   else if (b->type == TYPEMESSAGE)
   {
     if (mutt_is_message_type(b->type, b->subtype))
+    {
       handler = message_handler;
+    }
     else if (mutt_strcasecmp("delivery-status", b->subtype) == 0)
+    {
       plaintext = true;
+    }
     else if (mutt_strcasecmp("external-body", b->subtype) == 0)
+    {
       handler = external_body_handler;
+    }
   }
   else if (b->type == TYPEMULTIPART)
   {
@@ -1897,23 +2126,35 @@ int mutt_body_handler(struct Body *b, struct State *s)
 
     if ((mutt_strcmp("inline", ShowMultipartAlternative) != 0) &&
         (mutt_strcasecmp("alternative", b->subtype) == 0))
+    {
       handler = alternative_handler;
+    }
     else if (WithCrypto && (mutt_strcasecmp("signed", b->subtype) == 0))
     {
       p = mutt_get_parameter("protocol", b->parameter);
 
       if (!p)
+      {
         mutt_error(_("Error: multipart/signed has no protocol."));
+      }
       else if (s->flags & MUTT_VERIFY)
+      {
         handler = mutt_signed_handler;
+      }
     }
     else if (mutt_is_valid_multipart_pgp_encrypted(b))
+    {
       handler = valid_pgp_encrypted_handler;
+    }
     else if (mutt_is_malformed_multipart_pgp_encrypted(b))
+    {
       handler = malformed_pgp_encrypted_handler;
+    }
 
     if (!handler)
+    {
       handler = multipart_handler;
+    }
 
     if (b->encoding != ENC7BIT && b->encoding != ENC8BIT && b->encoding != ENCBINARY)
     {
@@ -1931,9 +2172,13 @@ int mutt_body_handler(struct Body *b, struct State *s)
       plaintext = true;
     }
     else if ((WithCrypto & APPLICATION_PGP) && mutt_is_application_pgp(b))
+    {
       handler = crypt_pgp_application_pgp_handler;
+    }
     else if ((WithCrypto & APPLICATION_SMIME) && mutt_is_application_smime(b))
+    {
       handler = crypt_smime_application_smime_handler;
+    }
   }
 
   /* only respect disposition == attachment if we're not
@@ -1952,18 +2197,26 @@ int mutt_body_handler(struct Body *b, struct State *s)
   {
     state_mark_attach(s);
     if (option(OPT_HONOR_DISPOSITION) && b->disposition == DISPATTACH)
+    {
       fputs(_("[-- This is an attachment "), s->fpout);
+    }
     else
+    {
       state_printf(s, _("[-- %s/%s is unsupported "), TYPE(b), b->subtype);
+    }
     if (!option(OPT_VIEW_ATTACH))
     {
       char keystroke[SHORT_STRING];
 
       if (km_expand_key(keystroke, sizeof(keystroke),
                         km_find_func(MENU_PAGER, OP_VIEW_ATTACHMENTS)))
+      {
         fprintf(s->fpout, _("(use '%s' to view this part)"), keystroke);
+      }
       else
+      {
         fputs(_("(need 'view-attachments' bound to key!)"), s->fpout);
+      }
     }
     fputs(" --]\n", s->fpout);
   }

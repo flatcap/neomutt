@@ -59,7 +59,9 @@ void mutt_check_rescore(struct Context *ctx)
     {
       set_option(OPT_NEED_RESORT);
       if ((Sort & SORT_MASK) == SORT_THREADS)
+      {
         set_option(OPT_SORT_SUBTHREADS);
+      }
     }
 
     /* must redraw the index since the user might have %N in it */
@@ -101,8 +103,12 @@ int mutt_parse_score(struct Buffer *buf, struct Buffer *s, unsigned long data,
   /* look for an existing entry and update the value, else add it to the end
      of the list */
   for (ptr = ScoreList, last = NULL; ptr; last = ptr, ptr = ptr->next)
+  {
     if (mutt_strcmp(pattern, ptr->str) == 0)
+    {
       break;
+    }
+  }
   if (!ptr)
   {
     if ((pat = mutt_pattern_comp(pattern, 0, err)) == NULL)
@@ -112,18 +118,24 @@ int mutt_parse_score(struct Buffer *buf, struct Buffer *s, unsigned long data,
     }
     ptr = safe_calloc(1, sizeof(struct Score));
     if (last)
+    {
       last->next = ptr;
+    }
     else
+    {
       ScoreList = ptr;
+    }
     ptr->pat = pat;
     ptr->str = pattern;
   }
   else
+  {
     /* 'buf' arg was cleared and 'pattern' holds the only reference;
      * as here 'ptr' != NULL -> update the value only in which case
      * ptr->str already has the string, so pattern should be freed.
      */
     FREE(&pattern);
+  }
   pc = buf->data;
   if (*pc == '=')
   {
@@ -160,14 +172,22 @@ void mutt_score_message(struct Context *ctx, struct Header *hdr, int upd_ctx)
     }
   }
   if (hdr->score < 0)
+  {
     hdr->score = 0;
+  }
 
   if (hdr->score <= ScoreThresholdDelete)
+  {
     _mutt_set_flag(ctx, hdr, MUTT_DELETE, 1, upd_ctx);
+  }
   if (hdr->score <= ScoreThresholdRead)
+  {
     _mutt_set_flag(ctx, hdr, MUTT_READ, 1, upd_ctx);
+  }
   if (hdr->score >= ScoreThresholdFlag)
+  {
     _mutt_set_flag(ctx, hdr, MUTT_FLAG, 1, upd_ctx);
+  }
 }
 
 int mutt_parse_unscore(struct Buffer *buf, struct Buffer *s, unsigned long data,
@@ -196,9 +216,13 @@ int mutt_parse_unscore(struct Buffer *buf, struct Buffer *s, unsigned long data,
         if (mutt_strcmp(buf->data, tmp->str) == 0)
         {
           if (last)
+          {
             last->next = tmp->next;
+          }
           else
+          {
             ScoreList = tmp->next;
+          }
           mutt_pattern_free(&tmp->pat);
           FREE(&tmp);
           /* there should only be one score per pattern, so we can stop here */

@@ -90,22 +90,32 @@ static int nntp_capabilities(struct NntpServer *nserv)
 
   if (mutt_socket_write(conn, "CAPABILITIES\r\n") < 0 ||
       mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+  {
     return nntp_connect_error(nserv);
+  }
 
   /* no capabilities */
   if (mutt_strncmp("101", buf, 3) != 0)
+  {
     return 1;
+  }
   nserv->hasCAPABILITIES = true;
 
   /* parse capabilities */
   do
   {
     if (mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strcmp("STARTTLS", buf) == 0)
+    {
       nserv->hasSTARTTLS = true;
+    }
     else if (mutt_strcmp("MODE-READER", buf) == 0)
+    {
       mode_reader = true;
+    }
     else if (mutt_strcmp("READER", buf) == 0)
     {
       nserv->hasDATE = true;
@@ -122,12 +132,16 @@ static int nntp_capabilities(struct NntpServer *nserv)
     {
       char *p = buf + 5;
       while (*p == ' ')
+      {
         p++;
+      }
       nserv->authenticators = safe_strdup(p);
     }
 #endif
     else if (mutt_strcmp("OVER", buf) == 0)
+    {
       nserv->hasOVER = true;
+    }
     else if (mutt_strncmp("LIST ", buf, 5) == 0)
     {
       char *p = strstr(buf, " NEWSGROUPS");
@@ -135,30 +149,40 @@ static int nntp_capabilities(struct NntpServer *nserv)
       {
         p += 11;
         if (*p == '\0' || *p == ' ')
+        {
           nserv->hasLIST_NEWSGROUPS = true;
+        }
       }
     }
   } while (mutt_strcmp(".", buf) != 0);
   *buf = '\0';
 #ifdef USE_SASL
   if (nserv->authenticators && strcasestr(authinfo, " SASL "))
+  {
     strfcpy(buf, nserv->authenticators, sizeof(buf));
+  }
 #endif
   if (strcasestr(authinfo, " USER "))
   {
     if (*buf)
+    {
       safe_strcat(buf, sizeof(buf), " ");
+    }
     safe_strcat(buf, sizeof(buf), "USER");
   }
   mutt_str_replace(&nserv->authenticators, buf);
 
   /* current mode is reader */
   if (nserv->hasDATE)
+  {
     return 0;
+  }
 
   /* server is mode-switching, need to switch to reader mode */
   if (mode_reader)
+  {
     return 1;
+  }
 
   mutt_socket_close(conn);
   nserv->status = NNTP_BYE;
@@ -189,27 +213,41 @@ static int nntp_attempt_features(struct NntpServer *nserv)
   {
     if (mutt_socket_write(conn, "DATE\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("500", buf, 3) != 0)
+    {
       nserv->hasDATE = true;
+    }
 
     if (mutt_socket_write(conn, "LISTGROUP\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("500", buf, 3) != 0)
+    {
       nserv->hasLISTGROUP = true;
+    }
 
     if (mutt_socket_write(conn, "LIST NEWSGROUPS +\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("500", buf, 3) != 0)
+    {
       nserv->hasLIST_NEWSGROUPS = true;
+    }
     if (mutt_strncmp("215", buf, 3) == 0)
     {
       do
       {
         if (mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+        {
           return nntp_connect_error(nserv);
+        }
       } while (mutt_strcmp(".", buf) != 0);
     }
   }
@@ -219,9 +257,13 @@ static int nntp_attempt_features(struct NntpServer *nserv)
   {
     if (mutt_socket_write(conn, "XGTITLE\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("500", buf, 3) != 0)
+    {
       nserv->hasXGTITLE = true;
+    }
   }
 
   /* no OVER, trying XOVER */
@@ -229,9 +271,13 @@ static int nntp_attempt_features(struct NntpServer *nserv)
   {
     if (mutt_socket_write(conn, "XOVER\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("500", buf, 3) != 0)
+    {
       nserv->hasXOVER = true;
+    }
   }
 
   /* trying LIST OVERVIEW.FMT */
@@ -239,16 +285,22 @@ static int nntp_attempt_features(struct NntpServer *nserv)
   {
     if (mutt_socket_write(conn, "LIST OVERVIEW.FMT\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("215", buf, 3) != 0)
+    {
       nserv->overview_fmt = OverviewFmt;
+    }
     else
     {
       int chunk, cont = 0;
       size_t buflen = 2 * LONG_STRING, off = 0, b = 0;
 
       if (nserv->overview_fmt)
+      {
         FREE(&nserv->overview_fmt);
+      }
       nserv->overview_fmt = safe_malloc(buflen);
 
       while (true)
@@ -267,7 +319,9 @@ static int nntp_attempt_features(struct NntpServer *nserv)
         }
 
         if (!cont && (mutt_strcmp(".", nserv->overview_fmt + off) == 0))
+        {
           break;
+        }
 
         cont = chunk >= buflen - off ? 1 : 0;
         off += strlen(nserv->overview_fmt + off);
@@ -282,9 +336,13 @@ static int nntp_attempt_features(struct NntpServer *nserv)
           }
           colon = strchr(nserv->overview_fmt + b, ':');
           if (!colon)
+          {
             nserv->overview_fmt[off++] = ':';
+          }
           else if (strcmp(colon + 1, "full") != 0)
+          {
             off = colon + 1 - nserv->overview_fmt;
+          }
           if (strcasecmp(nserv->overview_fmt + b, "Bytes:") == 0)
           {
             int len = strlen(nserv->overview_fmt + b);
@@ -318,11 +376,15 @@ static int nntp_auth(struct NntpServer *nserv)
     /* get login and password */
     if (mutt_account_getuser(&conn->account) || !conn->account.user[0] ||
         mutt_account_getpass(&conn->account) || !conn->account.pass[0])
+    {
       break;
+    }
 
     /* get list of authenticators */
     if (NntpAuthenticators && *NntpAuthenticators)
+    {
       strfcpy(authenticators, NntpAuthenticators, sizeof(authenticators));
+    }
     else if (nserv->hasCAPABILITIES)
     {
       strfcpy(authenticators, NONULL(nserv->authenticators), sizeof(authenticators));
@@ -330,7 +392,9 @@ static int nntp_auth(struct NntpServer *nserv)
       while (*p)
       {
         if (*p == ' ')
+        {
           *p = ':';
+        }
         p++;
       }
     }
@@ -355,23 +419,33 @@ static int nntp_auth(struct NntpServer *nserv)
       method = a;
       a = strchr(a, ':');
       if (a)
+      {
         *a++ = '\0';
 
-      /* check authenticator */
+        /* check authenticator */
+      }
       if (nserv->hasCAPABILITIES)
       {
         char *m = NULL;
 
         if (!nserv->authenticators)
+        {
           continue;
+        }
         m = strcasestr(nserv->authenticators, method);
         if (!m)
+        {
           continue;
+        }
         if (m > nserv->authenticators && *(m - 1) != ' ')
+        {
           continue;
+        }
         m += strlen(method);
         if (*m != '\0' && *m != ' ')
+        {
           continue;
+        }
       }
       mutt_debug(1, "nntp_auth: trying method %s\n", method);
 
@@ -382,32 +456,44 @@ static int nntp_auth(struct NntpServer *nserv)
         snprintf(buf, sizeof(buf), "AUTHINFO USER %s\r\n", conn->account.user);
         if (mutt_socket_write(conn, buf) < 0 ||
             mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+        {
           break;
+        }
 
         /* authenticated, password is not required */
         if (mutt_strncmp("281", buf, 3) == 0)
+        {
           return 0;
+        }
 
         /* username accepted, sending password */
         if (mutt_strncmp("381", buf, 3) == 0)
         {
 #ifdef DEBUG
           if (debuglevel < MUTT_SOCK_LOG_FULL)
+          {
             mutt_debug(MUTT_SOCK_LOG_CMD, "%d> AUTHINFO PASS *\n", conn->fd);
+          }
 #endif
           snprintf(buf, sizeof(buf), "AUTHINFO PASS %s\r\n", conn->account.pass);
           if (mutt_socket_write_d(conn, buf, -1, MUTT_SOCK_LOG_FULL) < 0 ||
               mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+          {
             break;
+          }
 
           /* authenticated */
           if (mutt_strncmp("281", buf, 3) == 0)
+          {
             return 0;
+          }
         }
 
         /* server doesn't support AUTHINFO USER, trying next method */
         if (*buf == '5')
+        {
           continue;
+        }
       }
 
       else
@@ -432,7 +518,9 @@ static int nntp_auth(struct NntpServer *nserv)
           rc = sasl_client_start(saslconn, method, &interaction, &client_out,
                                  &client_len, &mech);
           if (rc != SASL_INTERACT)
+          {
             break;
+          }
           mutt_sasl_interact(interaction);
         }
         if (rc != SASL_OK && rc != SASL_CONTINUE)
@@ -460,7 +548,9 @@ static int nntp_auth(struct NntpServer *nserv)
               for (p = tmp; p < tmp + client_len; p++)
               {
                 if (*p == '\0')
+                {
                   *p = '.';
+                }
               }
               *p = '\0';
               mutt_debug(1, "SASL> %s\n", tmp);
@@ -468,7 +558,9 @@ static int nntp_auth(struct NntpServer *nserv)
 #endif
 
             if (*buf)
+            {
               safe_strcat(buf, sizeof(buf), " ");
+            }
             len = strlen(buf);
             if (sasl_encode64(client_out, client_len, buf + len,
                               sizeof(buf) - len, &len) != SASL_OK)
@@ -484,22 +576,30 @@ static int nntp_auth(struct NntpServer *nserv)
           if (debuglevel < MUTT_SOCK_LOG_FULL)
           {
             if (strchr(buf, ' '))
+            {
               mutt_debug(MUTT_SOCK_LOG_CMD, "%d> AUTHINFO SASL %s%s\n",
                          conn->fd, method, client_len ? " sasl_data" : "");
+            }
             else
+            {
               mutt_debug(MUTT_SOCK_LOG_CMD, "%d> sasl_data\n", conn->fd);
+            }
           }
 #endif
           client_len = 0;
           if (mutt_socket_write_d(conn, buf, -1, MUTT_SOCK_LOG_FULL) < 0 ||
               mutt_socket_readln_d(inbuf, sizeof(inbuf), conn, MUTT_SOCK_LOG_FULL) < 0)
+          {
             break;
+          }
           if ((mutt_strncmp(inbuf, "283 ", 4) != 0) &&
               (mutt_strncmp(inbuf, "383 ", 4) != 0))
           {
 #ifdef DEBUG
             if (debuglevel < MUTT_SOCK_LOG_FULL)
+            {
               mutt_debug(MUTT_SOCK_LOG_CMD, "%d< %s\n", conn->fd, inbuf);
+            }
 #endif
             break;
           }
@@ -512,7 +612,9 @@ static int nntp_auth(struct NntpServer *nserv)
 #endif
 
           if (strcmp("=", inbuf + 4) == 0)
+          {
             len = 0;
+          }
           else if (sasl_decode64(inbuf + 4, strlen(inbuf + 4), buf,
                                  sizeof(buf) - 1, &len) != SASL_OK)
           {
@@ -528,7 +630,9 @@ static int nntp_auth(struct NntpServer *nserv)
             for (p = tmp; p < tmp + len; p++)
             {
               if (*p == '\0')
+              {
                 *p = '.';
+              }
             }
             *p = '\0';
             mutt_debug(1, "SASL< %s\n", tmp);
@@ -539,11 +643,15 @@ static int nntp_auth(struct NntpServer *nserv)
           {
             rc = sasl_client_step(saslconn, buf, len, &interaction, &client_out, &client_len);
             if (rc != SASL_INTERACT)
+            {
               break;
+            }
             mutt_sasl_interact(interaction);
           }
           if (*inbuf != '3')
+          {
             break;
+          }
 
           *buf = '\0';
         } /* looping protocol */
@@ -557,17 +665,23 @@ static int nntp_auth(struct NntpServer *nserv)
         /* terminate SASL session */
         sasl_dispose(&saslconn);
         if (conn->fd < 0)
+        {
           break;
+        }
         if (mutt_strncmp(inbuf, "383 ", 4) == 0)
         {
           if (mutt_socket_write(conn, "*\r\n") < 0 ||
               mutt_socket_readln(inbuf, sizeof(inbuf), conn) < 0)
+          {
             break;
+          }
         }
 
         /* server doesn't support AUTHINFO SASL, trying next method */
         if (*inbuf == '5')
+        {
           continue;
+        }
 #else
         continue;
 #endif /* USE_SASL */
@@ -589,7 +703,9 @@ static int nntp_auth(struct NntpServer *nserv)
     mutt_sleep(2);
   }
   else
+  {
     mutt_socket_close(conn);
+  }
   return -1;
 }
 
@@ -604,19 +720,29 @@ int nntp_open_connection(struct NntpServer *nserv)
   bool posting = false, auth = true;
 
   if (nserv->status == NNTP_OK)
+  {
     return 0;
+  }
   if (nserv->status == NNTP_BYE)
+  {
     return -1;
+  }
   nserv->status = NNTP_NONE;
 
   if (mutt_socket_open(conn) < 0)
+  {
     return -1;
+  }
 
   if (mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+  {
     return nntp_connect_error(nserv);
+  }
 
   if (mutt_strncmp("200", buf, 3) == 0)
+  {
     posting = true;
+  }
   else if (mutt_strncmp("201", buf, 3) != 0)
   {
     mutt_socket_close(conn);
@@ -629,20 +755,28 @@ int nntp_open_connection(struct NntpServer *nserv)
   /* get initial capabilities */
   cap = nntp_capabilities(nserv);
   if (cap < 0)
+  {
     return -1;
+  }
 
   /* tell news server to switch to mode reader if it isn't so */
   if (cap > 0)
   {
     if (mutt_socket_write(conn, "MODE READER\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
 
     if (mutt_strncmp("200", buf, 3) == 0)
+    {
       posting = true;
+    }
     else if (mutt_strncmp("201", buf, 3) == 0)
+    {
       posting = false;
-    /* error if has capabilities, ignore result if no capabilities */
+      /* error if has capabilities, ignore result if no capabilities */
+    }
     else if (nserv->hasCAPABILITIES)
     {
       mutt_socket_close(conn);
@@ -656,7 +790,9 @@ int nntp_open_connection(struct NntpServer *nserv)
     {
       cap = nntp_capabilities(nserv);
       if (cap < 0)
+      {
         return -1;
+      }
     }
   }
 
@@ -669,17 +805,21 @@ int nntp_open_connection(struct NntpServer *nserv)
   if (nserv->use_tls != 1 && (nserv->hasSTARTTLS || option(OPT_SSL_FORCE_TLS)))
   {
     if (nserv->use_tls == 0)
+    {
       nserv->use_tls =
           option(OPT_SSL_FORCE_TLS) ||
                   query_quadoption(OPT_SSL_STARTTLS,
                                    _("Secure connection with TLS?")) == MUTT_YES ?
               2 :
               1;
+    }
     if (nserv->use_tls == 2)
     {
       if (mutt_socket_write(conn, "STARTTLS\r\n") < 0 ||
           mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+      {
         return nntp_connect_error(nserv);
+      }
       if (mutt_strncmp("382", buf, 3) != 0)
       {
         nserv->use_tls = 0;
@@ -700,7 +840,9 @@ int nntp_open_connection(struct NntpServer *nserv)
         /* recheck capabilities after STARTTLS */
         cap = nntp_capabilities(nserv);
         if (cap < 0)
+        {
           return -1;
+        }
       }
     }
   }
@@ -710,27 +852,37 @@ int nntp_open_connection(struct NntpServer *nserv)
   if (conn->account.flags & MUTT_ACCT_USER)
   {
     if (!conn->account.user[0])
+    {
       auth = false;
+    }
   }
   else
   {
     if (mutt_socket_write(conn, "STAT\r\n") < 0 ||
         mutt_socket_readln(buf, sizeof(buf), conn) < 0)
+    {
       return nntp_connect_error(nserv);
+    }
     if (mutt_strncmp("480", buf, 3) != 0)
+    {
       auth = false;
+    }
   }
 
   /* authenticate */
   if (auth && nntp_auth(nserv) < 0)
+  {
     return -1;
+  }
 
   /* get final capabilities after authentication */
   if (nserv->hasCAPABILITIES && (auth || cap > 0))
   {
     cap = nntp_capabilities(nserv);
     if (cap < 0)
+    {
       return -1;
+    }
     if (cap > 0)
     {
       mutt_socket_close(conn);
@@ -742,7 +894,9 @@ int nntp_open_connection(struct NntpServer *nserv)
 
   /* attempt features */
   if (nntp_attempt_features(nserv) < 0)
+  {
     return -1;
+  }
 
   nserv->status = NNTP_OK;
   return 0;
@@ -757,7 +911,9 @@ static int nntp_query(struct NntpData *nntp_data, char *line, size_t linelen)
   char buf[LONG_STRING] = { 0 };
 
   if (nserv->status == NNTP_BYE)
+  {
     return -1;
+  }
 
   while (true)
   {
@@ -766,16 +922,22 @@ static int nntp_query(struct NntpData *nntp_data, char *line, size_t linelen)
       int rc = 0;
 
       if (*line)
+      {
         rc = mutt_socket_write(nserv->conn, line);
+      }
       else if (nntp_data->group)
       {
         snprintf(buf, sizeof(buf), "GROUP %s\r\n", nntp_data->group);
         rc = mutt_socket_write(nserv->conn, buf);
       }
       if (rc >= 0)
+      {
         rc = mutt_socket_readln(buf, sizeof(buf), nserv->conn);
+      }
       if (rc >= 0)
+      {
         break;
+      }
     }
 
     /* reconnect */
@@ -783,7 +945,9 @@ static int nntp_query(struct NntpData *nntp_data, char *line, size_t linelen)
     {
       nserv->status = NNTP_NONE;
       if (nntp_open_connection(nserv) == 0)
+      {
         break;
+      }
 
       snprintf(buf, sizeof(buf), _("Connection to %s lost. Reconnect?"),
                nserv->conn->account.host);
@@ -800,10 +964,14 @@ static int nntp_query(struct NntpData *nntp_data, char *line, size_t linelen)
       snprintf(buf, sizeof(buf), "GROUP %s\r\n", nntp_data->group);
       if (mutt_socket_write(nserv->conn, buf) < 0 ||
           mutt_socket_readln(buf, sizeof(buf), nserv->conn) < 0)
+      {
         return nntp_connect_error(nserv);
+      }
     }
     if (!*line)
+    {
       break;
+    }
   }
 
   strfcpy(line, buf, linelen);
@@ -835,11 +1003,15 @@ static int nntp_fetch_lines(struct NntpData *nntp_data, char *query, size_t qlen
     struct Progress progress;
 
     if (msg)
+    {
       mutt_progress_init(&progress, msg, MUTT_PROGRESS_MSG, ReadInc, -1);
+    }
 
     strfcpy(buf, query, sizeof(buf));
     if (nntp_query(nntp_data, buf, sizeof(buf)) < 0)
+    {
       return -1;
+    }
     if (buf[0] != '2')
     {
       strfcpy(query, buf, qlen);
@@ -869,20 +1041,28 @@ static int nntp_fetch_lines(struct NntpData *nntp_data, char *query, size_t qlen
           break;
         }
         if (buf[1] == '.')
+        {
           p++;
+        }
       }
 
       strfcpy(line + off, p, sizeof(buf));
 
       if (chunk >= sizeof(buf))
+      {
         off += strlen(p);
+      }
       else
       {
         if (msg)
+        {
           mutt_progress_update(&progress, ++lines, -1);
+        }
 
         if (rc == 0 && funct(line, data) < 0)
+        {
           rc = -2;
+        }
         off = 0;
       }
 
@@ -904,7 +1084,9 @@ static int fetch_description(char *line, void *data)
   char *desc = NULL;
 
   if (!line)
+  {
     return 0;
+  }
 
   desc = strpbrk(line, " \t");
   if (desc)
@@ -913,7 +1095,9 @@ static int fetch_description(char *line, void *data)
     desc += strspn(desc, " \t");
   }
   else
+  {
     desc = strchr(line, '\0');
+  }
 
   nntp_data = hash_find(nserv->groups_hash, line);
   if (nntp_data && (mutt_strcmp(desc, nntp_data->desc) != 0))
@@ -944,13 +1128,21 @@ static int get_description(struct NntpData *nntp_data, char *wildmat, char *msg)
   /* get newsgroup description, if possible */
   nserv = nntp_data->nserv;
   if (!wildmat)
+  {
     wildmat = nntp_data->group;
+  }
   if (nserv->hasLIST_NEWSGROUPS)
+  {
     cmd = "LIST NEWSGROUPS";
+  }
   else if (nserv->hasXGTITLE)
+  {
     cmd = "XGTITLE";
+  }
   else
+  {
     return 0;
+  }
 
   snprintf(buf, sizeof(buf), "%s %s\r\n", cmd, wildmat);
   rc = nntp_fetch_lines(nntp_data, buf, sizeof(buf), msg, fetch_description, nserv);
@@ -985,19 +1177,27 @@ static void nntp_parse_xref(struct Context *ctx, struct Header *hdr)
     /* skip to end of word */
     p = strpbrk(p, " \t");
     if (p)
+    {
       *p++ = '\0';
 
-    /* find colon */
+      /* find colon */
+    }
     colon = strchr(grp, ':');
     if (!colon)
+    {
       continue;
+    }
     *colon++ = '\0';
     if (sscanf(colon, ANUM, &anum) != 1)
+    {
       continue;
+    }
 
     nntp_article_status(ctx, hdr, grp, anum);
     if (hdr && !NHDR(hdr)->article_num && (mutt_strcmp(nntp_data->group, grp) == 0))
+    {
       NHDR(hdr)->article_num = anum;
+    }
   }
   FREE(&buf);
 }
@@ -1010,9 +1210,13 @@ static int fetch_tempfile(char *line, void *data)
   FILE *fp = data;
 
   if (!line)
+  {
     rewind(fp);
+  }
   else if (fputs(line, fp) == EOF || fputc('\n', fp) == EOF)
+  {
     return -1;
+  }
   return 0;
 }
 
@@ -1041,11 +1245,17 @@ static int fetch_numbers(char *line, void *data)
   anum_t anum;
 
   if (!line)
+  {
     return 0;
+  }
   if (sscanf(line, ANUM, &anum) != 1)
+  {
     return 0;
+  }
   if (anum < fc->first || anum > fc->last)
+  {
     return 0;
+  }
   fc->messages[anum - fc->first] = 1;
   return 0;
 }
@@ -1066,26 +1276,36 @@ static int parse_overview_line(char *line, void *data)
   anum_t anum;
 
   if (!line)
+  {
     return 0;
+  }
 
   /* parse article number */
   field = strchr(line, '\t');
   if (field)
+  {
     *field++ = '\0';
+  }
   if (sscanf(line, ANUM, &anum) != 1)
+  {
     return 0;
+  }
   mutt_debug(2, "parse_overview_line: " ANUM "\n", anum);
 
   /* out of bounds */
   if (anum < fc->first || anum > fc->last)
+  {
     return 0;
+  }
 
   /* not in LISTGROUP */
   if (!fc->messages[anum - fc->first])
   {
     /* progress */
     if (!ctx->quiet)
+    {
       mutt_progress_update(&fc->progress, anum - fc->first + 1, -1);
+    }
     return 0;
   }
 
@@ -1093,7 +1313,9 @@ static int parse_overview_line(char *line, void *data)
   mutt_mktemp(tempfile, sizeof(tempfile));
   fp = safe_fopen(tempfile, "w+");
   if (!fp)
+  {
     return -1;
+  }
 
   header = nntp_data->nserv->overview_fmt;
   while (field)
@@ -1113,7 +1335,9 @@ static int parse_overview_line(char *line, void *data)
 
     field = strchr(field, '\t');
     if (field)
+    {
       *field++ = '\0';
+    }
     if (fputs(b, fp) == EOF || fputc('\n', fp) == EOF)
     {
       safe_fclose(&fp);
@@ -1125,7 +1349,9 @@ static int parse_overview_line(char *line, void *data)
 
   /* allocate memory for headers */
   if (ctx->msgcount >= ctx->hdrmax)
+  {
     mx_alloc_memory(ctx);
+  }
 
   /* parse header */
   hdr = ctx->hdrs[ctx->msgcount] = mutt_new_header();
@@ -1184,22 +1410,32 @@ static int parse_overview_line(char *line, void *data)
     hdr->data = safe_calloc(1, sizeof(struct NntpHeaderData));
     NHDR(hdr)->article_num = anum;
     if (fc->restore)
+    {
       hdr->changed = true;
+    }
     else
     {
       nntp_article_status(ctx, hdr, NULL, anum);
       if (!hdr->read)
+      {
         nntp_parse_xref(ctx, hdr);
+      }
     }
     if (anum > nntp_data->last_loaded)
+    {
       nntp_data->last_loaded = anum;
+    }
   }
   else
+  {
     mutt_free_header(&hdr);
+  }
 
   /* progress */
   if (!ctx->quiet)
+  {
     mutt_progress_update(&fc->progress, anum - fc->first + 1, -1);
+  }
   return 0;
 }
 
@@ -1223,7 +1459,9 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
 
   /* if empty group or nothing to do */
   if (!last || first > last)
+  {
     return 0;
+  }
 
   /* init fetch context */
   fc.ctx = ctx;
@@ -1239,11 +1477,17 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
   if (option(OPT_NNTP_LISTGROUP) && nntp_data->nserv->hasLISTGROUP && !nntp_data->deleted)
   {
     if (!ctx->quiet)
+    {
       mutt_message(_("Fetching list of articles..."));
+    }
     if (nntp_data->nserv->hasLISTGROUPrange)
+    {
       snprintf(buf, sizeof(buf), "LISTGROUP %s %d-%d\r\n", nntp_data->group, first, last);
+    }
     else
+    {
       snprintf(buf, sizeof(buf), "LISTGROUP %s\r\n", nntp_data->group);
+    }
     rc = nntp_fetch_lines(nntp_data, buf, sizeof(buf), NULL, fetch_numbers, &fc);
     if (rc > 0)
     {
@@ -1255,7 +1499,9 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
       for (current = first; current <= last && rc == 0; current++)
       {
         if (fc.messages[current - first])
+        {
           continue;
+        }
 
         snprintf(buf, sizeof(buf), "%d", current);
         if (nntp_data->bcache)
@@ -1275,17 +1521,25 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
     }
   }
   else
+  {
     for (current = first; current <= last; current++)
+    {
       fc.messages[current - first] = 1;
+    }
+  }
 
   /* fetching header from cache or server, or fallback to fetch overview */
   if (!ctx->quiet)
+  {
     mutt_progress_init(&fc.progress, _("Fetching message headers..."),
                        MUTT_PROGRESS_MSG, ReadInc, last - first + 1);
+  }
   for (current = first; current <= last && rc == 0; current++)
   {
     if (!ctx->quiet)
+    {
       mutt_progress_update(&fc.progress, current - first + 1, -1);
+    }
 
 #ifdef USE_HCACHE
     snprintf(buf, sizeof(buf), "%d", current);
@@ -1293,11 +1547,15 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
 
     /* delete header from cache that does not exist on server */
     if (!fc.messages[current - first])
+    {
       continue;
+    }
 
     /* allocate memory for headers */
     if (ctx->msgcount >= ctx->hdrmax)
+    {
       mx_alloc_memory(ctx);
+    }
 
 #ifdef USE_HCACHE
     /* try to fetch header from cache */
@@ -1329,16 +1587,24 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
 
         /* don't try to fetch header from removed newsgroup */
         if (nntp_data->deleted)
+    {
       continue;
 
-    /* fallback to fetch overview */
+      /* fallback to fetch overview */
+    }
     else if (nntp_data->nserv->hasOVER || nntp_data->nserv->hasXOVER)
+    {
       if (option(OPT_NNTP_LISTGROUP) && nntp_data->nserv->hasLISTGROUP)
+      {
         break;
+      }
       else
+      {
         continue;
+      }
 
-    /* fetch header from server */
+      /* fetch header from server */
+    }
     else
     {
       FILE *fp = NULL;
@@ -1362,7 +1628,9 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
         safe_fclose(&fp);
         unlink(tempfile);
         if (rc < 0)
+        {
           break;
+        }
 
         /* invalid response */
         if (mutt_strncmp("423", buf, 3) != 0)
@@ -1399,20 +1667,28 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
     hdr->data = safe_calloc(1, sizeof(struct NntpHeaderData));
     NHDR(hdr)->article_num = current;
     if (restore)
+    {
       hdr->changed = true;
+    }
     else
     {
       nntp_article_status(ctx, hdr, NULL, NHDR(hdr)->article_num);
       if (!hdr->read)
+      {
         nntp_parse_xref(ctx, hdr);
+      }
     }
     if (current > nntp_data->last_loaded)
+    {
       nntp_data->last_loaded = current;
+    }
     first_over = current + 1;
   }
 
   if (!option(OPT_NNTP_LISTGROUP) || !nntp_data->nserv->hasLISTGROUP)
+  {
     current = first_over;
+  }
 
   /* fetch overview information */
   if (current <= last && rc == 0 && !nntp_data->deleted)
@@ -1428,11 +1704,15 @@ static int nntp_fetch_headers(struct Context *ctx, void *hc, anum_t first,
   }
 
   if (ctx->msgcount > oldmsgcount)
+  {
     mx_update_context(ctx, ctx->msgcount - oldmsgcount);
+  }
 
   FREE(&fc.messages);
   if (rc != 0)
+  {
     return -1;
+  }
   mutt_clear_error();
   return 0;
 }
@@ -1465,7 +1745,9 @@ static int nntp_open_mailbox(struct Context *ctx)
   url_tostring(&url, server, sizeof(server), 0);
   nserv = nntp_select_server(server, 1);
   if (!nserv)
+  {
     return -1;
+  }
   CurrentNewsSrv = nserv;
 
   /* find news group data structure */
@@ -1480,7 +1762,9 @@ static int nntp_open_mailbox(struct Context *ctx)
 
   mutt_bit_unset(ctx->rights, MUTT_ACL_INSERT);
   if (!nntp_data->newsrc_ent && !nntp_data->subscribed && !option(OPT_SAVE_UNSUBSCRIBED))
+  {
     ctx->readonly = true;
+  }
 
   /* select newsgroup */
   mutt_message(_("Selecting %s..."), group);
@@ -1533,7 +1817,9 @@ static int nntp_open_mailbox(struct Context *ctx)
         return -1;
       }
       if (nntp_data->desc)
+      {
         nntp_active_save_cache(nserv);
+      }
     }
   }
 
@@ -1541,12 +1827,16 @@ static int nntp_open_mailbox(struct Context *ctx)
   ctx->data = nntp_data;
   if (!nntp_data->bcache && (nntp_data->newsrc_ent || nntp_data->subscribed ||
                              option(OPT_SAVE_UNSUBSCRIBED)))
+  {
     nntp_data->bcache = mutt_bcache_open(&nserv->conn->account, nntp_data->group);
+  }
 
   /* strip off extra articles if adding context is greater than $nntp_context */
   first = nntp_data->first_message;
   if (NntpContext && nntp_data->last_message - first + 1 > NntpContext)
+  {
     first = nntp_data->last_message - NntpContext + 1;
+  }
   nntp_data->last_loaded = first ? first - 1 : 0;
   count = nntp_data->first_message;
   nntp_data->first_message = first;
@@ -1567,7 +1857,9 @@ static int nntp_open_mailbox(struct Context *ctx)
   mutt_hcache_close(hc);
 #endif
   if (rc < 0)
+  {
     return -1;
+  }
   nntp_data->last_loaded = nntp_data->last_message;
   nserv->newsrc_modified = false;
   return 0;
@@ -1594,7 +1886,9 @@ static int nntp_open_message(struct Context *ctx, struct Message *msg, int msgno
     {
       msg->fp = safe_fopen(acache->path, "r");
       if (msg->fp)
+      {
         return 0;
+      }
     }
     /* clear previous entry */
     else
@@ -1608,13 +1902,17 @@ static int nntp_open_message(struct Context *ctx, struct Message *msg, int msgno
   if (msg->fp)
   {
     if (NHDR(hdr)->parsed)
+    {
       return 0;
+    }
   }
   else
   {
     /* don't try to fetch article from removed newsgroup */
     if (nntp_data->deleted)
+    {
       return -1;
+    }
 
     /* create new cache file */
     mutt_message(fetch_msg);
@@ -1649,32 +1947,46 @@ static int nntp_open_message(struct Context *ctx, struct Message *msg, int msgno
       if (rc > 0)
       {
         if (mutt_strncmp(NHDR(hdr)->article_num ? "423" : "430", buf, 3) == 0)
+        {
           mutt_error(_("Article %d not found on the server."),
                      NHDR(hdr)->article_num ? article : hdr->env->message_id);
+        }
         else
+        {
           mutt_error("ARTICLE: %s", buf);
+        }
       }
       return -1;
     }
 
     if (!acache->path)
+    {
       mutt_bcache_commit(nntp_data->bcache, article);
+    }
   }
 
   /* replace envelope with new one
    * hash elements must be updated because pointers will be changed */
   if (ctx->id_hash && hdr->env->message_id)
+  {
     hash_delete(ctx->id_hash, hdr->env->message_id, hdr, NULL);
+  }
   if (ctx->subj_hash && hdr->env->real_subj)
+  {
     hash_delete(ctx->subj_hash, hdr->env->real_subj, hdr, NULL);
+  }
 
   mutt_free_envelope(&hdr->env);
   hdr->env = mutt_read_rfc822_header(msg->fp, hdr, 0, 0);
 
   if (ctx->id_hash && hdr->env->message_id)
+  {
     hash_insert(ctx->id_hash, hdr->env->message_id, hdr);
+  }
   if (ctx->subj_hash && hdr->env->real_subj)
+  {
     hash_insert(ctx->subj_hash, hdr->env->real_subj, hdr);
+  }
 
   /* fix content length */
   fseek(msg->fp, 0, SEEK_END);
@@ -1690,7 +2002,9 @@ static int nntp_open_message(struct Context *ctx, struct Message *msg, int msgno
    * full headers aren't parsed with overview, so the information wasn't
    * available then */
   if (WithCrypto)
+  {
     hdr->security = crypt_query(hdr->content);
+  }
 
   rewind(msg->fp);
   mutt_clear_error();
@@ -1716,12 +2030,16 @@ int nntp_post(const char *msg)
   size_t len;
 
   if (Context && Context->magic == MUTT_NNTP)
+  {
     nntp_data = Context->data;
+  }
   else
   {
     CurrentNewsSrv = nntp_select_server(NewsServer, 0);
     if (!CurrentNewsSrv)
+    {
       return -1;
+    }
 
     nntp_data = &nntp_tmp;
     nntp_data->nserv = CurrentNewsSrv;
@@ -1762,7 +2080,9 @@ int nntp_post(const char *msg)
     }
     if (mutt_socket_write_d(nntp_data->nserv->conn, buf[1] == '.' ? buf : buf + 1,
                             -1, MUTT_SOCK_LOG_HDR) < 0)
+    {
       return nntp_connect_error(nntp_data->nserv);
+    }
   }
   safe_fclose(&fp);
 
@@ -1770,7 +2090,9 @@ int nntp_post(const char *msg)
        mutt_socket_write_d(nntp_data->nserv->conn, "\r\n", -1, MUTT_SOCK_LOG_HDR) < 0) ||
       mutt_socket_write_d(nntp_data->nserv->conn, ".\r\n", -1, MUTT_SOCK_LOG_HDR) < 0 ||
       mutt_socket_readln(buf, sizeof(buf), nntp_data->nserv->conn) < 0)
+  {
     return nntp_connect_error(nntp_data->nserv);
+  }
   if (buf[0] != '2')
   {
     mutt_error(_("Can't post article: %s"), buf);
@@ -1792,11 +2114,17 @@ static int nntp_group_poll(struct NntpData *nntp_data, int update_stat)
 
   /* use GROUP command to poll newsgroup */
   if (nntp_query(nntp_data, buf, sizeof(buf)) < 0)
+  {
     return -1;
+  }
   if (sscanf(buf, "211 " ANUM " " ANUM " " ANUM, &count, &first, &last) != 3)
+  {
     return 0;
+  }
   if (first == nntp_data->first_message && last == nntp_data->last_message)
+  {
     return 0;
+  }
 
   /* articles have been renumbered */
   if (last < nntp_data->last_message)
@@ -1813,13 +2141,19 @@ static int nntp_group_poll(struct NntpData *nntp_data, int update_stat)
   nntp_data->first_message = first;
   nntp_data->last_message = last;
   if (!update_stat)
+  {
     return 1;
 
-  /* update counters */
+    /* update counters */
+  }
   else if (!last || (!nntp_data->newsrc_ent && !nntp_data->last_cached))
+  {
     nntp_data->unread = count;
+  }
   else
+  {
     nntp_group_unread_stat(nntp_data);
+  }
   return 1;
 }
 
@@ -1842,11 +2176,15 @@ static int check_mailbox(struct Context *ctx)
   void *hc = NULL;
 
   if (nserv->check_time + NntpPoll > now)
+  {
     return 0;
+  }
 
   mutt_message(_("Checking for new messages..."));
   if (nntp_newsrc_parse(nserv) < 0)
+  {
     return -1;
+  }
 
   nserv->check_time = now;
   rc = nntp_group_poll(nntp_data, 0);
@@ -1856,13 +2194,17 @@ static int check_mailbox(struct Context *ctx)
     return -1;
   }
   if (rc)
+  {
     nntp_active_save_cache(nserv);
+  }
 
   /* articles have been renumbered, remove all headers */
   if (nntp_data->last_message < nntp_data->last_loaded)
   {
     for (i = 0; i < ctx->msgcount; i++)
+    {
       mutt_free_header(&ctx->hdrs[i]);
+    }
     ctx->msgcount = 0;
     ctx->tagged = 0;
 
@@ -1870,7 +2212,9 @@ static int check_mailbox(struct Context *ctx)
     {
       nntp_data->last_loaded = nntp_data->first_message - 1;
       if (NntpContext && nntp_data->last_message - nntp_data->last_loaded > NntpContext)
+      {
         nntp_data->last_loaded = nntp_data->last_message - NntpContext;
+      }
     }
     ret = MUTT_REOPENED;
   }
@@ -1887,7 +2231,9 @@ static int check_mailbox(struct Context *ctx)
     anum_t first = nntp_data->first_message;
 
     if (NntpContext && nntp_data->last_message - first + 1 > NntpContext)
+    {
       first = nntp_data->last_message - NntpContext + 1;
+    }
     messages = safe_calloc(nntp_data->last_loaded - first + 1, sizeof(unsigned char));
     hc = nntp_hcache_open(nntp_data);
     nntp_hcache_update(nntp_data, hc);
@@ -1904,7 +2250,9 @@ static int check_mailbox(struct Context *ctx)
       if (hc)
       {
         if (anum >= first && anum <= nntp_data->last_loaded)
+        {
           messages[anum - first] = 1;
+        }
 
         snprintf(buf, sizeof(buf), "%d", anum);
         hdata = mutt_hcache_fetch(hc, buf, strlen(buf));
@@ -1938,7 +2286,9 @@ static int check_mailbox(struct Context *ctx)
         ctx->hdrs[i]->old = false;
         nntp_article_status(ctx, ctx->hdrs[i], NULL, anum);
         if (!ctx->hdrs[i]->read)
+        {
           nntp_parse_xref(ctx, ctx->hdrs[i]);
+        }
       }
       ctx->hdrs[j++] = ctx->hdrs[i];
     }
@@ -1950,7 +2300,9 @@ static int check_mailbox(struct Context *ctx)
     for (anum = first; anum <= nntp_data->last_loaded; anum++)
     {
       if (messages[anum - first])
+      {
         continue;
+      }
 
       snprintf(buf, sizeof(buf), "%d", anum);
       hdata = mutt_hcache_fetch(hc, buf, strlen(buf));
@@ -1958,7 +2310,9 @@ static int check_mailbox(struct Context *ctx)
       {
         mutt_debug(2, "nntp_check_mailbox: mutt_hcache_fetch %s\n", buf);
         if (ctx->msgcount >= ctx->hdrmax)
+        {
           mx_alloc_memory(ctx);
+        }
 
         ctx->hdrs[ctx->msgcount] = hdr = mutt_hcache_restore(hdata);
         mutt_hcache_free(hc, &hdata);
@@ -1981,7 +2335,9 @@ static int check_mailbox(struct Context *ctx)
         NHDR(hdr)->article_num = anum;
         nntp_article_status(ctx, hdr, NULL, anum);
         if (!hdr->read)
+        {
           nntp_parse_xref(ctx, hdr);
+        }
       }
     }
     FREE(&messages);
@@ -1995,9 +2351,13 @@ static int check_mailbox(struct Context *ctx)
   if (ret == MUTT_REOPENED)
   {
     if (ctx->subj_hash)
+    {
       hash_destroy(&ctx->subj_hash, NULL);
+    }
     if (ctx->id_hash)
+    {
       hash_destroy(&ctx->id_hash, NULL);
+    }
     mutt_clear_threads(ctx);
 
     ctx->vcount = 0;
@@ -2027,16 +2387,22 @@ static int check_mailbox(struct Context *ctx)
     rc = nntp_fetch_headers(ctx, hc, nntp_data->last_loaded + 1, nntp_data->last_message, 0);
     ctx->quiet = quiet;
     if (rc >= 0)
+    {
       nntp_data->last_loaded = nntp_data->last_message;
+    }
     if (ret == 0 && ctx->msgcount > oldmsgcount)
+    {
       ret = MUTT_NEW_MAIL;
+    }
   }
 
 #ifdef USE_HCACHE
   mutt_hcache_close(hc);
 #endif
   if (ret)
+  {
     nntp_newsrc_close(nserv);
+  }
   mutt_clear_error();
   return ret;
 }
@@ -2075,7 +2441,9 @@ static int nntp_sync_mailbox(struct Context *ctx, int *index_hint)
   nntp_data->nserv->check_time = 0;
   rc = check_mailbox(ctx);
   if (rc)
+  {
     return rc;
+  }
 
 #ifdef USE_HCACHE
   nntp_data->last_cached = 0;
@@ -2098,7 +2466,9 @@ static int nntp_sync_mailbox(struct Context *ctx, int *index_hint)
     if (hc && (hdr->changed || hdr->deleted))
     {
       if (hdr->deleted && !hdr->read)
+      {
         nntp_data->unread--;
+      }
       mutt_debug(2, "nntp_sync_mailbox: mutt_hcache_store %s\n", buf);
       mutt_hcache_store(hc, buf, strlen(buf), hdr, 0);
     }
@@ -2128,17 +2498,23 @@ static int nntp_close_mailbox(struct Context *ctx)
   struct NntpData *nntp_data = ctx->data, *nntp_tmp = NULL;
 
   if (!nntp_data)
+  {
     return 0;
+  }
 
   nntp_data->unread = ctx->unread;
 
   nntp_acache_free(nntp_data);
   if (!nntp_data->nserv || !nntp_data->nserv->groups_hash || !nntp_data->group)
+  {
     return 0;
+  }
 
   nntp_tmp = hash_find(nntp_data->nserv->groups_hash, nntp_data->group);
   if (nntp_tmp == NULL || nntp_tmp != nntp_data)
+  {
     nntp_data_free(nntp_data);
+  }
   return 0;
 }
 
@@ -2158,7 +2534,9 @@ static int nntp_date(struct NntpServer *nserv, time_t *now)
     nntp_data.group = NULL;
     strfcpy(buf, "DATE\r\n", sizeof(buf));
     if (nntp_query(&nntp_data, buf, sizeof(buf)) < 0)
+    {
       return -1;
+    }
 
     if (sscanf(buf, "111 %4d%2d%2d%2d%2d%2d%*s", &tm.tm_year, &tm.tm_mon,
                &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec) == 6)
@@ -2192,7 +2570,9 @@ int nntp_active_fetch(struct NntpServer *nserv, unsigned int new)
            nserv->conn->account.host);
   mutt_message(msg);
   if (nntp_date(nserv, &nserv->newgroups_time) < 0)
+  {
     return -1;
+  }
 
   nntp_data.nserv = nserv;
   nntp_data.group = NULL;
@@ -2231,11 +2611,15 @@ int nntp_active_fetch(struct NntpServer *nserv, unsigned int new)
   }
 
   if (option(OPT_NNTP_LOAD_DESCRIPTION))
+  {
     rc = get_description(&nntp_data, "*", _("Loading descriptions..."));
+  }
 
   nntp_active_save_cache(nserv);
   if (rc < 0)
+  {
     return -1;
+  }
   mutt_clear_error();
   return 0;
 }
@@ -2257,7 +2641,9 @@ int nntp_check_new_groups(struct NntpServer *nserv)
   int rc, update_active = false;
 
   if (!nserv || !nserv->newgroups_time)
+  {
     return -1;
+  }
 
   /* check subscribed newsgroups for new articles */
   if (option(OPT_SHOW_NEW_NEWS))
@@ -2271,9 +2657,13 @@ int nntp_check_new_groups(struct NntpServer *nserv)
       {
         rc = nntp_group_poll(data, 1);
         if (rc < 0)
+        {
           return -1;
+        }
         if (rc > 0)
+        {
           update_active = true;
+        }
       }
     }
     /* select current newsgroup */
@@ -2281,21 +2671,31 @@ int nntp_check_new_groups(struct NntpServer *nserv)
     {
       buf[0] = '\0';
       if (nntp_query((struct NntpData *) Context->data, buf, sizeof(buf)) < 0)
+      {
         return -1;
+      }
     }
   }
   else if (nserv->newgroups_time)
+  {
     return 0;
+  }
 
   /* get list of new groups */
   mutt_message(msg);
   if (nntp_date(nserv, &now) < 0)
+  {
     return -1;
+  }
   nntp_data.nserv = nserv;
   if (Context && Context->magic == MUTT_NNTP)
+  {
     nntp_data.group = ((struct NntpData *) Context->data)->group;
+  }
   else
+  {
     nntp_data.group = NULL;
+  }
   i = nserv->groups_num;
   tm = gmtime(&nserv->newgroups_time);
   snprintf(buf, sizeof(buf), "NEWGROUPS %02d%02d%02d %02d%02d%02d GMT\r\n",
@@ -2338,7 +2738,9 @@ int nntp_check_new_groups(struct NntpServer *nserv)
         struct NntpData *data = nserv->groups_list[i];
 
         if (get_description(data, NULL, NULL) < 0)
+        {
           return -1;
+        }
         mutt_progress_update(&progress, ++count, -1);
       }
     }
@@ -2346,7 +2748,9 @@ int nntp_check_new_groups(struct NntpServer *nserv)
     rc = 1;
   }
   if (update_active)
+  {
     nntp_active_save_cache(nserv);
+  }
   mutt_clear_error();
   return rc;
 }
@@ -2382,16 +2786,22 @@ int nntp_check_msgid(struct Context *ctx, const char *msgid)
     safe_fclose(&fp);
     unlink(tempfile);
     if (rc < 0)
+    {
       return -1;
+    }
     if (mutt_strncmp("430", buf, 3) == 0)
+    {
       return 1;
+    }
     mutt_error("HEAD: %s", buf);
     return -1;
   }
 
   /* parse header */
   if (ctx->msgcount == ctx->hdrmax)
+  {
     mx_alloc_memory(ctx);
+  }
   hdr = ctx->hdrs[ctx->msgcount] = mutt_new_header();
   hdr->data = safe_calloc(1, sizeof(struct NntpHeaderData));
   hdr->env = mutt_read_rfc822_header(fp, hdr, 0, 0);
@@ -2400,7 +2810,9 @@ int nntp_check_msgid(struct Context *ctx, const char *msgid)
 
   /* get article number */
   if (hdr->env->xref)
+  {
     nntp_parse_xref(ctx, hdr);
+  }
   else
   {
     snprintf(buf, sizeof(buf), "STAT %s\r\n", msgid);
@@ -2443,10 +2855,16 @@ static int fetch_children(char *line, void *data)
   anum_t anum;
 
   if (!line || sscanf(line, ANUM, &anum) != 1)
+  {
     return 0;
+  }
   for (unsigned int i = 0; i < cc->ctx->msgcount; i++)
+  {
     if (NHDR(cc->ctx->hdrs[i])->article_num == anum)
+    {
       return 0;
+    }
+  }
   if (cc->num >= cc->max)
   {
     cc->max *= 2;
@@ -2469,9 +2887,13 @@ int nntp_check_children(struct Context *ctx, const char *msgid)
   void *hc = NULL;
 
   if (!nntp_data || !nntp_data->nserv)
+  {
     return -1;
+  }
   if (nntp_data->first_message > nntp_data->last_loaded)
+  {
     return 0;
+  }
 
   /* init context */
   cc.ctx = ctx;
@@ -2489,10 +2911,14 @@ int nntp_check_children(struct Context *ctx, const char *msgid)
     if (rc > 0)
     {
       if (mutt_strncmp("500", buf, 3) != 0)
+      {
         mutt_error("XPAT: %s", buf);
+      }
       else
+      {
         mutt_error(_("Unable to find child articles because server does not "
                      "support XPAT command."));
+      }
     }
     return -1;
   }
@@ -2507,7 +2933,9 @@ int nntp_check_children(struct Context *ctx, const char *msgid)
   {
     rc = nntp_fetch_headers(ctx, hc, cc.child[i], cc.child[i], 1);
     if (rc < 0)
+    {
       break;
+    }
   }
 #ifdef USE_HCACHE
   mutt_hcache_close(hc);

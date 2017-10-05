@@ -78,7 +78,9 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->ids));
       }
       else if (!cctx->ids)
+      {
         optional = 0;
+      }
       break;
     }
 
@@ -90,7 +92,9 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->signas));
       }
       else if (!cctx->signas)
+      {
         optional = 0;
+      }
       break;
     }
 
@@ -102,7 +106,9 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->sig_fname));
       }
       else if (!cctx->sig_fname)
+      {
         optional = 0;
+      }
       break;
     }
 
@@ -114,7 +120,9 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, NONULL(cctx->fname));
       }
       else if (!cctx->fname)
+      {
         optional = 0;
+      }
       break;
     }
 
@@ -126,7 +134,9 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
         snprintf(dest, destlen, fmt, cctx->need_passphrase ? "PGPPASSFD=0" : "");
       }
       else if (!cctx->need_passphrase || pgp_use_gpg_agent())
+      {
         optional = 0;
+      }
       break;
     }
     default:
@@ -137,10 +147,14 @@ static const char *_mutt_fmt_pgp_command(char *dest, size_t destlen, size_t col,
   }
 
   if (optional)
+  {
     mutt_expando_format(dest, destlen, col, cols, ifstring, _mutt_fmt_pgp_command, data, 0);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     mutt_expando_format(dest, destlen, col, cols, elsestring,
                         _mutt_fmt_pgp_command, data, 0);
+  }
 
   return src;
 }
@@ -168,7 +182,9 @@ static pid_t pgp_invoke(FILE **pgpin, FILE **pgpout, FILE **pgperr, int pgpinfd,
   memset(&cctx, 0, sizeof(cctx));
 
   if (!format || !*format)
+  {
     return (pid_t) -1;
+  }
 
   cctx.need_passphrase = need_passphrase;
   cctx.fname = fname;
@@ -220,11 +236,15 @@ pid_t pgp_invoke_encrypt(FILE **pgpin, FILE **pgpout, FILE **pgperr,
                          const char *fname, const char *uids, int sign)
 {
   if (sign)
+  {
     return pgp_invoke(pgpin, pgpout, pgperr, pgpinfd, pgpoutfd, pgperrfd, 1,
                       fname, NULL, PgpSignAs, uids, PgpEncryptSignCommand);
+  }
   else
+  {
     return pgp_invoke(pgpin, pgpout, pgperr, pgpinfd, pgpoutfd, pgperrfd, 0,
                       fname, NULL, PgpSignAs, uids, PgpEncryptOnlyCommand);
+  }
 }
 
 pid_t pgp_invoke_traditional(FILE **pgpin, FILE **pgpout, FILE **pgperr,
@@ -232,12 +252,16 @@ pid_t pgp_invoke_traditional(FILE **pgpin, FILE **pgpout, FILE **pgperr,
                              const char *fname, const char *uids, int flags)
 {
   if (flags & ENCRYPT)
+  {
     return pgp_invoke(pgpin, pgpout, pgperr, pgpinfd, pgpoutfd, pgperrfd,
                       flags & SIGN ? 1 : 0, fname, NULL, PgpSignAs, uids,
                       flags & SIGN ? PgpEncryptSignCommand : PgpEncryptOnlyCommand);
+  }
   else
+  {
     return pgp_invoke(pgpin, pgpout, pgperr, pgpinfd, pgpoutfd, pgperrfd, 1,
                       fname, NULL, PgpSignAs, NULL, PgpClearSignCommand);
+  }
 }
 
 void pgp_invoke_import(const char *fname)
@@ -268,7 +292,9 @@ void pgp_invoke_getkeys(struct Address *addr)
   struct PgpCommandContext cctx;
 
   if (!PgpGetkeysCommand)
+  {
     return;
+  }
 
   memset(&cctx, 0, sizeof(cctx));
 
@@ -289,15 +315,21 @@ void pgp_invoke_getkeys(struct Address *addr)
   devnull = open("/dev/null", O_RDWR);
 
   if (!isendwin())
+  {
     mutt_message(_("Fetching PGP key..."));
+  }
 
   mutt_system(cmd);
 
   if (!isendwin())
+  {
     mutt_clear_error();
+  }
 
   if (devnull >= 0)
+  {
     close(devnull);
+  }
 }
 
 pid_t pgp_invoke_export(FILE **pgpin, FILE **pgpout, FILE **pgperr, int pgpinfd,

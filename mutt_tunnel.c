@@ -83,7 +83,9 @@ static int tunnel_socket_open(struct Connection *conn)
     devnull = open("/dev/null", O_RDWR);
     if (devnull < 0 || dup2(pout[0], STDIN_FILENO) < 0 ||
         dup2(pin[1], STDOUT_FILENO) < 0 || dup2(devnull, STDERR_FILENO) < 0)
+    {
       _exit(127);
+    }
     close(pin[0]);
     close(pin[1]);
     close(pout[0]);
@@ -109,7 +111,9 @@ static int tunnel_socket_open(struct Connection *conn)
     return -1;
   }
   if (close(pin[1]) < 0 || close(pout[0]) < 0)
+  {
     mutt_perror("close");
+  }
 
   fcntl(pin[0], F_SETFD, FD_CLOEXEC);
   fcntl(pout[1], F_SETFD, FD_CLOEXEC);

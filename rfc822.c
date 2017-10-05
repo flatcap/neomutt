@@ -57,9 +57,13 @@ int rfc822_remove_from_adrlist(struct Address **a, const char *mailbox)
     if (mutt_strcasecmp(mailbox, p->mailbox) == 0)
     {
       if (last)
+      {
         last->next = p->next;
+      }
       else
+      {
         (*a) = p->next;
+      }
       t = p;
       p = p->next;
       free_address(t);
@@ -96,7 +100,9 @@ static const char *parse_comment(const char *s, char *comment, size_t *commentle
   while (*s && level)
   {
     if (*s == '(')
+    {
       level++;
+    }
     else if (*s == ')')
     {
       if (--level == 0)
@@ -108,10 +114,14 @@ static const char *parse_comment(const char *s, char *comment, size_t *commentle
     else if (*s == '\\')
     {
       if (!*++s)
+      {
         break;
+      }
     }
     if (*commentlen < commentmax)
+    {
       comment[(*commentlen)++] = *s;
+    }
     s++;
   }
   if (level)
@@ -127,17 +137,25 @@ static const char *parse_quote(const char *s, char *token, size_t *tokenlen, siz
   while (*s)
   {
     if (*tokenlen < tokenmax)
+    {
       token[*tokenlen] = *s;
+    }
     if (*s == '\\')
     {
       if (!*++s)
+      {
         break;
+      }
 
       if (*tokenlen < tokenmax)
+      {
         token[*tokenlen] = *s;
+      }
     }
     else if (*s == '"')
+    {
       return (s + 1);
+    }
     (*tokenlen)++;
     s++;
   }
@@ -148,21 +166,31 @@ static const char *parse_quote(const char *s, char *token, size_t *tokenlen, siz
 static const char *next_token(const char *s, char *token, size_t *tokenlen, size_t tokenmax)
 {
   if (*s == '(')
+  {
     return (parse_comment(s + 1, token, tokenlen, tokenmax));
+  }
   if (*s == '"')
+  {
     return (parse_quote(s + 1, token, tokenlen, tokenmax));
+  }
   if (*s && is_special(*s))
   {
     if (*tokenlen < tokenmax)
+    {
       token[(*tokenlen)++] = *s;
+    }
     return (s + 1);
   }
   while (*s)
   {
     if (is_email_wsp(*s) || is_special(*s))
+    {
       break;
+    }
     if (*tokenlen < tokenmax)
+    {
       token[(*tokenlen)++] = *s;
+    }
     s++;
   }
   return s;
@@ -179,21 +207,31 @@ static const char *parse_mailboxdomain(const char *s, const char *nonspecial,
   {
     s = skip_email_wsp(s);
     if (!*s)
+    {
       return s;
+    }
 
     if (strchr(nonspecial, *s) == NULL && is_special(*s))
+    {
       return s;
+    }
 
     if (*s == '(')
     {
       if (*commentlen && *commentlen < commentmax)
+      {
         comment[(*commentlen)++] = ' ';
+      }
       ps = next_token(s, comment, commentlen, commentmax);
     }
     else
+    {
       ps = next_token(s, mailbox, mailboxlen, mailboxmax);
+    }
     if (!ps)
+    {
       return NULL;
+    }
     s = ps;
   }
 
@@ -207,16 +245,22 @@ static const char *parse_address(const char *s, char *token, size_t *tokenlen,
   s = parse_mailboxdomain(s, ".\"(\\", token, tokenlen, tokenmax, comment,
                           commentlen, commentmax);
   if (!s)
+  {
     return NULL;
+  }
 
   if (*s == '@')
   {
     if (*tokenlen < tokenmax)
+    {
       token[(*tokenlen)++] = '@';
+    }
     s = parse_mailboxdomain(s + 1, ".([]\\", token, tokenlen, tokenmax, comment,
                             commentlen, commentmax);
     if (!s)
+    {
       return NULL;
+    }
   }
 
   terminate_string(token, *tokenlen, tokenmax);
@@ -245,7 +289,9 @@ static const char *parse_route_addr(const char *s, char *comment, size_t *commen
     while (s && *s == '@')
     {
       if (tokenlen < sizeof(token) - 1)
+      {
         token[tokenlen++] = '@';
+      }
       s = parse_mailboxdomain(s + 1, ",.\\[](", token, &tokenlen,
                               sizeof(token) - 1, comment, commentlen, commentmax);
     }
@@ -256,13 +302,17 @@ static const char *parse_route_addr(const char *s, char *comment, size_t *commen
     }
 
     if (tokenlen < sizeof(token) - 1)
+    {
       token[tokenlen++] = ':';
+    }
     s++;
   }
 
   if ((s = parse_address(s, token, &tokenlen, sizeof(token) - 1, comment,
                          commentlen, commentmax, addr)) == NULL)
+  {
     return NULL;
+  }
 
   if (*s != '>')
   {
@@ -271,7 +321,9 @@ static const char *parse_route_addr(const char *s, char *comment, size_t *commen
   }
 
   if (!addr->mailbox)
+  {
     addr->mailbox = safe_strdup("@");
+  }
 
   s++;
   return s;
@@ -305,9 +357,13 @@ static void add_addrspec(struct Address **top, struct Address **last, const char
   }
 
   if (*last)
+  {
     (*last)->next = cur;
+  }
   else
+  {
     *top = cur;
+  }
   *last = cur;
 }
 
@@ -323,12 +379,15 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
 
   last = top;
   while (last && last->next)
+  {
     last = last->next;
+  }
 
   ws_pending = is_email_wsp(*s);
   if ((nl = mutt_strlen(s)))
+  {
     nl = s[nl - 1] == '\n';
-
+  }
   s = skip_email_wsp(s);
   while (*s)
   {
@@ -352,7 +411,9 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
     else if (*s == '(')
     {
       if (commentlen && commentlen < sizeof(comment) - 1)
+      {
         comment[commentlen++] = ' ';
+      }
       if ((ps = next_token(s, comment, &commentlen, sizeof(comment) - 1)) == NULL)
       {
         rfc822_free_address(&top);
@@ -363,7 +424,9 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
     else if (*s == '"')
     {
       if (phraselen && phraselen < sizeof(phrase) - 1)
+      {
         phrase[phraselen++] = ' ';
+      }
       if ((ps = parse_quote(s + 1, phrase, &phraselen, sizeof(phrase) - 1)) == NULL)
       {
         rfc822_free_address(&top);
@@ -379,9 +442,13 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
       cur->group = 1;
 
       if (last)
+      {
         last->next = cur;
+      }
       else
+      {
         top = cur;
+      }
       last = cur;
 
       phraselen = 0;
@@ -418,7 +485,9 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
       terminate_buffer(phrase, phraselen);
       cur = rfc822_new_address();
       if (phraselen)
+      {
         cur->personal = safe_strdup(phrase);
+      }
       if ((ps = parse_route_addr(s + 1, comment, &commentlen, sizeof(comment) - 1, cur)) == NULL)
       {
         rfc822_free_address(&top);
@@ -427,9 +496,13 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
       }
 
       if (last)
+      {
         last->next = cur;
+      }
       else
+      {
         top = cur;
+      }
       last = cur;
 
       phraselen = 0;
@@ -439,7 +512,9 @@ struct Address *rfc822_parse_adrlist(struct Address *top, const char *s)
     else
     {
       if (phraselen && phraselen < sizeof(phrase) - 1 && ws_pending)
+      {
         phrase[phraselen++] = ' ';
+      }
       if ((ps = next_token(s, phrase, &phraselen, sizeof(phrase) - 1)) == NULL)
       {
         rfc822_free_address(&top);
@@ -471,6 +546,7 @@ void rfc822_qualify(struct Address *addr, const char *host)
   char *p = NULL;
 
   for (; addr; addr = addr->next)
+  {
     if (!addr->group && addr->mailbox && strchr(addr->mailbox, '@') == NULL)
     {
       p = safe_malloc(mutt_strlen(addr->mailbox) + mutt_strlen(host) + 2);
@@ -478,6 +554,7 @@ void rfc822_qualify(struct Address *addr, const char *host)
       FREE(&addr->mailbox);
       addr->mailbox = p;
     }
+  }
 }
 
 void rfc822_cat(char *buf, size_t buflen, const char *value, const char *specials)
@@ -503,7 +580,9 @@ void rfc822_cat(char *buf, size_t buflen, const char *value, const char *special
     strfcpy(buf, tmp, buflen);
   }
   else
+  {
     strfcpy(buf, value, buflen);
+  }
 }
 
 void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr, int display)
@@ -513,7 +592,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
   char *pc = NULL;
 
   if (!addr)
+  {
     return;
+  }
 
   buflen--; /* save room for the terminal nul */
 
@@ -522,7 +603,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
     if (strpbrk(addr->personal, RFC822Specials))
     {
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = '"';
       buflen--;
       for (pc = addr->personal; *pc && buflen > 0; pc++)
@@ -533,19 +616,25 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
           buflen--;
         }
         if (!buflen)
+        {
           goto done;
+        }
         *pbuf++ = *pc;
         buflen--;
       }
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = '"';
       buflen--;
     }
     else
     {
       if (!buflen)
+      {
         goto done;
+      }
       strfcpy(pbuf, addr->personal, buflen);
       len = mutt_strlen(pbuf);
       pbuf += len;
@@ -553,7 +642,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
     }
 
     if (!buflen)
+    {
       goto done;
+    }
     *pbuf++ = ' ';
     buflen--;
   }
@@ -561,7 +652,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
   if (addr->personal || (addr->mailbox && *addr->mailbox == '@'))
   {
     if (!buflen)
+    {
       goto done;
+    }
     *pbuf++ = '<';
     buflen--;
   }
@@ -569,7 +662,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
   if (addr->mailbox)
   {
     if (!buflen)
+    {
       goto done;
+    }
     if ((mutt_strcmp(addr->mailbox, "@") != 0) && !display)
     {
       strfcpy(pbuf, addr->mailbox, buflen);
@@ -591,7 +686,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
     if (addr->personal || (addr->mailbox && *addr->mailbox == '@'))
     {
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = '>';
       buflen--;
     }
@@ -599,11 +696,15 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
     if (addr->group)
     {
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = ':';
       buflen--;
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = ' ';
       buflen--;
     }
@@ -611,7 +712,9 @@ void rfc822_write_address_single(char *buf, size_t buflen, struct Address *addr,
   else
   {
     if (!buflen)
+    {
       goto done;
+    }
     *pbuf++ = ';';
     buflen--;
   }
@@ -636,16 +739,22 @@ int rfc822_write_address(char *buf, size_t buflen, struct Address *addr, int dis
   if (len > 0)
   {
     if (len > buflen)
+    {
       return pbuf - buf; /* safety check for bogus arguments */
+    }
 
     pbuf += len;
     buflen -= len;
     if (!buflen)
+    {
       goto done;
+    }
     *pbuf++ = ',';
     buflen--;
     if (!buflen)
+    {
       goto done;
+    }
     *pbuf++ = ' ';
     buflen--;
   }
@@ -667,11 +776,15 @@ int rfc822_write_address(char *buf, size_t buflen, struct Address *addr, int dis
     if (addr->next && addr->next->mailbox && !addr->group)
     {
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = ',';
       buflen--;
       if (!buflen)
+      {
         goto done;
+      }
       *pbuf++ = ' ';
       buflen--;
     }
@@ -719,7 +832,9 @@ struct Address *rfc822_cpy_adr(struct Address *addr, int prune)
       last = last->next;
     }
     else
+    {
       top = last = rfc822_cpy_adr_real(addr);
+    }
   }
   return top;
 }
@@ -734,15 +849,25 @@ struct Address *rfc822_append(struct Address **a, struct Address *b, int prune)
   struct Address *tmp = *a;
 
   while (tmp && tmp->next)
+  {
     tmp = tmp->next;
+  }
   if (!b)
+  {
     return tmp;
+  }
   if (tmp)
+  {
     tmp->next = rfc822_cpy_adr(b, prune);
+  }
   else
+  {
     tmp = *a = rfc822_cpy_adr(b, prune);
+  }
   while (tmp && tmp->next)
+  {
     tmp = tmp->next;
+  }
   return tmp;
 }
 
@@ -777,20 +902,32 @@ bool rfc822_valid_msgid(const char *msgid)
   unsigned int l;
 
   if (!msgid || !*msgid)
+  {
     return false;
+  }
 
   l = mutt_strlen(msgid);
-  if (l < 5) /* <atom@atom> */
+  if (l < 5)
+  { /* <atom@atom> */
     return false;
+  }
   if (msgid[0] != '<' || msgid[l - 1] != '>')
+  {
     return false;
+  }
   if (!(strrchr(msgid, '@')))
+  {
     return false;
+  }
 
   /* TODO: complete parser */
   for (unsigned int i = 0; i < l; i++)
+  {
     if ((unsigned char) msgid[i] > 127)
+    {
       return false;
+    }
+  }
 
   return true;
 }

@@ -42,7 +42,9 @@ int mutt_system(const char *cmd)
   pid_t thepid;
 
   if (!cmd || !*cmd)
+  {
     return 0;
+  }
 
   /* must ignore SIGINT and SIGQUIT */
 

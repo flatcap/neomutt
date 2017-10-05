@@ -71,7 +71,9 @@ static void purge_empty_parameters(struct Parameter **headp)
       mutt_free_parameter(&p);
     }
     else
+    {
       last = &p->next;
+    }
   }
 }
 
@@ -89,9 +91,13 @@ static char *rfc2231_get_charset(char *value, char *charset, size_t chslen)
   strfcpy(charset, value, chslen);
 
   if ((u = strchr(t + 1, '\'')))
+  {
     return u + 1;
+  }
   else
+  {
     return t + 1;
+  }
 }
 
 static void rfc2231_decode_one(char *dest, char *src)
@@ -107,7 +113,9 @@ static void rfc2231_decode_one(char *dest, char *src)
       src += 2;
     }
     else
+    {
       *d++ = *src;
+    }
   }
 
   *d = '\0';
@@ -134,7 +142,9 @@ static void rfc2231_list_insert(struct Rfc2231Parameter **list, struct Rfc2231Pa
   {
     c = strcmp(par->attribute, p->attribute);
     if ((c < 0) || (c == 0 && par->index <= p->index))
+    {
       break;
+    }
 
     last = &p->next;
     p = p->next;
@@ -177,14 +187,20 @@ static void rfc2231_join_continuations(struct Parameter **head, struct Rfc2231Pa
     strfcpy(attribute, par->attribute, sizeof(attribute));
 
     if ((encoded = par->encoded))
+    {
       valp = rfc2231_get_charset(par->value, charset, sizeof(charset));
+    }
     else
+    {
       valp = par->value;
+    }
 
     do
     {
       if (encoded && par->encoded)
+      {
         rfc2231_decode_one(par->value, valp);
+      }
 
       vl = strlen(par->value);
 
@@ -195,11 +211,15 @@ static void rfc2231_join_continuations(struct Parameter **head, struct Rfc2231Pa
       q = par->next;
       rfc2231_free_parameter(&par);
       if ((par = q))
+      {
         valp = par->value;
+      }
     } while (par && (strcmp(par->attribute, attribute) == 0));
 
     if (encoded)
+    {
       mutt_convert_string(&value, charset, Charset, MUTT_ICONV_HOOK_FROM);
+    }
     *head = mutt_new_parameter();
     (*head)->attribute = safe_strdup(attribute);
     (*head)->value = value;
@@ -224,7 +244,9 @@ void rfc2231_decode_parameters(struct Parameter **headp)
   bool dirty = false; /* set to 1 when we may have created
                        * empty parameters. */
   if (!headp)
+  {
     return;
+  }
 
   purge_empty_parameters(headp);
 
@@ -242,9 +264,13 @@ void rfc2231_decode_parameters(struct Parameter **headp)
        */
 
       if (option(OPT_RFC2047_PARAMETERS) && p->value && strstr(p->value, "=?"))
+      {
         rfc2047_decode(&p->value);
+      }
       else if (AssumedCharset && *AssumedCharset)
+      {
         convert_nonmime_string(&p->value);
+      }
 
       *last = p;
       last = &p->next;
@@ -270,7 +296,9 @@ void rfc2231_decode_parameters(struct Parameter **headp)
       *s = '\0';
       s++; /* let s point to the first character of index. */
       for (t = s; *t && isdigit((unsigned char) *t); t++)
+      {
         ;
+      }
       encoded = (*t == '*');
       *t = '\0';
 
@@ -299,7 +327,9 @@ void rfc2231_decode_parameters(struct Parameter **headp)
   *headp = head;
 
   if (dirty)
+  {
     purge_empty_parameters(headp);
+  }
 }
 
 int rfc2231_encode_string(char **pd)
@@ -316,11 +346,17 @@ int rfc2231_encode_string(char **pd)
    */
 
   for (s = *pd; *s; s++)
+  {
     if (*s & 0x80)
+    {
       break;
+    }
+  }
 
   if (!*s)
+  {
     return 0;
+  }
 
   if (!Charset || !SendCharset ||
       !(charset = mutt_choose_charset(Charset, SendCharset, *pd, strlen(*pd), &d, &dlen)))
@@ -332,7 +368,9 @@ int rfc2231_encode_string(char **pd)
   }
 
   if (!mutt_is_us_ascii(charset))
+  {
     encode = 1;
+  }
 
   for (s = d, slen = dlen; slen; s++, slen--)
   {
@@ -342,7 +380,9 @@ int rfc2231_encode_string(char **pd)
       ext++;
     }
     else if (strchr(MimeSpecials, *s) || strchr("*'%", *s))
+    {
       ext++;
+    }
   }
 
   if (encode)
@@ -351,17 +391,23 @@ int rfc2231_encode_string(char **pd)
     sprintf(e, "%s''", charset);
     t = e + strlen(e);
     for (s = d, slen = dlen; slen; s++, slen--)
+    {
       if (*s < 0x20 || *s >= 0x7f || strchr(MimeSpecials, *s) || strchr("*'%", *s))
       {
         sprintf(t, "%%%02X", (unsigned char) *s);
         t += 3;
       }
       else
+      {
         *t++ = *s;
+      }
+    }
     *t = '\0';
 
     if (d != *pd)
+    {
       FREE(&d);
+    }
     FREE(pd);
     *pd = e;
   }

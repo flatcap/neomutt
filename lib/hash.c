@@ -62,7 +62,9 @@ static unsigned int gen_string_hash(union HashKey key, unsigned int n)
   unsigned char *s = (unsigned char *) key.strkey;
 
   while (*s)
+  {
     h += ((h << 7) + *s++);
+  }
   h = (h * SOMEPRIME) % n;
 
   return h;
@@ -93,7 +95,9 @@ static unsigned int gen_case_string_hash(union HashKey key, unsigned int n)
   unsigned char *s = (unsigned char *) key.strkey;
 
   while (*s)
+  {
     h += ((h << 7) + tolower(*s++));
+  }
   h = (h * SOMEPRIME) % n;
 
   return h;
@@ -134,9 +138,13 @@ static unsigned int gen_int_hash(union HashKey key, unsigned int n)
 static int cmp_int_key(union HashKey a, union HashKey b)
 {
   if (a.intkey == b.intkey)
+  {
     return 0;
+  }
   if (a.intkey < b.intkey)
+  {
     return -1;
+  }
   return 1;
 }
 
@@ -152,7 +160,9 @@ static struct Hash *new_hash(int nelem)
 {
   struct Hash *table = safe_calloc(1, sizeof(struct Hash));
   if (nelem == 0)
+  {
     nelem = 2;
+  }
   table->nelem = nelem;
   table->table = safe_calloc(nelem, sizeof(struct HashElem *));
   return table;
@@ -194,12 +204,18 @@ static int union_hash_insert(struct Hash *table, union HashKey key, void *data)
         return -1;
       }
       if (r > 0)
+      {
         break;
+      }
     }
     if (last)
+    {
       last->next = ptr;
+    }
     else
+    {
       table->table[h] = ptr;
+    }
     ptr->next = tmp;
   }
   return h;
@@ -217,14 +233,18 @@ static struct HashElem *union_hash_find_elem(const struct Hash *table, union Has
   struct HashElem *ptr = NULL;
 
   if (!table)
+  {
     return NULL;
+  }
 
   hash = table->gen_hash(key, table->nelem);
   ptr = table->table[hash];
   for (; ptr; ptr = ptr->next)
   {
     if (table->cmp_key(key, ptr->key) == 0)
+    {
       return ptr;
+    }
   }
   return NULL;
 }
@@ -239,9 +259,13 @@ static void *union_hash_find(const struct Hash *table, union HashKey key)
 {
   struct HashElem *ptr = union_hash_find_elem(table, key);
   if (ptr)
+  {
     return ptr->data;
+  }
   else
+  {
     return NULL;
+  }
 }
 
 /**
@@ -258,7 +282,9 @@ static void union_hash_delete(struct Hash *table, union HashKey key,
   struct HashElem *ptr = NULL, **last = NULL;
 
   if (!table)
+  {
     return;
+  }
 
   hash = table->gen_hash(key, table->nelem);
   ptr = table->table[hash];
@@ -270,9 +296,13 @@ static void union_hash_delete(struct Hash *table, union HashKey key,
     {
       *last = ptr->next;
       if (destroy)
+      {
         destroy(ptr->data);
+      }
       if (table->strdup_keys)
+      {
         FREE(&ptr->key.strkey);
+      }
       FREE(&ptr);
 
       ptr = *last;
@@ -305,9 +335,13 @@ struct Hash *hash_create(int nelem, int flags)
     table->cmp_key = cmp_string_key;
   }
   if (flags & MUTT_HASH_STRDUP_KEYS)
+  {
     table->strdup_keys = true;
+  }
   if (flags & MUTT_HASH_ALLOW_DUPS)
+  {
     table->allow_dups = true;
+  }
   return table;
 }
 
@@ -323,7 +357,9 @@ struct Hash *int_hash_create(int nelem, int flags)
   table->gen_hash = gen_int_hash;
   table->cmp_key = cmp_int_key;
   if (flags & MUTT_HASH_ALLOW_DUPS)
+  {
     table->allow_dups = true;
+  }
   return table;
 }
 
@@ -410,7 +446,9 @@ struct HashElem *hash_find_bucket(const struct Hash *table, const char *strkey)
   int hash;
 
   if (!table)
+  {
     return NULL;
+  }
 
   key.strkey = strkey;
   hash = table->gen_hash(key, table->nelem);
@@ -458,7 +496,9 @@ void hash_destroy(struct Hash **ptr, void (*destroy)(void *))
   struct HashElem *elem = NULL, *tmp = NULL;
 
   if (!ptr || !*ptr)
+  {
     return;
+  }
 
   pptr = *ptr;
   for (int i = 0; i < pptr->nelem; i++)
@@ -468,9 +508,13 @@ void hash_destroy(struct Hash **ptr, void (*destroy)(void *))
       tmp = elem;
       elem = elem->next;
       if (destroy)
+      {
         destroy(tmp->data);
+      }
       if (pptr->strdup_keys)
+      {
         FREE(&tmp->key.strkey);
+      }
       FREE(&tmp);
     }
   }
@@ -494,7 +538,9 @@ struct HashElem *hash_walk(const struct Hash *table, struct HashWalkState *state
   }
 
   if (state->last)
+  {
     state->index++;
+  }
 
   while (state->index < table->nelem)
   {

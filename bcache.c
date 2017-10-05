@@ -53,7 +53,9 @@ static int bcache_path(struct Account *account, const char *mailbox, char *dst, 
   int len;
 
   if (!account || !MessageCachedir || !*MessageCachedir || !dst || !dstlen)
+  {
     return -1;
+  }
 
   /* make up a Url we can turn into a string */
   memset(&url, 0, sizeof(struct Url));
@@ -73,7 +75,9 @@ static int bcache_path(struct Account *account, const char *mailbox, char *dst, 
 
   int plen = mutt_strlen(path);
   if (plen == 0)
+  {
     return -1;
+  }
 
   len = snprintf(dst, dstlen - 1, "%s/%s%s%s", MessageCachedir, host, path,
                  (*path && path[plen - 1] == '/') ? "" : "/");
@@ -81,7 +85,9 @@ static int bcache_path(struct Account *account, const char *mailbox, char *dst, 
   mutt_debug(3, "bcache_path: rc: %d, path: '%s'\n", len, dst);
 
   if (len < 0 || (size_t) len >= dstlen - 1)
+  {
     return -1;
+  }
 
   mutt_debug(3, "bcache_path: directory: '%s'\n", dst);
 
@@ -94,7 +100,9 @@ static int mutt_bcache_move(struct BodyCache *bcache, const char *id, const char
   char newpath[_POSIX_PATH_MAX];
 
   if (!bcache || !id || !*id || !newid || !*newid)
+  {
     return -1;
+  }
 
   snprintf(path, sizeof(path), "%s%s", bcache->path, id);
   snprintf(newpath, sizeof(newpath), "%s%s", bcache->path, newid);
@@ -109,25 +117,33 @@ struct BodyCache *mutt_bcache_open(struct Account *account, const char *mailbox)
   struct BodyCache *bcache = NULL;
 
   if (!account)
+  {
     goto bail;
+  }
 
   bcache = safe_calloc(1, sizeof(struct BodyCache));
   if (bcache_path(account, mailbox, bcache->path, sizeof(bcache->path)) < 0)
+  {
     goto bail;
+  }
   bcache->pathlen = mutt_strlen(bcache->path);
 
   return bcache;
 
 bail:
   if (bcache)
+  {
     FREE(&bcache);
+  }
   return NULL;
 }
 
 void mutt_bcache_close(struct BodyCache **bcache)
 {
   if (!bcache || !*bcache)
+  {
     return;
+  }
   FREE(bcache);
 }
 
@@ -137,7 +153,9 @@ FILE *mutt_bcache_get(struct BodyCache *bcache, const char *id)
   FILE *fp = NULL;
 
   if (!id || !*id || !bcache)
+  {
     return NULL;
+  }
 
   path[0] = '\0';
   safe_strncat(path, sizeof(path), bcache->path, bcache->pathlen);
@@ -156,7 +174,9 @@ FILE *mutt_bcache_put(struct BodyCache *bcache, const char *id)
   struct stat sb;
 
   if (!id || !*id || !bcache)
+  {
     return NULL;
+  }
 
   if (snprintf(path, sizeof(path), "%s%s%s", bcache->path, id, ".tmp") >= sizeof(path))
   {
@@ -200,7 +220,9 @@ int mutt_bcache_del(struct BodyCache *bcache, const char *id)
   char path[_POSIX_PATH_MAX];
 
   if (!id || !*id || !bcache)
+  {
     return -1;
+  }
 
   path[0] = '\0';
   safe_strncat(path, sizeof(path), bcache->path, bcache->pathlen);
@@ -218,16 +240,22 @@ int mutt_bcache_exists(struct BodyCache *bcache, const char *id)
   int rc = 0;
 
   if (!id || !*id || !bcache)
+  {
     return -1;
+  }
 
   path[0] = '\0';
   safe_strncat(path, sizeof(path), bcache->path, bcache->pathlen);
   safe_strncat(path, sizeof(path), id, mutt_strlen(id));
 
   if (stat(path, &st) < 0)
+  {
     rc = -1;
+  }
   else
+  {
     rc = S_ISREG(st.st_mode) && st.st_size != 0 ? 0 : -1;
+  }
 
   mutt_debug(3, "bcache: exists: '%s': %s\n", path, rc == 0 ? "yes" : "no");
 
@@ -243,7 +271,9 @@ int mutt_bcache_list(struct BodyCache *bcache,
   int rc = -1;
 
   if (!bcache || !(d = opendir(bcache->path)))
+  {
     goto out;
+  }
 
   rc = 0;
 
@@ -253,12 +283,16 @@ int mutt_bcache_list(struct BodyCache *bcache,
   {
     if ((mutt_strncmp(de->d_name, ".", 1) == 0) ||
         (mutt_strncmp(de->d_name, "..", 2) == 0))
+    {
       continue;
+    }
 
     mutt_debug(3, "bcache: list: dir: '%s', id :'%s'\n", bcache->path, de->d_name);
 
     if (want_id && want_id(de->d_name, bcache, data) != 0)
+    {
       goto out;
+    }
 
     rc++;
   }
@@ -267,7 +301,9 @@ out:
   if (d)
   {
     if (closedir(d) < 0)
+    {
       rc = -1;
+    }
   }
   mutt_debug(3, "bcache: list: did %d entries\n", rc);
   return rc;

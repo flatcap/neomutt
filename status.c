@@ -92,7 +92,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, mutt_buffy_check(false));
       }
       else if (!mutt_buffy_check(false))
+      {
         optional = 0;
+      }
       break;
 
     case 'd':
@@ -102,7 +104,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->deleted : 0);
       }
       else if (!Context || !Context->deleted)
+      {
         optional = 0;
+      }
       break;
 
     case 'f':
@@ -110,7 +114,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
 #ifdef USE_NOTMUCH
       char *p = NULL;
       if (Context && Context->magic == MUTT_NOTMUCH && (p = nm_get_description(Context)))
+      {
         strfcpy(tmp, p, sizeof(tmp));
+      }
       else
 #endif
 #ifdef USE_COMPRESSED
@@ -127,7 +133,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         mutt_pretty_mailbox(tmp, sizeof(tmp));
       }
       else
+      {
         strfcpy(tmp, _("(no mailbox)"), sizeof(tmp));
+      }
 
       snprintf(fmt, sizeof(fmt), "%%%ss", prefix);
       snprintf(buf, buflen, fmt, tmp);
@@ -140,7 +148,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->flagged : 0);
       }
       else if (!Context || !Context->flagged)
+      {
         optional = 0;
+      }
       break;
 
     case 'h':
@@ -156,7 +166,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, tmp);
       }
       else if (!Context || !Context->size)
+      {
         optional = 0;
+      }
       break;
 
     case 'L':
@@ -167,7 +179,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, tmp);
       }
       else if (!Context || !Context->pattern)
+      {
         optional = 0;
+      }
       break;
 
     case 'm':
@@ -177,7 +191,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->msgcount : 0);
       }
       else if (!Context || !Context->msgcount)
+      {
         optional = 0;
+      }
       break;
 
     case 'M':
@@ -187,7 +203,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->vcount : 0);
       }
       else if (!Context || !Context->pattern)
+      {
         optional = 0;
+      }
       break;
 
     case 'n':
@@ -197,7 +215,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->new : 0);
       }
       else if (!Context || !Context->new)
+      {
         optional = 0;
+      }
       break;
 
     case 'o':
@@ -207,7 +227,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->unread - Context->new : 0);
       }
       else if (!Context || !(Context->unread - Context->new))
+      {
         optional = 0;
+      }
       break;
 
     case 'p':
@@ -218,14 +240,20 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, count);
       }
       else if (!count)
+      {
         optional = 0;
+      }
       break;
 
     case 'P':
       if (!menu)
+      {
         break;
+      }
       if (menu->top + menu->pagelen >= menu->max)
+      {
         cp = menu->top ? "end" : "all";
+      }
       else
       {
         count = (100 * (menu->top + menu->pagelen)) / menu->max;
@@ -254,11 +282,17 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       }
 
       if (!StatusChars || !StatusChars->len)
+      {
         buf[0] = 0;
+      }
       else if (i >= StatusChars->len)
+      {
         snprintf(buf, buflen, "%s", StatusChars->chars[0]);
+      }
       else
+      {
         snprintf(buf, buflen, "%s", StatusChars->chars[i]);
+      }
       break;
     }
 
@@ -279,7 +313,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->tagged : 0);
       }
       else if (!Context || !Context->tagged)
+      {
         optional = 0;
+      }
       break;
 
     case 'u':
@@ -289,7 +325,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, Context ? Context->unread : 0);
       }
       else if (!Context || !Context->unread)
+      {
         optional = 0;
+      }
       break;
 
     case 'v':
@@ -304,7 +342,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
         snprintf(buf, buflen, fmt, (Context && Context->pattern) ? Context->pattern : "");
       }
       else if (!Context || !Context->pattern)
+      {
         optional = 0;
+      }
       break;
 
     case 0:
@@ -317,9 +357,13 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
   }
 
   if (optional)
+  {
     _menu_status_line(buf, buflen, col, cols, menu, ifstring);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     _menu_status_line(buf, buflen, col, cols, menu, elsestring);
+  }
 
   return src;
 }

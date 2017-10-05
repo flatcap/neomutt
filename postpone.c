@@ -96,7 +96,9 @@ int mutt_num_postponed(int force)
   }
 
   if (!Postponed)
+  {
     return 0;
+  }
 
 #ifdef USE_IMAP
   /* LastModify is useless for IMAP */
@@ -113,7 +115,9 @@ int mutt_num_postponed(int force)
         mutt_debug(3, "mutt_num_postponed: %d postponed IMAP messages found.\n", PostCount);
       }
       else
+      {
         mutt_debug(3, "mutt_num_postponed: using old IMAP postponed count.\n");
+      }
     }
     return PostCount;
   }
@@ -149,19 +153,29 @@ int mutt_num_postponed(int force)
     LastModify = st.st_mtime;
 
     if (access(Postponed, R_OK | F_OK) != 0)
+    {
       return (PostCount = 0);
+    }
 #ifdef USE_NNTP
     if (optnews)
+    {
       unset_option(OPT_NEWS);
+    }
 #endif
     if (mx_open_mailbox(Postponed, MUTT_NOSORT | MUTT_QUIET, &ctx) == NULL)
+    {
       PostCount = 0;
+    }
     else
+    {
       PostCount = ctx.msgcount;
+    }
     mx_fastclose_mailbox(&ctx);
 #ifdef USE_NNTP
     if (optnews)
+    {
       set_option(OPT_NEWS);
+    }
 #endif
   }
 
@@ -222,10 +236,14 @@ static struct Header *select_msg(void)
             menu->redraw |= REDRAW_INDEX | REDRAW_STATUS;
           }
           else
+          {
             menu->redraw |= REDRAW_MOTION_RESYNCH;
+          }
         }
         else
+        {
           menu->redraw |= REDRAW_CURRENT;
+        }
         break;
 
       case OP_GENERIC_SELECT_ENTRY:
@@ -266,7 +284,9 @@ int mutt_get_postponed(struct Context *ctx, struct Header *hdr,
   int opt_delete;
 
   if (!Postponed)
+  {
     return -1;
+  }
 
   if ((PostContext = mx_open_mailbox(Postponed, MUTT_NOSORT, NULL)) == NULL)
   {
@@ -329,11 +349,15 @@ int mutt_get_postponed(struct Context *ctx, struct Header *hdr,
            the user attempted to reply to is in this mailbox */
         p = skip_email_wsp(np->data + 18);
         if (!ctx->id_hash)
+        {
           ctx->id_hash = mutt_make_id_hash(ctx);
+        }
         *cur = hash_find(ctx->id_hash, p);
       }
       if (*cur)
+      {
         code |= SENDREPLY;
+      }
     }
     else if (mutt_strncasecmp("X-Mutt-Fcc:", np->data, 11) == 0)
     {
@@ -392,7 +416,9 @@ int mutt_get_postponed(struct Context *ctx, struct Header *hdr,
   }
 
   if (option(OPT_CRYPT_OPPORTUNISTIC_ENCRYPT))
+  {
     crypt_opportunistic_encrypt(hdr);
+  }
 
   return code;
 }
@@ -404,7 +430,9 @@ int mutt_parse_crypt_hdr(const char *p, int set_empty_signas, int crypt_app)
   int flags = 0;
 
   if (!WithCrypto)
+  {
     return 0;
+  }
 
   p = skip_email_wsp(p);
   for (; *p; p++)
@@ -429,7 +457,9 @@ int mutt_parse_crypt_hdr(const char *p, int set_empty_signas, int crypt_app)
         if (*(p + 1) == '<')
         {
           for (p += 2; *p && *p != '>' && q < sign_as + sizeof(sign_as) - 1; *q++ = *p++)
+          {
             ;
+          }
 
           if (*p != '>')
           {
@@ -451,7 +481,9 @@ int mutt_parse_crypt_hdr(const char *p, int set_empty_signas, int crypt_app)
         if (*(p + 1) == '<')
         {
           for (p += 2; *p && *p != '>'; p++)
+          {
             ;
+          }
           if (*p != '>')
           {
             mutt_error(_("Illegal crypto header"));
@@ -469,7 +501,9 @@ int mutt_parse_crypt_hdr(const char *p, int set_empty_signas, int crypt_app)
         {
           for (p += 2; *p && *p != '>' && q < smime_cryptalg + sizeof(smime_cryptalg) - 1;
                *q++ = *p++)
+          {
             ;
+          }
 
           if (*p != '>')
           {
@@ -494,17 +528,23 @@ int mutt_parse_crypt_hdr(const char *p, int set_empty_signas, int crypt_app)
 
   /* the cryptalg field must not be empty */
   if ((WithCrypto & APPLICATION_SMIME) && *smime_cryptalg)
+  {
     mutt_str_replace(&SmimeEncryptWith, smime_cryptalg);
+  }
 
   /* Set {Smime,Pgp}SignAs, if desired. */
 
   if ((WithCrypto & APPLICATION_PGP) && (crypt_app == APPLICATION_PGP) &&
       (flags & SIGN) && (set_empty_signas || *sign_as))
+  {
     mutt_str_replace(&PgpSignAs, sign_as);
+  }
 
   if ((WithCrypto & APPLICATION_SMIME) && (crypt_app == APPLICATION_SMIME) &&
       (flags & SIGN) && (set_empty_signas || *sign_as))
+  {
     mutt_str_replace(&SmimeDefaultKey, sign_as);
+  }
 
   return flags;
 }
@@ -535,10 +575,14 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
   memset(&s, 0, sizeof(s));
 
   if (!fp && (msg = mx_open_message(ctx, hdr->msgno)) == NULL)
+  {
     return -1;
+  }
 
   if (!fp)
+  {
     fp = msg->fp;
+  }
 
   bfp = fp;
 
@@ -568,7 +612,9 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
   {
     newhdr->security |= sec_type;
     if (!crypt_valid_passphrase(sec_type))
+    {
       goto err;
+    }
 
     mutt_message(_("Decrypting message..."));
     if ((crypt_pgp_decrypt_mime(fp, &bfp, newhdr->content, &b) == -1) || b == NULL)
@@ -598,9 +644,13 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
     if ((WithCrypto & APPLICATION_PGP) &&
         (mutt_strcasecmp(mutt_get_parameter("protocol", newhdr->content->parameter),
                          "application/pgp-signature") == 0))
+    {
       newhdr->security |= APPLICATION_PGP;
+    }
     else if ((WithCrypto & APPLICATION_SMIME))
+    {
       newhdr->security |= APPLICATION_SMIME;
+    }
 
     /* destroy the signature */
     mutt_free_body(&newhdr->content->parts->next);
@@ -618,7 +668,9 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
    */
 
   if (newhdr->content->type == TYPEMULTIPART)
+  {
     newhdr->content = mutt_remove_multipart(newhdr->content);
+  }
 
   s.fpin = bfp;
 
@@ -648,7 +700,9 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
     if (b->type == TYPETEXT)
     {
       if (mutt_strcasecmp("yes", mutt_get_parameter("x-mutt-noconv", b->parameter)) == 0)
+      {
         b->noconv = true;
+      }
       else
       {
         s.flags |= MUTT_CHARCONV;
@@ -660,7 +714,9 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
 
     mutt_adv_mktemp(file, sizeof(file));
     if ((s.fpout = safe_fopen(file, "w")) == NULL)
+    {
       goto bail;
+    }
 
     if ((WithCrypto & APPLICATION_PGP) &&
         ((sec_type = mutt_is_application_pgp(b)) & (ENCRYPT | SIGN)))
@@ -683,10 +739,14 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
       mutt_str_replace(&b->subtype, "plain");
     }
     else
+    {
       mutt_decode_attachment(b, &s);
+    }
 
     if (safe_fclose(&s.fpout) != 0)
+    {
       goto bail;
+    }
 
     mutt_str_replace(&b->filename, file);
     b->unlink = true;
@@ -695,14 +755,18 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
 
     mutt_free_body(&b->parts);
     if (b->hdr)
+    {
       b->hdr->content = NULL; /* avoid dangling pointer */
+    }
   }
 
   /* Fix encryption flags. */
 
   /* No inline if multipart. */
   if (WithCrypto && (newhdr->security & INLINE) && newhdr->content->next)
+  {
     newhdr->security &= ~INLINE;
+  }
 
   /* Do we even support multiple mechanisms? */
   newhdr->security &= WithCrypto | ~(APPLICATION_PGP | APPLICATION_SMIME);
@@ -711,9 +775,13 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
   if ((newhdr->security & APPLICATION_PGP) && (newhdr->security & APPLICATION_SMIME))
   {
     if (option(OPT_SMIME_IS_DEFAULT))
+    {
       newhdr->security &= ~APPLICATION_PGP;
+    }
     else
+    {
       newhdr->security &= ~APPLICATION_SMIME;
+    }
   }
 
   rv = 0;
@@ -722,9 +790,13 @@ bail:
 
   /* that's it. */
   if (bfp != fp)
+  {
     safe_fclose(&bfp);
+  }
   if (msg)
+  {
     mx_close_message(ctx, &msg);
+  }
 
   if (rv == -1)
   {

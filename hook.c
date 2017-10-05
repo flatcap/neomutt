@@ -222,7 +222,9 @@ int mutt_parse_hook(struct Buffer *buf, struct Buffer *s, unsigned long data,
     if ((pat = mutt_pattern_comp(
              pattern.data, (data & (MUTT_SENDHOOK | MUTT_SEND2HOOK | MUTT_FCCHOOK)) ? 0 : MUTT_FULL_MSG,
              err)) == NULL)
+    {
       goto error;
+    }
   }
   else if (~data & MUTT_GLOBALHOOK) /* NOT a global hook */
   {
@@ -253,8 +255,10 @@ int mutt_parse_hook(struct Buffer *buf, struct Buffer *s, unsigned long data,
   return 0;
 
 error:
-  if (~data & MUTT_GLOBALHOOK) /* NOT a global hook */
+  if (~data & MUTT_GLOBALHOOK)
+  { /* NOT a global hook */
     FREE(&pattern.data);
+  }
   FREE(&command.data);
   return -1;
 }
@@ -343,7 +347,9 @@ void mutt_folder_hook(char *path)
   TAILQ_FOREACH(tmp, &Hooks, entries)
   {
     if (!tmp->command)
+    {
       continue;
+    }
 
     if (tmp->type & MUTT_FOLDERHOOK)
     {
@@ -377,7 +383,9 @@ char *mutt_find_hook(int type, const char *pat)
     if (tmp->type & type)
     {
       if (regexec(tmp->regex.regex, pat, 0, NULL, 0) == 0)
+      {
         return tmp->command;
+      }
     }
   }
   return NULL;
@@ -399,9 +407,12 @@ void mutt_message_hook(struct Context *ctx, struct Header *hdr, int type)
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
     if (!hook->command)
+    {
       continue;
+    }
 
     if (hook->type & type)
+    {
       if ((mutt_pattern_exec(hook->pattern, 0, ctx, hdr, &cache) > 0) ^
           hook->regex.not)
       {
@@ -419,6 +430,7 @@ void mutt_message_hook(struct Context *ctx, struct Header *hdr, int type)
          * so the cache has to be wiped */
         memset(&cache, 0, sizeof(cache));
       }
+    }
   }
   FREE(&token.data);
   FREE(&err.data);
@@ -437,15 +449,19 @@ static int addr_hook(char *path, size_t pathlen, int type, struct Context *ctx,
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
     if (!hook->command)
+    {
       continue;
+    }
 
     if (hook->type & type)
+    {
       if ((mutt_pattern_exec(hook->pattern, 0, ctx, hdr, &cache) > 0) ^
           hook->regex.not)
       {
         mutt_make_string(path, pathlen, hook->command, ctx, hdr);
         return 0;
       }
+    }
   }
 
   return -1;
@@ -462,15 +478,25 @@ void mutt_default_save(char *path, size_t pathlen, struct Header *hdr)
     bool fromMe = mutt_addr_is_user(env->from);
 
     if (!fromMe && env->reply_to && env->reply_to->mailbox)
+    {
       adr = env->reply_to;
+    }
     else if (!fromMe && env->from && env->from->mailbox)
+    {
       adr = env->from;
+    }
     else if (env->to && env->to->mailbox)
+    {
       adr = env->to;
+    }
     else if (env->cc && env->cc->mailbox)
+    {
       adr = env->cc;
+    }
     else
+    {
       adr = NULL;
+    }
     if (adr)
     {
       mutt_safe_path(tmp, sizeof(tmp), adr);
@@ -493,10 +519,14 @@ void mutt_select_fcc(char *path, size_t pathlen, struct Header *hdr)
       mutt_safe_path(buf, sizeof(buf), adr);
       mutt_concat_path(path, NONULL(Folder), buf, pathlen);
       if (!option(OPT_FORCE_NAME) && mx_access(path, W_OK) != 0)
+      {
         strfcpy(path, NONULL(Record), pathlen);
+      }
     }
     else
+    {
       strfcpy(path, NONULL(Record), pathlen);
+    }
   }
   mutt_pretty_mailbox(path, pathlen);
 }
@@ -509,7 +539,9 @@ static char *_mutt_string_hook(const char *match, int hook)
   {
     if ((tmp->type & hook) && ((match && regexec(tmp->regex.regex, match, 0, NULL, 0) == 0) ^
                                tmp->regex.not))
+    {
       return tmp->command;
+    }
   }
   return NULL;
 }
@@ -522,7 +554,9 @@ static void _mutt_list_hook(struct ListHead *matches, const char *match, int hoo
   {
     if ((tmp->type & hook) && ((match && regexec(tmp->regex.regex, match, 0, NULL, 0) == 0) ^
                                tmp->regex.not))
+    {
       mutt_list_insert_tail(matches, safe_strdup(tmp->command));
+    }
   }
 }
 
@@ -554,7 +588,9 @@ void mutt_account_hook(const char *url)
   struct Buffer err;
 
   if (inhook)
+  {
     return;
+  }
 
   mutt_buffer_init(&err);
   err.dsize = STRING;
@@ -564,7 +600,9 @@ void mutt_account_hook(const char *url)
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
     if (!(hook->command && (hook->type & MUTT_ACCOUNTHOOK)))
+    {
       continue;
+    }
 
     if ((regexec(hook->regex.regex, url, 0, NULL, 0) == 0) ^ hook->regex.not)
     {
@@ -604,7 +642,9 @@ void mutt_timeout_hook(void)
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
     if (!(hook->command && (hook->type & MUTT_TIMEOUTHOOK)))
+    {
       continue;
+    }
 
     if (mutt_parse_rc_line(hook->command, &token, &err) == -1)
     {
@@ -639,7 +679,9 @@ void mutt_startup_shutdown_hook(int type)
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
     if (!(hook->command && (hook->type & type)))
+    {
       continue;
+    }
 
     if (mutt_parse_rc_line(hook->command, &token, &err) == -1)
     {

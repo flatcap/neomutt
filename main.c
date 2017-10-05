@@ -249,10 +249,14 @@ int main(int argc, char **argv, char **env)
     char **srcp, **dstp;
     int count = 0;
     for (srcp = env; srcp && *srcp; srcp++)
+    {
       count++;
+    }
     envlist = safe_calloc(count + 1, sizeof(char *));
     for (srcp = env, dstp = envlist; srcp && *srcp; srcp++, dstp++)
+    {
       *dstp = safe_strdup(*srcp);
+    }
   }
 
   for (optind = 1; optind < double_dash;)
@@ -267,20 +271,27 @@ int main(int argc, char **argv, char **env)
       if (argv[optind][0] == '-' && argv[optind][1] != '\0')
       {
         if (argv[optind][1] == '-' && argv[optind][2] == '\0')
+        {
           double_dash = optind; /* quit outer loop after getopt */
-        break;                  /* drop through to getopt */
+        }
+        break; /* drop through to getopt */
       }
 
       /* non-option, either an attachment or address */
       if (!STAILQ_EMPTY(&attach))
+      {
         mutt_list_insert_tail(&attach, safe_strdup(argv[optind]));
+      }
       else
+      {
         argv[nargc++] = argv[optind];
+      }
     }
 
     /* USE_NNTP 'g:G' */
     if ((i = getopt(argc, argv,
                     "+A:a:Bb:F:f:c:Dd:l:Ee:g:GH:s:i:hm:npQ:RSvxyzZ")) != EOF)
+    {
       switch (i)
       {
         case 'A':
@@ -303,13 +314,21 @@ int main(int argc, char **argv, char **env)
         case 'b':
         case 'c':
           if (!msg)
+          {
             msg = mutt_new_header();
+          }
           if (!msg->env)
+          {
             msg->env = mutt_new_envelope();
+          }
           if (i == 'b')
+          {
             msg->env->bcc = rfc822_parse_adrlist(msg->env->bcc, optarg);
+          }
           else
+          {
             msg->env->cc = rfc822_parse_adrlist(msg->env->cc, optarg);
+          }
           break;
 
         case 'D':
@@ -425,11 +444,14 @@ int main(int argc, char **argv, char **env)
         default:
           usage();
       }
+    }
   }
 
   /* collapse remaining argv */
   while (optind < argc)
+  {
     argv[nargc++] = argv[optind++];
+  }
   optind = 1;
   argc = nargc;
 
@@ -475,23 +497,31 @@ int main(int argc, char **argv, char **env)
   crypt_init();
 
   if (newMagic)
+  {
     mx_set_magic(newMagic);
+  }
 
   if (!STAILQ_EMPTY(&queries))
   {
     for (; optind < argc; optind++)
+    {
       mutt_list_insert_tail(&queries, safe_strdup(argv[optind]));
+    }
     return mutt_query_variables(&queries);
   }
   if (dump_variables)
+  {
     return mutt_dump_variables(hide_sensitive);
+  }
 
   if (!STAILQ_EMPTY(&alias_queries))
   {
     int rv = 0;
     struct Address *a = NULL;
     for (; optind < argc; optind++)
+    {
       mutt_list_insert_tail(&alias_queries, safe_strdup(argv[optind]));
+    }
     struct ListNode *np;
     STAILQ_FOREACH(np, &alias_queries, entries)
     {
@@ -542,18 +572,24 @@ int main(int argc, char **argv, char **env)
       if (mutt_yesorno(msg2, MUTT_YES) == MUTT_YES)
       {
         if (mkdir(fpath, 0700) == -1 && errno != EEXIST)
+        {
           mutt_error(_("Can't create %s: %s."), Folder, strerror(errno));
+        }
       }
     }
   }
 
   if (batch_mode)
+  {
     exit(0);
+  }
 
   if (sendflags & SENDPOSTPONED)
   {
     if (!option(OPT_NO_CURSES))
+    {
       mutt_flushinp();
+    }
     ci_send_message(SENDPOSTPONED, NULL, NULL, NULL, NULL);
     mutt_free_windows();
     mutt_endwin(NULL);
@@ -570,12 +606,18 @@ int main(int argc, char **argv, char **env)
     char expanded_infile[_POSIX_PATH_MAX];
 
     if (!option(OPT_NO_CURSES))
+    {
       mutt_flushinp();
+    }
 
     if (!msg)
+    {
       msg = mutt_new_header();
+    }
     if (!msg->env)
+    {
       msg->env = mutt_new_envelope();
+    }
 
     for (i = optind; i < argc; i++)
     {
@@ -584,25 +626,33 @@ int main(int argc, char **argv, char **env)
         if (url_parse_mailto(msg->env, &bodytext, argv[i]) < 0)
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           fputs(_("Failed to parse mailto: link\n"), stderr);
           exit(1);
         }
       }
       else
+      {
         msg->env->to = rfc822_parse_adrlist(msg->env->to, argv[i]);
+      }
     }
 
     if (!draftFile && option(OPT_AUTOEDIT) && !msg->env->to && !msg->env->cc)
     {
       if (!option(OPT_NO_CURSES))
+      {
         mutt_endwin(NULL);
+      }
       fputs(_("No recipients specified.\n"), stderr);
       exit(1);
     }
 
     if (subject)
+    {
       msg->env->subject = safe_strdup(subject);
+    }
 
     if (draftFile)
     {
@@ -610,9 +660,13 @@ int main(int argc, char **argv, char **env)
       includeFile = NULL;
     }
     else if (includeFile)
+    {
       infile = includeFile;
+    }
     else
+    {
       edit_infile = false;
+    }
 
     if (infile || bodytext)
     {
@@ -635,7 +689,9 @@ int main(int argc, char **argv, char **env)
           if ((fin = fopen(expanded_infile, "r")) == NULL)
           {
             if (!option(OPT_NO_CURSES))
+            {
               mutt_endwin(NULL);
+            }
             perror(expanded_infile);
             exit(1);
           }
@@ -654,7 +710,9 @@ int main(int argc, char **argv, char **env)
         if ((fout = safe_fopen(tempfile, "w")) == NULL)
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           perror(tempfile);
           safe_fclose(&fin);
           FREE(&tempfile);
@@ -664,16 +722,22 @@ int main(int argc, char **argv, char **env)
         {
           mutt_copy_stream(fin, fout);
           if (fin != stdin)
+          {
             safe_fclose(&fin);
+          }
         }
         else if (bodytext)
+        {
           fputs(bodytext, fout);
+        }
         safe_fclose(&fout);
 
         if ((fin = fopen(tempfile, "r")) == NULL)
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           perror(tempfile);
           FREE(&tempfile);
           exit(1);
@@ -683,7 +747,9 @@ int main(int argc, char **argv, char **env)
        * it doesn't get unlinked, and we can rebuild the draftFile
        */
       else
+      {
         sendflags |= SENDNOFREEHEADER;
+      }
 
       /* Parse the draftFile into the full Header/Body structure.
        * Set SENDDRAFTFILE so ci_send_message doesn't overwrite
@@ -719,7 +785,9 @@ int main(int argc, char **argv, char **env)
           if (mutt_strncasecmp("X-Mutt-Resume-Draft:", np->data, 20) == 0)
           {
             if (option(OPT_RESUME_EDITED_DRAFT_FILES))
+            {
               set_option(OPT_RESUME_DRAFT_FILES);
+            }
 
             STAILQ_REMOVE(&msg->env->userhdrs, np, ListNode, entries);
             FREE(&np->data);
@@ -731,7 +799,9 @@ int main(int argc, char **argv, char **env)
         rfc822_append(&msg->env->cc, opts_env->cc, 0);
         rfc822_append(&msg->env->bcc, opts_env->bcc, 0);
         if (opts_env->subject)
+        {
           mutt_str_replace(&msg->env->subject, opts_env->subject);
+        }
 
         mutt_free_envelope(&opts_env);
         mutt_free_header(&context_hdr);
@@ -740,14 +810,20 @@ int main(int argc, char **argv, char **env)
        * Note that SENDNOFREEHEADER is set above so it isn't unlinked.
        */
       else if (edit_infile)
+      {
         bodyfile = expanded_infile;
-      /* For bodytext and unedited includeFile: use the tempfile.
+        /* For bodytext and unedited includeFile: use the tempfile.
        */
+      }
       else
+      {
         bodyfile = tempfile;
+      }
 
       if (fin)
+      {
         safe_fclose(&fin);
+      }
     }
 
     FREE(&bodytext);
@@ -757,7 +833,9 @@ int main(int argc, char **argv, char **env)
       struct Body *a = msg->content;
 
       while (a && a->next)
+      {
         a = a->next;
+      }
 
       struct ListNode *np;
       STAILQ_FOREACH(np, &attach, entries)
@@ -768,11 +846,15 @@ int main(int argc, char **argv, char **env)
           a = a->next;
         }
         else
+        {
           msg->content = a = mutt_make_file_attach(np->data);
+        }
         if (!a)
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           fprintf(stderr, _("%s: unable to attach file.\n"), np->data);
           mutt_list_free(&attach);
           exit(1);
@@ -786,20 +868,26 @@ int main(int argc, char **argv, char **env)
     if (edit_infile)
     {
       if (includeFile)
+      {
         msg->content->unlink = false;
+      }
       else if (draftFile)
       {
         if (truncate(expanded_infile, 0) == -1)
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           perror(expanded_infile);
           exit(1);
         }
         if ((fout = safe_fopen(expanded_infile, "a")) == NULL)
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           perror(expanded_infile);
           exit(1);
         }
@@ -810,7 +898,9 @@ int main(int argc, char **argv, char **env)
         if (rv < 0)
         {
           if (msg->content->next)
+          {
             msg->content = mutt_make_multipart(msg->content);
+          }
           mutt_encode_descriptions(msg->content, 1);
           mutt_prepare_envelope(msg->env, 0);
           mutt_env_to_intl(msg->env, NULL, NULL);
@@ -818,12 +908,16 @@ int main(int argc, char **argv, char **env)
 
         mutt_write_rfc822_header(fout, msg->env, msg->content, -1, 0);
         if (option(OPT_RESUME_EDITED_DRAFT_FILES))
+        {
           fprintf(fout, "X-Mutt-Resume-Draft: 1\n");
+        }
         fputc('\n', fout);
         if ((mutt_write_mime_body(msg->content, fout) == -1))
         {
           if (!option(OPT_NO_CURSES))
+          {
             mutt_endwin(NULL);
+          }
           safe_fclose(&fout);
           exit(1);
         }
@@ -842,10 +936,14 @@ int main(int argc, char **argv, char **env)
 
     mutt_free_windows();
     if (!option(OPT_NO_CURSES))
+    {
       mutt_endwin(NULL);
+    }
 
     if (rv)
+    {
       exit(1);
+    }
   }
   else
   {
@@ -890,9 +988,13 @@ int main(int argc, char **argv, char **env)
     if (!folder[0])
     {
       if (SpoolFile)
+      {
         strfcpy(folder, NONULL(SpoolFile), sizeof(folder));
+      }
       else if (Folder)
+      {
         strfcpy(folder, NONULL(Folder), sizeof(folder));
+      }
       /* else no folder */
     }
 
@@ -903,8 +1005,10 @@ int main(int argc, char **argv, char **env)
       nntp_expand_path(folder, sizeof(folder), &CurrentNewsSrv->conn->account);
     }
     else
+    {
 #endif
       mutt_expand_path(folder, sizeof(folder));
+    }
 
     mutt_str_replace(&CurrentFolder, folder);
     mutt_str_replace(&LastFolder, folder);
@@ -935,7 +1039,9 @@ int main(int argc, char **argv, char **env)
 #endif
       mutt_index_menu();
       if (Context)
+      {
         FREE(&Context);
+      }
     }
 #ifdef USE_IMAP
     imap_logout_all();

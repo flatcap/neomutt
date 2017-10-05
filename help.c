@@ -54,15 +54,23 @@ static const struct Binding *help_lookup_function(int op, int menu)
   {
     /* first look in the generic map for the function */
     for (i = 0; OpGeneric[i].name; i++)
+    {
       if (OpGeneric[i].op == op)
+      {
         return (&OpGeneric[i]);
+      }
+    }
   }
 
   if ((map = km_get_table(menu)))
   {
     for (i = 0; map[i].name; i++)
+    {
       if (map[i].op == op)
+      {
         return (&map[i]);
+      }
+    }
   }
 
   return NULL;
@@ -74,9 +82,13 @@ void mutt_make_help(char *d, size_t dlen, const char *txt, int menu, int op)
 
   if (km_expand_key(buf, sizeof(buf), km_find_func(menu, op)) ||
       km_expand_key(buf, sizeof(buf), km_find_func(MENU_GENERIC, op)))
+  {
     snprintf(d, dlen, "%s:%s", buf, txt);
+  }
   else
+  {
     d[0] = '\0';
+  }
 }
 
 char *mutt_compile_help(char *buf, size_t buflen, int menu, const struct Mapping *items)
@@ -116,7 +128,9 @@ static int print_macro(FILE *f, int maxwidth, const char **macro)
     if (k == (size_t)(-1) || k == (size_t)(-2))
     {
       if (k == (size_t)(-1))
+      {
         memset(&mbstate1, 0, sizeof(mbstate1));
+      }
       k = (k == (size_t)(-1)) ? 1 : len;
       wc = replacement_char();
     }
@@ -124,36 +138,54 @@ static int print_macro(FILE *f, int maxwidth, const char **macro)
     if (IsWPrint(wc) && (w = wcwidth(wc)) >= 0)
     {
       if (w > n)
+      {
         break;
+      }
       n -= w;
       {
         char buf[MB_LEN_MAX * 2];
         size_t n1, n2;
         if ((n1 = wcrtomb(buf, wc, &mbstate2)) != (size_t)(-1) &&
             (n2 = wcrtomb(buf + n1, 0, &mbstate2)) != (size_t)(-1))
+        {
           fputs(buf, f);
+        }
       }
     }
     else if (wc < 0x20 || wc == 0x7f)
     {
       if (2 > n)
+      {
         break;
+      }
       n -= 2;
       if (wc == '\033')
+      {
         fprintf(f, "\\e");
+      }
       else if (wc == '\n')
+      {
         fprintf(f, "\\n");
+      }
       else if (wc == '\r')
+      {
         fprintf(f, "\\r");
+      }
       else if (wc == '\t')
+      {
         fprintf(f, "\\t");
+      }
       else
+      {
         fprintf(f, "^%c", (char) ((wc + '@') & 0x7f));
+      }
     }
     else
     {
       if (1 > n)
+      {
         break;
+      }
       n -= 1;
       fprintf(f, "?");
     }
@@ -175,22 +207,32 @@ static int get_wrapped_width(const char *t, size_t wid)
        s += k, len -= k)
   {
     if (*s == ' ')
+    {
       m = n;
+    }
     if (k == (size_t)(-1) || k == (size_t)(-2))
     {
       if (k == (size_t)(-1))
+      {
         memset(&mbstate, 0, sizeof(mbstate));
+      }
       k = (k == (size_t)(-1)) ? 1 : len;
       wc = replacement_char();
     }
     if (!IsWPrint(wc))
+    {
       wc = '?';
+    }
     n += wcwidth(wc);
   }
   if (n > wid)
+  {
     n = m;
+  }
   else
+  {
     n = wid;
+  }
   return n;
 }
 
@@ -235,7 +277,9 @@ static void format_line(FILE *f, int ismacro, const char *t1, const char *t2, co
   if (ismacro > 0)
   {
     if (mutt_strcmp(Pager, "builtin") == 0)
+    {
       fputs("_\010", f);
+    }
     fputs("M ", f);
     col += 2;
 
@@ -243,15 +287,21 @@ static void format_line(FILE *f, int ismacro, const char *t1, const char *t2, co
     {
       col += print_macro(f, col_b - col - 4, &t2);
       if (mutt_strwidth(t2) > col_b - col)
+      {
         t2 = "...";
+      }
     }
   }
 
   col += print_macro(f, col_b - col - 1, &t2);
   if (split)
+  {
     fputc('\n', f);
+  }
   else
+  {
     col = pad(f, col, col_b);
+  }
 
   if (split)
   {
@@ -283,7 +333,9 @@ static void format_line(FILE *f, int ismacro, const char *t1, const char *t2, co
         {
           n += col - MuttIndexWindow->cols;
           if (option(OPT_MARKERS))
+          {
             n++;
+          }
         }
         col = pad(f, n, col_b);
       }
@@ -309,9 +361,13 @@ static void dump_menu(FILE *f, int menu)
       if (map->op == OP_MACRO)
       {
         if (!map->descr)
+        {
           format_line(f, -1, buf, "macro", map->macro);
+        }
         else
+        {
           format_line(f, 1, buf, map->macro, map->descr);
+        }
       }
       else
       {
@@ -327,8 +383,12 @@ static void dump_menu(FILE *f, int menu)
 static bool is_bound(struct Keymap *map, int op)
 {
   for (; map; map = map->next)
+  {
     if (map->op == op)
+    {
       return true;
+    }
+  }
   return false;
 }
 
@@ -338,7 +398,9 @@ static void dump_unbound(FILE *f, const struct Binding *funcs,
   for (int i = 0; funcs[i].name; i++)
   {
     if (!is_bound(map, funcs[i].op) && (!aux || !is_bound(aux, funcs[i].op)))
+    {
       format_line(f, 0, funcs[i].name, "", _(HelpStrings[funcs[i].op]));
+    }
   }
 }
 
@@ -355,7 +417,9 @@ void mutt_help(int menu)
   funcs = km_get_table(menu);
   desc = mutt_getnamebyvalue(menu, Menus);
   if (!desc)
+  {
     desc = _("<UNKNOWN>");
+  }
 
   do
   {
@@ -374,9 +438,13 @@ void mutt_help(int menu)
 
     fputs(_("\nUnbound functions:\n\n"), f);
     if (funcs)
+    {
       dump_unbound(f, funcs, Keymaps[menu], NULL);
+    }
     if (menu != MENU_PAGER)
+    {
       dump_unbound(f, OpGeneric, Keymaps[MENU_GENERIC], Keymaps[menu]);
+    }
 
     safe_fclose(&f);
 

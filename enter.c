@@ -52,11 +52,17 @@ static int my_wcwidth(wchar_t wc)
 {
   int n = wcwidth(wc);
   if (IsWPrint(wc) && n > 0)
+  {
     return n;
+  }
   if (!(wc & ~0x7f))
+  {
     return 2;
+  }
   if (!(wc & ~0xffff))
+  {
     return 6;
+  }
   return 10;
 }
 
@@ -67,7 +73,9 @@ static int my_wcswidth(const wchar_t *s, size_t n)
 {
   int w = 0;
   while (n--)
+  {
     w += my_wcwidth(*s++);
+  }
   return w;
 }
 
@@ -75,11 +83,17 @@ static int my_addwch(wchar_t wc)
 {
   int n = wcwidth(wc);
   if (IsWPrint(wc) && n > 0)
+  {
     return mutt_addwch(wc);
+  }
   if (!(wc & ~0x7f))
+  {
     return printw("^%c", ((int) wc + 0x40) & 0x7f);
+  }
   if (!(wc & ~0xffff))
+  {
     return printw("\\u%04x", (int) wc);
+  }
   return printw("\\u%08x", (int) wc);
 }
 
@@ -88,8 +102,12 @@ static size_t width_ceiling(const wchar_t *s, size_t n, int w1)
   const wchar_t *s0 = s;
   int w = 0;
   for (; n; s++, n--)
+  {
     if ((w += my_wcwidth(*s)) > w1)
+    {
       break;
+    }
+  }
   return s - s0;
 }
 
@@ -101,8 +119,12 @@ static void my_wcstombs(char *dest, size_t dlen, const wchar_t *src, size_t slen
   /* First convert directly into the destination buffer */
   memset(&st, 0, sizeof(st));
   for (; slen && dlen >= MB_LEN_MAX; dest += k, dlen -= k, src++, slen--)
+  {
     if ((k = wcrtomb(dest, *src, &st)) == (size_t)(-1))
+    {
       break;
+    }
+  }
 
   /* If this works, we can stop now */
   if (dlen >= MB_LEN_MAX)
@@ -117,8 +139,12 @@ static void my_wcstombs(char *dest, size_t dlen, const wchar_t *src, size_t slen
     char *p = buf;
 
     for (; slen && p - buf < dlen; p += k, src++, slen--)
+    {
       if ((k = wcrtomb(p, *src, &st)) == (size_t)(-1))
+      {
         break;
+      }
+    }
     p += wcrtomb(p, 0, &st);
 
     /* If it fits into the destination buffer, we can stop now */
@@ -304,19 +330,33 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
   }
 
   if (flags & MUTT_FILE)
+  {
     hclass = HC_FILE;
+  }
   else if (flags & MUTT_EFILE)
+  {
     hclass = HC_MBOX;
+  }
   else if (flags & MUTT_CMD)
+  {
     hclass = HC_CMD;
+  }
   else if (flags & MUTT_ALIAS)
+  {
     hclass = HC_ALIAS;
+  }
   else if (flags & MUTT_COMMAND)
+  {
     hclass = HC_COMMAND;
+  }
   else if (flags & MUTT_PATTERN)
+  {
     hclass = HC_PATTERN;
+  }
   else
+  {
     hclass = HC_OTHER;
+  }
 
   for (;;)
   {
@@ -332,15 +372,19 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
       }
       if (state->curpos < state->begin ||
           my_wcswidth(state->wbuf + state->begin, state->curpos - state->begin) >= width)
+      {
         state->begin = width_ceiling(state->wbuf, state->lastchar,
                                      my_wcswidth(state->wbuf, state->curpos) - width / 2);
+      }
       mutt_window_move(MuttMessageWindow, 0, col);
       w = 0;
       for (i = state->begin; i < state->lastchar; i++)
       {
         w += my_wcwidth(state->wbuf[i]);
         if (w > width)
+        {
           break;
+        }
         my_addwch(state->wbuf[i]);
       }
       mutt_window_clrtoeol(MuttMessageWindow);
@@ -360,7 +404,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
     {
       first = 0;
       if (ch != OP_EDITOR_COMPLETE && ch != OP_EDITOR_COMPLETE_QUERY)
+      {
         state->tabs = 0;
+      }
       redraw = MUTT_REDRAW_LINE;
       switch (ch)
       {
@@ -388,14 +434,20 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
         case OP_EDITOR_BACKSPACE:
           if (state->curpos == 0)
+          {
             BEEP();
+          }
           else
           {
             i = state->curpos;
             while (i && COMB_CHAR(state->wbuf[i - 1]))
+            {
               i--;
+            }
             if (i)
+            {
               i--;
+            }
             memmove(state->wbuf + i, state->wbuf + state->curpos,
                     (state->lastchar - state->curpos) * sizeof(wchar_t));
             state->lastchar -= state->curpos - i;
@@ -421,50 +473,72 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
         case OP_EDITOR_BACKWARD_CHAR:
           if (state->curpos == 0)
+          {
             BEEP();
+          }
           else
           {
             while (state->curpos && COMB_CHAR(state->wbuf[state->curpos - 1]))
+            {
               state->curpos--;
+            }
             if (state->curpos)
+            {
               state->curpos--;
+            }
           }
           break;
 
         case OP_EDITOR_FORWARD_CHAR:
           if (state->curpos == state->lastchar)
+          {
             BEEP();
+          }
           else
           {
             state->curpos++;
             while (state->curpos < state->lastchar &&
                    COMB_CHAR(state->wbuf[state->curpos]))
+            {
               state->curpos++;
+            }
           }
           break;
 
         case OP_EDITOR_BACKWARD_WORD:
           if (state->curpos == 0)
+          {
             BEEP();
+          }
           else
           {
             while (state->curpos && iswspace(state->wbuf[state->curpos - 1]))
+            {
               state->curpos--;
+            }
             while (state->curpos && !iswspace(state->wbuf[state->curpos - 1]))
+            {
               state->curpos--;
+            }
           }
           break;
 
         case OP_EDITOR_FORWARD_WORD:
           if (state->curpos == state->lastchar)
+          {
             BEEP();
+          }
           else
           {
             while (state->curpos < state->lastchar && iswspace(state->wbuf[state->curpos]))
+            {
               state->curpos++;
+            }
             while (state->curpos < state->lastchar &&
                    !iswspace(state->wbuf[state->curpos]))
+            {
               state->curpos++;
+            }
           }
           break;
 
@@ -477,18 +551,26 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             break;
           }
           while (state->curpos && !iswspace(state->wbuf[state->curpos]))
+          {
             state->curpos--;
+          }
           while (state->curpos < state->lastchar && iswspace(state->wbuf[state->curpos]))
+          {
             state->curpos++;
+          }
           while (state->curpos < state->lastchar && !iswspace(state->wbuf[state->curpos]))
           {
             if (ch == OP_EDITOR_DOWNCASE_WORD)
+            {
               state->wbuf[state->curpos] = towlower(state->wbuf[state->curpos]);
+            }
             else
             {
               state->wbuf[state->curpos] = towupper(state->wbuf[state->curpos]);
               if (ch == OP_EDITOR_CAPITALIZE_WORD)
+              {
                 ch = OP_EDITOR_DOWNCASE_WORD;
+              }
             }
             state->curpos++;
           }
@@ -496,16 +578,24 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
         case OP_EDITOR_DELETE_CHAR:
           if (state->curpos == state->lastchar)
+          {
             BEEP();
+          }
           else
           {
             i = state->curpos;
             while (i < state->lastchar && COMB_CHAR(state->wbuf[i]))
+            {
               i++;
+            }
             if (i < state->lastchar)
+            {
               i++;
+            }
             while (i < state->lastchar && COMB_CHAR(state->wbuf[i]))
+            {
               i++;
+            }
             memmove(state->wbuf + state->curpos, state->wbuf + i,
                     (state->lastchar - i) * sizeof(wchar_t));
             state->lastchar -= i - state->curpos;
@@ -518,16 +608,22 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
           {
             i = state->curpos;
             while (i && iswspace(state->wbuf[i - 1]))
+            {
               i--;
+            }
             if (i)
             {
               if (iswalnum(state->wbuf[i - 1]))
               {
                 for (--i; i && iswalnum(state->wbuf[i - 1]); i--)
+                {
                   ;
+                }
               }
               else
+              {
                 i--;
+              }
             }
             memmove(state->wbuf + i, state->wbuf + state->curpos,
                     (state->lastchar - state->curpos) * sizeof(wchar_t));
@@ -541,7 +637,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
           /* first skip over whitespace */
           for (i = state->curpos; i < state->lastchar && iswspace(state->wbuf[i]); i++)
+          {
             ;
+          }
 
           /* if there are any characters left.. */
           if (i < state->lastchar)
@@ -551,7 +649,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             {
               /* skip over the rest of the word consistent of only alphanumerics */
               for (; i < state->lastchar && iswalnum(state->wbuf[i]); i++)
+              {
                 ;
+              }
             }
             else
             {
@@ -576,7 +676,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             break;
           }
           else if (!(flags & MUTT_FILE))
+          {
             goto self_insert;
+          }
         /* fall through to completion routine (MUTT_FILE) */
 
         case OP_EDITOR_COMPLETE:
@@ -585,14 +687,18 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
           if (flags & MUTT_CMD)
           {
             for (i = state->curpos; i && !is_shell_char(state->wbuf[i - 1]); i--)
+            {
               ;
+            }
             my_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
             if (tempbuf && templen == state->lastchar - i &&
                 !memcmp(tempbuf, state->wbuf + i, (state->lastchar - i) * sizeof(wchar_t)))
             {
               mutt_select_file(buf, buflen, (flags & MUTT_EFILE) ? MUTT_SEL_FOLDER : 0);
               if (*buf)
+              {
                 replace_part(state, i, buf);
+              }
               rv = 1;
               goto bye;
             }
@@ -602,7 +708,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
               safe_realloc(&tempbuf, templen * sizeof(wchar_t));
             }
             else
+            {
               BEEP();
+            }
 
             replace_part(state, i, buf);
           }
@@ -611,9 +719,13 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             /* invoke the alias-menu to get more addresses */
             for (i = state->curpos;
                  i && state->wbuf[i - 1] != ',' && state->wbuf[i - 1] != ':'; i--)
+            {
               ;
+            }
             for (; i < state->lastchar && state->wbuf[i] == ' '; i++)
+            {
               ;
+            }
             my_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
             r = mutt_alias_complete(buf, buflen);
             replace_part(state, i, buf);
@@ -628,9 +740,13 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
           {
             for (i = state->curpos;
                  i && state->wbuf[i - 1] != ',' && state->wbuf[i - 1] != ':'; i--)
+            {
               ;
+            }
             for (; i < state->lastchar && state->wbuf[i] == ' '; i++)
+            {
               ;
+            }
             my_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
             r = mutt_label_complete(buf, buflen, state->tabs);
             replace_part(state, i, buf);
@@ -644,7 +760,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
           else if (flags & MUTT_PATTERN && ch == OP_EDITOR_COMPLETE)
           {
             for (i = state->curpos; i && state->wbuf[i - 1] != '~'; i--)
+            {
               ;
+            }
             if (i && i < state->curpos && state->wbuf[i - 1] == '~' && state->wbuf[i] == 'y')
             {
               i++;
@@ -658,7 +776,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
               }
             }
             else
+            {
               goto self_insert;
+            }
             break;
           }
           else if (flags & MUTT_ALIAS && ch == OP_EDITOR_COMPLETE_QUERY)
@@ -666,9 +786,13 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             if ((i = state->curpos))
             {
               for (; i && state->wbuf[i - 1] != ','; i--)
+              {
                 ;
+              }
               for (; i < state->curpos && state->wbuf[i] == ' '; i++)
+              {
                 ;
+              }
             }
 
             my_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
@@ -683,9 +807,13 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             my_wcstombs(buf, buflen, state->wbuf, state->curpos);
             i = strlen(buf);
             if (i && buf[i - 1] == '=' && mutt_var_value_complete(buf, buflen, i))
+            {
               state->tabs = 0;
+            }
             else if (!mutt_command_complete(buf, buflen, i, state->tabs))
+            {
               BEEP();
+            }
             replace_part(state, 0, buf);
           }
           else if (flags & (MUTT_FILE | MUTT_EFILE))
@@ -705,7 +833,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
               {
                 mutt_pretty_mailbox(buf, buflen);
                 if (!pass)
+                {
                   mutt_history_add(hclass, buf, true);
+                }
                 rv = 0;
                 goto bye;
               }
@@ -722,7 +852,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
               memcpy(tempbuf, state->wbuf, templen * sizeof(wchar_t));
             }
             else
+            {
               BEEP(); /* let the user know that nothing matched */
+            }
             replace_part(state, 0, buf);
           }
 #ifdef USE_NOTMUCH
@@ -731,7 +863,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             my_wcstombs(buf, buflen, state->wbuf, state->curpos);
             i = strlen(buf);
             if (!mutt_nm_query_complete(buf, buflen, i, state->tabs))
+            {
               BEEP();
+            }
 
             replace_part(state, 0, buf);
           }
@@ -740,14 +874,18 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
             my_wcstombs(buf, buflen, state->wbuf, state->curpos);
             i = strlen(buf);
             if (!mutt_nm_tag_complete(buf, buflen, i, state->tabs))
+            {
               BEEP();
+            }
 
             replace_part(state, 0, buf);
           }
 
 #endif
           else
+          {
             goto self_insert;
+          }
           break;
 
         case OP_EDITOR_QUOTE_CHAR:
@@ -764,15 +902,21 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
         case OP_EDITOR_TRANSPOSE_CHARS:
           if (state->lastchar < 2)
+          {
             BEEP();
+          }
           else
           {
             wchar_t t;
 
             if (state->curpos == 0)
+            {
               state->curpos = 2;
+            }
             else if (state->curpos < state->lastchar)
+            {
               state->curpos++;
+            }
 
             t = state->wbuf[state->curpos - 2];
             state->wbuf[state->curpos - 2] = state->wbuf[state->curpos - 1];
@@ -794,7 +938,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
 
       /* quietly ignore all other function keys */
       if (ch & ~0xff)
+      {
         continue;
+      }
 
       /* gather the octets into a wide character */
       {
@@ -804,7 +950,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
         c = ch;
         k = mbrtowc(&wc, &c, 1, &mbstate);
         if (k == (size_t)(-2))
+        {
           continue;
+        }
         else if (k && k != 1)
         {
           memset(&mbstate, 0, sizeof(mbstate));
@@ -815,8 +963,10 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
       if (first && (flags & MUTT_CLEAR))
       {
         first = 0;
-        if (IsWPrint(wc)) /* why? */
+        if (IsWPrint(wc))
+        { /* why? */
           state->curpos = state->lastchar = 0;
+        }
       }
 
       if (wc == '\r' || wc == '\n')
@@ -824,7 +974,9 @@ int _mutt_enter_string(char *buf, size_t buflen, int col, int flags, int multipl
         /* Convert from wide characters */
         my_wcstombs(buf, buflen, state->wbuf, state->lastchar);
         if (!pass)
+        {
           mutt_history_add(hclass, buf, true);
+        }
 
         if (multiple)
         {
@@ -868,7 +1020,9 @@ bye:
 void mutt_free_enter_state(struct EnterState **esp)
 {
   if (!esp)
+  {
     return;
+  }
 
   FREE(&(*esp)->wbuf);
   FREE(esp);

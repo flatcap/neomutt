@@ -103,9 +103,13 @@ static int _lua_mutt_call(lua_State *l)
   else
   {
     if (lua_pushstring(l, err.data) == NULL)
+    {
       _handle_error(l);
+    }
     else
+    {
       rv++;
+    }
   }
 
   FREE(&err.data);
@@ -155,7 +159,9 @@ static int _lua_mutt_set(lua_State *l)
         rv = -1;
       }
       else
+      {
         rv = mutt_option_set(&opt, &err);
+      }
       break;
     case DT_MAGIC:
       if (mx_set_magic(lua_tostring(l, -1)))
@@ -284,9 +290,13 @@ static int _lua_mutt_enter(lua_State *l)
   else
   {
     if (lua_pushstring(l, err.data) == NULL)
+    {
       _handle_error(l);
+    }
     else
+    {
       rv++;
+    }
   }
 
   FREE(&buffer);
@@ -300,7 +310,9 @@ static int _lua_mutt_message(lua_State *l)
   mutt_debug(2, " * _lua_mutt_message()\n");
   const char *msg = lua_tostring(l, -1);
   if (msg)
+  {
     mutt_message(msg);
+  }
   return 0;
 }
 
@@ -309,7 +321,9 @@ static int _lua_mutt_error(lua_State *l)
   mutt_debug(2, " * _lua_mutt_error()\n");
   const char *msg = lua_tostring(l, -1);
   if (msg)
+  {
     mutt_error(msg);
+  }
   return 0;
 }
 

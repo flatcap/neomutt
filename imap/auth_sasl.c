@@ -72,35 +72,49 @@ enum ImapAuthRes imap_auth_sasl(struct ImapData *idata, const char *method)
      * 3. if sasl_client_start fails, fall through... */
 
     if (mutt_account_getuser(&idata->conn->account))
+    {
       return IMAP_AUTH_FAILURE;
+    }
 
     if (mutt_bit_isset(idata->capabilities, AUTH_ANON) &&
         (!idata->conn->account.user[0] ||
          (mutt_strncmp(idata->conn->account.user, "anonymous", 9) == 0)))
+    {
       rc = sasl_client_start(saslconn, "AUTH=ANONYMOUS", NULL, &pc, &olen, &mech);
+    }
   }
   else if ((mutt_strcasecmp("login", method) == 0) &&
            !strstr(NONULL(idata->capstr), "AUTH=LOGIN"))
+  {
     /* do not use SASL login for regular IMAP login (#3556) */
     return IMAP_AUTH_UNAVAIL;
+  }
 
   if (rc != SASL_OK && rc != SASL_CONTINUE)
+  {
     do
     {
       rc = sasl_client_start(saslconn, method, &interaction, &pc, &olen, &mech);
       if (rc == SASL_INTERACT)
+      {
         mutt_sasl_interact(interaction);
+      }
     } while (rc == SASL_INTERACT);
+  }
 
   client_start = (olen > 0);
 
   if (rc != SASL_OK && rc != SASL_CONTINUE)
   {
     if (method)
+    {
       mutt_debug(2, "imap_auth_sasl: %s unavailable\n", method);
+    }
     else
+    {
       mutt_debug(1, "imap_auth_sasl: Failure starting authentication exchange. "
                     "No shared mechanisms?\n");
+    }
     /* SASL doesn't support LOGIN, so fall back */
 
     return IMAP_AUTH_UNAVAIL;
@@ -131,11 +145,14 @@ enum ImapAuthRes imap_auth_sasl(struct ImapData *idata, const char *method)
   while (rc == SASL_CONTINUE || olen > 0)
   {
     do
+    {
       irc = imap_cmd_step(idata);
-    while (irc == IMAP_CMD_CONTINUE);
+    } while (irc == IMAP_CMD_CONTINUE);
 
     if (irc == IMAP_CMD_BAD || irc == IMAP_CMD_NO)
+    {
       goto bail;
+    }
 
     if (irc == IMAP_CMD_RESPOND)
     {
@@ -173,11 +190,15 @@ enum ImapAuthRes imap_auth_sasl(struct ImapData *idata, const char *method)
       {
         rc = sasl_client_step(saslconn, buf, len, &interaction, &pc, &olen);
         if (rc == SASL_INTERACT)
+        {
           mutt_sasl_interact(interaction);
+        }
       } while (rc == SASL_INTERACT);
     }
     else
+    {
       client_start = false;
+    }
 
     /* send out response, or line break if none needed */
     if (olen)
@@ -212,11 +233,17 @@ enum ImapAuthRes imap_auth_sasl(struct ImapData *idata, const char *method)
   }
 
   while (irc != IMAP_CMD_OK)
+  {
     if ((irc = imap_cmd_step(idata)) != IMAP_CMD_CONTINUE)
+    {
       break;
+    }
+  }
 
   if (rc != SASL_OK)
+  {
     goto bail;
+  }
 
   if (imap_code(idata->buf))
   {

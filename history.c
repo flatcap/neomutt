@@ -97,13 +97,17 @@ static void init_history(struct History *h)
     if (h->hist)
     {
       for (i = 0; i <= OldSize; i++)
+      {
         FREE(&h->hist[i]);
+      }
       FREE(&h->hist);
     }
   }
 
   if (History)
+  {
     h->hist = safe_calloc(History + 1, sizeof(char *));
+  }
 
   h->cur = 0;
   h->last = 0;
@@ -117,7 +121,9 @@ void mutt_read_histfile(void)
   size_t buflen;
 
   if ((f = fopen(HistoryFile, "r")) == NULL)
+  {
     return;
+  }
 
   while ((linebuf = mutt_read_line(linebuf, &buflen, f, &line, 0)) != NULL)
   {
@@ -130,7 +136,9 @@ void mutt_read_histfile(void)
     }
     /* silently ignore too high class (probably newer neomutt) */
     if (hclass >= HC_LAST)
+    {
       continue;
+    }
     *p = '\0';
     p = safe_strdup(linebuf + read);
     if (p)
@@ -152,7 +160,9 @@ static int dup_hash_dec(struct Hash *dup_hash, char *s)
 
   elem = hash_find_elem(dup_hash, s);
   if (!elem)
+  {
     return -1;
+  }
 
   count = (uintptr_t) elem->data;
   if (count <= 1)
@@ -197,11 +207,17 @@ static void shrink_histfile(void)
   struct Hash *dup_hashes[HC_LAST] = { 0 };
 
   if ((f = fopen(HistoryFile, "r")) == NULL)
+  {
     return;
+  }
 
   if (option(OPT_HISTORY_REMOVE_DUPS))
+  {
     for (hclass = 0; hclass < HC_LAST; hclass++)
+    {
       dup_hashes[hclass] = hash_create(MAX(10, SaveHistory * 2), MUTT_HASH_STRDUP_KEYS);
+    }
+  }
 
   line = 0;
   while ((linebuf = mutt_read_line(linebuf, &buflen, f, &line, 0)) != NULL)
@@ -214,7 +230,9 @@ static void shrink_histfile(void)
     }
     /* silently ignore too high class (probably newer neomutt) */
     if (hclass >= HC_LAST)
+    {
       continue;
+    }
     *p = '\0';
     if (option(OPT_HISTORY_REMOVE_DUPS) &&
         (dup_hash_inc(dup_hashes[hclass], linebuf + read) > 1))
@@ -226,12 +244,16 @@ static void shrink_histfile(void)
   }
 
   if (!regen_file)
+  {
     for (hclass = HC_FIRST; hclass < HC_LAST; hclass++)
+    {
       if (n[hclass] > SaveHistory)
       {
         regen_file = true;
         break;
       }
+    }
+  }
 
   if (regen_file)
   {
@@ -252,14 +274,20 @@ static void shrink_histfile(void)
         goto cleanup;
       }
       if (hclass >= HC_LAST)
+      {
         continue;
+      }
       *p = '\0';
       if (option(OPT_HISTORY_REMOVE_DUPS) &&
           (dup_hash_dec(dup_hashes[hclass], linebuf + read) > 0))
+      {
         continue;
+      }
       *p = '|';
       if (n[hclass]-- <= SaveHistory)
+      {
         fprintf(tmp, "%s\n", linebuf);
+      }
     }
   }
 
@@ -278,8 +306,12 @@ cleanup:
     unlink(tmpfname);
   }
   if (option(OPT_HISTORY_REMOVE_DUPS))
+  {
     for (hclass = 0; hclass < HC_LAST; hclass++)
+    {
       hash_destroy(&dup_hashes[hclass], NULL);
+    }
+  }
 }
 
 static void save_history(enum HistoryClass hclass, const char *s)
@@ -288,8 +320,10 @@ static void save_history(enum HistoryClass hclass, const char *s)
   FILE *f = NULL;
   char *tmp = NULL, *p = NULL;
 
-  if (!s || !*s) /* This shouldn't happen, but it's safer. */
+  if (!s || !*s)
+  { /* This shouldn't happen, but it's safer. */
     return;
+  }
 
   if ((f = fopen(HistoryFile, "a")) == NULL)
   {
@@ -309,7 +343,9 @@ static void save_history(enum HistoryClass hclass, const char *s)
        shouldn't contain such a character anyway, but as this can happen
        in practice, we must deal with that. */
     if (*p != '\n')
+    {
       putc((unsigned char) *p, f);
+    }
   }
   fputs("|\n", f);
 
@@ -335,16 +371,22 @@ static void remove_history_dups(enum HistoryClass hclass, const char *s)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return; /* disabled */
+  }
 
   /* Remove dups from 0..last-1 compacting up. */
   source = dest = 0;
   while (source < h->last)
   {
     if (!mutt_strcmp(h->hist[source], s))
+    {
       FREE(&h->hist[source++]);
+    }
     else
+    {
       h->hist[dest++] = h->hist[source++];
+    }
   }
 
   /* Move 'last' entry up. */
@@ -354,30 +396,42 @@ static void remove_history_dups(enum HistoryClass hclass, const char *s)
 
   /* Fill in moved entries with NULL */
   while (source > h->last)
+  {
     h->hist[source--] = NULL;
+  }
 
   /* Remove dups from last+1 .. History compacting down. */
   source = dest = History;
   while (source > old_last)
   {
     if (!mutt_strcmp(h->hist[source], s))
+    {
       FREE(&h->hist[source--]);
+    }
     else
+    {
       h->hist[dest--] = h->hist[source--];
+    }
   }
 
   /* Fill in moved entries with NULL */
   while (dest > old_last)
+  {
     h->hist[dest--] = NULL;
+  }
 }
 
 void mutt_init_history(void)
 {
   if (History == OldSize)
+  {
     return;
+  }
 
   for (enum HistoryClass hclass = HC_FIRST; hclass < HC_LAST; hclass++)
+  {
     init_history(&Histories[hclass]);
+  }
 
   OldSize = History;
 }
@@ -388,13 +442,17 @@ void mutt_history_add(enum HistoryClass hclass, const char *s, bool save)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return; /* disabled */
+  }
 
   if (*s)
   {
     prev = h->last - 1;
     if (prev < 0)
+    {
       prev = History;
+    }
 
     /* don't add to prompt history:
      *  - lines beginning by a space
@@ -403,12 +461,18 @@ void mutt_history_add(enum HistoryClass hclass, const char *s, bool save)
     if (*s != ' ' && (!h->hist[prev] || (mutt_strcmp(h->hist[prev], s) != 0)))
     {
       if (option(OPT_HISTORY_REMOVE_DUPS))
+      {
         remove_history_dups(hclass, s);
+      }
       if (save && SaveHistory)
+      {
         save_history(hclass, s);
+      }
       mutt_str_replace(&h->hist[h->last++], s);
       if (h->last > History)
+      {
         h->last = 0;
+      }
     }
   }
   h->cur = h->last; /* reset to the last entry */
@@ -420,16 +484,22 @@ char *mutt_history_next(enum HistoryClass hclass)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return ""; /* disabled */
+  }
 
   next = h->cur;
   do
   {
     next++;
     if (next > History)
+    {
       next = 0;
+    }
     if (next == h->last)
+    {
       break;
+    }
   } while (h->hist[next] == NULL);
 
   h->cur = next;
@@ -442,16 +512,22 @@ char *mutt_history_prev(enum HistoryClass hclass)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return ""; /* disabled */
+  }
 
   prev = h->cur;
   do
   {
     prev--;
     if (prev < 0)
+    {
       prev = History;
+    }
     if (prev == h->last)
+    {
       break;
+    }
   } while (h->hist[prev] == NULL);
 
   h->cur = prev;
@@ -463,7 +539,9 @@ void mutt_reset_history_state(enum HistoryClass hclass)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return; /* disabled */
+  }
 
   h->cur = h->last;
 }
@@ -473,7 +551,9 @@ bool mutt_history_at_scratch(enum HistoryClass hclass)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return false; /* disabled */
+  }
 
   return h->cur == h->last;
 }
@@ -483,7 +563,9 @@ void mutt_history_save_scratch(enum HistoryClass hclass, const char *s)
   struct History *h = GET_HISTORY(hclass);
 
   if (!History || !h)
+  {
     return; /* disabled */
+  }
 
   /* Don't check if s has a value because the scratch buffer may contain
    * an old garbage value that should be overwritten */

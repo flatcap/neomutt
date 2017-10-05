@@ -59,7 +59,9 @@ int mutt_get_tmp_attachment(struct Body *a)
   struct stat st;
 
   if (a->unlink)
+  {
     return 0;
+  }
 
   struct Rfc1524MailcapEntry *entry = rfc1524_new_entry();
   snprintf(type, sizeof(type), "%s/%s", TYPE(a), a->subtype);
@@ -69,7 +71,9 @@ int mutt_get_tmp_attachment(struct Body *a)
   rfc1524_free_entry(&entry);
 
   if (stat(a->filename, &st) == -1)
+  {
     return -1;
+  }
 
   if ((fpin = fopen(a->filename, "r")) && (fpout = safe_fopen(tempfile, "w")))
   {
@@ -78,15 +82,23 @@ int mutt_get_tmp_attachment(struct Body *a)
     a->unlink = true;
 
     if (a->stamp >= st.st_mtime)
+    {
       mutt_stamp_attachment(a);
+    }
   }
   else
+  {
     mutt_perror(fpin ? tempfile : a->filename);
+  }
 
   if (fpin)
+  {
     safe_fclose(&fpin);
+  }
   if (fpout)
+  {
     safe_fclose(&fpout);
+  }
 
   return a->unlink ? 0 : -1;
 }
@@ -111,22 +123,32 @@ int mutt_compose_attachment(struct Body *a)
     if (entry->composecommand || entry->composetypecommand)
     {
       if (entry->composetypecommand)
+      {
         strfcpy(command, entry->composetypecommand, sizeof(command));
+      }
       else
+      {
         strfcpy(command, entry->composecommand, sizeof(command));
+      }
       if (rfc1524_expand_filename(entry->nametemplate, a->filename, newfile, sizeof(newfile)))
       {
         mutt_debug(1, "oldfile: %s\t newfile: %s\n", a->filename, newfile);
         if (safe_symlink(a->filename, newfile) == -1)
         {
           if (mutt_yesorno(_("Can't match nametemplate, continue?"), MUTT_YES) != MUTT_YES)
+          {
             goto bailout;
+          }
         }
         else
+        {
           unlink_newfile = true;
+        }
       }
       else
+      {
         strfcpy(newfile, a->filename, sizeof(newfile));
+      }
 
       if (rfc1524_expand_command(a, newfile, type, command, sizeof(command)))
       {
@@ -139,7 +161,9 @@ int mutt_compose_attachment(struct Body *a)
 
         mutt_endwin(NULL);
         if ((r = mutt_system(command)) == -1)
+        {
           mutt_error(_("Error running \"%s\"!"), command);
+        }
 
         if (r != -1 && entry->composetypecommand)
         {
@@ -212,7 +236,9 @@ int mutt_compose_attachment(struct Body *a)
 bailout:
 
   if (unlink_newfile)
+  {
     unlink(newfile);
+  }
 
   rfc1524_free_entry(&entry);
   return rc;
@@ -252,13 +278,19 @@ int mutt_edit_attachment(struct Body *a)
         if (safe_symlink(a->filename, newfile) == -1)
         {
           if (mutt_yesorno(_("Can't match nametemplate, continue?"), MUTT_YES) != MUTT_YES)
+          {
             goto bailout;
+          }
         }
         else
+        {
           unlink_newfile = true;
+        }
       }
       else
+      {
         strfcpy(newfile, a->filename, sizeof(newfile));
+      }
 
       if (rfc1524_expand_command(a, newfile, type, command, sizeof(command)))
       {
@@ -294,7 +326,9 @@ int mutt_edit_attachment(struct Body *a)
 bailout:
 
   if (unlink_newfile)
+  {
     unlink(newfile);
+  }
 
   rfc1524_free_entry(&entry);
   return rc;
@@ -339,9 +373,13 @@ void mutt_check_lookup_list(struct Body *b, char *type, int len)
         mutt_debug(1, "mutt_check_lookup_list: \"%s\" -> %s\n", b->filename, type);
       }
       if (tmp.subtype)
+      {
         FREE(&tmp.subtype);
+      }
       if (tmp.xtype)
+      {
         FREE(&tmp.xtype);
+      }
     }
   }
 }
@@ -387,7 +425,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
   is_message = mutt_is_message_type(a->type, a->subtype);
   if (WithCrypto && is_message && a->hdr && (a->hdr->security & ENCRYPT) &&
       !crypt_valid_passphrase(a->hdr->security))
+  {
     return rc;
+  }
   use_mailcap =
       (flag == MUTT_MAILCAP || (flag == MUTT_REGULAR && mutt_needs_mailcap(a)));
   snprintf(type, sizeof(type), "%s/%s", TYPE(a), a->subtype);
@@ -406,7 +446,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
         use_mailcap = false;
       }
       else
+      {
         goto return_error;
+      }
     }
   }
 
@@ -425,7 +467,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
       mutt_sanitize_filename(fname, 1);
     }
     else
+    {
       fname = a->filename;
+    }
 
     if (rfc1524_expand_filename(entry->nametemplate, fname, tempfile, sizeof(tempfile)))
     {
@@ -435,23 +479,33 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
         if (safe_symlink(a->filename, tempfile) == -1)
         {
           if (mutt_yesorno(_("Can't match nametemplate, continue?"), MUTT_YES) == MUTT_YES)
+          {
             strfcpy(tempfile, a->filename, sizeof(tempfile));
+          }
           else
+          {
             goto return_error;
+          }
         }
         else
+        {
           unlink_tempfile = true;
+        }
       }
     }
-    else if (!fp) /* send case */
+    else if (!fp)
+    { /* send case */
       strfcpy(tempfile, a->filename, sizeof(tempfile));
+    }
 
     if (fp)
     {
       /* recv case: we need to save the attachment to a file */
       FREE(&fname);
       if (mutt_save_attachment(fp, a, tempfile, 0, NULL) == -1)
+      {
         goto return_error;
+      }
       chmod(tempfile, 0400);
     }
 
@@ -468,7 +522,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
       mutt_adv_mktemp(pagerfile, sizeof(pagerfile));
     }
     else
+    {
       mutt_mktemp(pagerfile, sizeof(pagerfile));
+    }
   }
 
   if (use_mailcap)
@@ -477,7 +533,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
     int tempfd = -1, pagerfd = -1;
 
     if (!use_pager)
+    {
       mutt_endwin(NULL);
+    }
 
     if (use_pager || use_pipe)
     {
@@ -490,7 +548,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
       if (use_pipe && ((tempfd = open(tempfile, 0)) == -1))
       {
         if (pagerfd != -1)
+        {
           close(pagerfd);
+        }
         mutt_perror("open");
         goto return_error;
       }
@@ -499,10 +559,14 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
                                           use_pager ? pagerfd : -1, -1)) == -1)
       {
         if (pagerfd != -1)
+        {
           close(pagerfd);
+        }
 
         if (tempfd != -1)
+        {
           close(tempfd);
+        }
 
         mutt_error(_("Cannot create filter"));
         goto return_error;
@@ -511,26 +575,38 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
       if (use_pager)
       {
         if (a->description)
+        {
           snprintf(descrip, sizeof(descrip),
                    _("---Command: %-20.20s Description: %s"), command, a->description);
+        }
         else
+        {
           snprintf(descrip, sizeof(descrip),
                    _("---Command: %-30.30s Attachment: %s"), command, type);
+        }
       }
 
       if ((mutt_wait_filter(thepid) || (entry->needsterminal && option(OPT_WAIT_KEY))) && !use_pager)
+      {
         mutt_any_key_to_continue(NULL);
+      }
 
       if (tempfd != -1)
+      {
         close(tempfd);
+      }
       if (pagerfd != -1)
+      {
         close(pagerfd);
+      }
     }
     else
     {
       /* interactive command */
       if (mutt_system(command) || (entry->needsterminal && option(OPT_WAIT_KEY)))
+      {
         mutt_any_key_to_continue(NULL);
+      }
     }
   }
   else
@@ -563,8 +639,10 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
         decode_state.flags = MUTT_CHARCONV;
         mutt_decode_attachment(a, &decode_state);
         if (fclose(decode_state.fpout) == EOF)
+        {
           mutt_debug(1, "mutt_view_attachment:%d fclose(%s) errno=%d %s\n",
                      __LINE__, pagerfile, errno, strerror(errno));
+        }
       }
       else
       {
@@ -573,7 +651,9 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
          * already been applied
          */
         if (mutt_save_attachment(fp, a, pagerfile, 0, NULL))
+        {
           goto return_error;
+        }
       }
     }
     else
@@ -590,11 +670,17 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
     }
 
     if (a->description)
+    {
       strfcpy(descrip, a->description, sizeof(descrip));
+    }
     else if (a->filename)
+    {
       snprintf(descrip, sizeof(descrip), _("---Attachment: %s: %s"), a->filename, type);
+    }
     else
+    {
       snprintf(descrip, sizeof(descrip), _("---Attachment: %s"), type);
+    }
   }
 
   /* We only reach this point if there have been no errors */
@@ -616,12 +702,16 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
     *pagerfile = '\0';
   }
   else
+  {
     rc = 0;
+  }
 
 return_error:
 
   if (entry)
+  {
     rfc1524_free_entry(&entry);
+  }
   if (fp && tempfile[0])
   {
     /* Restore write permission so mutt_unlink can open the file for writing */
@@ -629,10 +719,14 @@ return_error:
     mutt_unlink(tempfile);
   }
   else if (unlink_tempfile)
+  {
     unlink(tempfile);
+  }
 
   if (pagerfile[0])
+  {
     mutt_unlink(pagerfile);
+  }
 
   return rc;
 }
@@ -649,11 +743,13 @@ int mutt_pipe_attachment(FILE *fp, struct Body *b, const char *path, char *outfi
   int rv = 0;
 
   if (outfile && *outfile)
+  {
     if ((out = safe_open(outfile, O_CREAT | O_EXCL | O_WRONLY)) < 0)
     {
       mutt_perror("open");
       return 0;
     }
+  }
 
   mutt_endwin(NULL);
 
@@ -668,9 +764,13 @@ int mutt_pipe_attachment(FILE *fp, struct Body *b, const char *path, char *outfi
     s.flags = MUTT_CHARCONV;
 
     if (outfile && *outfile)
+    {
       thepid = mutt_create_filter_fd(path, &s.fpout, NULL, NULL, -1, out, -1);
+    }
     else
+    {
       thepid = mutt_create_filter(path, &s.fpout, NULL, NULL);
+    }
 
     if (thepid < 0)
     {
@@ -700,9 +800,13 @@ int mutt_pipe_attachment(FILE *fp, struct Body *b, const char *path, char *outfi
     }
 
     if (outfile && *outfile)
+    {
       thepid = mutt_create_filter_fd(path, &ofp, NULL, NULL, -1, out, -1);
+    }
     else
+    {
       thepid = mutt_create_filter(path, &ofp, NULL, NULL);
+    }
 
     if (thepid < 0)
     {
@@ -721,25 +825,35 @@ int mutt_pipe_attachment(FILE *fp, struct Body *b, const char *path, char *outfi
 bail:
 
   if (outfile && *outfile)
+  {
     close(out);
+  }
 
   /*
    * check for error exit from child process
    */
   if (mutt_wait_filter(thepid) != 0)
+  {
     rv = 0;
+  }
 
   if (rv == 0 || option(OPT_WAIT_KEY))
+  {
     mutt_any_key_to_continue(NULL);
+  }
   return rv;
 }
 
 static FILE *save_attachment_open(char *path, int flags)
 {
   if (flags == MUTT_SAVE_APPEND)
+  {
     return fopen(path, "a");
+  }
   if (flags == MUTT_SAVE_OVERWRITE)
+  {
     return fopen(path, "w");
+  }
 
   return safe_fopen(path, "w");
 }
@@ -752,7 +866,9 @@ static FILE *save_attachment_open(char *path, int flags)
 int mutt_save_attachment(FILE *fp, struct Body *m, char *path, int flags, struct Header *hdr)
 {
   if (!m)
+  {
     return -1;
+  }
 
   if (fp)
   {
@@ -775,24 +891,36 @@ int mutt_save_attachment(FILE *fp, struct Body *m, char *path, int flags, struct
       hn->read = true;
 
       if (fseeko(fp, m->offset, SEEK_SET) < 0)
+      {
         return -1;
+      }
       if (fgets(buf, sizeof(buf), fp) == NULL)
+      {
         return -1;
+      }
       if (mx_open_mailbox(path, MUTT_APPEND | MUTT_QUIET, &ctx) == NULL)
+      {
         return -1;
+      }
       if ((msg = mx_open_new_message(&ctx, hn, is_from(buf, NULL, 0, NULL) ? 0 : MUTT_ADD_FROM)) == NULL)
       {
         mx_close_mailbox(&ctx, NULL);
         return -1;
       }
       if (ctx.magic == MUTT_MBOX || ctx.magic == MUTT_MMDF)
+      {
         chflags = CH_FROM | CH_UPDATE_LEN;
+      }
       chflags |= (ctx.magic == MUTT_MAILDIR ? CH_NOSTATUS : CH_UPDATE);
       if (_mutt_copy_message(msg->fp, fp, hn, hn->content, 0, chflags) == 0 &&
           mx_commit_message(msg, &ctx) == 0)
+      {
         r = 0;
+      }
       else
+      {
         r = -1;
+      }
 
       mx_close_message(&ctx, &msg);
       mx_close_mailbox(&ctx, NULL);
@@ -825,7 +953,9 @@ int mutt_save_attachment(FILE *fp, struct Body *m, char *path, int flags, struct
   else
   {
     if (!m->filename)
+    {
       return -1;
+    }
 
     /* In send mode, just copy file */
 
@@ -879,11 +1009,17 @@ int mutt_decode_save_attachment(FILE *fp, struct Body *m, char *path, int displa
   s.flags = displaying;
 
   if (flags == MUTT_SAVE_APPEND)
+  {
     s.fpout = fopen(path, "a");
+  }
   else if (flags == MUTT_SAVE_OVERWRITE)
+  {
     s.fpout = fopen(path, "w");
+  }
   else
+  {
     s.fpout = safe_fopen(path, "w");
+  }
 
   if (!s.fpout)
   {
@@ -912,7 +1048,9 @@ int mutt_decode_save_attachment(FILE *fp, struct Body *m, char *path, int displa
 
     saved_encoding = m->encoding;
     if (!is_multipart(m))
+    {
       m->encoding = ENC8BIT;
+    }
 
     m->length = st.st_size;
     m->offset = 0;
@@ -921,7 +1059,9 @@ int mutt_decode_save_attachment(FILE *fp, struct Body *m, char *path, int displa
     mutt_parse_part(s.fpin, m);
 
     if (m->noconv || is_multipart(m))
+    {
       s.flags |= MUTT_CHARCONV;
+    }
   }
   else
   {
@@ -995,13 +1135,17 @@ int mutt_print_attachment(FILE *fp, struct Body *a)
           strfcpy(newfile, a->filename, sizeof(newfile));
         }
         else
+        {
           unlink_newfile = true;
+        }
       }
     }
 
     /* in recv mode, save file to newfile first */
     if (fp)
+    {
       mutt_save_attachment(fp, a, newfile, 0, NULL);
+    }
 
     strfcpy(command, entry->printcommand, sizeof(command));
     piped = rfc1524_expand_command(a, newfile, type, command, sizeof(command));
@@ -1029,18 +1173,26 @@ int mutt_print_attachment(FILE *fp, struct Body *a)
       safe_fclose(&fpout);
       safe_fclose(&ifp);
       if (mutt_wait_filter(thepid) || option(OPT_WAIT_KEY))
+      {
         mutt_any_key_to_continue(NULL);
+      }
     }
     else
     {
       if (mutt_system(command) || option(OPT_WAIT_KEY))
+      {
         mutt_any_key_to_continue(NULL);
+      }
     }
 
     if (fp)
+    {
       mutt_unlink(newfile);
+    }
     else if (unlink_newfile)
+    {
       unlink(newfile);
+    }
 
     rfc1524_free_entry(&entry);
     return 1;
@@ -1088,7 +1240,9 @@ int mutt_print_attachment(FILE *fp, struct Body *a)
       safe_fclose(&ifp);
 
       if (mutt_wait_filter(thepid) != 0 || option(OPT_WAIT_KEY))
+      {
         mutt_any_key_to_continue(NULL);
+      }
       rc = 1;
     }
   bail0:
@@ -1114,7 +1268,9 @@ void mutt_actx_add_attach(struct AttachCtx *actx, struct AttachPtr *attach)
     safe_realloc(&actx->idx, sizeof(struct AttachPtr *) * actx->idxmax);
     safe_realloc(&actx->v2r, sizeof(short) * actx->idxmax);
     for (i = actx->idxlen; i < actx->idxmax; i++)
+    {
       actx->idx[i] = NULL;
+    }
   }
 
   actx->idx[actx->idxlen++] = attach;
@@ -1129,7 +1285,9 @@ void mutt_actx_add_fp(struct AttachCtx *actx, FILE *new_fp)
     actx->fp_max += 5;
     safe_realloc(&actx->fp_idx, sizeof(FILE *) * actx->fp_max);
     for (i = actx->fp_len; i < actx->fp_max; i++)
+    {
       actx->fp_idx[i] = NULL;
+    }
   }
 
   actx->fp_idx[actx->fp_len++] = new_fp;
@@ -1144,7 +1302,9 @@ void mutt_actx_add_body(struct AttachCtx *actx, struct Body *new_body)
     actx->body_max += 5;
     safe_realloc(&actx->body_idx, sizeof(struct Body *) * actx->body_max);
     for (i = actx->body_len; i < actx->body_max; i++)
+    {
       actx->body_idx[i] = NULL;
+    }
   }
 
   actx->body_idx[actx->body_len++] = new_body;
@@ -1157,7 +1317,9 @@ void mutt_actx_free_entries(struct AttachCtx *actx)
   for (i = 0; i < actx->idxlen; i++)
   {
     if (actx->idx[i]->content)
+    {
       actx->idx[i]->content->aptr = NULL;
+    }
     FREE(&actx->idx[i]->tree);
     FREE(&actx->idx[i]);
   }
@@ -1165,11 +1327,15 @@ void mutt_actx_free_entries(struct AttachCtx *actx)
   actx->vcount = 0;
 
   for (i = 0; i < actx->fp_len; i++)
+  {
     safe_fclose(&actx->fp_idx[i]);
+  }
   actx->fp_len = 0;
 
   for (i = 0; i < actx->body_len; i++)
+  {
     mutt_free_body(&actx->body_idx[i]);
+  }
   actx->body_len = 0;
 }
 
@@ -1178,7 +1344,9 @@ void mutt_free_attach_context(struct AttachCtx **pactx)
   struct AttachCtx *actx = NULL;
 
   if (!pactx || !*pactx)
+  {
     return;
+  }
 
   actx = *pactx;
   mutt_actx_free_entries(actx);

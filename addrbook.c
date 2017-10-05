@@ -116,22 +116,36 @@ static int alias_sort_address(const void *a, const void *b)
   int r;
 
   if (pa == pb)
+  {
     r = 0;
+  }
   else if (!pa)
+  {
     r = -1;
+  }
   else if (!pb)
+  {
     r = 1;
+  }
   else if (pa->personal)
   {
     if (pb->personal)
+    {
       r = mutt_strcasecmp(pa->personal, pb->personal);
+    }
     else
+    {
       r = 1;
+    }
   }
   else if (pb->personal)
+  {
     r = -1;
+  }
   else
+  {
     r = mutt_strcasecmp(pa->mailbox, pb->mailbox);
+  }
   return (RSORT(r));
 }
 
@@ -176,7 +190,9 @@ new_aliases:
   safe_realloc(&AliasTable, menu->max * sizeof(struct Alias *));
   menu->data = AliasTable;
   if (!AliasTable)
+  {
     return;
+  }
 
   for (i = omax, aliasp = aliases; aliasp; aliasp = aliasp->next, i++)
   {
@@ -191,7 +207,9 @@ new_aliases:
   }
 
   for (i = 0; i < menu->max; i++)
+  {
     AliasTable[i]->num = i;
+  }
 
   while (!done)
   {
@@ -209,8 +227,12 @@ new_aliases:
         if (menu->tagprefix)
         {
           for (i = 0; i < menu->max; i++)
+          {
             if (AliasTable[i]->tagged)
+            {
               AliasTable[i]->del = (op == OP_DELETE);
+            }
+          }
           menu->redraw |= REDRAW_INDEX;
         }
         else

@@ -106,10 +106,14 @@ void crypt_init(void)
 #if defined(CRYPT_BACKEND_CLASSIC_PGP) ||                                      \
     defined(CRYPT_BACKEND_CLASSIC_SMIME) || defined(CRYPT_BACKEND_GPGME)
   if (CRYPT_MOD_CALL_CHECK(PGP, init))
+  {
     (CRYPT_MOD_CALL(PGP, init))();
+  }
 
   if (CRYPT_MOD_CALL_CHECK(SMIME, init))
+  {
     (CRYPT_MOD_CALL(SMIME, init))();
+  }
 #endif
 }
 
@@ -121,9 +125,13 @@ void crypt_init(void)
 void crypt_invoke_message(int type)
 {
   if ((WithCrypto & APPLICATION_PGP) && (type & APPLICATION_PGP))
+  {
     mutt_message(_("Invoking PGP..."));
+  }
   else if ((WithCrypto & APPLICATION_SMIME) && (type & APPLICATION_SMIME))
+  {
     mutt_message(_("Invoking S/MIME..."));
+  }
 }
 
 /*
@@ -136,13 +144,17 @@ void crypt_invoke_message(int type)
 void crypt_pgp_void_passphrase(void)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, void_passphrase))
+  {
     (CRYPT_MOD_CALL(PGP, void_passphrase))();
+  }
 }
 
 int crypt_pgp_valid_passphrase(void)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, valid_passphrase))
+  {
     return (CRYPT_MOD_CALL(PGP, valid_passphrase))();
+  }
 
   return 0;
 }
@@ -153,7 +165,9 @@ int crypt_pgp_valid_passphrase(void)
 int crypt_pgp_decrypt_mime(FILE *a, FILE **b, struct Body *c, struct Body **d)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, decrypt_mime))
+  {
     return (CRYPT_MOD_CALL(PGP, decrypt_mime))(a, b, c, d);
+  }
 
   return -1;
 }
@@ -164,7 +178,9 @@ int crypt_pgp_decrypt_mime(FILE *a, FILE **b, struct Body *c, struct Body **d)
 int crypt_pgp_application_pgp_handler(struct Body *m, struct State *s)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, application_handler))
+  {
     return (CRYPT_MOD_CALL(PGP, application_handler))(m, s);
+  }
 
   return -1;
 }
@@ -175,7 +191,9 @@ int crypt_pgp_application_pgp_handler(struct Body *m, struct State *s)
 int crypt_pgp_encrypted_handler(struct Body *a, struct State *s)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, encrypted_handler))
+  {
     return (CRYPT_MOD_CALL(PGP, encrypted_handler))(a, s);
+  }
 
   return -1;
 }
@@ -183,7 +201,9 @@ int crypt_pgp_encrypted_handler(struct Body *a, struct State *s)
 void crypt_pgp_invoke_getkeys(struct Address *addr)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_invoke_getkeys))
+  {
     (CRYPT_MOD_CALL(PGP, pgp_invoke_getkeys))(addr);
+  }
 }
 
 /**
@@ -192,7 +212,9 @@ void crypt_pgp_invoke_getkeys(struct Address *addr)
 int crypt_pgp_check_traditional(FILE *fp, struct Body *b, int just_one)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_check_traditional))
+  {
     return (CRYPT_MOD_CALL(PGP, pgp_check_traditional))(fp, b, just_one);
+  }
 
   return 0;
 }
@@ -200,7 +222,9 @@ int crypt_pgp_check_traditional(FILE *fp, struct Body *b, int just_one)
 struct Body *crypt_pgp_traditional_encryptsign(struct Body *a, int flags, char *keylist)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_traditional_encryptsign))
+  {
     return (CRYPT_MOD_CALL(PGP, pgp_traditional_encryptsign))(a, flags, keylist);
+  }
 
   return NULL;
 }
@@ -211,7 +235,9 @@ struct Body *crypt_pgp_traditional_encryptsign(struct Body *a, int flags, char *
 struct Body *crypt_pgp_make_key_attachment(char *tempf)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_make_key_attachment))
+  {
     return (CRYPT_MOD_CALL(PGP, pgp_make_key_attachment))(tempf);
+  }
 
   return NULL;
 }
@@ -225,7 +251,9 @@ struct Body *crypt_pgp_make_key_attachment(char *tempf)
 char *crypt_pgp_findkeys(struct Address *adrlist, int oppenc_mode)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, findkeys))
+  {
     return (CRYPT_MOD_CALL(PGP, findkeys))(adrlist, oppenc_mode);
+  }
 
   return NULL;
 }
@@ -236,7 +264,9 @@ char *crypt_pgp_findkeys(struct Address *adrlist, int oppenc_mode)
 struct Body *crypt_pgp_sign_message(struct Body *a)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, sign_message))
+  {
     return (CRYPT_MOD_CALL(PGP, sign_message))(a);
+  }
 
   return NULL;
 }
@@ -250,7 +280,9 @@ struct Body *crypt_pgp_sign_message(struct Body *a)
 struct Body *crypt_pgp_encrypt_message(struct Body *a, char *keylist, int sign)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_encrypt_message))
+  {
     return (CRYPT_MOD_CALL(PGP, pgp_encrypt_message))(a, keylist, sign);
+  }
 
   return NULL;
 }
@@ -261,13 +293,17 @@ struct Body *crypt_pgp_encrypt_message(struct Body *a, char *keylist, int sign)
 void crypt_pgp_invoke_import(const char *fname)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_invoke_import))
+  {
     (CRYPT_MOD_CALL(PGP, pgp_invoke_import))(fname);
+  }
 }
 
 int crypt_pgp_verify_one(struct Body *sigbdy, struct State *s, const char *tempf)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, verify_one))
+  {
     return (CRYPT_MOD_CALL(PGP, verify_one))(sigbdy, s, tempf);
+  }
 
   return -1;
 }
@@ -275,7 +311,9 @@ int crypt_pgp_verify_one(struct Body *sigbdy, struct State *s, const char *tempf
 int crypt_pgp_send_menu(struct Header *msg)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, send_menu))
+  {
     return (CRYPT_MOD_CALL(PGP, send_menu))(msg);
+  }
 
   return 0;
 }
@@ -283,13 +321,17 @@ int crypt_pgp_send_menu(struct Header *msg)
 void crypt_pgp_extract_keys_from_attachment_list(FILE *fp, int tag, struct Body *top)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_extract_keys_from_attachment_list))
+  {
     (CRYPT_MOD_CALL(PGP, pgp_extract_keys_from_attachment_list))(fp, tag, top);
+  }
 }
 
 void crypt_pgp_set_sender(const char *sender)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, set_sender))
+  {
     (CRYPT_MOD_CALL(PGP, set_sender))(sender);
+  }
 }
 
 /*
@@ -302,13 +344,17 @@ void crypt_pgp_set_sender(const char *sender)
 void crypt_smime_void_passphrase(void)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, void_passphrase))
+  {
     (CRYPT_MOD_CALL(SMIME, void_passphrase))();
+  }
 }
 
 int crypt_smime_valid_passphrase(void)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, valid_passphrase))
+  {
     return (CRYPT_MOD_CALL(SMIME, valid_passphrase))();
+  }
 
   return 0;
 }
@@ -319,7 +365,9 @@ int crypt_smime_valid_passphrase(void)
 int crypt_smime_decrypt_mime(FILE *a, FILE **b, struct Body *c, struct Body **d)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, decrypt_mime))
+  {
     return (CRYPT_MOD_CALL(SMIME, decrypt_mime))(a, b, c, d);
+  }
 
   return -1;
 }
@@ -330,7 +378,9 @@ int crypt_smime_decrypt_mime(FILE *a, FILE **b, struct Body *c, struct Body **d)
 int crypt_smime_application_smime_handler(struct Body *m, struct State *s)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, application_handler))
+  {
     return (CRYPT_MOD_CALL(SMIME, application_handler))(m, s);
+  }
 
   return -1;
 }
@@ -341,13 +391,17 @@ int crypt_smime_application_smime_handler(struct Body *m, struct State *s)
 void crypt_smime_encrypted_handler(struct Body *a, struct State *s)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, encrypted_handler))
+  {
     (CRYPT_MOD_CALL(SMIME, encrypted_handler))(a, s);
+  }
 }
 
 void crypt_smime_getkeys(struct Envelope *env)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, smime_getkeys))
+  {
     (CRYPT_MOD_CALL(SMIME, smime_getkeys))(env);
+  }
 }
 
 /**
@@ -356,7 +410,9 @@ void crypt_smime_getkeys(struct Envelope *env)
 int crypt_smime_verify_sender(struct Header *h)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, smime_verify_sender))
+  {
     return (CRYPT_MOD_CALL(SMIME, smime_verify_sender))(h);
+  }
 
   return 1;
 }
@@ -370,7 +426,9 @@ int crypt_smime_verify_sender(struct Header *h)
 char *crypt_smime_findkeys(struct Address *adrlist, int oppenc_mode)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, findkeys))
+  {
     return (CRYPT_MOD_CALL(SMIME, findkeys))(adrlist, oppenc_mode);
+  }
 
   return NULL;
 }
@@ -378,7 +436,9 @@ char *crypt_smime_findkeys(struct Address *adrlist, int oppenc_mode)
 struct Body *crypt_smime_sign_message(struct Body *a)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, sign_message))
+  {
     return (CRYPT_MOD_CALL(SMIME, sign_message))(a);
+  }
 
   return NULL;
 }
@@ -386,7 +446,9 @@ struct Body *crypt_smime_sign_message(struct Body *a)
 struct Body *crypt_smime_build_smime_entity(struct Body *a, char *certlist)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, smime_build_smime_entity))
+  {
     return (CRYPT_MOD_CALL(SMIME, smime_build_smime_entity))(a, certlist);
+  }
 
   return NULL;
 }
@@ -399,13 +461,17 @@ struct Body *crypt_smime_build_smime_entity(struct Body *a, char *certlist)
 void crypt_smime_invoke_import(char *infile, char *mailbox)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, smime_invoke_import))
+  {
     (CRYPT_MOD_CALL(SMIME, smime_invoke_import))(infile, mailbox);
+  }
 }
 
 int crypt_smime_verify_one(struct Body *sigbdy, struct State *s, const char *tempf)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, verify_one))
+  {
     return (CRYPT_MOD_CALL(SMIME, verify_one))(sigbdy, s, tempf);
+  }
 
   return -1;
 }
@@ -413,7 +479,9 @@ int crypt_smime_verify_one(struct Body *sigbdy, struct State *s, const char *tem
 int crypt_smime_send_menu(struct Header *msg)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, send_menu))
+  {
     return (CRYPT_MOD_CALL(SMIME, send_menu))(msg);
+  }
 
   return 0;
 }
@@ -421,5 +489,7 @@ int crypt_smime_send_menu(struct Header *msg)
 void crypt_smime_set_sender(const char *sender)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, set_sender))
+  {
     (CRYPT_MOD_CALL(SMIME, set_sender))(sender);
+  }
 }

@@ -65,7 +65,9 @@ static size_t convert_string(ICONV_CONST char *f, size_t flen, const char *from,
 
   cd = mutt_iconv_open(to, from, 0);
   if (cd == (iconv_t)(-1))
+  {
     return (size_t)(-1);
+  }
   obl = 4 * flen + 1;
   ob = buf = safe_malloc(obl);
   n = iconv(cd, &f, &flen, &ob, &obl);
@@ -102,12 +104,16 @@ int convert_nonmime_string(char **ps)
     size_t slen;
 
     if (!u || !*u)
+    {
       return 0;
+    }
 
     c1 = strchr(c, ':');
     n = c1 ? c1 - c : mutt_strlen(c);
     if (!n)
+    {
       return 0;
+    }
     fromcode = safe_malloc(n + 1);
     strfcpy(fromcode, c, n + 1);
     m = convert_string(u, ulen, fromcode, Charset, &s, &slen);
@@ -141,7 +147,9 @@ char *mutt_choose_charset(const char *fromcode, const char *charsets, char *u,
 
     n = q ? q - p : strlen(p);
     if (!n)
+    {
       continue;
+    }
 
     t = safe_malloc(n + 1);
     memcpy(t, p, n);
@@ -165,10 +173,14 @@ char *mutt_choose_charset(const char *fromcode, const char *charsets, char *u,
         e = s;
       }
       else
+      {
         FREE(&s);
+      }
       elen = slen;
       if (!bestn)
+      {
         break;
+      }
     }
     else
     {
@@ -179,9 +191,13 @@ char *mutt_choose_charset(const char *fromcode, const char *charsets, char *u,
   if (tocode)
   {
     if (d)
+    {
       *d = e;
+    }
     if (dlen)
+    {
       *dlen = elen;
+    }
 
     mutt_canonical_charset(canonical_buff, sizeof(canonical_buff), tocode);
     mutt_str_replace(&tocode, canonical_buff);
@@ -208,7 +224,9 @@ static size_t b_encoder(char *s, ICONV_CONST char *d, size_t dlen, const char *t
 
     ret = mutt_to_base64(encoded, d, in_len, sizeof(encoded));
     for (i = 0; i < ret; i++)
+    {
       *s++ = encoded[i];
+    }
 
     dlen -= in_len;
     d += in_len;
@@ -234,7 +252,9 @@ static size_t q_encoder(char *s, ICONV_CONST char *d, size_t dlen, const char *t
   {
     unsigned char c = *d++;
     if (c == ' ')
+    {
       *s++ = '_';
+    }
     else if (c >= 0x7f || c < 0x20 || c == '_' || strchr(MimeSpecials, c))
     {
       *s++ = '=';
@@ -242,7 +262,9 @@ static size_t q_encoder(char *s, ICONV_CONST char *d, size_t dlen, const char *t
       *s++ = hex[c & 0x0f];
     }
     else
+    {
       *s++ = c;
+    }
   }
   memcpy(s, "?=", 2);
   s += 2;
@@ -298,7 +320,9 @@ static size_t try_block(ICONV_CONST char *d, size_t dlen, const char *fromcode,
   else
   {
     if (dlen > sizeof(buf1) - strlen(tocode))
+    {
       return sizeof(buf1) - strlen(tocode) + 1;
+    }
     memcpy(buf1, d, dlen);
     ob = buf1 + dlen;
   }
@@ -309,7 +333,9 @@ static size_t try_block(ICONV_CONST char *d, size_t dlen, const char *fromcode,
     unsigned char c = *p;
     assert(strchr(MimeSpecials, '?'));
     if (c >= 0x7f || c < 0x20 || *p == '_' || (c != ' ' && strchr(MimeSpecials, *p)))
+    {
       count++;
+    }
   }
 
   len = ENCWORD_LEN_MIN - 2 + strlen(tocode);
@@ -318,7 +344,9 @@ static size_t try_block(ICONV_CONST char *d, size_t dlen, const char *fromcode,
 
   /* Apparently RFC1468 says to use B encoding for iso-2022-jp. */
   if (mutt_strcasecmp(tocode, "ISO-2022-JP") == 0)
+  {
     len_q = ENCWORD_LEN_MAX + 1;
+  }
 
   if (len_b < len_q && len_b <= ENCWORD_LEN_MAX)
   {
@@ -333,7 +361,9 @@ static size_t try_block(ICONV_CONST char *d, size_t dlen, const char *fromcode,
     return 0;
   }
   else
+  {
     return dlen;
+  }
 }
 
 /**
@@ -372,7 +402,9 @@ static size_t encode_block(char *s, char *d, size_t dlen, const char *fromcode,
     return (*encoder)(s, buf1, ob - buf1, tocode);
   }
   else
+  {
     return (*encoder)(s, d, dlen, tocode);
+  }
 }
 
 /**
@@ -395,12 +427,18 @@ static size_t choose_block(char *d, size_t dlen, int col, const char *fromcode,
     assert(d + n > d);
     nn = try_block(d, n, fromcode, tocode, encoder, wlen);
     if (!nn && (col + *wlen <= ENCWORD_LEN_MAX + 1 || n <= 1))
+    {
       break;
+    }
     n = (nn ? nn : n) - 1;
     assert(n > 0);
     if (utf8)
+    {
       while (n > 1 && CONTINUATION_BYTE(d[n]))
+      {
         n--;
+      }
+    }
   }
   return n;
 }
@@ -456,22 +494,30 @@ static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col, const char 
     if ((*t & 0x80) || (*t == '=' && t[1] == '?' && (t == u || HSPACE(*(t - 1)))))
     {
       if (!t0)
+      {
         t0 = t;
+      }
       t1 = t;
     }
     else if (specials && *t && strchr(specials, *t))
     {
       if (!s0)
+      {
         s0 = t;
+      }
       s1 = t;
     }
   }
 
   /* If we have something to encode, include RFC822 specials */
   if (t0 && s0 && s0 < t0)
+  {
     t0 = s0;
+  }
   if (t1 && s1 && s1 > t1)
+  {
     t1 = s1;
+  }
 
   if (!t0)
   {
@@ -486,7 +532,9 @@ static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col, const char 
   if (icode)
   {
     if ((tocode1 = mutt_choose_charset(icode, charsets, u, ulen, 0, 0)))
+    {
       tocode = tocode1;
+    }
     else
     {
       ret = 2;
@@ -496,41 +544,63 @@ static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col, const char 
 
   /* Hack to avoid labelling 8-bit data as us-ascii. */
   if (!icode && mutt_is_us_ascii(tocode))
+  {
     tocode = "unknown-8bit";
+  }
 
   /* Adjust t0 for maximum length of line. */
   t = u + (ENCWORD_LEN_MAX + 1) - col - ENCWORD_LEN_MIN;
   if (t < u)
+  {
     t = u;
+  }
   if (t < t0)
+  {
     t0 = t;
+  }
 
   /* Adjust t0 until we can encode a character after a space. */
   for (; t0 > u; t0--)
   {
     if (!HSPACE(*(t0 - 1)))
+    {
       continue;
+    }
     t = t0 + 1;
     if (icode)
+    {
       while (t < u + ulen && CONTINUATION_BYTE(*t))
+      {
         t++;
+      }
+    }
     if (!try_block(t0, t - t0, icode, tocode, &encoder, &wlen) &&
         col + (t0 - u) + wlen <= ENCWORD_LEN_MAX + 1)
+    {
       break;
+    }
   }
 
   /* Adjust t1 until we can encode a character before a space. */
   for (; t1 < u + ulen; t1++)
   {
     if (!HSPACE(*t1))
+    {
       continue;
+    }
     t = t1 - 1;
     if (icode)
+    {
       while (CONTINUATION_BYTE(*t))
+      {
         t--;
+      }
+    }
     if (!try_block(t, t1 - t, icode, tocode, &encoder, &wlen) &&
         1 + wlen + (u + ulen - t1) <= ENCWORD_LEN_MAX + 1)
+    {
       break;
+    }
   }
 
   /* We shall encode the region [t0,t1). */
@@ -552,11 +622,17 @@ static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col, const char 
     {
       /* See if we can fit the us-ascii suffix, too. */
       if (col + wlen + (u + ulen - t1) <= ENCWORD_LEN_MAX + 1)
+      {
         break;
+      }
       n = t1 - t - 1;
       if (icode)
+      {
         while (CONTINUATION_BYTE(t[n]))
+        {
           n--;
+        }
+      }
       assert(t + n >= t);
       if (!n)
       {
@@ -567,7 +643,9 @@ static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col, const char 
            and try again. */
         assert(t1 < u + ulen);
         for (t1++; t1 < u + ulen && !HSPACE(*t1); t1++)
+        {
           ;
+        }
         continue;
       }
       n = choose_block(t, n, col, icode, tocode, &encoder, &wlen);
@@ -617,11 +695,15 @@ void _rfc2047_encode_string(char **pd, int encode_specials, int col)
   char *charsets = NULL;
 
   if (!Charset || !*pd)
+  {
     return;
+  }
 
   charsets = SendCharset;
   if (!charsets || !*charsets)
+  {
     charsets = "utf-8";
+  }
 
   rfc2047_encode(*pd, strlen(*pd), col, Charset, charsets, &e, &elen,
                  encode_specials ? RFC822Specials : NULL);
@@ -638,9 +720,13 @@ void rfc2047_encode_adrlist(struct Address *addr, const char *tag)
   while (ptr)
   {
     if (ptr->personal)
+    {
       _rfc2047_encode_string(&ptr->personal, 1, col);
+    }
     else if (ptr->group && ptr->mailbox)
+    {
       _rfc2047_encode_string(&ptr->mailbox, 1, col);
+    }
     ptr = ptr->next;
   }
 }
@@ -664,9 +750,13 @@ static int rfc2047_decode_word(char *d, const char *s, size_t len)
     if (count == 4)
     {
       while (pp1 && *(pp1 + 1) != '=')
+      {
         pp1 = strchr(pp1 + 1, '?');
+      }
       if (!pp1)
+      {
         goto error_out_0;
+      }
     }
 
     switch (count)
@@ -675,16 +765,24 @@ static int rfc2047_decode_word(char *d, const char *s, size_t len)
         /* ignore language specification a la RFC2231 */
         t = pp1;
         if ((t1 = memchr(pp, '*', t - pp)))
+        {
           t = t1;
+        }
         charset = mutt_substrdup(pp, t);
         break;
       case 3:
         if (toupper((unsigned char) *pp) == 'Q')
+        {
           enc = ENCQUOTEDPRINTABLE;
+        }
         else if (toupper((unsigned char) *pp) == 'B')
+        {
           enc = ENCBASE64;
+        }
         else
+        {
           goto error_out_0;
+        }
         break;
       case 4:
         if (enc == ENCQUOTEDPRINTABLE)
@@ -692,7 +790,9 @@ static int rfc2047_decode_word(char *d, const char *s, size_t len)
           for (; pp < pp1; pp++)
           {
             if (*pp == '_')
+            {
               *pd++ = ' ';
+            }
             else if (*pp == '=' && (!(pp[1] & ~127) && hexval(pp[1]) != -1) &&
                      (!(pp[2] & ~127) && hexval(pp[2]) != -1))
             {
@@ -700,7 +800,9 @@ static int rfc2047_decode_word(char *d, const char *s, size_t len)
               pp += 2;
             }
             else
+            {
               *pd++ = *pp;
+            }
           }
           *pd = 0;
         }
@@ -711,9 +813,13 @@ static int rfc2047_decode_word(char *d, const char *s, size_t len)
           for (; pp < pp1; pp++)
           {
             if (*pp == '=')
+            {
               break;
+            }
             if ((*pp & ~127) || (c = base64val(*pp)) == -1)
+            {
               continue;
+            }
             if (k + 6 >= 8)
             {
               k -= 2;
@@ -733,7 +839,9 @@ static int rfc2047_decode_word(char *d, const char *s, size_t len)
   }
 
   if (charset)
+  {
     mutt_convert_string(&d0, charset, Charset, MUTT_ICONV_HOOK_FROM);
+  }
   mutt_filter_unprintable(&d0);
   strfcpy(d, d0, len);
   rv = 0;
@@ -759,12 +867,18 @@ static const char *find_encoded_word(const char *s, const char **x)
   while ((p = strstr(q, "=?")))
   {
     for (q = p + 2; 0x20 < *q && *q < 0x7f && !strchr("()<>@,;:\"/[]?.=", *q); q++)
+    {
       ;
+    }
     if (q[0] != '?' || q[1] == '\0' || !strchr("BbQq", q[1]) || q[2] != '?')
+    {
       continue;
+    }
     /* non-strict check since many MUAs will not encode spaces and question marks */
     for (q = q + 3; 0x20 <= *q && *q < 0x7f && (*q != '?' || q[1] != '='); q++)
+    {
       ;
+    }
     if (q[0] != '?' || q[1] != '=')
     {
       q--;
@@ -794,7 +908,9 @@ void rfc2047_decode(char **pd)
   size_t dlen;
 
   if (!s || !*s)
+  {
     return;
+  }
 
   dlen = 4 * strlen(s); /* should be enough */
   d = d0 = safe_malloc(dlen + 1);
@@ -860,7 +976,9 @@ void rfc2047_decode(char **pd)
         if ((m = n - lwsrlen(s, n)) != 0)
         {
           if (m > dlen)
+          {
             m = dlen;
+          }
           memcpy(d, s, m);
           d += m;
           dlen -= m;
@@ -875,7 +993,9 @@ void rfc2047_decode(char **pd)
       else if (!found_encoded || strspn(s, " \t\r\n") != n)
       {
         if (n > dlen)
+        {
           n = dlen;
+        }
         memcpy(d, s, n);
         d += n;
         dlen -= n;
@@ -906,9 +1026,13 @@ void rfc2047_decode_adrlist(struct Address *a)
   {
     if (a->personal &&
         ((strstr(a->personal, "=?") != NULL) || (AssumedCharset && *AssumedCharset)))
+    {
       rfc2047_decode(&a->personal);
+    }
     else if (a->group && a->mailbox && (strstr(a->mailbox, "=?") != NULL))
+    {
       rfc2047_decode(&a->mailbox);
+    }
     a = a->next;
   }
 }

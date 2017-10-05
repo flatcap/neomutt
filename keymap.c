@@ -147,7 +147,9 @@ static int parse_fkey(char *s)
   int n = 0;
 
   if (s[0] != '<' || tolower(s[1]) != 'f')
+  {
     return -1;
+  }
 
   for (t = s + 2; *t && isdigit((unsigned char) *t); t++)
   {
@@ -156,9 +158,13 @@ static int parse_fkey(char *s)
   }
 
   if (*t != '>')
+  {
     return -1;
+  }
   else
+  {
     return n;
+  }
 }
 
 /**
@@ -173,7 +179,9 @@ static int parse_keycode(const char *s)
   long int result = strtol(s + 1, &endChar, 8);
   /* allow trailing whitespace, eg.  < 1001 > */
   while (ISSPACE(*endChar))
+  {
     endChar++;
+  }
   /* negative keycodes don't make sense, also detect overflow */
   if (*endChar != '>' || result < 0 || result == LONG_MAX)
   {
@@ -303,7 +311,9 @@ int km_bind_err(char *s, int menu, int op, char *macro, char *descr, struct Buff
       break;
     }
     else if (buf[pos] == tmp->keys[pos])
+    {
       pos++;
+    }
     else if (buf[pos] < tmp->keys[pos])
     {
       /* found location to insert between last and tmp */
@@ -315,7 +325,9 @@ int km_bind_err(char *s, int menu, int op, char *macro, char *descr, struct Buff
       last = tmp;
       lastpos = pos;
       if (pos > tmp->eq)
+      {
         pos = tmp->eq;
+      }
       tmp = tmp->next;
     }
   }
@@ -355,7 +367,9 @@ static int get_op(const struct Binding *bindings, const char *start, size_t len)
   {
     if ((mutt_strncasecmp(start, bindings[i].name, len) == 0) &&
         mutt_strlen(bindings[i].name) == len)
+    {
       return bindings[i].op;
+    }
   }
 
   return OP_NULL;
@@ -366,7 +380,9 @@ static char *get_func(const struct Binding *bindings, int op)
   for (int i = 0; bindings[i].name; i++)
   {
     if (bindings[i].op == op)
+    {
       return bindings[i].name;
+    }
   }
 
   return NULL;
@@ -392,7 +408,9 @@ static void generic_tokenize_push_string(char *s, void (*generic_push)(int, int)
     if (*p == '>')
     {
       for (pp = p - 1; pp >= s && *pp != '<'; pp--)
+      {
         ;
+      }
       if (pp >= s)
       {
         if ((i = parse_fkey(pp)) > 0)
@@ -406,7 +424,9 @@ static void generic_tokenize_push_string(char *s, void (*generic_push)(int, int)
         for (i = 0; KeyNames[i].name; i++)
         {
           if (mutt_strncasecmp(pp, KeyNames[i].name, l) == 0)
+          {
             break;
+          }
         }
         if (KeyNames[i].name)
         {
@@ -425,7 +445,9 @@ static void generic_tokenize_push_string(char *s, void (*generic_push)(int, int)
           {
             op = get_op(binding, pp + 1, l - 2);
             if (op != OP_NULL)
+            {
               break;
+            }
           }
         }
 
@@ -446,9 +468,13 @@ static int retry_generic(int menu, keycode_t *keys, int keyslen, int lastkey)
   if (menu != MENU_EDITOR && menu != MENU_GENERIC && menu != MENU_PAGER)
   {
     if (lastkey)
+    {
       mutt_unget_event(lastkey, 0);
+    }
     for (; keyslen; keyslen--)
+    {
       mutt_unget_event(keys[keyslen - 1], 0);
+    }
     return (km_dokey(MENU_GENERIC));
   }
   if (menu != MENU_EDITOR)
@@ -475,7 +501,9 @@ int km_dokey(int menu)
   int i;
 
   if (!map)
+  {
     return (retry_generic(menu, NULL, 0, 0));
+  }
 
   while (true)
   {
@@ -485,8 +513,11 @@ int km_dokey(int menu)
     if (ImapKeepalive)
     {
       if (ImapKeepalive >= i)
+      {
         imap_keepalive();
+      }
       else
+      {
         while (ImapKeepalive && ImapKeepalive < i)
         {
           timeout(ImapKeepalive * 1000);
@@ -497,10 +528,13 @@ int km_dokey(int menu)
            * $timeout seconds.
            */
           if (tmp.ch != -2 || SigWinch)
+          {
             goto gotkey;
+          }
           i -= ImapKeepalive;
           imap_keepalive();
         }
+      }
     }
 #endif
 
@@ -513,11 +547,15 @@ int km_dokey(int menu)
 #endif
     /* hide timeouts, but not window resizes, from the line editor. */
     if (menu == MENU_EDITOR && tmp.ch == -2 && !SigWinch)
+    {
       continue;
+    }
 
     LastKey = tmp.ch;
     if (LastKey < 0)
+    {
       return LastKey;
+    }
 
     /* do we have an op already? */
     if (tmp.op)
@@ -527,17 +565,23 @@ int km_dokey(int menu)
 
       /* is this a valid op for this menu? */
       if ((bindings = km_get_table(menu)) && (func = get_func(bindings, tmp.op)))
+      {
         return tmp.op;
+      }
 
       if (menu == MENU_EDITOR && get_func(OpEditor, tmp.op))
+      {
         return tmp.op;
+      }
 
       if (menu != MENU_EDITOR && menu != MENU_PAGER)
       {
         /* check generic menu */
         bindings = OpGeneric;
         if ((func = get_func(bindings, tmp.op)))
+        {
           return tmp.op;
+        }
       }
 
       /* Sigh. Valid function but not in this context.
@@ -559,24 +603,32 @@ int km_dokey(int menu)
       }
       /* continue to chew */
       if (func)
+      {
         continue;
+      }
     }
 
     /* Nope. Business as usual */
     while (LastKey > map->keys[pos])
     {
       if (pos > map->eq || !map->next)
+      {
         return (retry_generic(menu, map->keys, pos, LastKey));
+      }
       map = map->next;
     }
 
     if (LastKey != map->keys[pos])
+    {
       return (retry_generic(menu, map->keys, pos, LastKey));
+    }
 
     if (++pos == map->len)
     {
       if (map->op != OP_MACRO)
+      {
         return map->op;
+      }
 
       if (option(OPT_IGNORE_MACRO_EVENTS))
       {
@@ -603,8 +655,12 @@ int km_dokey(int menu)
 static void create_bindings(const struct Binding *map, int menu)
 {
   for (int i = 0; map[i].name; i++)
+  {
     if (map[i].seq)
+    {
       km_bindkey(map[i].seq, menu, map[i].op);
+    }
+  }
 }
 
 static const char *km_keyname(int c)
@@ -613,12 +669,16 @@ static const char *km_keyname(int c)
   const char *p = NULL;
 
   if ((p = mutt_getnamebyvalue(c, KeyNames)))
+  {
     return p;
+  }
 
   if (c < 256 && c > -128 && iscntrl((unsigned char) c))
   {
     if (c < 0)
+    {
       c += 256;
+    }
 
     if (c < 128)
     {
@@ -627,14 +687,22 @@ static const char *km_keyname(int c)
       buf[2] = '\0';
     }
     else
+    {
       snprintf(buf, sizeof(buf), "\\%d%d%d", c >> 6, (c >> 3) & 7, c & 7);
+    }
   }
-  else if (c >= KEY_F0 && c < KEY_F(256)) /* this maximum is just a guess */
+  else if (c >= KEY_F0 && c < KEY_F(256))
+  { /* this maximum is just a guess */
     sprintf(buf, "<F%d>", c - KEY_F0);
+  }
   else if (IsPrint(c))
+  {
     snprintf(buf, sizeof(buf), "%c", (unsigned char) c);
+  }
   else
+  {
     snprintf(buf, sizeof(buf), "\\x%hx", (unsigned short) c);
+  }
   return buf;
 }
 
@@ -644,7 +712,9 @@ int km_expand_key(char *s, size_t len, struct Keymap *map)
   int p = 0;
 
   if (!map)
+  {
     return 0;
+  }
 
   while (true)
   {
@@ -652,7 +722,9 @@ int km_expand_key(char *s, size_t len, struct Keymap *map)
     len -= (l = mutt_strlen(s));
 
     if (++p >= map->len || !len)
+    {
       return 1;
+    }
 
     s += l;
   }
@@ -665,8 +737,12 @@ struct Keymap *km_find_func(int menu, int func)
   struct Keymap *map = Keymaps[menu];
 
   for (; map; map = map->next)
+  {
     if (map->op == func)
+    {
       break;
+    }
+  }
   return map;
 }
 
@@ -727,7 +803,9 @@ static const char *find_ext_name(const char *key)
   for (int j = 0; ExtKeys[j].name; ++j)
   {
     if (strcasecmp(key, ExtKeys[j].name) == 0)
+    {
       return ExtKeys[j].sym;
+    }
   }
   return 0;
 }
@@ -762,7 +840,9 @@ void init_extended_keys(void)
         {
           int code = key_defined(s);
           if (code > 0)
+          {
             KeyNames[j].value = code;
+          }
         }
       }
     }
@@ -784,10 +864,14 @@ void km_init(void)
   create_bindings(OpAlias, MENU_ALIAS);
 
   if ((WithCrypto & APPLICATION_PGP))
+  {
     create_bindings(OpPgp, MENU_PGP);
+  }
 
   if ((WithCrypto & APPLICATION_SMIME))
+  {
     create_bindings(OpSmime, MENU_SMIME);
+  }
 
 #ifdef CRYPT_BACKEND_GPGME
   create_bindings(OpPgp, MENU_KEY_SELECT_PGP);
@@ -897,7 +981,9 @@ void km_error_key(int menu)
 
   key = km_find_func(menu, OP_HELP);
   if (!key && (menu != MENU_EDITOR) && (menu != MENU_PAGER))
+  {
     key = km_find_func(MENU_GENERIC, OP_HELP);
+  }
   if (!key)
   {
     mutt_error(_("Key is not bound."));
@@ -915,7 +1001,9 @@ void km_error_key(int menu)
   mutt_unget_event(0, OP_END_COND);
   p = key->len;
   while (p--)
+  {
     mutt_unget_event(key->keys[p], 0);
+  }
 
   /* Note, e.g. for the index menu:
    *   bind generic ?   noop
@@ -932,7 +1020,9 @@ void km_error_key(int menu)
    */
   op = km_dokey(menu);
   if (op != OP_END_COND)
+  {
     mutt_flush_unget_to_endcond();
+  }
   if (op != OP_HELP)
   {
     mutt_error(_("Key is not bound."));
@@ -956,7 +1046,9 @@ int mutt_parse_push(struct Buffer *buf, struct Buffer *s, unsigned long data,
     r = -1;
   }
   else
+  {
     generic_tokenize_push_string(buf->data, mutt_push_macro_event);
+  }
   return r;
 }
 
@@ -982,8 +1074,9 @@ char *parse_keymap(int *menu, struct Buffer *s, int maxmenus, int *nummenus, str
     {
       q = strchr(p, ',');
       if (q)
+      {
         *q = '\0';
-
+      }
       menu[i] = mutt_getvaluebyname(p, Menus);
       if (menu[i] == -1)
       {
@@ -992,9 +1085,13 @@ char *parse_keymap(int *menu, struct Buffer *s, int maxmenus, int *nummenus, str
       }
       i++;
       if (q)
+      {
         p = q + 1;
+      }
       else
+      {
         break;
+      }
     }
     *nummenus = i;
     /* key sequence */
@@ -1005,7 +1102,9 @@ char *parse_keymap(int *menu, struct Buffer *s, int maxmenus, int *nummenus, str
       strfcpy(err->data, _("null key sequence"), err->dsize);
     }
     else if (MoreArgs(s))
+    {
       return buf.data;
+    }
   }
   else
   {
@@ -1091,7 +1190,9 @@ int mutt_parse_bind(struct Buffer *buf, struct Buffer *s, unsigned long data,
   int menu[sizeof(Menus) / sizeof(struct Mapping) - 1], r = 0, nummenus, i;
 
   if ((key = parse_keymap(menu, s, sizeof(menu) / sizeof(menu[0]), &nummenus, err)) == NULL)
+  {
     return -1;
+  }
 
   /* function to execute */
   mutt_extract_token(buf, s, 0);
@@ -1117,9 +1218,13 @@ int mutt_parse_bind(struct Buffer *buf, struct Buffer *s, unsigned long data,
       {
         r = try_bind(key, menu[i], buf->data, OpGeneric, err);
         if (r == 0)
+        {
           continue;
+        }
         if (r == -2)
+        {
           break;
+        }
       }
 
       /* Clear any error message, we're going to try again */
@@ -1148,7 +1253,9 @@ int mutt_parse_macro(struct Buffer *buf, struct Buffer *s, unsigned long data,
   char *key = NULL;
 
   if ((key = parse_keymap(menu, s, sizeof(menu) / sizeof(menu[0]), &nummenus, err)) == NULL)
+  {
     return -1;
+  }
 
   mutt_extract_token(buf, s, MUTT_TOKEN_CONDENSE);
   /* make sure the macro sequence is not an empty string */
@@ -1212,11 +1319,15 @@ int mutt_parse_exec(struct Buffer *buf, struct Buffer *s, unsigned long data,
     function = buf->data;
 
     if ((bindings = km_get_table(CurrentMenu)) == NULL && CurrentMenu != MENU_PAGER)
+    {
       bindings = OpGeneric;
+    }
 
     ops[nops] = get_op(bindings, function, mutt_strlen(function));
     if (ops[nops] == OP_NULL && CurrentMenu != MENU_PAGER)
+    {
       ops[nops] = get_op(OpGeneric, function, mutt_strlen(function));
+    }
 
     if (ops[nops] == OP_NULL)
     {
@@ -1228,7 +1339,9 @@ int mutt_parse_exec(struct Buffer *buf, struct Buffer *s, unsigned long data,
   } while (MoreArgs(s) && nops < sizeof(ops) / sizeof(ops[0]));
 
   while (nops)
+  {
     mutt_push_macro_event(0, ops[--nops]);
+  }
 
   return 0;
 }

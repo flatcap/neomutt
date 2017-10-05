@@ -51,15 +51,21 @@ enum ImapAuthRes imap_auth_cram_md5(struct ImapData *idata, const char *method)
   int rc;
 
   if (!mutt_bit_isset(idata->capabilities, ACRAM_MD5))
+  {
     return IMAP_AUTH_UNAVAIL;
+  }
 
   mutt_message(_("Authenticating (CRAM-MD5)..."));
 
   /* get auth info */
   if (mutt_account_getlogin(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
   if (mutt_account_getpass(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
 
   imap_cmd_start(idata, "AUTHENTICATE CRAM-MD5");
 
@@ -70,8 +76,9 @@ enum ImapAuthRes imap_auth_cram_md5(struct ImapData *idata, const char *method)
    * correspond to that of an RFC822 'msg-id' [RFC822] as described in [POP3].
    */
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc != IMAP_CMD_RESPOND)
   {
@@ -120,8 +127,9 @@ enum ImapAuthRes imap_auth_cram_md5(struct ImapData *idata, const char *method)
   mutt_socket_write(idata->conn, ibuf);
 
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc != IMAP_CMD_OK)
   {
@@ -130,7 +138,9 @@ enum ImapAuthRes imap_auth_cram_md5(struct ImapData *idata, const char *method)
   }
 
   if (imap_code(idata->buf))
+  {
     return IMAP_AUTH_SUCCESS;
+  }
 
 bail:
   mutt_error(_("CRAM-MD5 authentication failed."));
@@ -161,7 +171,9 @@ static void hmac_md5(const char *password, char *challenge, unsigned char *respo
     secret_len = MD5_DIGEST_LEN;
   }
   else
+  {
     strfcpy((char *) secret, password, sizeof(secret));
+  }
 
   memset(ipad, 0, sizeof(ipad));
   memset(opad, 0, sizeof(opad));

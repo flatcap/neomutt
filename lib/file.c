@@ -171,7 +171,9 @@ int safe_fclose(FILE **f)
   int r = 0;
 
   if (*f)
+  {
     r = fclose(*f);
+  }
 
   *f = NULL;
   return r;
@@ -197,7 +199,9 @@ int safe_fsync_close(FILE **f)
       errno = save_errno;
     }
     else
+    {
       r = safe_fclose(f);
+    }
   }
 
   return r;
@@ -229,7 +233,9 @@ void mutt_unlink(const char *s)
   {
     fd = open(s, flags);
     if (fd < 0)
+    {
       return;
+    }
 
     if ((fstat(fd, &sb2) != 0) || !S_ISREG(sb2.st_mode) ||
         (sb.st_dev != sb2.st_dev) || (sb.st_ino != sb2.st_ino))
@@ -271,15 +277,21 @@ int mutt_copy_bytes(FILE *in, FILE *out, size_t size)
     chunk = (size > sizeof(buf)) ? sizeof(buf) : size;
     chunk = fread(buf, 1, chunk, in);
     if (chunk < 1)
+    {
       break;
+    }
     if (fwrite(buf, 1, chunk, out) != chunk)
+    {
       return -1;
+    }
 
     size -= chunk;
   }
 
   if (fflush(out) != 0)
+  {
     return -1;
+  }
   return 0;
 }
 
@@ -298,11 +310,15 @@ int mutt_copy_stream(FILE *fin, FILE *fout)
   while ((l = fread(buf, 1, sizeof(buf), fin)) > 0)
   {
     if (fwrite(buf, 1, l, fout) != l)
+    {
       return -1;
+    }
   }
 
   if (fflush(fout) != 0)
+  {
     return -1;
+  }
   return 0;
 }
 
@@ -318,15 +334,21 @@ int safe_symlink(const char *oldpath, const char *newpath)
   struct stat osb, nsb;
 
   if (!oldpath || !newpath)
+  {
     return -1;
+  }
 
   if ((unlink(newpath) == -1) && (errno != ENOENT))
+  {
     return -1;
+  }
 
   if (oldpath[0] == '/')
   {
     if (symlink(oldpath, newpath) == -1)
+    {
       return -1;
+    }
   }
   else
   {
@@ -341,7 +363,9 @@ int safe_symlink(const char *oldpath, const char *newpath)
     strcat(abs_oldpath, "/");
     strcat(abs_oldpath, oldpath);
     if (symlink(abs_oldpath, newpath) == -1)
+    {
       return -1;
+    }
   }
 
   if ((stat(oldpath, &osb) == -1) || (stat(newpath, &nsb) == -1) ||
@@ -368,7 +392,9 @@ int safe_rename(const char *src, const char *target)
   struct stat ssb, tsb;
 
   if (!src || !target)
+  {
     return -1;
+  }
 
   if (link(src, target) != 0)
   {
@@ -467,7 +493,9 @@ int mutt_rmtree(const char *path)
   while ((de = readdir(dirp)))
   {
     if ((strcmp(".", de->d_name) == 0) || (strcmp("..", de->d_name) == 0))
+    {
       continue;
+    }
 
     snprintf(cur, sizeof(cur), "%s/%s", path, de->d_name);
     /* XXX make nonrecursive version */
@@ -479,9 +507,13 @@ int mutt_rmtree(const char *path)
     }
 
     if (S_ISDIR(statbuf.st_mode))
+    {
       rc |= mutt_rmtree(cur);
+    }
     else
+    {
       rc |= unlink(cur);
+    }
   }
   closedir(dirp);
 
@@ -508,7 +540,9 @@ int safe_open(const char *path, int flags)
     char safe_dir[_POSIX_PATH_MAX];
 
     if (mkwrapdir(path, safe_file, sizeof(safe_file), safe_dir, sizeof(safe_dir)) == -1)
+    {
       return -1;
+    }
 
     fd = open(safe_file, flags, 0600);
     if (fd < 0)
@@ -520,12 +554,16 @@ int safe_open(const char *path, int flags)
     /* NFS and I believe cygwin do not handle movement of open files well */
     close(fd);
     if (put_file_in_place(path, safe_file, safe_dir) == -1)
+    {
       return -1;
+    }
   }
 
   fd = open(path, flags & ~O_EXCL, 0600);
   if (fd < 0)
+  {
     return fd;
+  }
 
   /* make sure the file is not symlink */
   if ((lstat(path, &osb) < 0 || fstat(fd, &nsb) < 0) || !compare_stat(&osb, &nsb))
@@ -559,18 +597,26 @@ FILE *safe_fopen(const char *path, const char *mode)
 #endif
 
     if (mode[1] == '+')
+    {
       flags |= O_RDWR;
+    }
     else
+    {
       flags |= O_WRONLY;
+    }
 
     fd = safe_open(path, flags);
     if (fd < 0)
+    {
       return NULL;
+    }
 
     return (fdopen(fd, mode));
   }
   else
+  {
     return (fopen(path, mode));
+  }
 }
 
 /**
@@ -581,12 +627,16 @@ FILE *safe_fopen(const char *path, const char *mode)
 void mutt_sanitize_filename(char *f, short slash)
 {
   if (!f)
+  {
     return;
+  }
 
   for (; *f; f++)
   {
     if ((slash && *f == '/') || !strchr(safe_chars, *f))
+    {
       *f = '_';
+    }
   }
 }
 
@@ -613,9 +663,13 @@ int mutt_regex_sanitize_string(char *dest, size_t destlen, const char *src)
   *dest = '\0';
 
   if (*src)
+  {
     return -1;
+  }
   else
+  {
     return 0;
+  }
 }
 
 /**
@@ -653,14 +707,22 @@ char *mutt_read_line(char *s, size_t *size, FILE *fp, int *line, int flags)
     if ((ch = strchr(s + offset, '\n')) != NULL)
     {
       if (line)
+      {
         (*line)++;
+      }
       if (flags & MUTT_EOL)
+      {
         return s;
+      }
       *ch = '\0';
       if ((ch > s) && (*(ch - 1) == '\r'))
+      {
         *--ch = '\0';
+      }
       if (!(flags & MUTT_CONT) || (ch == s) || (*(ch - 1) != '\\'))
+      {
         return s;
+      }
       offset = ch - s - 1;
     }
     else
@@ -675,7 +737,9 @@ char *mutt_read_line(char *s, size_t *size, FILE *fp, int *line, int flags)
       {
         /* The last line of fp isn't \n terminated */
         if (line)
+        {
           (*line)++;
+        }
         return s;
       }
       else
@@ -724,7 +788,9 @@ size_t mutt_quote_filename(char *d, size_t l, const char *f)
       d[j++] = '\'';
     }
     else
+    {
       d[j++] = f[i];
+    }
   }
 
   d[j++] = '\'';
@@ -754,12 +820,16 @@ char *mutt_concatn_path(char *dst, size_t dstlen, const char *dir,
   size_t offset = 0;
 
   if (dstlen == 0)
+  {
     return NULL; /* probably should not mask errors like this */
+  }
 
   /* size check */
   req = dirlen + fnamelen + 1; /* +1 for the trailing nul */
   if (dirlen && fnamelen)
+  {
     req++; /* when both components are non-nul, we add a "/" in between */
+  }
   if (req > dstlen)
   { /* check for condition where the dst length is too short */
     /* Two options here:
@@ -777,7 +847,9 @@ char *mutt_concatn_path(char *dst, size_t dstlen, const char *dir,
     memcpy(dst, dir, dirlen);
     offset = dirlen;
     if (fnamelen)
+    {
       dst[offset++] = '/';
+    }
   }
   if (fnamelen)
   { /* when fname is not empty */
@@ -804,7 +876,9 @@ char *mutt_concat_path(char *d, const char *dir, const char *fname, size_t l)
   const char *fmt = "%s/%s";
 
   if (!*fname || (*dir && dir[strlen(dir) - 1] == '/'))
+  {
     fmt = "%s%s";
+  }
 
   snprintf(d, l, fmt, dir, fname);
   return d;
@@ -819,9 +893,13 @@ const char *mutt_basename(const char *f)
 {
   const char *p = strrchr(f, '/');
   if (p)
+  {
     return p + 1;
+  }
   else
+  {
     return f;
+  }
 }
 
 /**
@@ -858,7 +936,9 @@ int mutt_mkdir(const char *path, mode_t mode)
 
   struct stat sb;
   if ((stat(path, &sb) == 0) && S_ISDIR(sb.st_mode))
+  {
     return 0;
+  }
 
   /* Create a mutable copy */
   strfcpy(_path, path, sizeof(_path));
@@ -866,19 +946,25 @@ int mutt_mkdir(const char *path, mode_t mode)
   for (p = _path + 1; *p; p++)
   {
     if (*p != '/')
+    {
       continue;
+    }
 
     /* Temporarily truncate the path */
     *p = '\0';
 
     if ((mkdir(_path, S_IRWXU | S_IRWXG | S_IRWXO) != 0) && (errno != EEXIST))
+    {
       return -1;
+    }
 
     *p = '/';
   }
 
   if ((mkdir(_path, mode) != 0) && (errno != EEXIST))
+  {
     return -1;
+  }
 
   return 0;
 }
@@ -901,7 +987,9 @@ time_t mutt_decrease_mtime(const char *f, struct stat *st)
   if (!st)
   {
     if (stat(f, &_st) == -1)
+    {
       return -1;
+    }
     st = &_st;
   }
 
@@ -992,16 +1080,22 @@ int mutt_lock_file(const char *path, int fd, int excl, int timeout)
     }
 
     if (fstat(fd, &sb) != 0)
+    {
       sb.st_size = 0;
+    }
 
     if (count == 0)
+    {
       prev_sb = sb;
+    }
 
     /* only unlock file if it is unchanged */
     if ((prev_sb.st_size == sb.st_size) && (++count >= (timeout ? MAX_LOCK_ATTEMPTS : 0)))
     {
       if (timeout)
+      {
         mutt_error(_("Timeout exceeded while attempting fcntl lock!"));
+      }
       return -1;
     }
 
@@ -1097,7 +1191,9 @@ void mutt_unlink_empty(const char *path)
 
   fd = open(path, O_RDWR);
   if (fd == -1)
+  {
     return;
+  }
 
   if (mutt_lock_file(path, fd, 1, 1) == -1)
   {
@@ -1106,7 +1202,9 @@ void mutt_unlink_empty(const char *path)
   }
 
   if (fstat(fd, &sb) == 0 && sb.st_size == 0)
+  {
     unlink(path);
+  }
 
   mutt_unlock_file(path, fd);
   close(fd);

@@ -51,7 +51,9 @@ void mutt_set_charset(char *charset)
   Charset_is_utf8 = false;
 
   if (mutt_is_utf8(buffer))
+  {
     Charset_is_utf8 = true;
+  }
 
 #if defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(ENABLE_NLS)
   bind_textdomain_codeset(PACKAGE, buffer);
@@ -72,9 +74,13 @@ bool is_display_corrupting_utf8(wchar_t wc)
        wc <= (wchar_t) 0x2069) ||
       (wc >= (wchar_t) 0x202a && /* misc directional markers: #3854 */
        wc <= (wchar_t) 0x202e))
+  {
     return true;
+  }
   else
+  {
     return false;
+  }
 }
 
 int mutt_filter_unprintable(char **s)
@@ -87,7 +93,9 @@ int mutt_filter_unprintable(char **s)
   mbstate_t mbstate1, mbstate2;
 
   if (!(b = mutt_buffer_new()))
+  {
     return -1;
+  }
   memset(&mbstate1, 0, sizeof(mbstate1));
   memset(&mbstate2, 0, sizeof(mbstate2));
   for (; (k = mbrtowc(&wc, p, MB_LEN_MAX, &mbstate1)); p += k)
@@ -99,9 +107,13 @@ int mutt_filter_unprintable(char **s)
       wc = replacement_char();
     }
     if (!IsWPrint(wc))
+    {
       wc = '?';
+    }
     else if (Charset_is_utf8 && is_display_corrupting_utf8(wc))
+    {
       continue;
+    }
     k2 = wcrtomb(scratch, wc, &mbstate2);
     scratch[k2] = '\0';
     mutt_buffer_addstr(b, scratch);

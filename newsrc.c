@@ -106,7 +106,9 @@ void nntp_data_free(void *data)
   struct NntpData *nntp_data = data;
 
   if (!nntp_data)
+  {
     return;
+  }
   nntp_acache_free(nntp_data);
   mutt_bcache_close(&nntp_data->bcache);
   FREE(&nntp_data->newsrc_ent);
@@ -120,7 +122,9 @@ void nntp_data_free(void *data)
 void nntp_newsrc_close(struct NntpServer *nserv)
 {
   if (!nserv->newsrc_fp)
+  {
     return;
+  }
 
   mutt_debug(1, "Unlocking %s\n", nserv->newsrc_file);
   mutt_unlock_file(nserv->newsrc_file, fileno(nserv->newsrc_fp));
@@ -136,19 +140,27 @@ void nntp_group_unread_stat(struct NntpData *nntp_data)
 
   nntp_data->unread = 0;
   if (nntp_data->last_message == 0 || nntp_data->first_message > nntp_data->last_message)
+  {
     return;
+  }
 
   nntp_data->unread = nntp_data->last_message - nntp_data->first_message + 1;
   for (unsigned int i = 0; i < nntp_data->newsrc_len; i++)
   {
     first = nntp_data->newsrc_ent[i].first;
     if (first < nntp_data->first_message)
+    {
       first = nntp_data->first_message;
+    }
     last = nntp_data->newsrc_ent[i].last;
     if (last > nntp_data->last_message)
+    {
       last = nntp_data->last_message;
+    }
     if (first <= last)
+    {
       nntp_data->unread -= last - first + 1;
+    }
   }
 }
 
@@ -202,7 +214,9 @@ int nntp_newsrc_parse(struct NntpServer *nserv)
   }
 
   if (nserv->size == sb.st_size && nserv->mtime == sb.st_mtime)
+  {
     return 0;
+  }
 
   nserv->size = sb.st_size;
   nserv->mtime = sb.st_mtime;
@@ -215,7 +229,9 @@ int nntp_newsrc_parse(struct NntpServer *nserv)
     struct NntpData *nntp_data = nserv->groups_list[i];
 
     if (!nntp_data)
+    {
       continue;
+    }
 
     nntp_data->subscribed = false;
     nntp_data->newsrc_len = 0;
@@ -233,11 +249,15 @@ int nntp_newsrc_parse(struct NntpServer *nserv)
     /* find end of newsgroup name */
     p = strpbrk(line, ":!");
     if (!p)
+    {
       continue;
+    }
 
     /* ":" - subscribed, "!" - unsubscribed */
     if (*p == ':')
+    {
       subs = true;
+    }
     *p++ = '\0';
 
     /* get newsgroup data */
@@ -247,8 +267,12 @@ int nntp_newsrc_parse(struct NntpServer *nserv)
     /* count number of entries */
     b = p;
     while (*b)
+    {
       if (*b++ == ',')
+      {
         j++;
+      }
+    }
     nntp_data->newsrc_ent = safe_calloc(j, sizeof(struct NewsrcEntry));
     nntp_data->subscribed = subs;
 
@@ -261,18 +285,26 @@ int nntp_newsrc_parse(struct NntpServer *nserv)
       /* find end of entry */
       p = strchr(p, ',');
       if (p)
+      {
         *p++ = '\0';
 
-      /* first-last or single number */
+        /* first-last or single number */
+      }
       h = strchr(b, '-');
       if (h)
+      {
         *h++ = '\0';
+      }
       else
+      {
         h = b;
+      }
 
       if (sscanf(b, ANUM, &nntp_data->newsrc_ent[j].first) == 1 &&
           sscanf(h, ANUM, &nntp_data->newsrc_ent[j].last) == 1)
+      {
         j++;
+      }
     }
     if (j == 0)
     {
@@ -281,7 +313,9 @@ int nntp_newsrc_parse(struct NntpServer *nserv)
       j++;
     }
     if (nntp_data->last_message == 0)
+    {
       nntp_data->last_message = nntp_data->newsrc_ent[j - 1].last;
+    }
     nntp_data->newsrc_len = j;
     safe_realloc(&nntp_data->newsrc_ent, j * sizeof(struct NewsrcEntry));
     nntp_group_unread_stat(nntp_data);
@@ -416,11 +450,17 @@ static int update_file(char *filename, char *buf)
     break;
   }
   if (fp)
+  {
     safe_fclose(&fp);
+  }
   if (*tmpfile)
+  {
     unlink(tmpfile);
+  }
   if (rc)
+  {
     mutt_sleep(2);
+  }
   return rc;
 }
 
@@ -434,7 +474,9 @@ int nntp_newsrc_update(struct NntpServer *nserv)
   int rc = -1;
 
   if (!nserv)
+  {
     return -1;
+  }
 
   buflen = 10 * LONG_STRING;
   buf = safe_calloc(1, buflen);
@@ -447,7 +489,9 @@ int nntp_newsrc_update(struct NntpServer *nserv)
     unsigned int n;
 
     if (!nntp_data || !nntp_data->newsrc_ent)
+    {
       continue;
+    }
 
     /* write newsgroup name */
     if (off + strlen(nntp_data->group) + 3 > buflen)
@@ -468,12 +512,18 @@ int nntp_newsrc_update(struct NntpServer *nserv)
         safe_realloc(&buf, buflen);
       }
       if (n)
+      {
         buf[off++] = ',';
+      }
       if (nntp_data->newsrc_ent[n].first == nntp_data->newsrc_ent[n].last)
+      {
         snprintf(buf + off, buflen - off, "%d", nntp_data->newsrc_ent[n].first);
+      }
       else if (nntp_data->newsrc_ent[n].first < nntp_data->newsrc_ent[n].last)
+      {
         snprintf(buf + off, buflen - off, "%d-%d",
                  nntp_data->newsrc_ent[n].first, nntp_data->newsrc_ent[n].last);
+      }
       off += strlen(buf + off);
     }
     buf[off++] = '\n';
@@ -520,14 +570,18 @@ static void cache_expand(char *dst, size_t dstlen, struct Account *acct, char *s
     url_tostring(&url, file, sizeof(file), U_PATH);
   }
   else
+  {
     strfcpy(file, src ? src : "", sizeof(file));
+  }
 
   snprintf(dst, dstlen, "%s/%s", NewsCacheDir, file);
 
   /* remove trailing slash */
   c = dst + strlen(dst) - 1;
   if (*c == '/')
+  {
     *c = '\0';
+  }
   mutt_expand_path(dst, dstlen);
 }
 
@@ -557,10 +611,14 @@ int nntp_add_group(char *line, void *data)
   anum_t first, last;
 
   if (!nserv || !line)
+  {
     return 0;
+  }
 
   if (sscanf(line, "%s " ANUM " " ANUM " %c %[^\n]", group, &last, &first, &mod, desc) < 4)
+  {
     return 0;
+  }
 
   nntp_data = nntp_data_find(nserv, group);
   nntp_data->deleted = false;
@@ -569,11 +627,17 @@ int nntp_add_group(char *line, void *data)
   nntp_data->allowed = (mod == 'y') || (mod == 'm');
   mutt_str_replace(&nntp_data->desc, desc);
   if (nntp_data->newsrc_ent || nntp_data->last_cached)
+  {
     nntp_group_unread_stat(nntp_data);
+  }
   else if (nntp_data->last_message && nntp_data->first_message <= nntp_data->last_message)
+  {
     nntp_data->unread = nntp_data->last_message - nntp_data->first_message + 1;
+  }
   else
+  {
     nntp_data->unread = 0;
+  }
   return 0;
 }
 
@@ -591,7 +655,9 @@ static int active_get_cache(struct NntpServer *nserv)
   mutt_debug(1, "Parsing %s\n", file);
   fp = safe_fopen(file, "r");
   if (!fp)
+  {
     return -1;
+  }
 
   if (fgets(buf, sizeof(buf), fp) == NULL || sscanf(buf, "%ld%s", &t, file) != 1 || t == 0)
   {
@@ -602,7 +668,9 @@ static int active_get_cache(struct NntpServer *nserv)
 
   mutt_message(_("Loading list of groups from cache..."));
   while (fgets(buf, sizeof(buf), fp))
+  {
     nntp_add_group(buf, nserv);
+  }
   nntp_add_group(NULL, NULL);
   safe_fclose(&fp);
   mutt_clear_error();
@@ -620,7 +688,9 @@ int nntp_active_save_cache(struct NntpServer *nserv)
   int rc;
 
   if (!nserv->cacheable)
+  {
     return 0;
+  }
 
   buflen = 10 * LONG_STRING;
   buf = safe_calloc(1, buflen);
@@ -632,7 +702,9 @@ int nntp_active_save_cache(struct NntpServer *nserv)
     struct NntpData *nntp_data = nserv->groups_list[i];
 
     if (!nntp_data || nntp_data->deleted)
+    {
       continue;
+    }
 
     if (off + strlen(nntp_data->group) + (nntp_data->desc ? strlen(nntp_data->desc) : 0) + 50 > buflen)
     {
@@ -675,7 +747,9 @@ header_cache_t *nntp_hcache_open(struct NntpData *nntp_data)
   if (!nntp_data->nserv || !nntp_data->nserv->cacheable ||
       !nntp_data->nserv->conn || !nntp_data->group ||
       !(nntp_data->newsrc_ent || nntp_data->subscribed || option(OPT_SAVE_UNSUBSCRIBED)))
+  {
     return NULL;
+  }
 
   mutt_account_tourl(&nntp_data->nserv->conn->account, &url);
   url.path = nntp_data->group;
@@ -694,7 +768,9 @@ void nntp_hcache_update(struct NntpData *nntp_data, header_cache_t *hc)
   anum_t first, last, current;
 
   if (!hc)
+  {
     return;
+  }
 
   /* fetch previous values of first and last */
   hdata = mutt_hcache_fetch_raw(hc, "index", 5);
@@ -710,7 +786,9 @@ void nntp_hcache_update(struct NntpData *nntp_data, header_cache_t *hc)
       for (current = first; current <= last; current++)
       {
         if (current >= nntp_data->first_message && current <= nntp_data->last_message)
+        {
           continue;
+        }
 
         snprintf(buf, sizeof(buf), "%d", current);
         mutt_debug(2, "nntp_hcache_update: mutt_hcache_delete %s\n", buf);
@@ -743,7 +821,9 @@ static int nntp_bcache_delete(const char *id, struct BodyCache *bcache, void *da
       anum < nntp_data->first_message || anum > nntp_data->last_message)
   {
     if (nntp_data)
+    {
       mutt_debug(2, "nntp_bcache_delete: mutt_bcache_del %s\n", id);
+    }
     mutt_bcache_del(bcache, id);
   }
   return 0;
@@ -763,7 +843,9 @@ void nntp_bcache_update(struct NntpData *nntp_data)
 void nntp_delete_group_cache(struct NntpData *nntp_data)
 {
   if (!nntp_data || !nntp_data->nserv || !nntp_data->nserv->cacheable)
+  {
     return;
+  }
 
 #ifdef USE_HCACHE
   char file[_POSIX_PATH_MAX];
@@ -775,8 +857,10 @@ void nntp_delete_group_cache(struct NntpData *nntp_data)
 #endif
 
   if (!nntp_data->bcache)
+  {
     nntp_data->bcache =
         mutt_bcache_open(&nntp_data->nserv->conn->account, nntp_data->group);
+  }
   if (nntp_data->bcache)
   {
     mutt_debug(2, "nntp_delete_group_cache: %s/*\n", nntp_data->group);
@@ -798,7 +882,9 @@ void nntp_clear_cache(struct NntpServer *nserv)
   DIR *dp = NULL;
 
   if (!nserv || !nserv->cacheable)
+  {
     return;
+  }
 
   cache_expand(file, sizeof(file), &nserv->conn->account, NULL);
   dp = opendir(file);
@@ -814,24 +900,32 @@ void nntp_clear_cache(struct NntpServer *nserv)
       struct NntpData nntp_tmp;
 
       if ((mutt_strcmp(group, ".") == 0) || (mutt_strcmp(group, "..") == 0))
+      {
         continue;
+      }
       *fp = '\0';
       safe_strncat(file, sizeof(file), group, strlen(group));
       if (stat(file, &sb))
+      {
         continue;
+      }
 
 #ifdef USE_HCACHE
       if (S_ISREG(sb.st_mode))
       {
         char *ext = group + strlen(group) - 7;
         if (strlen(group) < 8 || (mutt_strcmp(ext, ".hcache") != 0))
+        {
           continue;
+        }
         *ext = '\0';
       }
       else
 #endif
           if (!S_ISDIR(sb.st_mode))
+      {
         continue;
+      }
 
       nntp_data = hash_find(nserv->groups_hash, group);
       if (!nntp_data)
@@ -842,7 +936,9 @@ void nntp_clear_cache(struct NntpServer *nserv)
         nntp_data->bcache = NULL;
       }
       else if (nntp_data->newsrc_ent || nntp_data->subscribed || option(OPT_SAVE_UNSUBSCRIBED))
+      {
         continue;
+      }
 
       nntp_delete_group_cache(nntp_data);
       if (S_ISDIR(sb.st_mode))
@@ -882,7 +978,9 @@ const char *nntp_format_str(char *dest, size_t destlen, size_t col, int cols,
       url_tostring(&url, fn, sizeof(fn), U_PATH);
       p = strchr(fn, '/');
       if (p)
+      {
         *p = '\0';
+      }
       snprintf(tmp, sizeof(tmp), "%%%ss", fmt);
       snprintf(dest, destlen, tmp, fn);
       break;
@@ -909,7 +1007,9 @@ const char *nntp_format_str(char *dest, size_t destlen, size_t col, int cols,
       url_tostring(&url, fn, sizeof(fn), U_PATH);
       p = strchr(fn, ':');
       if (p)
+      {
         *p = '\0';
+      }
       snprintf(tmp, sizeof(tmp), "%%%ss", fmt);
       snprintf(dest, destlen, tmp, fn);
       break;
@@ -971,7 +1071,9 @@ struct NntpServer *nntp_select_server(char *server, int leave_lock)
   /* find connection by account */
   conn = mutt_conn_find(NULL, &acct);
   if (!conn)
+  {
     return NULL;
+  }
   if (!(conn->account.flags & MUTT_ACCT_USER) && acct.flags & MUTT_ACCT_USER)
   {
     conn->account.flags |= MUTT_ACCT_USER;
@@ -983,23 +1085,35 @@ struct NntpServer *nntp_select_server(char *server, int leave_lock)
   if (nserv)
   {
     if (nserv->status == NNTP_BYE)
+    {
       nserv->status = NNTP_NONE;
+    }
     if (nntp_open_connection(nserv) < 0)
+    {
       return NULL;
+    }
 
     rc = nntp_newsrc_parse(nserv);
     if (rc < 0)
+    {
       return NULL;
+    }
 
     /* check for new newsgroups */
     if (!leave_lock && nntp_check_new_groups(nserv) < 0)
+    {
       rc = -1;
+    }
 
     /* .newsrc has been externally modified */
     if (rc > 0)
+    {
       nntp_clear_cache(nserv);
+    }
     if (rc < 0 || !leave_lock)
+    {
       nntp_newsrc_close(nserv);
+    }
     return rc < 0 ? NULL : nserv;
   }
 
@@ -1038,15 +1152,21 @@ struct NntpServer *nntp_select_server(char *server, int leave_lock)
   {
     /* try to load list of newsgroups from cache */
     if (nserv->cacheable && active_get_cache(nserv) == 0)
+    {
       rc = nntp_check_new_groups(nserv);
 
-    /* load list of newsgroups from server */
+      /* load list of newsgroups from server */
+    }
     else
+    {
       rc = nntp_active_fetch(nserv, 0);
+    }
   }
 
   if (rc >= 0)
+  {
     nntp_clear_cache(nserv);
+  }
 
 #ifdef USE_HCACHE
   /* check cache files */
@@ -1065,15 +1185,21 @@ struct NntpServer *nntp_select_server(char *server, int leave_lock)
 
         p = group + strlen(group) - 7;
         if (strlen(group) < 8 || (strcmp(p, ".hcache") != 0))
+        {
           continue;
+        }
         *p = '\0';
         nntp_data = hash_find(nserv->groups_hash, group);
         if (!nntp_data)
+        {
           continue;
+        }
 
         hc = nntp_hcache_open(nntp_data);
         if (!hc)
+        {
           continue;
+        }
 
         /* fetch previous values of first and last */
         hdata = mutt_hcache_fetch_raw(hc, "index", 5);
@@ -1105,7 +1231,9 @@ struct NntpServer *nntp_select_server(char *server, int leave_lock)
 #endif
 
   if (rc < 0 || !leave_lock)
+  {
     nntp_newsrc_close(nserv);
+  }
 
   if (rc < 0)
   {
@@ -1136,10 +1264,14 @@ void nntp_article_status(struct Context *ctx, struct Header *hdr, char *group, a
   struct NntpData *nntp_data = ctx->data;
 
   if (group)
+  {
     nntp_data = hash_find(nntp_data->nserv->groups_hash, group);
+  }
 
   if (!nntp_data)
+  {
     return;
+  }
 
   for (unsigned int i = 0; i < nntp_data->newsrc_len; i++)
   {
@@ -1155,11 +1287,15 @@ void nntp_article_status(struct Context *ctx, struct Header *hdr, char *group, a
 
   /* article was not cached yet, it's new */
   if (anum > nntp_data->last_cached)
+  {
     return;
+  }
 
   /* article isn't read but cached, it's old */
   if (option(OPT_MARK_OLD))
+  {
     hdr->old = true;
+  }
 }
 
 /**
@@ -1170,7 +1306,9 @@ struct NntpData *mutt_newsgroup_subscribe(struct NntpServer *nserv, char *group)
   struct NntpData *nntp_data = NULL;
 
   if (!nserv || !nserv->groups_hash || !group || !*group)
+  {
     return NULL;
+  }
 
   nntp_data = nntp_data_find(nserv, group);
   nntp_data->subscribed = true;
@@ -1192,11 +1330,15 @@ struct NntpData *mutt_newsgroup_unsubscribe(struct NntpServer *nserv, char *grou
   struct NntpData *nntp_data = NULL;
 
   if (!nserv || !nserv->groups_hash || !group || !*group)
+  {
     return NULL;
+  }
 
   nntp_data = hash_find(nserv->groups_hash, group);
   if (!nntp_data)
+  {
     return NULL;
+  }
 
   nntp_data->subscribed = false;
   if (!option(OPT_SAVE_UNSUBSCRIBED))
@@ -1215,11 +1357,15 @@ struct NntpData *mutt_newsgroup_catchup(struct NntpServer *nserv, char *group)
   struct NntpData *nntp_data = NULL;
 
   if (!nserv || !nserv->groups_hash || !group || !*group)
+  {
     return NULL;
+  }
 
   nntp_data = hash_find(nserv->groups_hash, group);
   if (!nntp_data)
+  {
     return NULL;
+  }
 
   if (nntp_data->newsrc_ent)
   {
@@ -1232,7 +1378,9 @@ struct NntpData *mutt_newsgroup_catchup(struct NntpServer *nserv, char *group)
   if (Context && Context->data == nntp_data)
   {
     for (unsigned int i = 0; i < Context->msgcount; i++)
+    {
       mutt_set_flag(Context, Context->hdrs[i], MUTT_READ, 1);
+    }
   }
   return nntp_data;
 }
@@ -1245,11 +1393,15 @@ struct NntpData *mutt_newsgroup_uncatchup(struct NntpServer *nserv, char *group)
   struct NntpData *nntp_data = NULL;
 
   if (!nserv || !nserv->groups_hash || !group || !*group)
+  {
     return NULL;
+  }
 
   nntp_data = hash_find(nserv->groups_hash, group);
   if (!nntp_data)
+  {
     return NULL;
+  }
 
   if (nntp_data->newsrc_ent)
   {
@@ -1262,13 +1414,17 @@ struct NntpData *mutt_newsgroup_uncatchup(struct NntpServer *nserv, char *group)
   {
     nntp_data->unread = Context->msgcount;
     for (unsigned int i = 0; i < Context->msgcount; i++)
+    {
       mutt_set_flag(Context, Context->hdrs[i], MUTT_READ, 0);
+    }
   }
   else
   {
     nntp_data->unread = nntp_data->last_message;
     if (nntp_data->newsrc_ent)
+    {
       nntp_data->unread -= nntp_data->newsrc_ent[0].last;
+    }
   }
   return nntp_data;
 }
@@ -1283,7 +1439,9 @@ void nntp_buffy(char *buf, size_t len)
     struct NntpData *nntp_data = CurrentNewsSrv->groups_list[i];
 
     if (!nntp_data || !nntp_data->subscribed || !nntp_data->unread)
+    {
       continue;
+    }
 
     if (Context && Context->magic == MUTT_NNTP &&
         (mutt_strcmp(nntp_data->group, ((struct NntpData *) Context->data)->group) == 0))
@@ -1291,10 +1449,16 @@ void nntp_buffy(char *buf, size_t len)
       unsigned int j, unread = 0;
 
       for (j = 0; j < Context->msgcount; j++)
+      {
         if (!Context->hdrs[j]->read && !Context->hdrs[j]->deleted)
+        {
           unread++;
+        }
+      }
       if (!unread)
+      {
         continue;
+      }
     }
     strfcpy(buf, nntp_data->group, len);
     break;

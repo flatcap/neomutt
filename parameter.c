@@ -42,8 +42,12 @@ void mutt_free_parameter(struct Parameter **p)
 char *mutt_get_parameter(const char *s, struct Parameter *p)
 {
   for (; p; p = p->next)
+  {
     if (mutt_strcasecmp(s, p->attribute) == 0)
+    {
       return p->value;
+    }
+  }
 
   return NULL;
 }

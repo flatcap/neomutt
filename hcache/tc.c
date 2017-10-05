@@ -42,11 +42,17 @@ static void *hcache_tokyocabinet_open(const char *path)
 {
   TCBDB *db = tcbdbnew();
   if (!db)
+  {
     return NULL;
+  }
   if (option(OPT_HEADER_CACHE_COMPRESS))
+  {
     tcbdbtune(db, 0, 0, 0, -1, -1, BDBTDEFLATE);
+  }
   if (tcbdbopen(db, path, BDBOWRITER | BDBOCREAT))
+  {
     return db;
+  }
   else
   {
 #ifdef DEBUG
@@ -64,7 +70,9 @@ static void *hcache_tokyocabinet_fetch(void *ctx, const char *key, size_t keylen
   int sp;
 
   if (!ctx)
+  {
     return NULL;
+  }
 
   TCBDB *db = ctx;
   return tcbdbget(db, key, keylen, &sp);
@@ -79,7 +87,9 @@ static int hcache_tokyocabinet_store(void *ctx, const char *key, size_t keylen,
                                      void *data, size_t dlen)
 {
   if (!ctx)
+  {
     return -1;
+  }
 
   TCBDB *db = ctx;
   if (!tcbdbput(db, key, keylen, data, dlen))
@@ -93,7 +103,9 @@ static int hcache_tokyocabinet_store(void *ctx, const char *key, size_t keylen,
 static int hcache_tokyocabinet_delete(void *ctx, const char *key, size_t keylen)
 {
   if (!ctx)
+  {
     return -1;
+  }
 
   TCBDB *db = ctx;
   if (!tcbdbout(db, key, keylen))
@@ -107,7 +119,9 @@ static int hcache_tokyocabinet_delete(void *ctx, const char *key, size_t keylen)
 static void hcache_tokyocabinet_close(void **ctx)
 {
   if (!ctx || !*ctx)
+  {
     return;
+  }
 
   TCBDB *db = *ctx;
   if (!tcbdbclose(db))

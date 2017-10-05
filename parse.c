@@ -76,14 +76,18 @@ char *mutt_read_rfc822_line(FILE *f, char *line, size_t *linelen)
 
     len = mutt_strlen(buf);
     if (!len)
+    {
       return line;
+    }
 
     buf += len - 1;
     if (*buf == '\n')
     {
       /* we did get a full line. remove trailing space */
       while (ISSPACE(*buf))
-        *buf-- = 0; /* we cannot come beyond line's beginning because
+      {
+        *buf-- = 0;
+      } /* we cannot come beyond line's beginning because
                          * it begins with a non-space */
 
       /* check to see if the next line is a continuation line */
@@ -95,7 +99,9 @@ char *mutt_read_rfc822_line(FILE *f, char *line, size_t *linelen)
 
       /* eat tabs and spaces from the beginning of the continuation line */
       while ((ch = fgetc(f)) == ' ' || ch == '\t')
+      {
         ;
+      }
       ungetc(ch, f);
       *++buf = ' '; /* string is still terminated because we removed
                        at least one whitespace char above */
@@ -129,23 +135,39 @@ static void parse_references(struct ListHead *head, char *s)
 int mutt_check_encoding(const char *c)
 {
   if (mutt_strncasecmp("7bit", c, sizeof("7bit") - 1) == 0)
+  {
     return ENC7BIT;
+  }
   else if (mutt_strncasecmp("8bit", c, sizeof("8bit") - 1) == 0)
+  {
     return ENC8BIT;
+  }
   else if (mutt_strncasecmp("binary", c, sizeof("binary") - 1) == 0)
+  {
     return ENCBINARY;
+  }
   else if (mutt_strncasecmp("quoted-printable", c, sizeof("quoted-printable") - 1) == 0)
+  {
     return ENCQUOTEDPRINTABLE;
+  }
   else if (mutt_strncasecmp("base64", c, sizeof("base64") - 1) == 0)
+  {
     return ENCBASE64;
+  }
   else if (mutt_strncasecmp("x-uuencode", c, sizeof("x-uuencode") - 1) == 0)
+  {
     return ENCUUENCODED;
 #ifdef SUN_ATTACHMENT
+  }
   else if (mutt_strncasecmp("uuencode", c, sizeof("uuencode") - 1) == 0)
+  {
     return ENCUUENCODED;
 #endif
+  }
   else
+  {
     return ENCOTHER;
+  }
 }
 
 static struct Parameter *parse_parameters(const char *s)
@@ -171,7 +193,9 @@ static struct Parameter *parse_parameters(const char *s)
       i = p - s;
       /* remove whitespace from the end of the attribute name */
       while (i > 0 && is_email_wsp(s[i - 1]))
+      {
         i--;
+      }
 
       /* the check for the missing parameter token is here so that we can skip
        * over any quoted value that may be present.
@@ -202,31 +226,45 @@ static struct Parameter *parse_parameters(const char *s)
             if (*s == 0x1b && i < sizeof(buffer) - 2)
             {
               if (s[1] == '(' && (s[2] == 'B' || s[2] == 'J'))
+              {
                 state_ascii = true;
+              }
               else
+              {
                 state_ascii = false;
+              }
             }
           }
           if (state_ascii && *s == '"')
+          {
             break;
+          }
           if (*s == '\\')
           {
             /* Quote the next character */
             buffer[i] = s[1];
             if (!*++s)
+            {
               break;
+            }
           }
           else
+          {
             buffer[i] = *s;
+          }
         }
         buffer[i] = 0;
         if (*s)
+        {
           s++; /* skip over the " */
+        }
       }
       else
       {
         for (i = 0; *s && *s != ' ' && *s != ';' && i < sizeof(buffer) - 1; i++, s++)
+        {
           buffer[i] = *s;
+        }
         buffer[i] = 0;
       }
 
@@ -245,7 +283,9 @@ static struct Parameter *parse_parameters(const char *s)
           cur = cur->next;
         }
         else
+        {
           head = cur = new;
+        }
       }
     }
     else
@@ -256,7 +296,9 @@ static struct Parameter *parse_parameters(const char *s)
 
     /* Find the next parameter */
     if (*s != ';' && (s = strchr(s, ';')) == NULL)
+    {
       break; /* no more parameters */
+    }
 
     do
     {
@@ -274,31 +316,55 @@ bail:
 int mutt_check_mime_type(const char *s)
 {
   if (mutt_strcasecmp("text", s) == 0)
+  {
     return TYPETEXT;
+  }
   else if (mutt_strcasecmp("multipart", s) == 0)
+  {
     return TYPEMULTIPART;
 #ifdef SUN_ATTACHMENT
+  }
   else if (mutt_strcasecmp("x-sun-attachment", s) == 0)
+  {
     return TYPEMULTIPART;
 #endif
+  }
   else if (mutt_strcasecmp("application", s) == 0)
+  {
     return TYPEAPPLICATION;
+  }
   else if (mutt_strcasecmp("message", s) == 0)
+  {
     return TYPEMESSAGE;
+  }
   else if (mutt_strcasecmp("image", s) == 0)
+  {
     return TYPEIMAGE;
+  }
   else if (mutt_strcasecmp("audio", s) == 0)
+  {
     return TYPEAUDIO;
+  }
   else if (mutt_strcasecmp("video", s) == 0)
+  {
     return TYPEVIDEO;
+  }
   else if (mutt_strcasecmp("model", s) == 0)
+  {
     return TYPEMODEL;
+  }
   else if (mutt_strcasecmp("*", s) == 0)
+  {
     return TYPEANY;
+  }
   else if (mutt_strcasecmp(".*", s) == 0)
+  {
     return TYPEANY;
+  }
   else
+  {
     return TYPEOTHER;
+  }
 }
 
 void mutt_parse_content_type(char *s, struct Body *ct)
@@ -314,19 +380,25 @@ void mutt_parse_content_type(char *s, struct Body *ct)
   {
     *pc++ = 0;
     while (*pc && ISSPACE(*pc))
+    {
       pc++;
+    }
     ct->parameter = parse_parameters(pc);
 
     /* Some pre-RFC1521 gateways still use the "name=filename" convention,
      * but if a filename has already been set in the content-disposition,
      * let that take precedence, and don't set it here */
     if ((pc = mutt_get_parameter("name", ct->parameter)) && !ct->filename)
+    {
       ct->filename = safe_strdup(pc);
+    }
 
 #ifdef SUN_ATTACHMENT
     /* this is deep and utter perversion */
     if ((pc = mutt_get_parameter("conversions", ct->parameter)))
+    {
       ct->encoding = mutt_check_encoding(pc);
+    }
 #endif
   }
 
@@ -335,7 +407,9 @@ void mutt_parse_content_type(char *s, struct Body *ct)
   {
     *subtype++ = '\0';
     for (pc = subtype; *pc && !ISSPACE(*pc) && *pc != ';'; pc++)
+    {
       ;
+    }
     *pc = '\0';
     ct->subtype = safe_strdup(subtype);
   }
@@ -345,7 +419,9 @@ void mutt_parse_content_type(char *s, struct Body *ct)
 
 #ifdef SUN_ATTACHMENT
   if (mutt_strcasecmp("x-sun-attachment", s) == 0)
+  {
     ct->subtype = safe_strdup("x-sun-attachment");
+  }
 #endif
 
   if (ct->type == TYPEOTHER)
@@ -359,11 +435,17 @@ void mutt_parse_content_type(char *s, struct Body *ct)
      * field, so we can attempt to convert the type to Body here.
      */
     if (ct->type == TYPETEXT)
+    {
       ct->subtype = safe_strdup("plain");
+    }
     else if (ct->type == TYPEAUDIO)
+    {
       ct->subtype = safe_strdup("basic");
+    }
     else if (ct->type == TYPEMESSAGE)
+    {
       ct->subtype = safe_strdup("rfc822");
+    }
     else if (ct->type == TYPEOTHER)
     {
       char buffer[SHORT_STRING];
@@ -373,18 +455,22 @@ void mutt_parse_content_type(char *s, struct Body *ct)
       ct->subtype = safe_strdup(buffer);
     }
     else
+    {
       ct->subtype = safe_strdup("x-unknown");
+    }
   }
 
   /* Default character set for text types. */
   if (ct->type == TYPETEXT)
   {
     if (!(pc = mutt_get_parameter("charset", ct->parameter)))
+    {
       mutt_set_parameter("charset",
                          (AssumedCharset && *AssumedCharset) ?
                              (const char *) mutt_get_default_charset() :
                              "us-ascii",
                          &ct->parameter);
+    }
   }
 }
 
@@ -393,20 +479,30 @@ static void parse_content_disposition(const char *s, struct Body *ct)
   struct Parameter *parms = NULL;
 
   if (mutt_strncasecmp("inline", s, 6) == 0)
+  {
     ct->disposition = DISPINLINE;
+  }
   else if (mutt_strncasecmp("form-data", s, 9) == 0)
+  {
     ct->disposition = DISPFORMDATA;
+  }
   else
+  {
     ct->disposition = DISPATTACH;
+  }
 
   /* Check to see if a default filename was given */
   if ((s = strchr(s, ';')) != NULL)
   {
     s = skip_email_wsp(s + 1);
     if ((s = mutt_get_parameter("filename", (parms = parse_parameters(s)))))
+    {
       mutt_str_replace(&ct->filename, s);
+    }
     if ((s = mutt_get_parameter("name", parms)))
+    {
       ct->form_name = safe_strdup(s);
+    }
     mutt_free_parameter(&parms);
   }
 }
@@ -452,11 +548,17 @@ struct Body *mutt_read_mime_header(FILE *fp, int digest)
     if (mutt_strncasecmp("content-", line, 8) == 0)
     {
       if (mutt_strcasecmp("type", line + 8) == 0)
+      {
         mutt_parse_content_type(c, p);
+      }
       else if (mutt_strcasecmp("transfer-encoding", line + 8) == 0)
+      {
         p->encoding = mutt_check_encoding(c);
+      }
       else if (mutt_strcasecmp("disposition", line + 8) == 0)
+      {
         parse_content_disposition(c, p);
+      }
       else if (mutt_strcasecmp("description", line + 8) == 0)
       {
         mutt_str_replace(&p->description, c);
@@ -467,11 +569,17 @@ struct Body *mutt_read_mime_header(FILE *fp, int digest)
     else if (mutt_strncasecmp("x-sun-", line, 6) == 0)
     {
       if (mutt_strcasecmp("data-type", line + 6) == 0)
+      {
         mutt_parse_content_type(c, p);
+      }
       else if (mutt_strcasecmp("encoding-info", line + 6) == 0)
+      {
         p->encoding = mutt_check_encoding(c);
+      }
       else if (mutt_strcasecmp("content-lines", line + 6) == 0)
+      {
         mutt_set_parameter("content-lines", c, &(p->parameter));
+      }
       else if (mutt_strcasecmp("data-description", line + 6) == 0)
       {
         mutt_str_replace(&p->description, c);
@@ -482,9 +590,13 @@ struct Body *mutt_read_mime_header(FILE *fp, int digest)
   }
   p->offset = ftello(fp); /* Mark the start of the real data */
   if (p->type == TYPETEXT && !p->subtype)
+  {
     p->subtype = safe_strdup("plain");
+  }
   else if (p->type == TYPEMESSAGE && !p->subtype)
+  {
     p->subtype = safe_strdup("rfc822");
+  }
 
   FREE(&line);
 
@@ -500,10 +612,14 @@ void mutt_parse_part(FILE *fp, struct Body *b)
     case TYPEMULTIPART:
 #ifdef SUN_ATTACHMENT
       if (mutt_strcasecmp(b->subtype, "x-sun-attachment") == 0)
+      {
         bound = "--------";
+      }
       else
+      {
 #endif
         bound = mutt_get_parameter("boundary", b->parameter);
+      }
 
       fseeko(fp, b->offset, SEEK_SET);
       b->parts = mutt_parse_multipart(fp, bound, b->offset + b->length,
@@ -515,11 +631,17 @@ void mutt_parse_part(FILE *fp, struct Body *b)
       {
         fseeko(fp, b->offset, SEEK_SET);
         if (mutt_is_message_type(b->type, b->subtype))
+        {
           b->parts = mutt_parse_message_rfc822(fp, b);
+        }
         else if (mutt_strcasecmp(b->subtype, "external-body") == 0)
+        {
           b->parts = mutt_read_mime_header(fp, 0);
+        }
         else
+        {
           return;
+        }
       }
       break;
 
@@ -558,7 +680,9 @@ struct Body *mutt_parse_message_rfc822(FILE *fp, struct Body *parent)
 
   /* if body of this message is empty, we can end up with a negative length */
   if (msg->length < 0)
+  {
     msg->length = 0;
+  }
 
   mutt_parse_part(fp, msg);
   return msg;
@@ -603,15 +727,21 @@ struct Body *mutt_parse_multipart(FILE *fp, const char *boundary, LOFF_T end_off
       {
         last->length = ftello(fp) - last->offset - len - 1 - crlf;
         if (last->parts && last->parts->length == 0)
+        {
           last->parts->length = ftello(fp) - last->parts->offset - len - 1 - crlf;
+        }
         /* if the body is empty, we can end up with a -1 length */
         if (last->length < 0)
+        {
           last->length = 0;
+        }
       }
 
       /* Remove any trailing whitespace, up to the length of the boundary */
       for (i = len - 1; ISSPACE(buffer[i]) && i >= blen + 2; i--)
+      {
         buffer[i] = 0;
+      }
 
       /* Check for the end boundary */
       if (mutt_strcmp(buffer + blen + 2, "--") == 0)
@@ -627,10 +757,16 @@ struct Body *mutt_parse_multipart(FILE *fp, const char *boundary, LOFF_T end_off
         if (mutt_get_parameter("content-lines", new->parameter))
         {
           if (mutt_atoi(mutt_get_parameter("content-lines", new->parameter), &lines) < 0)
+          {
             lines = 0;
+          }
           for (; lines; lines--)
+          {
             if (ftello(fp) >= end_off || fgets(buffer, LONG_STRING, fp) == NULL)
+            {
               break;
+            }
+          }
         }
 #endif
 
@@ -650,18 +786,24 @@ struct Body *mutt_parse_multipart(FILE *fp, const char *boundary, LOFF_T end_off
           last = new;
         }
         else
+        {
           last = head = new;
+        }
       }
     }
   }
 
   /* in case of missing end boundary, set the length to something reasonable */
   if (last && last->length == 0 && !final)
+  {
     last->length = end_off - last->offset;
+  }
 
   /* parse recursive MIME parts */
   for (last = head; last; last = last->next)
+  {
     mutt_parse_part(fp, last);
+  }
 
   return head;
 }
@@ -678,11 +820,17 @@ char *mutt_extract_message_id(const char *s, const char **saveptr)
   char *ret = NULL;
 
   if (s)
+  {
     p = s;
+  }
   else if (saveptr)
+  {
     p = *saveptr;
+  }
   else
+  {
     return NULL;
+  }
 
   for (s = NULL, o = NULL, onull = NULL; (p = strpbrk(p, "<> \t;")) != NULL; ++p)
   {
@@ -694,28 +842,38 @@ char *mutt_extract_message_id(const char *s, const char **saveptr)
     }
 
     if (!s)
+    {
       continue;
+    }
 
     if (*p == '>')
     {
       size_t olen = onull - o, slen = p - s + 1;
       ret = safe_malloc(olen + slen + 1);
       if (o)
+      {
         memcpy(ret, o, olen);
+      }
       memcpy(ret + olen, s, slen);
       ret[olen + slen] = '\0';
       if (saveptr)
+      {
         *saveptr = p + 1; /* next call starts after '>' */
+      }
       return ret;
     }
 
     /* some idiotic clients break their message-ids between lines */
     if (s == p)
+    {
       /* step past another whitespace */
       s = p + 1;
+    }
     else if (o)
+    {
       /* more than two lines, give up */
       s = o = onull = NULL;
+    }
     else
     {
       /* remember the first line, start looking for the second */
@@ -735,17 +893,23 @@ void mutt_parse_mime_message(struct Context *ctx, struct Header *cur)
   do
   {
     if (cur->content->type != TYPEMESSAGE && cur->content->type != TYPEMULTIPART)
+    {
       break; /* nothing to do */
+    }
 
     if (cur->content->parts)
+    {
       break; /* The message was parsed earlier. */
+    }
 
     if ((msg = mx_open_message(ctx, cur->msgno)))
     {
       mutt_parse_part(msg->fp, cur->content);
 
       if (WithCrypto)
+      {
         cur->security = crypt_query(cur->content);
+      }
 
       mx_close_message(ctx, &msg);
     }
@@ -793,13 +957,17 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
         if (mutt_strcasecmp(line + 8, "type") == 0)
         {
           if (hdr)
+          {
             mutt_parse_content_type(p, hdr->content);
+          }
           matched = 1;
         }
         else if (mutt_strcasecmp(line + 8, "transfer-encoding") == 0)
         {
           if (hdr)
+          {
             hdr->content->encoding = mutt_check_encoding(p);
+          }
           matched = 1;
         }
         else if (mutt_strcasecmp(line + 8, "length") == 0)
@@ -807,7 +975,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
           if (hdr)
           {
             if ((hdr->content->length = atol(p)) < 0)
+            {
               hdr->content->length = -1;
+            }
           }
           matched = 1;
         }
@@ -823,7 +993,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
         else if (mutt_strcasecmp(line + 8, "disposition") == 0)
         {
           if (hdr)
+          {
             parse_content_disposition(p, hdr->content);
+          }
           matched = 1;
         }
       }
@@ -851,7 +1023,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
     case 'e':
       if ((mutt_strcasecmp("xpires", line + 1) == 0) && hdr &&
           mutt_parse_date(p, NULL) < time(NULL))
+      {
         hdr->expired = true;
+      }
       break;
 
     case 'f':
@@ -892,7 +1066,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
          * Lines header values.  Ignore them.
          */
           if (mutt_atoi(p, &hdr->lines) < 0 || hdr->lines < 0)
+          {
             hdr->lines = 0;
+          }
         }
 
         matched = 1;
@@ -907,7 +1083,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
           {
             beg++;
             if (!(end = strchr(beg, '>')))
+            {
               break;
+            }
 
             /* Take the first mailto URL */
             if (url_check_scheme(beg) == U_MAILTO)
@@ -926,7 +1104,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (mutt_strcasecmp(line + 1, "ime-version") == 0)
       {
         if (hdr)
+        {
           hdr->mime = true;
+        }
         matched = 1;
       }
       else if (mutt_strcasecmp(line + 1, "essage-id") == 0)
@@ -970,7 +1150,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (mutt_strcasecmp(line + 1, "rganization") == 0)
       {
         if (!e->organization && (mutt_strcasecmp(p, "unknown") != 0))
+        {
           e->organization = safe_strdup(p);
+        }
       }
       break;
 
@@ -998,7 +1180,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
           char *d = strrchr(p, ';');
 
           if (d)
+          {
             hdr->received = mutt_parse_date(d + 1, NULL);
+          }
         }
       }
       break;
@@ -1007,7 +1191,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       if (mutt_strcasecmp(line + 1, "ubject") == 0)
       {
         if (!e->subject)
+        {
           e->subject = safe_strdup(p);
+        }
         matched = 1;
       }
       else if (mutt_strcasecmp(line + 1, "ender") == 0)
@@ -1091,13 +1277,17 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
       else if (mutt_strcasecmp(line + 1, "-comment-to") == 0)
       {
         if (!e->x_comment_to)
+        {
           e->x_comment_to = safe_strdup(p);
+        }
         matched = 1;
       }
       else if (mutt_strcasecmp(line + 1, "ref") == 0)
       {
         if (!e->xref)
+        {
           e->xref = safe_strdup(p);
+        }
         matched = 1;
       }
 #endif
@@ -1121,7 +1311,9 @@ int mutt_parse_rfc822_line(struct Envelope *e, struct Header *hdr, char *line,
     {
       struct ListNode *np = mutt_list_insert_tail(&e->userhdrs, safe_strdup(line));
       if (do_2047)
+      {
         rfc2047_decode(&np->data);
+      }
     }
   }
 
@@ -1172,7 +1364,9 @@ struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
   {
     line = mutt_read_rfc822_line(f, line, &linelen);
     if (*line == '\0')
+    {
       break;
+    }
     if ((p = strpbrk(line, ": \t")) == NULL || *p != ':')
     {
       char return_path[LONG_STRING];
@@ -1180,12 +1374,16 @@ struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
 
       /* some bogus MTAs will quote the original "From " line */
       if (mutt_strncmp(">From ", line, 6) == 0)
+      {
         continue; /* just ignore */
+      }
       else if (is_from(line, return_path, sizeof(return_path), &t))
       {
         /* MH sometimes has the From_ line in the middle of the header! */
         if (hdr && !hdr->received)
+        {
           hdr->received = t - mutt_local_tz(t);
+        }
         continue;
       }
 
@@ -1231,14 +1429,18 @@ struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
         }
 
         if (e->spam && e->spam->data)
+        {
           mutt_debug(5, "p822: spam = %s\n", e->spam->data);
+        }
       }
     }
 
     *p = 0;
     p = skip_email_wsp(p + 1);
     if (!*p)
+    {
       continue; /* skip empty header fields */
+    }
 
     mutt_parse_rfc822_line(e, hdr, line, p, user_hdrs, weed, 1);
   }
@@ -1268,9 +1470,13 @@ struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
       rfc2047_decode(&e->subject);
 
       if (regexec(ReplyRegexp.regex, e->subject, 1, pmatch, 0) == 0)
+      {
         e->real_subj = e->subject + pmatch[0].rm_eo;
+      }
       else
+      {
         e->real_subj = e->subject;
+      }
     }
 
     if (hdr->received < 0)
@@ -1311,7 +1517,9 @@ struct Address *mutt_parse_adrlist(struct Address *p, const char *s)
     }
   }
   else
+  {
     p = rfc822_parse_adrlist(p, s);
+  }
 
   return p;
 }
@@ -1367,7 +1575,9 @@ static int count_body_parts(struct Body *body, int flags)
   struct Body *bp = NULL;
 
   if (!body)
+  {
     return 0;
+  }
 
   for (bp = body; bp != NULL; bp = bp->next)
   {
@@ -1386,7 +1596,9 @@ static int count_body_parts(struct Body *body, int flags)
 
       /* If it's an external body pointer, don't recurse it. */
       if (mutt_strcasecmp(bp->subtype, "external-body") == 0)
+      {
         shallrecurse = false;
+      }
 
       /* Don't count containers if they're top-level. */
       if (flags & MUTT_PARTS_TOPLEVEL)
@@ -1397,7 +1609,9 @@ static int count_body_parts(struct Body *body, int flags)
       /* Always recurse multiparts, except multipart/alternative. */
       shallrecurse = true;
       if (mutt_strcasecmp(bp->subtype, "alternative") == 0)
+      {
         shallrecurse = false;
+      }
 
       /* Don't count containers if they're top-level. */
       if (flags & MUTT_PARTS_TOPLEVEL)
@@ -1435,7 +1649,9 @@ static int count_body_parts(struct Body *body, int flags)
     }
 
     if (shallcount)
+    {
       count++;
+    }
     bp->attach_qualifies = shallcount ? true : false;
 
     mutt_debug(5, "cbp: %p shallcount = %d\n", (void *) bp, shallcount);
@@ -1458,12 +1674,18 @@ int mutt_count_body_parts(struct Context *ctx, struct Header *hdr)
   bool keep_parts = false;
 
   if (hdr->attach_valid)
+  {
     return hdr->attach_total;
+  }
 
   if (hdr->content->parts)
+  {
     keep_parts = true;
+  }
   else
+  {
     mutt_parse_mime_message(ctx, hdr);
+  }
 
   if (!STAILQ_EMPTY(&AttachAllow) || !STAILQ_EMPTY(&AttachExclude) ||
       !STAILQ_EMPTY(&InlineAllow) || !STAILQ_EMPTY(&InlineExclude))
@@ -1471,12 +1693,16 @@ int mutt_count_body_parts(struct Context *ctx, struct Header *hdr)
     hdr->attach_total = count_body_parts(hdr->content, MUTT_PARTS_TOPLEVEL);
   }
   else
+  {
     hdr->attach_total = 0;
+  }
 
   hdr->attach_valid = true;
 
   if (!keep_parts)
+  {
     mutt_free_body(&hdr->content->parts);
+  }
 
   return hdr->attach_total;
 }

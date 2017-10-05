@@ -316,16 +316,24 @@ static void print_compile_options(struct CompileOptions *co)
     if (co[i].enabled)
     {
       if (tty)
+      {
         printf("\033[1;32m+%s\033[0m ", co[i].name);
+      }
       else
+      {
         printf("+%s ", co[i].name);
+      }
     }
     else
     {
       if (tty)
+      {
         printf("\033[1;31m-%s\033[0m ", co[i].name);
+      }
       else
+      {
         printf("-%s ", co[i].name);
+      }
     }
   }
   puts("");
@@ -341,16 +349,22 @@ static void print_compile_options(struct CompileOptions *co)
 static char *rstrip_in_place(char *s)
 {
   if (!s)
+  {
     return NULL;
+  }
 
   char *p = NULL;
 
   p = &s[strlen(s)];
   if (p == s)
+  {
     return s;
+  }
   p--;
   while ((p >= s) && ((*p == '\n') || (*p == '\r')))
+  {
     *p-- = '\0';
+  }
   return s;
 }
 
@@ -464,7 +478,9 @@ void print_copyright(void)
 bool feature_enabled(const char *name)
 {
   if (!name)
+  {
     return false;
+  }
   for (int i = 0; comp_opts_default[i].name; i++)
   {
     if (mutt_strcmp(name, comp_opts_default[i].name) == 0)

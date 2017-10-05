@@ -41,14 +41,19 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
   int yr;
 
   if (path)
+  {
     *path = '\0';
-
+  }
   if (mutt_strncmp("From ", s, 5) != 0)
+  {
     return 0;
+  }
 
   s = next_word(s); /* skip over the From part. */
   if (!*s)
+  {
     return 0;
+  }
 
   mutt_debug(3, "\nis_from(): parsing: %s\n", s);
 
@@ -63,7 +68,9 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
       if (*p == '\\')
       {
         if (*++p == '\0')
+        {
           return 0;
+        }
       }
       else if (*p == '"')
       {
@@ -72,7 +79,9 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
     }
 
     if (q || !*p)
+    {
       return 0;
+    }
 
     /* pipermail archives have the return_path obscured such as "me at mutt.org" */
     if (mutt_strncasecmp(p, " at ", 4) == 0)
@@ -91,7 +100,9 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
     {
       len = (size_t)(p - s);
       if (len + 1 > pathlen)
+      {
         len = pathlen - 1;
+      }
       memcpy(path, s, len);
       path[len] = '\0';
       mutt_debug(3, "is_from(): got return path: %s\n", path);
@@ -100,7 +111,9 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
     s = p + 1;
     SKIPWS(s);
     if (!*s)
+    {
       return 0;
+    }
 
     if (!is_day_name(s))
     {
@@ -111,7 +124,9 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
 
   s = next_word(s);
   if (!*s)
+  {
     return 0;
+  }
 
   /* do a quick check to make sure that this isn't really the day of the week.
    * this could happen when receiving mail from a local user whose login name
@@ -121,49 +136,73 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
   {
     s = next_word(s);
     if (!*s)
+    {
       return 0;
+    }
   }
 
   /* now we should be on the month. */
   if ((tm.tm_mon = mutt_check_month(s)) < 0)
+  {
     return 0;
+  }
 
   /* day */
   s = next_word(s);
   if (!*s)
+  {
     return 0;
+  }
   if (sscanf(s, "%d", &tm.tm_mday) != 1)
+  {
     return 0;
+  }
   if ((tm.tm_mday < 1) || (tm.tm_mday > 31))
+  {
     return 0;
+  }
 
   /* time */
   s = next_word(s);
   if (!*s)
+  {
     return 0;
+  }
 
   /* Accept either HH:MM or HH:MM:SS */
   if (sscanf(s, "%d:%d:%d", &tm.tm_hour, &tm.tm_min, &tm.tm_sec) == 3)
+  {
     ;
+  }
   else if (sscanf(s, "%d:%d", &tm.tm_hour, &tm.tm_min) == 2)
+  {
     tm.tm_sec = 0;
+  }
   else
+  {
     return 0;
+  }
 
   if ((tm.tm_hour < 0) || (tm.tm_hour > 23) || (tm.tm_min < 0) ||
       (tm.tm_min > 59) || (tm.tm_sec < 0) || (tm.tm_sec > 60))
+  {
     return 0;
+  }
 
   s = next_word(s);
   if (!*s)
+  {
     return 0;
+  }
 
   /* timezone? */
   if (isalpha((unsigned char) *s) || *s == '+' || *s == '-')
   {
     s = next_word(s);
     if (!*s)
+    {
       return 0;
+    }
 
     /*
      * some places have two timezone fields after the time, e.g.
@@ -173,15 +212,21 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
     {
       s = next_word(s);
       if (!*s)
+      {
         return 0;
+      }
     }
   }
 
   /* year */
   if (sscanf(s, "%d", &yr) != 1)
+  {
     return 0;
+  }
   if ((yr < 0) || (yr > 9999))
+  {
     return 0;
+  }
   tm.tm_year = yr > 1900 ? yr - 1900 : (yr < 70 ? yr + 100 : yr);
 
   mutt_debug(3, "is_from(): month=%d, day=%d, hr=%d, min=%d, sec=%d, yr=%d.\n",
@@ -190,6 +235,8 @@ int is_from(const char *s, char *path, size_t pathlen, time_t *tp)
   tm.tm_isdst = -1;
 
   if (tp)
+  {
     *tp = mutt_mktime(&tm, 0);
+  }
   return 1;
 }

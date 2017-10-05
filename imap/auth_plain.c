@@ -43,9 +43,13 @@ enum ImapAuthRes imap_auth_plain(struct ImapData *idata, const char *method)
   char buf[STRING];
 
   if (mutt_account_getuser(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
   if (mutt_account_getpass(&idata->conn->account))
+  {
     return IMAP_AUTH_FAILURE;
+  }
 
   mutt_message(_("Logging in..."));
 
@@ -54,8 +58,9 @@ enum ImapAuthRes imap_auth_plain(struct ImapData *idata, const char *method)
 
   imap_cmd_start(idata, buf);
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc == IMAP_CMD_BAD)
   {

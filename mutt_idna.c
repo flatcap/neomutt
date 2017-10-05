@@ -36,15 +36,21 @@
 static bool check_idn(char *domain)
 {
   if (!domain)
+  {
     return false;
+  }
 
   if (mutt_strncasecmp(domain, "xn--", 4) == 0)
+  {
     return true;
+  }
 
   while ((domain = strchr(domain, '.')) != NULL)
   {
     if (mutt_strncasecmp(++domain, "xn--", 4) == 0)
+    {
       return true;
+    }
   }
 
   return false;
@@ -58,11 +64,15 @@ static int mbox_to_udomain(const char *mbx, char **user, char **domain)
 
   mutt_str_replace(&buff, mbx);
   if (!buff)
+  {
     return -1;
+  }
 
   p = strchr(buff, '@');
   if (!p || !p[1])
+  {
     return -1;
+  }
   *p = '\0';
   *user = buff;
   *domain = p + 1;
@@ -112,7 +122,9 @@ static char *intl_to_local(char *orig_user, char *orig_domain, int flags)
   if (is_idn_encoded && option(OPT_IDN_DECODE))
   {
     if (idna_to_unicode_8z8z(local_domain, &tmp, IDNA_ALLOW_UNASSIGNED) != IDNA_SUCCESS)
+    {
       goto cleanup;
+    }
     mutt_str_replace(&local_domain, tmp);
     FREE(&tmp);
   }
@@ -120,10 +132,14 @@ static char *intl_to_local(char *orig_user, char *orig_domain, int flags)
 
   /* we don't want charset-hook effects, so we set flags to 0 */
   if (mutt_convert_string(&local_user, "utf-8", Charset, 0) == -1)
+  {
     goto cleanup;
+  }
 
   if (mutt_convert_string(&local_domain, "utf-8", Charset, 0) == -1)
+  {
     goto cleanup;
+  }
 
   /*
    * make sure that we can convert back and come out with the same
@@ -210,16 +226,22 @@ static char *local_to_intl(char *user, char *domain)
 
   /* we don't want charset-hook effects, so we set flags to 0 */
   if (mutt_convert_string(&intl_user, Charset, "utf-8", 0) == -1)
+  {
     goto cleanup;
+  }
 
   if (mutt_convert_string(&intl_domain, Charset, "utf-8", 0) == -1)
+  {
     goto cleanup;
+  }
 
 #ifdef HAVE_LIBIDN
   if (option(OPT_IDN_ENCODE))
   {
     if (idna_to_ascii_8z(intl_domain, &tmp, IDNA_ALLOW_UNASSIGNED) != IDNA_SUCCESS)
+    {
       goto cleanup;
+    }
     mutt_str_replace(&intl_domain, tmp);
   }
 #endif /* HAVE_LIBIDN */
@@ -244,22 +266,30 @@ int mutt_addrlist_to_intl(struct Address *a, char **err)
   int rv = 0;
 
   if (err)
+  {
     *err = NULL;
+  }
 
   for (; a; a = a->next)
   {
     if (!a->mailbox || addr_is_intl(a))
+    {
       continue;
+    }
 
     if (mbox_to_udomain(a->mailbox, &user, &domain) == -1)
+    {
       continue;
+    }
 
     intl_mailbox = local_to_intl(user, domain);
     if (!intl_mailbox)
     {
       rv = -1;
       if (err && !*err)
+      {
         *err = safe_strdup(a->mailbox);
+      }
       continue;
     }
 
@@ -277,14 +307,20 @@ int mutt_addrlist_to_local(struct Address *a)
   for (; a; a = a->next)
   {
     if (!a->mailbox || addr_is_local(a))
+    {
       continue;
+    }
 
     if (mbox_to_udomain(a->mailbox, &user, &domain) == -1)
+    {
       continue;
+    }
 
     local_mailbox = intl_to_local(user, domain, 0);
     if (local_mailbox)
+    {
       set_local_mailbox(a, local_mailbox);
+    }
   }
 
   return 0;
@@ -302,14 +338,20 @@ const char *mutt_addr_for_display(struct Address *a)
   FREE(&buff);
 
   if (!a->mailbox || addr_is_local(a))
+  {
     return a->mailbox;
+  }
 
   if (mbox_to_udomain(a->mailbox, &user, &domain) == -1)
+  {
     return a->mailbox;
+  }
 
   local_mailbox = intl_to_local(user, domain, MI_MAY_BE_IRREVERSIBLE);
   if (!local_mailbox)
+  {
     return a->mailbox;
+  }
 
   mutt_str_replace(&buff, local_mailbox);
   FREE(&local_mailbox);

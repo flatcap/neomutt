@@ -79,7 +79,9 @@ int mutt_socket_open(struct Connection *conn)
   int rc;
 
   if (socket_preconnect())
+  {
     return -1;
+  }
 
   rc = conn->conn_open(conn);
 
@@ -94,9 +96,13 @@ int mutt_socket_close(struct Connection *conn)
   int rc = -1;
 
   if (conn->fd < 0)
+  {
     mutt_debug(1, "mutt_socket_close: Attempt to close closed connection.\n");
+  }
   else
+  {
     rc = conn->conn_close(conn);
+  }
 
   conn->fd = -1;
   conn->ssf = 0;
@@ -118,7 +124,9 @@ int mutt_socket_write_d(struct Connection *conn, const char *buf, int len, int d
   }
 
   if (len < 0)
+  {
     len = mutt_strlen(buf);
+  }
 
   while (sent < len)
   {
@@ -132,7 +140,9 @@ int mutt_socket_write_d(struct Connection *conn, const char *buf, int len, int d
     }
 
     if (rc < len - sent)
+    {
       mutt_debug(3, "mutt_socket_write: short write (%d of %d bytes)\n", rc, len - sent);
+    }
 
     sent += rc;
   }
@@ -149,10 +159,14 @@ int mutt_socket_write_d(struct Connection *conn, const char *buf, int len, int d
 int mutt_socket_poll(struct Connection *conn, time_t wait_secs)
 {
   if (conn->bufpos < conn->available)
+  {
     return conn->available - conn->bufpos;
+  }
 
   if (conn->conn_poll)
+  {
     return conn->conn_poll(conn, wait_secs);
+  }
 
   return -1;
 }
@@ -165,7 +179,9 @@ int mutt_socket_readchar(struct Connection *conn, char *c)
   if (conn->bufpos >= conn->available)
   {
     if (conn->fd >= 0)
+    {
       conn->available = conn->conn_read(conn, conn->inbuf, sizeof(conn->inbuf));
+    }
     else
     {
       mutt_debug(
@@ -203,13 +219,17 @@ int mutt_socket_readln_d(char *buf, size_t buflen, struct Connection *conn, int 
     }
 
     if (ch == '\n')
+    {
       break;
+    }
     buf[i] = ch;
   }
 
   /* strip \r from \r\n termination */
   if (i && buf[i - 1] == '\r')
+  {
     i--;
+  }
   buf[i] = '\0';
 
   mutt_debug(dbg, "%d< %s\n", conn->fd, buf);
@@ -278,7 +298,9 @@ struct Connection *mutt_conn_find(const struct Connection *start, const struct A
   while (conn)
   {
     if (mutt_account_match(account, &(conn->account)))
+    {
       return conn;
+    }
     conn = TAILQ_NEXT(conn, entries);
   }
 
@@ -288,7 +310,9 @@ struct Connection *mutt_conn_find(const struct Connection *start, const struct A
   TAILQ_INSERT_HEAD(&Connections, conn, entries);
 
   if (Tunnel && *Tunnel)
+  {
     mutt_tunnel_socket_setup(conn);
+  }
   else if (account->flags & MUTT_ACCT_SSL)
   {
 #ifdef USE_SSL
@@ -378,7 +402,9 @@ int raw_socket_poll(struct Connection *conn, time_t wait_secs)
   int rv;
 
   if (conn->fd < 0)
+  {
     return -1;
+  }
 
   wait_millis = wait_secs * 1000UL;
 
@@ -395,15 +421,21 @@ int raw_socket_poll(struct Connection *conn, time_t wait_secs)
     gettimeofday(&post_t, NULL);
 
     if (rv > 0 || (rv < 0 && errno != EINTR))
+    {
       return rv;
+    }
 
     if (SigInt)
+    {
       mutt_query_exit();
+    }
 
     wait_millis += (pre_t.tv_sec * 1000UL) + (pre_t.tv_usec / 1000);
     post_t_millis = (post_t.tv_sec * 1000UL) + (post_t.tv_usec / 1000);
     if (wait_millis <= post_t_millis)
+    {
       return 0;
+    }
     wait_millis -= post_t_millis;
   }
 }
@@ -418,11 +450,15 @@ static int socket_connect(int fd, struct sockaddr *sa)
   sigset_t set;
 
   if (sa->sa_family == AF_INET)
+  {
     sa_size = sizeof(struct sockaddr_in);
 #ifdef HAVE_GETADDRINFO
+  }
   else if (sa->sa_family == AF_INET6)
+  {
     sa_size = sizeof(struct sockaddr_in6);
 #endif
+  }
   else
   {
     mutt_debug(1, "Unknown address family!\n");
@@ -430,7 +466,9 @@ static int socket_connect(int fd, struct sockaddr *sa)
   }
 
   if (ConnectTimeout > 0)
+  {
     alarm(ConnectTimeout);
+  }
 
   mutt_allow_interrupt(1);
 
@@ -450,7 +488,9 @@ static int socket_connect(int fd, struct sockaddr *sa)
   }
 
   if (ConnectTimeout > 0)
+  {
     alarm(0);
+  }
   mutt_allow_interrupt(0);
   sigprocmask(SIG_UNBLOCK, &set, NULL);
 
@@ -477,9 +517,13 @@ int raw_socket_open(struct Connection *conn)
   memset(&hints, 0, sizeof(hints));
 
   if (option(OPT_USE_IPV6))
+  {
     hints.ai_family = AF_UNSPEC;
+  }
   else
+  {
     hints.ai_family = AF_INET;
+  }
 
   hints.ai_socktype = SOCK_STREAM;
 
@@ -496,7 +540,9 @@ int raw_socket_open(struct Connection *conn)
 #endif
 
   if (!option(OPT_NO_CURSES))
+  {
     mutt_message(_("Looking up %s..."), conn->account.host);
+  }
 
   rc = getaddrinfo(host_idna, port, &hints, &res);
 
@@ -512,7 +558,9 @@ int raw_socket_open(struct Connection *conn)
   }
 
   if (!option(OPT_NO_CURSES))
+  {
     mutt_message(_("Connecting to %s..."), conn->account.host);
+  }
 
   rc = -1;
   for (cur = res; cur != NULL; cur = cur->ai_next)
@@ -527,7 +575,9 @@ int raw_socket_open(struct Connection *conn)
         break;
       }
       else
+      {
         close(fd);
+      }
     }
   }
 

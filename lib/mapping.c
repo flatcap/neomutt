@@ -45,8 +45,12 @@
 const char *mutt_getnamebyvalue(int val, const struct Mapping *map)
 {
   for (int i = 0; map[i].name; i++)
+  {
     if (map[i].value == val)
+    {
       return map[i].name;
+    }
+  }
   return NULL;
 }
 
@@ -60,7 +64,11 @@ const char *mutt_getnamebyvalue(int val, const struct Mapping *map)
 int mutt_getvaluebyname(const char *name, const struct Mapping *map)
 {
   for (int i = 0; map[i].name; i++)
+  {
     if (mutt_strcasecmp(map[i].name, name) == 0)
+    {
       return map[i].value;
+    }
+  }
   return -1;
 }

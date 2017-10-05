@@ -39,40 +39,60 @@ int mutt_account_match(const struct Account *a1, const struct Account *a2)
   const char *user = NONULL(Username);
 
   if (a1->type != a2->type)
+  {
     return 0;
+  }
   if (mutt_strcasecmp(a1->host, a2->host) != 0)
+  {
     return 0;
+  }
   if (a1->port != a2->port)
+  {
     return 0;
+  }
 
 #ifdef USE_IMAP
   if (a1->type == MUTT_ACCT_TYPE_IMAP)
   {
     if (ImapUser)
+    {
       user = ImapUser;
+    }
   }
 #endif
 
 #ifdef USE_POP
   if (a1->type == MUTT_ACCT_TYPE_POP && PopUser)
+  {
     user = PopUser;
+  }
 #endif
 
 #ifdef USE_NNTP
   if (a1->type == MUTT_ACCT_TYPE_NNTP && NntpUser)
+  {
     user = NntpUser;
+  }
 #endif
 
   if (a1->flags & a2->flags & MUTT_ACCT_USER)
+  {
     return (strcmp(a1->user, a2->user) == 0);
+  }
 #ifdef USE_NNTP
   if (a1->type == MUTT_ACCT_TYPE_NNTP)
+  {
     return a1->flags & MUTT_ACCT_USER && a1->user[0] ? 0 : 1;
+  }
 #endif
   if (a1->flags & MUTT_ACCT_USER)
+  {
     return (strcmp(a1->user, user) == 0);
+  }
   if (a2->flags & MUTT_ACCT_USER)
+  {
     return (strcmp(a2->user, user) == 0);
+  }
 
   return 1;
 }
@@ -84,9 +104,13 @@ int mutt_account_fromurl(struct Account *account, struct Url *url)
 {
   /* must be present */
   if (url->host)
+  {
     strfcpy(account->host, url->host, sizeof(account->host));
+  }
   else
+  {
     return -1;
+  }
 
   if (url->user)
   {
@@ -126,9 +150,13 @@ void mutt_account_tourl(struct Account *account, struct Url *url)
   if (account->type == MUTT_ACCT_TYPE_IMAP)
   {
     if (account->flags & MUTT_ACCT_SSL)
+    {
       url->scheme = U_IMAPS;
+    }
     else
+    {
       url->scheme = U_IMAP;
+    }
   }
 #endif
 
@@ -136,9 +164,13 @@ void mutt_account_tourl(struct Account *account, struct Url *url)
   if (account->type == MUTT_ACCT_TYPE_POP)
   {
     if (account->flags & MUTT_ACCT_SSL)
+    {
       url->scheme = U_POPS;
+    }
     else
+    {
       url->scheme = U_POP;
+    }
   }
 #endif
 
@@ -146,9 +178,13 @@ void mutt_account_tourl(struct Account *account, struct Url *url)
   if (account->type == MUTT_ACCT_TYPE_SMTP)
   {
     if (account->flags & MUTT_ACCT_SSL)
+    {
       url->scheme = U_SMTPS;
+    }
     else
+    {
       url->scheme = U_SMTP;
+    }
   }
 #endif
 
@@ -156,19 +192,29 @@ void mutt_account_tourl(struct Account *account, struct Url *url)
   if (account->type == MUTT_ACCT_TYPE_NNTP)
   {
     if (account->flags & MUTT_ACCT_SSL)
+    {
       url->scheme = U_NNTPS;
+    }
     else
+    {
       url->scheme = U_NNTP;
+    }
   }
 #endif
 
   url->host = account->host;
   if (account->flags & MUTT_ACCT_PORT)
+  {
     url->port = account->port;
+  }
   if (account->flags & MUTT_ACCT_USER)
+  {
     url->user = account->user;
+  }
   if (account->flags & MUTT_ACCT_PASS)
+  {
     url->pass = account->pass;
+  }
 }
 
 /**
@@ -180,29 +226,41 @@ int mutt_account_getuser(struct Account *account)
 
   /* already set */
   if (account->flags & MUTT_ACCT_USER)
+  {
     return 0;
 #ifdef USE_IMAP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_IMAP) && ImapUser)
+  {
     strfcpy(account->user, ImapUser, sizeof(account->user));
 #endif
 #ifdef USE_POP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_POP) && PopUser)
+  {
     strfcpy(account->user, PopUser, sizeof(account->user));
 #endif
 #ifdef USE_NNTP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_NNTP) && NntpUser)
+  {
     strfcpy(account->user, NntpUser, sizeof(account->user));
 #endif
+  }
   else if (option(OPT_NO_CURSES))
+  {
     return -1;
-  /* prompt (defaults to unix username), copy into account->user */
+    /* prompt (defaults to unix username), copy into account->user */
+  }
   else
   {
     /* L10N: Example: Username at myhost.com */
     snprintf(prompt, sizeof(prompt), _("Username at %s: "), account->host);
     strfcpy(account->user, NONULL(Username), sizeof(account->user));
     if (mutt_get_field_unbuffered(prompt, account->user, sizeof(account->user), 0))
+    {
       return -1;
+    }
   }
 
   account->flags |= MUTT_ACCT_USER;
@@ -214,8 +272,10 @@ int mutt_account_getlogin(struct Account *account)
 {
   /* already set */
   if (account->flags & MUTT_ACCT_LOGIN)
+  {
     return 0;
 #ifdef USE_IMAP
+  }
   else if (account->type == MUTT_ACCT_TYPE_IMAP)
   {
     if (ImapLogin)
@@ -245,25 +305,37 @@ int mutt_account_getpass(struct Account *account)
   char prompt[STRING];
 
   if (account->flags & MUTT_ACCT_PASS)
+  {
     return 0;
 #ifdef USE_IMAP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_IMAP) && ImapPass)
+  {
     strfcpy(account->pass, ImapPass, sizeof(account->pass));
 #endif
 #ifdef USE_POP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_POP) && PopPass)
+  {
     strfcpy(account->pass, PopPass, sizeof(account->pass));
 #endif
 #ifdef USE_SMTP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_SMTP) && SmtpPass)
+  {
     strfcpy(account->pass, SmtpPass, sizeof(account->pass));
 #endif
 #ifdef USE_NNTP
+  }
   else if ((account->type == MUTT_ACCT_TYPE_NNTP) && NntpPass)
+  {
     strfcpy(account->pass, NntpPass, sizeof(account->pass));
 #endif
+  }
   else if (option(OPT_NO_CURSES))
+  {
     return -1;
+  }
   else
   {
     snprintf(prompt, sizeof(prompt), _("Password for %s@%s: "),
@@ -271,7 +343,9 @@ int mutt_account_getpass(struct Account *account)
              account->host);
     account->pass[0] = '\0';
     if (mutt_get_password(prompt, account->pass, sizeof(account->pass)))
+    {
       return -1;
+    }
   }
 
   account->flags |= MUTT_ACCT_PASS;

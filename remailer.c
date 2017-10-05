@@ -89,7 +89,9 @@ static int mix_get_caps(const char *capstr)
     }
 
     if (*capstr)
+    {
       capstr++;
+    }
   }
 
   return caps;
@@ -106,7 +108,9 @@ static void mix_add_entry(struct Remailer ***type2_list, struct Remailer *entry,
 
   (*type2_list)[(*used)++] = entry;
   if (entry)
+  {
     entry->num = *used;
+  }
 }
 
 static struct Remailer *mix_new_remailer(void)
@@ -140,10 +144,14 @@ static struct Remailer **mix_type2_list(size_t *l)
   size_t slots = 0, used = 0;
 
   if (!l)
+  {
     return NULL;
+  }
 
   if ((devnull = open("/dev/null", O_RDWR)) == -1)
+  {
     return NULL;
+  }
 
   snprintf(cmd, sizeof(cmd), "%s -T", Mixmaster);
 
@@ -164,25 +172,35 @@ static struct Remailer **mix_type2_list(size_t *l)
     p = mix_new_remailer();
 
     if (!(t = strtok(line, " \t\n")))
+    {
       goto problem;
+    }
 
     p->shortname = safe_strdup(t);
 
     if (!(t = strtok(NULL, " \t\n")))
+    {
       goto problem;
+    }
 
     p->addr = safe_strdup(t);
 
     if (!(t = strtok(NULL, " \t\n")))
+    {
       goto problem;
+    }
 
     if (!(t = strtok(NULL, " \t\n")))
+    {
       goto problem;
+    }
 
     p->ver = safe_strdup(t);
 
     if (!(t = strtok(NULL, " \t\n")))
+    {
       goto problem;
+    }
 
     p->caps = mix_get_caps(t);
 
@@ -208,7 +226,9 @@ static void mix_free_type2_list(struct Remailer ***ttlp)
   struct Remailer **type2_list = *ttlp;
 
   for (int i = 0; type2_list[i]; i++)
+  {
     mix_free_remailer(&type2_list[i]);
+  }
 
   FREE(type2_list);
 }
@@ -224,7 +244,9 @@ static void mix_screen_coordinates(struct Remailer **type2_list, struct Coord **
   struct Coord *coords = NULL;
 
   if (!chain->cl)
+  {
     return;
+  }
 
   safe_realloc(coordsp, sizeof(struct Coord) * chain->cl);
 
@@ -261,21 +283,29 @@ static void mix_redraw_ce(struct Remailer **type2_list, struct Coord *coords,
                           struct MixChain *chain, int i, short selected)
 {
   if (!coords || !chain)
+  {
     return;
+  }
 
   if (coords[i].r < MIX_MAXROW)
   {
     if (selected)
+    {
       SETCOLOR(MT_COLOR_INDICATOR);
+    }
     else
+    {
       NORMAL_COLOR;
+    }
 
     mutt_window_mvaddstr(MuttIndexWindow, coords[i].r, coords[i].c,
                          type2_list[chain->ch[i]]->shortname);
     NORMAL_COLOR;
 
     if (i + 1 < chain->cl)
+    {
       addstr(", ");
+    }
   }
 }
 
@@ -291,7 +321,9 @@ static void mix_redraw_chain(struct Remailer **type2_list, struct Coord *coords,
   }
 
   for (i = 0; i < chain->cl; i++)
+  {
     mix_redraw_ce(type2_list, coords, chain, i, i == cur);
+  }
 }
 
 static void mix_redraw_head(struct MixChain *chain)
@@ -309,15 +341,21 @@ static const char *mix_format_caps(struct Remailer *r)
   char *t = capbuff;
 
   if (r->caps & MIX_CAP_COMPRESS)
+  {
     *t++ = 'C';
+  }
   else
+  {
     *t++ = ' ';
-
+  }
   if (r->caps & MIX_CAP_MIDDLEMAN)
+  {
     *t++ = 'M';
+  }
   else
+  {
     *t++ = ' ';
-
+  }
   if (r->caps & MIX_CAP_NEWSPOST)
   {
     *t++ = 'N';
@@ -385,7 +423,9 @@ static const char *mix_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, NONULL(remailer->shortname));
       }
       else if (!remailer->shortname)
+      {
         optional = 0;
+      }
       break;
     case 'a':
       if (!optional)
@@ -394,7 +434,9 @@ static const char *mix_entry_fmt(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, NONULL(remailer->addr));
       }
       else if (!remailer->addr)
+      {
         optional = 0;
+      }
       break;
 
     default:
@@ -402,9 +444,13 @@ static const char *mix_entry_fmt(char *dest, size_t destlen, size_t col, int col
   }
 
   if (optional)
+  {
     mutt_expando_format(dest, destlen, col, cols, ifstring, mutt_attach_fmt, data, 0);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     mutt_expando_format(dest, destlen, col, cols, elsestring, mutt_attach_fmt, data, 0);
+  }
   return src;
 }
 
@@ -420,7 +466,9 @@ static int mix_chain_add(struct MixChain *chain, const char *s, struct Remailer 
   int i;
 
   if (chain->cl >= MAXMIXES)
+  {
     return -1;
+  }
 
   if ((mutt_strcmp(s, "0") == 0) || (mutt_strcasecmp(s, "<random>") == 0))
   {
@@ -440,7 +488,9 @@ static int mix_chain_add(struct MixChain *chain, const char *s, struct Remailer 
   /* replace unknown remailers by <random> */
 
   if (!type2_list[i])
+  {
     chain->ch[chain->cl++] = 0;
+  }
 
   return 0;
 }
@@ -489,7 +539,9 @@ void mix_make_chain(struct ListHead *chainhead)
   for (i = 0; i < chain->cl; i++)
   {
     if (chain->ch[i] >= ttll)
+    {
       chain->ch[i] = 0;
+    }
   }
 
   mix_screen_coordinates(type2_list, &coords, chain, 0);
@@ -573,7 +625,9 @@ void mix_make_chain(struct ListHead *chainhead)
       case OP_MIX_APPEND:
       {
         if (chain->cl < MAXMIXES && c_cur < chain->cl)
+        {
           c_cur++;
+        }
       }
       /* fallthrough */
       case OP_MIX_INSERT:
@@ -582,14 +636,18 @@ void mix_make_chain(struct ListHead *chainhead)
         {
           chain->cl++;
           for (i = chain->cl - 1; i > c_cur; i--)
+          {
             chain->ch[i] = chain->ch[i - 1];
+          }
 
           chain->ch[c_cur] = menu->current;
           mix_screen_coordinates(type2_list, &coords, chain, c_cur);
           c_redraw = true;
         }
         else
+        {
           mutt_error(_("Mixmaster chains are limited to %d elements."), MAXMIXES);
+        }
 
         break;
       }
@@ -601,10 +659,14 @@ void mix_make_chain(struct ListHead *chainhead)
           chain->cl--;
 
           for (i = c_cur; i < chain->cl; i++)
+          {
             chain->ch[i] = chain->ch[i + 1];
+          }
 
           if (c_cur == chain->cl && c_cur)
+          {
             c_cur--;
+          }
 
           mix_screen_coordinates(type2_list, &coords, chain, c_cur);
           c_redraw = true;
@@ -619,9 +681,13 @@ void mix_make_chain(struct ListHead *chainhead)
       case OP_MIX_CHAIN_PREV:
       {
         if (c_cur)
+        {
           c_cur--;
+        }
         else
+        {
           mutt_error(_("You already have the first chain element selected."));
+        }
 
         break;
       }
@@ -629,9 +695,13 @@ void mix_make_chain(struct ListHead *chainhead)
       case OP_MIX_CHAIN_NEXT:
       {
         if (chain->cl && c_cur < chain->cl - 1)
+        {
           c_cur++;
+        }
         else
+        {
           mutt_error(_("You already have the last chain element selected."));
+        }
 
         break;
       }
@@ -648,9 +718,13 @@ void mix_make_chain(struct ListHead *chainhead)
     for (i = 0; i < chain->cl; i++)
     {
       if ((j = chain->ch[i]))
+      {
         t = type2_list[j]->shortname;
+      }
       else
+      {
         t = "*";
+      }
 
       mutt_list_insert_tail(chainhead, safe_strdup(t));
     }
@@ -728,7 +802,9 @@ int mix_send_message(struct ListHead *chain, const char *tempfile)
   }
 
   if (!option(OPT_NO_CURSES))
+  {
     mutt_endwin(NULL);
+  }
 
   if ((i = mutt_system(cmd)))
   {

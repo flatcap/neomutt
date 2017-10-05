@@ -69,7 +69,9 @@ static int tls_init(void)
   int err;
 
   if (init_complete)
+  {
     return 0;
+  }
 
   err = gnutls_global_init();
   if (err < 0)
@@ -188,7 +190,9 @@ static gnutls_certificate_status_t tls_verify_peers(gnutls_session_t tlsstate)
 
   verify_ret = gnutls_certificate_verify_peers2(tlsstate, &status);
   if (!verify_ret)
+  {
     return status;
+  }
 
   if (status == GNUTLS_E_NO_CERTIFICATE_FOUND)
   {
@@ -304,7 +308,9 @@ static int tls_compare_certificates(const gnutls_datum_t *peercert)
   struct stat filestat;
 
   if (stat(CertificateFile, &filestat) == -1)
+  {
     return 0;
+  }
 
   b64_data.size = filestat.st_size + 1;
   b64_data_data = safe_calloc(1, b64_data.size);
@@ -389,15 +395,21 @@ static int tls_check_preauth(const gnutls_datum_t *certdata,
   if (option(OPT_SSL_VERIFY_DATES) != MUTT_NO)
   {
     if (gnutls_x509_crt_get_expiration_time(cert) < time(NULL))
+    {
       *certerr |= CERTERR_EXPIRED;
+    }
     if (gnutls_x509_crt_get_activation_time(cert) > time(NULL))
+    {
       *certerr |= CERTERR_NOTYETVALID;
+    }
   }
 
   if (chainidx == 0 && option(OPT_SSL_VERIFY_HOST) != MUTT_NO &&
       !gnutls_x509_crt_check_hostname(cert, hostname) &&
       !tls_check_stored_hostname(certdata, hostname))
+  {
     *certerr |= CERTERR_HOSTNAME;
+  }
 
   /* see whether certificate is in our cache (certificates file) */
   if (tls_compare_certificates(certdata))
@@ -474,7 +486,9 @@ static int tls_check_preauth(const gnutls_datum_t *certdata,
    don't return OK if there are any unhandled bits we don't
    understand */
   if (*certerr == CERTERR_VALID && certstat == 0)
+  {
     return 0;
+  }
 
   return -1;
 }
@@ -484,10 +498,14 @@ static char *tls_make_date(time_t t, char *s, size_t len)
   struct tm *l = gmtime(&t);
 
   if (l)
+  {
     snprintf(s, len, "%s, %d %s %d %02d:%02d:%02d UTC", Weekdays[l->tm_wday], l->tm_mday,
              Months[l->tm_mon], l->tm_year + 1900, l->tm_hour, l->tm_min, l->tm_sec);
+  }
   else
+  {
     strfcpy(s, _("[invalid date]"), len);
+  }
 
   return s;
 }
@@ -528,7 +546,9 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
   int i, row, done, ret;
 
   if (!tls_check_preauth(certdata, certstat, hostname, idx, &certerr, &savedcert))
+  {
     return 1;
+  }
 
   /* skip signers if insecure algorithm was used */
   if (idx && (certerr & CERTERR_INSECUREALG))
@@ -562,7 +582,9 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
   menu->max = 25;
   menu->dialog = safe_calloc(1, menu->max * sizeof(char *));
   for (i = 0; i < menu->max; i++)
+  {
     menu->dialog[i] = safe_calloc(1, SHORT_STRING * sizeof(char));
+  }
   mutt_push_current_menu(menu);
 
   row = 0;
@@ -572,31 +594,44 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
   buflen = sizeof(dn_common_name);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0,
                                     dn_common_name, &buflen) != 0)
+  {
     dn_common_name[0] = '\0';
+  }
   buflen = sizeof(dn_email);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0, dn_email, &buflen) != 0)
+  {
     dn_email[0] = '\0';
+  }
   buflen = sizeof(dn_organization);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
                                     0, dn_organization, &buflen) != 0)
+  {
     dn_organization[0] = '\0';
+  }
   buflen = sizeof(dn_organizational_unit);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
                                     0, 0, dn_organizational_unit, &buflen) != 0)
+  {
     dn_organizational_unit[0] = '\0';
+  }
   buflen = sizeof(dn_locality);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_LOCALITY_NAME, 0, 0,
                                     dn_locality, &buflen) != 0)
+  {
     dn_locality[0] = '\0';
+  }
   buflen = sizeof(dn_province);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
                                     0, 0, dn_province, &buflen) != 0)
+  {
     dn_province[0] = '\0';
+  }
   buflen = sizeof(dn_country);
   if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COUNTRY_NAME, 0, 0,
                                     dn_country, &buflen) != 0)
+  {
     dn_country[0] = '\0';
-
+  }
   snprintf(menu->dialog[row++], SHORT_STRING, "   %s  %s", dn_common_name, dn_email);
   snprintf(menu->dialog[row++], SHORT_STRING, "   %s", dn_organization);
   snprintf(menu->dialog[row++], SHORT_STRING, "   %s", dn_organizational_unit);
@@ -610,32 +645,45 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
   buflen = sizeof(dn_common_name);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME, 0,
                                            0, dn_common_name, &buflen) != 0)
+  {
     dn_common_name[0] = '\0';
+  }
   buflen = sizeof(dn_email);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL, 0, 0,
                                            dn_email, &buflen) != 0)
+  {
     dn_email[0] = '\0';
+  }
   buflen = sizeof(dn_organization);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_X520_ORGANIZATION_NAME,
                                            0, 0, dn_organization, &buflen) != 0)
+  {
     dn_organization[0] = '\0';
+  }
   buflen = sizeof(dn_organizational_unit);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
                                            0, 0, dn_organizational_unit, &buflen) != 0)
+  {
     dn_organizational_unit[0] = '\0';
+  }
   buflen = sizeof(dn_locality);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_X520_LOCALITY_NAME,
                                            0, 0, dn_locality, &buflen) != 0)
+  {
     dn_locality[0] = '\0';
+  }
   buflen = sizeof(dn_province);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
                                            0, 0, dn_province, &buflen) != 0)
+  {
     dn_province[0] = '\0';
+  }
   buflen = sizeof(dn_country);
   if (gnutls_x509_crt_get_issuer_dn_by_oid(cert, GNUTLS_OID_X520_COUNTRY_NAME,
                                            0, 0, dn_country, &buflen) != 0)
+  {
     dn_country[0] = '\0';
-
+  }
   snprintf(menu->dialog[row++], SHORT_STRING, "   %s  %s", dn_common_name, dn_email);
   snprintf(menu->dialog[row++], SHORT_STRING, "   %s", dn_organization);
   snprintf(menu->dialog[row++], SHORT_STRING, "   %s", dn_organizational_unit);
@@ -833,9 +881,13 @@ static int tls_check_certificate(struct Connection *conn)
     if (savedcert)
     {
       if (!preauthrc)
+      {
         return 1;
+      }
       else
+      {
         break;
+      }
     }
   }
 
@@ -850,14 +902,18 @@ static int tls_check_certificate(struct Connection *conn)
     {
       rc = gnutls_certificate_set_x509_trust_mem(data->xcred, &cert_list[i], GNUTLS_X509_FMT_DER);
       if (rc != 1)
+      {
         mutt_debug(1, "error trusting certificate %d: %d\n", i, rc);
+      }
 
       certstat = tls_verify_peers(state);
       /* If the cert chain now verifies, and the peer's cert was otherwise
        * valid (rcpeer==0), we are done.
        */
       if (!certstat && !rcpeer)
+      {
         return 1;
+      }
     }
   }
 
@@ -876,7 +932,9 @@ static void tls_get_client_cert(struct Connection *conn)
 
   /* get our cert CN if we have one */
   if (!(crtdata = gnutls_certificate_get_ours(data->state)))
+  {
     return;
+  }
 
   if (gnutls_x509_crt_init(&clientcrt) < 0)
   {
@@ -908,9 +966,11 @@ static void tls_get_client_cert(struct Connection *conn)
   cn += 3;
 
   if ((cnend = strstr(dn, ",EMAIL=")))
+  {
     *cnend = '\0';
 
-  /* if we are using a client cert, SASL may expect an external auth name */
+    /* if we are using a client cert, SASL may expect an external auth name */
+  }
   mutt_account_getuser(&conn->account);
 
 err_dn:
@@ -932,9 +992,13 @@ static int tls_set_priority(struct TlsSockData *data)
 
   priority[0] = 0;
   if (SslCiphers)
+  {
     safe_strcat(priority, priority_size, SslCiphers);
+  }
   else
+  {
     safe_strcat(priority, priority_size, "NORMAL");
+  }
 
   if (!option(OPT_SSL_USE_TLSV1_2))
   {
@@ -1117,7 +1181,9 @@ static int tls_negotiate(struct Connection *conn)
   }
 
   if (!tls_check_certificate(conn))
+  {
     goto fail;
+  }
 
   /* set Security Strength Factor (SSF) for SASL */
   /* NB: gnutls_cipher_get_key_size() returns key length in bytes */
@@ -1147,7 +1213,9 @@ fail:
 static int tls_socket_open(struct Connection *conn)
 {
   if (raw_socket_open(conn) < 0)
+  {
     return -1;
+  }
 
   if (tls_negotiate(conn) < 0)
   {
@@ -1161,7 +1229,9 @@ static int tls_socket_open(struct Connection *conn)
 int mutt_ssl_socket_setup(struct Connection *conn)
 {
   if (tls_init() < 0)
+  {
     return -1;
+  }
 
   conn->conn_open = tls_socket_open;
   conn->conn_read = tls_socket_read;
@@ -1175,10 +1245,14 @@ int mutt_ssl_socket_setup(struct Connection *conn)
 int mutt_ssl_starttls(struct Connection *conn)
 {
   if (tls_init() < 0)
+  {
     return -1;
+  }
 
   if (tls_negotiate(conn) < 0)
+  {
     return -1;
+  }
 
   conn->conn_read = tls_socket_read;
   conn->conn_write = tls_socket_write;

@@ -93,11 +93,15 @@ void mutt_refresh(void)
 {
   /* don't refresh when we are waiting for a child. */
   if (option(OPT_KEEP_QUIET))
+  {
     return;
+  }
 
   /* don't refresh in the middle of macros unless necessary */
   if (MacroBufferCount && !option(OPT_FORCE_REFRESH) && !option(OPT_IGNORE_MACRO_EVENTS))
+  {
     return;
+  }
 
   /* else */
   refresh();
@@ -125,10 +129,14 @@ struct Event mutt_getch(void)
   struct Event timeout = { -2, OP_NULL };
 
   if (UngetCount)
+  {
     return UngetKeyEvents[--UngetCount];
+  }
 
   if (!option(OPT_IGNORE_MACRO_EVENTS) && MacroBufferCount)
+  {
     return MacroEvents[--MacroBufferCount];
+  }
 
   SigInt = 0;
 
@@ -137,8 +145,10 @@ struct Event mutt_getch(void)
   /* ncurses 4.2 sends this when the screen is resized */
   ch = KEY_RESIZE;
   while (ch == KEY_RESIZE)
+  {
 #endif /* KEY_RESIZE */
     ch = getch();
+  }
   mutt_allow_interrupt(0);
 
   if (SigInt)
@@ -222,7 +232,9 @@ void mutt_clear_error(void)
 {
   ErrorBuf[0] = 0;
   if (!option(OPT_NO_CURSES))
+  {
     mutt_window_clearline(MuttMessageWindow, 0);
+  }
 }
 
 void mutt_edit_file(const char *editor, const char *data)
@@ -325,9 +337,13 @@ int mutt_yesorno(const char *msg, int def)
     ch = mutt_getch();
     timeout(-1);
     if (ch.ch == -2)
+    {
       continue;
+    }
     if (CI_is_return(ch.ch))
+    {
       break;
+    }
     if (ch.ch < 0)
     {
       def = MUTT_ABORT;
@@ -354,9 +370,13 @@ int mutt_yesorno(const char *msg, int def)
   FREE(&answer_string);
 
   if (reyes_ok)
+  {
     regfree(&reyes);
+  }
   if (reno_ok)
+  {
     regfree(&reno);
+  }
 
   if (MuttMessageWindow->rows != 1)
   {
@@ -364,7 +384,9 @@ int mutt_yesorno(const char *msg, int def)
     mutt_current_menu_redraw();
   }
   else
+  {
     mutt_window_clearline(MuttMessageWindow, 0);
+  }
 
   if (def != MUTT_ABORT)
   {
@@ -390,7 +412,9 @@ void mutt_query_exit(void)
   mutt_flushinp();
   curs_set(1);
   if (Timeout)
+  {
     timeout(-1); /* restore blocking operation */
+  }
   if (mutt_yesorno(_("Exit NeoMutt?"), MUTT_YES) == MUTT_YES)
   {
     endwin();
@@ -414,7 +438,9 @@ static void curses_message(int error, const char *fmt, va_list ap)
   if (!option(OPT_KEEP_QUIET))
   {
     if (error)
+    {
       BEEP();
+    }
     SETCOLOR(error ? MT_COLOR_ERROR : MT_COLOR_MESSAGE);
     mutt_window_mvaddstr(MuttMessageWindow, 0, 0, ErrorBuf);
     NORMAL_COLOR;
@@ -423,9 +449,13 @@ static void curses_message(int error, const char *fmt, va_list ap)
   }
 
   if (error)
+  {
     set_option(OPT_MSG_ERR);
+  }
   else
+  {
     unset_option(OPT_MSG_ERR);
+  }
 }
 
 void mutt_curses_error(const char *fmt, ...)
@@ -452,9 +482,13 @@ void mutt_progress_init(struct Progress *progress, const char *msg,
   struct timeval tv = { 0, 0 };
 
   if (!progress)
+  {
     return;
+  }
   if (option(OPT_NO_CURSES))
+  {
     return;
+  }
 
   memset(progress, 0, sizeof(struct Progress));
   progress->inc = inc;
@@ -464,24 +498,36 @@ void mutt_progress_init(struct Progress *progress, const char *msg,
   if (progress->size)
   {
     if (progress->flags & MUTT_PROGRESS_SIZE)
+    {
       mutt_pretty_size(progress->sizestr, sizeof(progress->sizestr), progress->size);
+    }
     else
+    {
       snprintf(progress->sizestr, sizeof(progress->sizestr), "%ld", progress->size);
+    }
   }
   if (!inc)
   {
     if (size)
+    {
       mutt_message("%s (%s)", msg, progress->sizestr);
+    }
     else
+    {
       mutt_message(msg);
+    }
     return;
   }
   if (gettimeofday(&tv, NULL) < 0)
+  {
     mutt_debug(1, "gettimeofday failed: %d\n", errno);
+  }
   /* if timestamp is 0 no time-based suppression is done */
   if (TimeInc)
+  {
     progress->timestamp =
         ((unsigned int) tv.tv_sec * 1000) + (unsigned int) (tv.tv_usec / 1000);
+  }
   mutt_progress_update(progress, 0, 0);
 }
 
@@ -553,28 +599,40 @@ void mutt_progress_update(struct Progress *progress, long pos, int percent)
   unsigned int now = 0;
 
   if (option(OPT_NO_CURSES))
+  {
     return;
+  }
 
   if (!progress->inc)
+  {
     goto out;
+  }
 
   /* refresh if size > inc */
   if (progress->flags & MUTT_PROGRESS_SIZE && (pos >= progress->pos + (progress->inc << 10)))
+  {
     update = true;
+  }
   else if (pos >= progress->pos + progress->inc)
+  {
     update = true;
+  }
 
   /* skip refresh if not enough time has passed */
   if (update && progress->timestamp && !gettimeofday(&tv, NULL))
   {
     now = ((unsigned int) tv.tv_sec * 1000) + (unsigned int) (tv.tv_usec / 1000);
     if (now && now - progress->timestamp < TimeInc)
+    {
       update = false;
+    }
   }
 
   /* always show the first update */
   if (!pos)
+  {
     update = true;
+  }
 
   if (update)
   {
@@ -584,13 +642,17 @@ void mutt_progress_update(struct Progress *progress, long pos, int percent)
       mutt_pretty_size(posstr, sizeof(posstr), pos);
     }
     else
+    {
       snprintf(posstr, sizeof(posstr), "%ld", pos);
+    }
 
     mutt_debug(5, "updating progress: %s\n", posstr);
 
     progress->pos = pos;
     if (now)
+    {
       progress->timestamp = now;
+    }
 
     if (progress->size > 0)
     {
@@ -603,15 +665,21 @@ void mutt_progress_update(struct Progress *progress, long pos, int percent)
     else
     {
       if (percent > 0)
+      {
         message_bar(percent, "%s %s (%d%%)", progress->msg, posstr, percent);
+      }
       else
+      {
         mutt_message("%s %s", progress->msg, posstr);
+      }
     }
   }
 
 out:
   if (pos >= progress->size)
+  {
     mutt_clear_error();
+  }
 }
 
 void mutt_init_windows(void)
@@ -639,7 +707,9 @@ void mutt_free_windows(void)
 void mutt_reflow_windows(void)
 {
   if (option(OPT_NO_CURSES))
+  {
     return;
+  }
 
   mutt_debug(2, "In mutt_reflow_windows\n");
 
@@ -650,9 +720,13 @@ void mutt_reflow_windows(void)
 
   memcpy(MuttHelpWindow, MuttStatusWindow, sizeof(struct MuttWindow));
   if (!option(OPT_HELP))
+  {
     MuttHelpWindow->rows = 0;
+  }
   else
+  {
     MuttHelpWindow->row_offset = option(OPT_STATUS_ON_TOP) ? LINES - 2 : 0;
+  }
 
   memcpy(MuttMessageWindow, MuttStatusWindow, sizeof(struct MuttWindow));
   MuttMessageWindow->row_offset = LINES - 1;
@@ -694,14 +768,18 @@ static void reflow_message_window_rows(int mw_rows)
   MuttStatusWindow->row_offset = option(OPT_STATUS_ON_TOP) ? 0 : LINES - mw_rows - 1;
 
   if (option(OPT_HELP))
+  {
     MuttHelpWindow->row_offset = option(OPT_STATUS_ON_TOP) ? LINES - mw_rows - 1 : 0;
+  }
 
   MuttIndexWindow->rows = MAX(
       LINES - MuttStatusWindow->rows - MuttHelpWindow->rows - MuttMessageWindow->rows, 0);
 
 #ifdef USE_SIDEBAR
   if (option(OPT_SIDEBAR_VISIBLE))
+  {
     MuttSidebarWindow->rows = MuttIndexWindow->rows;
+  }
 #endif
 
   /* We don't also set REDRAW_FLOW because this function only
@@ -760,7 +838,9 @@ void mutt_window_clrtoeol(struct MuttWindow *win)
   int row, col, curcol;
 
   if (win->col_offset + win->cols == COLS)
+  {
     clrtoeol();
+  }
   else
   {
     getyx(stdscr, row, col);
@@ -792,15 +872,21 @@ void mutt_window_getyx(struct MuttWindow *win, int *y, int *x)
 
   getyx(stdscr, row, col);
   if (y)
+  {
     *y = row - win->row_offset;
+  }
   if (x)
+  {
     *x = col - win->col_offset;
+  }
 }
 
 void mutt_show_error(void)
 {
   if (option(OPT_KEEP_QUIET))
+  {
     return;
+  }
 
   SETCOLOR(option(OPT_MSG_ERR) ? MT_COLOR_ERROR : MT_COLOR_MESSAGE);
   mutt_window_mvaddstr(MuttMessageWindow, 0, 0, ErrorBuf);
@@ -846,7 +932,9 @@ int mutt_any_key_to_continue(const char *s)
 
   f = open("/dev/tty", O_RDONLY);
   if (f < 0)
+  {
     return EOF;
+  }
   tcgetattr(f, &t);
   memcpy((void *) &old, (void *) &t, sizeof(struct termios)); /* save original state */
   t.c_lflag &= ~(ICANON | ECHO);
@@ -855,9 +943,13 @@ int mutt_any_key_to_continue(const char *s)
   tcsetattr(f, TCSADRAIN, &t);
   fflush(stdout);
   if (s)
+  {
     fputs(s, stdout);
+  }
   else
+  {
     fputs(_("Press any key to continue..."), stdout);
+  }
   fflush(stdout);
   ch = fgetc(stdin);
   fflush(stdin);
@@ -873,7 +965,9 @@ int mutt_do_pager(const char *banner, const char *tempfile, int do_color, struct
   int rc;
 
   if (!Pager || (mutt_strcmp(Pager, "builtin") == 0))
+  {
     rc = mutt_pager(banner, tempfile, do_color, info);
+  }
   else
   {
     char cmd[STRING];
@@ -886,7 +980,9 @@ int mutt_do_pager(const char *banner, const char *tempfile, int do_color, struct
       rc = -1;
     }
     else
+    {
       rc = 0;
+    }
     mutt_unlink(tempfile);
   }
 
@@ -903,7 +999,9 @@ int _mutt_enter_fname(const char *prompt, char *buf, size_t blen, int buffy,
   addstr(_(" ('?' for list): "));
   NORMAL_COLOR;
   if (buf[0])
+  {
     addstr(buf);
+  }
   mutt_window_clrtoeol(MuttMessageWindow);
   mutt_refresh();
 
@@ -919,11 +1017,17 @@ int _mutt_enter_fname(const char *prompt, char *buf, size_t blen, int buffy,
     buf[0] = '\0';
 
     if (!flags)
+    {
       flags = MUTT_SEL_FOLDER;
+    }
     if (multiple)
+    {
       flags |= MUTT_SEL_MULTI;
+    }
     if (buffy)
+    {
       flags |= MUTT_SEL_BUFFY;
+    }
     _mutt_select_file(buf, blen, flags, files, numfiles);
   }
   else
@@ -934,11 +1038,15 @@ int _mutt_enter_fname(const char *prompt, char *buf, size_t blen, int buffy,
     mutt_unget_event(ch.op ? 0 : ch.ch, ch.op ? ch.op : 0);
     if (_mutt_get_field(pc, buf, blen, (buffy ? MUTT_EFILE : MUTT_FILE) | MUTT_CLEAR,
                         multiple, files, numfiles) != 0)
+    {
       buf[0] = '\0';
+    }
     FREE(&pc);
 #ifdef USE_NOTMUCH
     if ((flags & MUTT_SEL_VFOLDER) && buf[0] && (strncmp(buf, "notmuch://", 10) != 0))
+    {
       nm_description_to_path(buf, buf, blen);
+    }
 #endif
   }
 
@@ -953,7 +1061,9 @@ void mutt_unget_event(int ch, int op)
   tmp.op = op;
 
   if (UngetCount >= UngetLen)
+  {
     safe_realloc(&UngetKeyEvents, (UngetLen += 16) * sizeof(struct Event));
+  }
 
   UngetKeyEvents[UngetCount++] = tmp;
 }
@@ -982,7 +1092,9 @@ void mutt_push_macro_event(int ch, int op)
   tmp.op = op;
 
   if (MacroBufferCount >= MacroBufferLen)
+  {
     safe_realloc(&MacroEvents, (MacroBufferLen += 128) * sizeof(struct Event));
+  }
 
   MacroEvents[MacroBufferCount++] = tmp;
 }
@@ -993,7 +1105,9 @@ void mutt_flush_macro_to_endcond(void)
   while (MacroBufferCount > 0)
   {
     if (MacroEvents[--MacroBufferCount].op == OP_END_COND)
+    {
       return;
+    }
   }
 }
 
@@ -1009,7 +1123,9 @@ void mutt_flush_unget_to_endcond(void)
   while (UngetCount > 0)
   {
     if (UngetKeyEvents[--UngetCount].op == OP_END_COND)
+    {
       return;
+    }
   }
 }
 
@@ -1033,14 +1149,20 @@ void mutt_curs_set(int cursor)
   static int SavedCursor = 1;
 
   if (cursor < 0)
+  {
     cursor = SavedCursor;
+  }
   else
+  {
     SavedCursor = cursor;
+  }
 
   if (curs_set(cursor) == ERR)
   {
-    if (cursor == 1) /* cnorm */
-      curs_set(2);   /* cvvis */
+    if (cursor == 1)
+    {              /* cnorm */
+      curs_set(2); /* cvvis */
+    }
   }
 }
 #endif
@@ -1091,7 +1213,9 @@ int mutt_multi_choice(char *prompt, char *letters)
     ch = mutt_getch();
     timeout(-1);
     if (ch.ch == -2)
+    {
       continue;
+    }
     /* (ch.ch == 0) is technically possible.  Treat the same as < 0 (abort) */
     if (ch.ch <= 0 || CI_is_return(ch.ch))
     {
@@ -1110,7 +1234,9 @@ int mutt_multi_choice(char *prompt, char *letters)
       {
         choice = ch.ch - '0';
         if (choice <= mutt_strlen(letters))
+        {
           break;
+        }
       }
     }
     BEEP();
@@ -1121,7 +1247,9 @@ int mutt_multi_choice(char *prompt, char *letters)
     mutt_current_menu_redraw();
   }
   else
+  {
     mutt_window_clearline(MuttMessageWindow, 0);
+  }
   mutt_refresh();
   return choice;
 }
@@ -1138,9 +1266,13 @@ int mutt_addwch(wchar_t wc)
   memset(&mbstate, 0, sizeof(mbstate));
   if ((n1 = wcrtomb(buf, wc, &mbstate)) == (size_t)(-1) ||
       (n2 = wcrtomb(buf + n1, 0, &mbstate)) == (size_t)(-1))
+  {
     return -1; /* ERR */
+  }
   else
+  {
     return addstr(buf);
+  }
 }
 
 /**
@@ -1170,7 +1302,9 @@ void mutt_simple_format(char *dest, size_t destlen, int min_width, int max_width
     if (k == (size_t)(-1) || k == (size_t)(-2))
     {
       if (k == (size_t)(-1) && errno == EILSEQ)
+      {
         memset(&mbstate1, 0, sizeof(mbstate1));
+      }
 
       k = (k == (size_t)(-1)) ? 1 : n;
       wc = replacement_char();
@@ -1193,17 +1327,23 @@ void mutt_simple_format(char *dest, size_t destlen, int min_width, int max_width
     {
 #ifdef HAVE_ISWBLANK
       if (iswblank(wc))
+      {
         wc = ' ';
+      }
       else
 #endif
           if (!IsWPrint(wc))
+      {
         wc = '?';
+      }
       w = wcwidth(wc);
     }
     if (w >= 0)
     {
       if (w > max_width || (k2 = wcrtomb(scratch, wc, &mbstate2)) > destlen)
+      {
         continue;
+      }
       min_width -= w;
       max_width -= w;
       strncpy(p, scratch, k2);
@@ -1213,14 +1353,20 @@ void mutt_simple_format(char *dest, size_t destlen, int min_width, int max_width
   }
   w = (int) destlen < min_width ? destlen : min_width;
   if (w <= 0)
+  {
     *p = '\0';
+  }
   else if (justify == FMT_RIGHT) /* right justify */
   {
     p[w] = '\0';
     while (--p >= dest)
+    {
       p[w] = *p;
+    }
     while (--w >= 0)
+    {
       dest[w] = m_pad_char;
+    }
   }
   else if (justify == FMT_CENTER) /* center */
   {
@@ -1231,21 +1377,29 @@ void mutt_simple_format(char *dest, size_t destlen, int min_width, int max_width
 
     /* move str to center of buffer */
     while (--p >= dest)
+    {
       p[half] = *p;
+    }
 
     /* fill rhs */
     p = savedp + half;
     while (--w >= half)
+    {
       *p++ = m_pad_char;
+    }
 
     /* fill lhs */
     while (half--)
+    {
       dest[half] = m_pad_char;
+    }
   }
   else /* left justify */
   {
     while (--w >= 0)
+    {
       *p++ = m_pad_char;
+    }
     *p = '\0';
   }
 }
@@ -1283,7 +1437,9 @@ static void format_s_x(char *dest, size_t destlen, const char *prefix,
     prefix = p + 1;
     max_width = strtol(prefix, &p, 10);
     if (p <= prefix)
+    {
       max_width = INT_MAX;
+    }
   }
 
   mutt_simple_format(dest, destlen, min_width, max_width, justify, ' ', s,
@@ -1319,23 +1475,31 @@ void mutt_paddstr(int n, const char *s)
     if (k == (size_t)(-1) || k == (size_t)(-2))
     {
       if (k == (size_t)(-1))
+      {
         memset(&mbstate, 0, sizeof(mbstate));
+      }
       k = (k == (size_t)(-1)) ? 1 : len;
       wc = replacement_char();
     }
     if (!IsWPrint(wc))
+    {
       wc = '?';
+    }
     w = wcwidth(wc);
     if (w >= 0)
     {
       if (w > n)
+      {
         break;
+      }
       addnstr((char *) s, k);
       n -= w;
     }
   }
   while (n-- > 0)
+  {
     addch(' ');
+  }
 }
 
 /**
@@ -1357,7 +1521,9 @@ size_t mutt_wstr_trunc(const char *src, size_t maxlen, size_t maxwid, size_t *wi
   mbstate_t mbstate;
 
   if (!src)
+  {
     goto out;
+  }
 
   n = mutt_strlen(src);
 
@@ -1367,7 +1533,9 @@ size_t mutt_wstr_trunc(const char *src, size_t maxlen, size_t maxwid, size_t *wi
     if (cl == (size_t)(-1) || cl == (size_t)(-2))
     {
       if (cl == (size_t)(-1))
+      {
         memset(&mbstate, 0, sizeof(mbstate));
+      }
       cl = (cl == (size_t)(-1)) ? 1 : n;
       wc = replacement_char();
     }
@@ -1380,17 +1548,25 @@ size_t mutt_wstr_trunc(const char *src, size_t maxlen, size_t maxwid, size_t *wi
       cw = 0;
     }
     else if (cw < 0 && cl == 1 && src[0] && src[0] < MUTT_TREE_MAX)
+    {
       cw = 1;
+    }
     else if (cw < 0)
+    {
       cw = 0; /* unprintable wchar */
+    }
     if (cl + l > maxlen || cw + w > maxwid)
+    {
       break;
+    }
     l += cl;
     w += cw;
   }
 out:
   if (width)
+  {
     *width = w;
+  }
   return l;
 }
 
@@ -1410,13 +1586,17 @@ int mutt_charlen(const char *s, int *width)
   size_t k, n;
 
   if (!s || !*s)
+  {
     return 0;
+  }
 
   n = mutt_strlen(s);
   memset(&mbstate, 0, sizeof(mbstate));
   k = mbrtowc(&wc, s, n, &mbstate);
   if (width)
+  {
     *width = wcwidth(wc);
+  }
   return (k == (size_t)(-1) || k == (size_t)(-2)) ? -1 : k;
 }
 
@@ -1433,7 +1613,9 @@ int mutt_strwidth(const char *s)
   mbstate_t mbstate;
 
   if (!s)
+  {
     return 0;
+  }
 
   n = mutt_strlen(s);
 
@@ -1450,12 +1632,16 @@ int mutt_strwidth(const char *s)
     if (k == (size_t)(-1) || k == (size_t)(-2))
     {
       if (k == (size_t)(-1))
+      {
         memset(&mbstate, 0, sizeof(mbstate));
+      }
       k = (k == (size_t)(-1)) ? 1 : n;
       wc = replacement_char();
     }
     if (!IsWPrint(wc))
+    {
       wc = '?';
+    }
     w += wcwidth(wc);
   }
   return w;

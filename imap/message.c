@@ -67,7 +67,9 @@ static void imap_update_context(struct ImapData *idata, int oldmsgcount)
 
   ctx = idata->ctx;
   if (!idata->uid_hash)
+  {
     idata->uid_hash = int_hash_create(MAX(6 * ctx->msgcount / 5, 30), 0);
+  }
 
   for (int msgno = oldmsgcount; msgno < ctx->msgcount; msgno++)
   {
@@ -81,7 +83,9 @@ static struct BodyCache *msg_cache_open(struct ImapData *idata)
   char mailbox[_POSIX_PATH_MAX];
 
   if (idata->bcache)
+  {
     return idata->bcache;
+  }
 
   imap_cachepath(idata, idata->mailbox, mailbox, sizeof(mailbox));
 
@@ -93,7 +97,9 @@ static FILE *msg_cache_get(struct ImapData *idata, struct Header *h)
   char id[_POSIX_PATH_MAX];
 
   if (!idata || !h)
+  {
     return NULL;
+  }
 
   idata->bcache = msg_cache_open(idata);
   snprintf(id, sizeof(id), "%u-%u", idata->uid_validity, HEADER_DATA(h)->uid);
@@ -105,7 +111,9 @@ static FILE *msg_cache_put(struct ImapData *idata, struct Header *h)
   char id[_POSIX_PATH_MAX];
 
   if (!idata || !h)
+  {
     return NULL;
+  }
 
   idata->bcache = msg_cache_open(idata);
   snprintf(id, sizeof(id), "%u-%u", idata->uid_validity, HEADER_DATA(h)->uid);
@@ -117,7 +125,9 @@ static int msg_cache_commit(struct ImapData *idata, struct Header *h)
   char id[_POSIX_PATH_MAX];
 
   if (!idata || !h)
+  {
     return -1;
+  }
 
   idata->bcache = msg_cache_open(idata);
   snprintf(id, sizeof(id), "%u-%u", idata->uid_validity, HEADER_DATA(h)->uid);
@@ -131,11 +141,15 @@ static int msg_cache_clean_cb(const char *id, struct BodyCache *bcache, void *da
   struct ImapData *idata = data;
 
   if (sscanf(id, "%u-%u", &uv, &uid) != 2)
+  {
     return 0;
+  }
 
   /* bad UID */
   if (uv != idata->uid_validity || !int_hash_find(idata->uid_hash, uid))
+  {
     mutt_bcache_del(bcache, id);
+  }
 
   return 0;
 }
@@ -191,7 +205,9 @@ static char *msg_parse_flags(struct ImapHeader *h, char *s)
       hd->read = true;
     }
     else if (mutt_strncasecmp("\\recent", s, 7) == 0)
+    {
       s += 7;
+    }
     else if (mutt_strncasecmp("old", s, 3) == 0)
     {
       s += 3;
@@ -204,17 +220,23 @@ static char *msg_parse_flags(struct ImapHeader *h, char *s)
       bool is_system_keyword = (mutt_strncasecmp("\\", s, 1) == 0);
 
       while (*s && !ISSPACE(*s) && *s != ')')
+      {
         s++;
+      }
 
       ctmp = *s;
       *s = '\0';
 
       /* store other system flags as well (mainly \\Draft) */
       if (is_system_keyword)
+      {
         mutt_str_append_item(&hd->flags_system, flag_word, ' ');
-      /* store custom flags as well */
+        /* store custom flags as well */
+      }
       else
+      {
         mutt_str_append_item(&hd->flags_remote, flag_word, ' ');
+      }
 
       *s = ctmp;
     }
@@ -223,7 +245,9 @@ static char *msg_parse_flags(struct ImapHeader *h, char *s)
 
   /* wrap up, or note bad flags response */
   if (*s == ')')
+  {
     s++;
+  }
   else
   {
     mutt_debug(1, "msg_parse_flags: Unterminated FLAGS response: %s\n", s);
@@ -247,7 +271,9 @@ static int msg_parse_fetch(struct ImapHeader *h, char *s)
   char *ptmp = NULL;
 
   if (!s)
+  {
     return -1;
+  }
 
   while (*s)
   {
@@ -256,7 +282,9 @@ static int msg_parse_fetch(struct ImapHeader *h, char *s)
     if (mutt_strncasecmp("FLAGS", s, 5) == 0)
     {
       if ((s = msg_parse_flags(h, s)) == NULL)
+      {
         return -1;
+      }
     }
     else if (mutt_strncasecmp("UID", s, 3) == 0)
     {
@@ -278,9 +306,13 @@ static int msg_parse_fetch(struct ImapHeader *h, char *s)
       s++;
       ptmp = tmp;
       while (*s && *s != '\"')
+      {
         *ptmp++ = *s++;
+      }
       if (*s != '\"')
+      {
         return -1;
+      }
       s++; /* skip past the trailing " */
       *ptmp = '\0';
       h->received = imap_parse_date(tmp);
@@ -291,7 +323,9 @@ static int msg_parse_fetch(struct ImapHeader *h, char *s)
       SKIPWS(s);
       ptmp = tmp;
       while (isdigit((unsigned char) *s))
+      {
         *ptmp++ = *s++;
+      }
       *ptmp = '\0';
       h->content_length = atoi(tmp);
     }
@@ -302,7 +336,9 @@ static int msg_parse_fetch(struct ImapHeader *h, char *s)
       return -2;
     }
     else if (*s == ')')
+    {
       s++; /* end of request */
+    }
     else if (*s)
     {
       /* got something i don't understand */
@@ -332,7 +368,9 @@ static int msg_fetch_header(struct Context *ctx, struct ImapHeader *h, char *buf
   idata = ctx->data;
 
   if (buf[0] != '*')
+  {
     return rc;
+  }
 
   /* skip to message number */
   buf = imap_next_word(buf);
@@ -341,20 +379,28 @@ static int msg_fetch_header(struct Context *ctx, struct ImapHeader *h, char *buf
   /* find FETCH tag */
   buf = imap_next_word(buf);
   if (mutt_strncasecmp("FETCH", buf, 5) != 0)
+  {
     return rc;
+  }
 
   rc = -2; /* we've got a FETCH response, for better or worse */
   if (!(buf = strchr(buf, '(')))
+  {
     return rc;
+  }
   buf++;
 
   /* FIXME: current implementation - call msg_parse_fetch - if it returns -2,
    *   read header lines and call it again. Silly. */
   parse_rc = msg_parse_fetch(h, buf);
   if (!parse_rc)
+  {
     return 0;
+  }
   if (parse_rc != -2 || !fp)
+  {
     return rc;
+  }
 
   if (imap_get_literal_count(buf, &bytes) == 0)
   {
@@ -365,10 +411,14 @@ static int msg_fetch_header(struct Context *ctx, struct ImapHeader *h, char *buf
      * This all has to go - we should accept literals and nonliterals
      * interchangeably at any time. */
     if (imap_cmd_step(idata) != IMAP_CMD_CONTINUE)
+    {
       return rc;
+    }
 
     if (msg_parse_fetch(h, idata->buf) == -1)
+    {
       return rc;
+    }
   }
 
   rc = 0; /* success */
@@ -392,7 +442,9 @@ static void imap_alloc_msn_index(struct ImapData *idata, unsigned int msn_count)
   unsigned int new_size;
 
   if (msn_count <= idata->msn_index_size)
+  {
     return;
+  }
 
   /* This is a conservative check to protect against a malicious imap
    * server.  Most likely size_t is bigger than an unsigned int, but
@@ -408,7 +460,9 @@ static void imap_alloc_msn_index(struct ImapData *idata, unsigned int msn_count)
   new_size = msn_count + 25;
 
   if (!idata->msn_index)
+  {
     idata->msn_index = safe_calloc(new_size, sizeof(struct Header *));
+  }
   else
   {
     safe_realloc(&idata->msn_index, sizeof(struct Header *) * new_size);
@@ -457,14 +511,22 @@ static void imap_generate_seqset(struct Buffer *b, struct ImapData *idata,
     else if (state)
     {
       if (chunks++)
+      {
         mutt_buffer_addch(b, ',');
+      }
       if (chunks == 150)
+      {
         break;
+      }
 
       if (state == 1)
+      {
         mutt_buffer_printf(b, "%u", range_begin);
+      }
       else if (state == 2)
+      {
         mutt_buffer_printf(b, "%u:%u", range_begin, range_end);
+      }
       state = 0;
     }
   }
@@ -543,7 +605,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
 
   /* make sure context has room to hold the mailbox */
   while (msn_end > ctx->hdrmax)
+  {
     mx_alloc_memory(ctx);
+  }
   imap_alloc_msn_index(idata, msn_end);
 
   idx = ctx->msgcount;
@@ -564,7 +628,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
       mutt_hcache_free(idata->hcache, &puidnext);
     }
     if (uid_validity && uidnext && *(unsigned int *) uid_validity == idata->uid_validity)
+    {
       evalhc = true;
+    }
     mutt_hcache_free(idata->hcache, &uid_validity);
   }
   if (evalhc)
@@ -589,10 +655,14 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
       {
         rc = imap_cmd_step(idata);
         if (rc != IMAP_CMD_CONTINUE)
+        {
           break;
+        }
 
         if ((mfhrc = msg_fetch_header(ctx, &h, idata->buf, NULL)) < 0)
+        {
           continue;
+        }
 
         if (!h.data->uid)
         {
@@ -660,7 +730,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
     while (msn_begin <= msn_end)
     {
       if (!idata->msn_index[msn_begin - 1])
+      {
         break;
+      }
       msn_begin++;
     }
   }
@@ -682,7 +754,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
       imap_generate_seqset(b, idata, msn_begin, msn_end);
     }
     else
+    {
       mutt_buffer_printf(b, "%u:%u", msn_begin, msn_end);
+    }
 
     fetch_msn_end = msn_end;
     safe_asprintf(&cmd, "FETCH %s (UID FLAGS INTERNALDATE RFC822.SIZE %s)", b->data, hdrreq);
@@ -707,10 +781,14 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
       {
         rc = imap_cmd_step(idata);
         if (rc != IMAP_CMD_CONTINUE)
+        {
           break;
+        }
 
         if ((mfhrc = msg_fetch_header(ctx, &h, idata->buf, fp)) < 0)
+        {
           continue;
+        }
 
         if (!ftello(fp))
         {
@@ -760,7 +838,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
         driver_tags_replace(&ctx->hdrs[idx]->tags, safe_strdup(h.data->flags_remote));
 
         if (maxuid < h.data->uid)
+        {
           maxuid = h.data->uid;
+        }
 
         rewind(fp);
         /* NOTE: if Date: header is missing, mutt_read_rfc822_header depends
@@ -804,7 +884,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
       msn_begin = idata->max_msn + 1;
       msn_end = idata->new_mail_count;
       while (msn_end > ctx->hdrmax)
+      {
         mx_alloc_memory(ctx);
+      }
       imap_alloc_msn_index(idata, msn_end);
       idata->reopen &= ~IMAP_NEWMAIL_PENDING;
       idata->new_mail_count = 0;
@@ -813,7 +895,9 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
 
   if (maxuid && (status = imap_mboxcache_get(idata, idata->mailbox, 0)) &&
       (status->uidnext < maxuid + 1))
+  {
     status->uidnext = maxuid + 1;
+  }
 
 #ifdef USE_HCACHE
   mutt_hcache_store_raw(idata->hcache, "/UIDVALIDITY", 12, &idata->uid_validity,
@@ -824,8 +908,10 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin, unsigned i
     idata->uidnext = maxuid + 1;
   }
   if (idata->uidnext > 1)
+  {
     mutt_hcache_store_raw(idata->hcache, "/UIDNEXT", 8, &idata->uidnext,
                           sizeof(idata->uidnext));
+  }
 
   imap_hcache_close(idata);
 #endif /* USE_HCACHE */
@@ -879,9 +965,13 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
   if ((msg->fp = msg_cache_get(idata, h)))
   {
     if (HEADER_DATA(h)->parsed)
+    {
       return 0;
+    }
     else
+    {
       goto parsemsg;
+    }
   }
 
   /* we still do some caching even if imap_cachedir is unset */
@@ -893,7 +983,9 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
   {
     /* don't treat cache errors as fatal, just fall back. */
     if (cache->uid == HEADER_DATA(h)->uid && (msg->fp = fopen(cache->path, "r")))
+    {
       return 0;
+    }
     else
     {
       unlink(cache->path);
@@ -905,7 +997,9 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
    * e.g. _mutt_pipe_message(). */
   output_progress = !isendwin();
   if (output_progress)
+  {
     mutt_message(_("Fetching message..."));
+  }
 
   if (!(msg->fp = msg_cache_put(idata, h)))
   {
@@ -933,7 +1027,9 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
   do
   {
     if ((rc = imap_cmd_step(idata)) != IMAP_CMD_CONTINUE)
+    {
       break;
+    }
 
     pc = idata->buf;
     pc = imap_next_word(pc);
@@ -945,14 +1041,18 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
       {
         pc = imap_next_word(pc);
         if (pc[0] == '(')
+        {
           pc++;
+        }
         if (mutt_strncasecmp("UID", pc, 3) == 0)
         {
           pc = imap_next_word(pc);
           uid = atoi(pc);
           if (uid != HEADER_DATA(h)->uid)
+          {
             mutt_error(_(
                 "The message index is incorrect. Try reopening the mailbox."));
+          }
         }
         else if ((mutt_strncasecmp("RFC822", pc, 6) == 0) ||
                  (mutt_strncasecmp("BODY[]", pc, 6) == 0))
@@ -970,10 +1070,14 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
           }
           if (imap_read_literal(msg->fp, idata, bytes,
                                 output_progress ? &progressbar : NULL) < 0)
+          {
             goto bail;
+          }
           /* pick up trailing line */
           if ((rc = imap_cmd_step(idata)) != IMAP_CMD_CONTINUE)
+          {
             goto bail;
+          }
           pc = idata->buf;
 
           fetched = true;
@@ -985,7 +1089,9 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
         else if ((mutt_strncasecmp("FLAGS", pc, 5) == 0) && !h->changed)
         {
           if ((pc = imap_set_flags(idata, h, pc, NULL)) == NULL)
+          {
             goto bail;
+          }
         }
       }
     }
@@ -1002,10 +1108,14 @@ int imap_fetch_message(struct Context *ctx, struct Message *msg, int msgno)
   }
 
   if (rc != IMAP_CMD_OK)
+  {
     goto bail;
+  }
 
   if (!fetched || !imap_code(idata->buf))
+  {
     goto bail;
+  }
 
   msg_cache_commit(idata, h);
 
@@ -1069,7 +1179,9 @@ int imap_commit_message(struct Context *ctx, struct Message *msg)
   int r = safe_fclose(&msg->fp);
 
   if (r)
+  {
     return r;
+  }
 
   return imap_append_message(ctx, msg);
 }
@@ -1093,11 +1205,15 @@ int imap_append_message(struct Context *ctx, struct Message *msg)
   idata = ctx->data;
 
   if (imap_parse_path(ctx->path, &mx))
+  {
     return -1;
+  }
 
   imap_fix_path(idata, mx.mbox, mailbox, sizeof(mailbox));
   if (!*mailbox)
+  {
     strfcpy(mailbox, "INBOX", sizeof(mailbox));
+  }
 
   if ((fp = fopen(msg->path, "r")) == NULL)
   {
@@ -1114,7 +1230,9 @@ int imap_append_message(struct Context *ctx, struct Message *msg)
   for (last = EOF, len = 0; (c = fgetc(fp)) != EOF; last = c)
   {
     if (c == '\n' && last != '\r')
+    {
       len++;
+    }
 
     len++;
   }
@@ -1128,13 +1246,21 @@ int imap_append_message(struct Context *ctx, struct Message *msg)
 
   imap_flags[0] = imap_flags[1] = 0;
   if (msg->flags.read)
+  {
     safe_strcat(imap_flags, sizeof(imap_flags), " \\Seen");
+  }
   if (msg->flags.replied)
+  {
     safe_strcat(imap_flags, sizeof(imap_flags), " \\Answered");
+  }
   if (msg->flags.flagged)
+  {
     safe_strcat(imap_flags, sizeof(imap_flags), " \\Flagged");
+  }
   if (msg->flags.draft)
+  {
     safe_strcat(imap_flags, sizeof(imap_flags), " \\Draft");
+  }
 
   snprintf(buf, sizeof(buf), "APPEND %s (%s) \"%s\" {%lu}", mbox,
            imap_flags + 1, internaldate, (unsigned long) len);
@@ -1142,8 +1268,9 @@ int imap_append_message(struct Context *ctx, struct Message *msg)
   imap_cmd_start(idata, buf);
 
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (rc != IMAP_CMD_RESPOND)
   {
@@ -1163,8 +1290,9 @@ int imap_append_message(struct Context *ctx, struct Message *msg)
   for (last = EOF, sent = len = 0; (c = fgetc(fp)) != EOF; last = c)
   {
     if (c == '\n' && last != '\r')
+    {
       buf[len++] = '\r';
-
+    }
     buf[len++] = c;
 
     if (len > sizeof(buf) - 3)
@@ -1176,14 +1304,17 @@ int imap_append_message(struct Context *ctx, struct Message *msg)
   }
 
   if (len)
+  {
     flush_buffer(buf, &len, idata->conn);
+  }
 
   mutt_socket_write(idata->conn, "\r\n");
   safe_fclose(&fp);
 
   do
+  {
     rc = imap_cmd_step(idata);
-  while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_CMD_CONTINUE);
 
   if (!imap_code(idata->buf))
   {
@@ -1249,7 +1380,9 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
 
   imap_fix_path(idata, mx.mbox, mbox, sizeof(mbox));
   if (!*mbox)
+  {
     strfcpy(mbox, "INBOX", sizeof(mbox));
+  }
   imap_munge_mbox_name(idata, mmbox, sizeof(mmbox), mbox);
 
   /* loop in case of TRYCREATE */
@@ -1297,7 +1430,9 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
         goto out;
       }
       else
+      {
         mutt_message(_("Copying %d messages to %s..."), rc, mbox);
+      }
     }
     else
     {
@@ -1331,7 +1466,9 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
       }
       /* bail out if command failed for reasons other than nonexistent target */
       if (mutt_strncasecmp(imap_get_qualifier(idata->buf), "[TRYCREATE]", 11) != 0)
+      {
         break;
+      }
       mutt_debug(3, "imap_copy_messages: server suggests TRYCREATE\n");
       snprintf(prompt, sizeof(prompt), _("Create %s?"), mbox);
       if (option(OPT_CONFIRMCREATE) && mutt_yesorno(prompt, 1) != MUTT_YES)
@@ -1340,7 +1477,9 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
         goto out;
       }
       if (imap_create_mailbox(idata, mbox) < 0)
+      {
         break;
+      }
       triedcreate = 1;
     }
   } while (rc == -2);
@@ -1355,6 +1494,7 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
   if (delete)
   {
     if (!h)
+    {
       for (n = 0; n < ctx->msgcount; n++)
       {
         if (ctx->hdrs[n]->tagged)
@@ -1362,15 +1502,20 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
           mutt_set_flag(ctx, ctx->hdrs[n], MUTT_DELETE, 1);
           mutt_set_flag(ctx, ctx->hdrs[n], MUTT_PURGE, 1);
           if (option(OPT_DELETE_UNTAG))
+          {
             mutt_set_flag(ctx, ctx->hdrs[n], MUTT_TAG, 0);
+          }
         }
       }
+    }
     else
     {
       mutt_set_flag(ctx, h, MUTT_DELETE, 1);
       mutt_set_flag(ctx, h, MUTT_PURGE, 1);
       if (option(OPT_DELETE_UNTAG))
+      {
         mutt_set_flag(ctx, h, MUTT_TAG, 0);
+      }
     }
   }
 
@@ -1378,9 +1523,13 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, int de
 
 out:
   if (cmd.data)
+  {
     FREE(&cmd.data);
+  }
   if (sync_cmd.data)
+  {
     FREE(&sync_cmd.data);
+  }
   FREE(&mx.mbox);
 
   return rc < 0 ? -1 : rc;
@@ -1391,7 +1540,9 @@ int imap_cache_del(struct ImapData *idata, struct Header *h)
   char id[_POSIX_PATH_MAX];
 
   if (!idata || !h)
+  {
     return -1;
+  }
 
   idata->bcache = msg_cache_open(idata);
   snprintf(id, sizeof(id), "%u-%u", idata->uid_validity, HEADER_DATA(h)->uid);
@@ -1437,11 +1588,15 @@ static void imap_set_changed_flag(struct Context *ctx, struct Header *h,
     if (new_hd_flag != h_flag)
     {
       if (server_changes)
+      {
         *server_changes = 1;
+      }
 
       /* Local changes have priority */
       if (!local_changes)
+      {
         mutt_set_flag(ctx, h, flag_name, new_hd_flag);
+      }
     }
   }
 }
@@ -1477,7 +1632,9 @@ char *imap_set_flags(struct ImapData *idata, struct Header *h, char *s, int *ser
 
   mutt_debug(2, "imap_set_flags: parsing FLAGS\n");
   if ((s = msg_parse_flags(&newh, s)) == NULL)
+  {
     return NULL;
+  }
 
   /* Update tags system */
   driver_tags_replace(&h->tags, safe_strdup(hd->flags_remote));
@@ -1506,7 +1663,9 @@ char *imap_set_flags(struct ImapData *idata, struct Header *h, char *s, int *ser
   /* this message is now definitively *not* changed (mutt_set_flag
    * marks things changed as a side-effect) */
   if (!local_changes)
+  {
     h->changed = false;
+  }
   ctx->changed &= !readonly;
   ctx->readonly = readonly;
 

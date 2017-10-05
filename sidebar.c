@@ -118,13 +118,17 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
   char fmt[STRING];
 
   if (!sbe || !dest)
+  {
     return src;
+  }
 
   dest[0] = 0; /* Just in case there's nothing to do */
 
   struct Buffy *b = sbe->buffy;
   if (!b)
+  {
     return src;
+  }
 
   int c = Context && (mutt_strcmp(Context->realpath, b->realpath) == 0);
 
@@ -143,7 +147,9 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, c ? Context->deleted : 0);
       }
       else if ((c && Context->deleted == 0) || !c)
+      {
         optional = 0;
+      }
       break;
 
     case 'F':
@@ -153,7 +159,9 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->msg_flagged);
       }
       else if (b->msg_flagged == 0)
+      {
         optional = 0;
+      }
       break;
 
     case 'L':
@@ -163,7 +171,9 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, c ? Context->vcount : b->msg_count);
       }
       else if ((c && Context->vcount == b->msg_count) || !c)
+      {
         optional = 0;
+      }
       break;
 
     case 'N':
@@ -173,7 +183,9 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->msg_unread);
       }
       else if (b->msg_unread == 0)
+      {
         optional = 0;
+      }
       break;
 
     case 'n':
@@ -183,7 +195,9 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->new ? 'N' : ' ');
       }
       else if (b->new == false)
+      {
         optional = 0;
+      }
       break;
 
     case 'S':
@@ -193,7 +207,9 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, b->msg_count);
       }
       else if (b->msg_count == 0)
+      {
         optional = 0;
+      }
       break;
 
     case 't':
@@ -203,16 +219,24 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
         snprintf(dest, destlen, fmt, c ? Context->tagged : 0);
       }
       else if ((c && Context->tagged == 0) || !c)
+      {
         optional = 0;
+      }
       break;
 
     case '!':
       if (b->msg_flagged == 0)
+      {
         mutt_format_s(dest, destlen, prefix, "");
+      }
       else if (b->msg_flagged == 1)
+      {
         mutt_format_s(dest, destlen, prefix, "!");
+      }
       else if (b->msg_flagged == 2)
+      {
         mutt_format_s(dest, destlen, prefix, "!!");
+      }
       else
       {
         snprintf(fmt, sizeof(fmt), "%d!", b->msg_flagged);
@@ -222,11 +246,15 @@ static const char *cb_format_str(char *dest, size_t destlen, size_t col, int col
   }
 
   if (optional)
+  {
     mutt_expando_format(dest, destlen, col, SidebarWidth, ifstring,
                         cb_format_str, (unsigned long) sbe, flags);
+  }
   else if (flags & MUTT_FORMAT_OPTIONAL)
+  {
     mutt_expando_format(dest, destlen, col, SidebarWidth, elsestring,
                         cb_format_str, (unsigned long) sbe, flags);
+  }
 
   /* We return the format string, unchanged */
   return src;
@@ -248,7 +276,9 @@ static void make_sidebar_entry(char *buf, unsigned int buflen, int width,
                                char *box, struct SbEntry *sbe)
 {
   if (!buf || !box || !sbe)
+  {
     return;
+  }
 
   strfcpy(sbe->box, box, sizeof(sbe->box));
 
@@ -294,36 +324,52 @@ static int cb_qsort_sbe(const void *a, const void *b)
   {
     case SORT_COUNT:
       if (b2->msg_count == b1->msg_count)
+      {
         result = mutt_strcoll(b1->path, b2->path);
+      }
       else
+      {
         result = (b2->msg_count - b1->msg_count);
+      }
       break;
     case SORT_UNREAD:
       if (b2->msg_unread == b1->msg_unread)
+      {
         result = mutt_strcoll(b1->path, b2->path);
+      }
       else
+      {
         result = (b2->msg_unread - b1->msg_unread);
+      }
       break;
     case SORT_DESC:
       result = mutt_strcmp(b1->desc, b2->desc);
       break;
     case SORT_FLAGGED:
       if (b2->msg_flagged == b1->msg_flagged)
+      {
         result = mutt_strcoll(b1->path, b2->path);
+      }
       else
+      {
         result = (b2->msg_flagged - b1->msg_flagged);
+      }
       break;
     case SORT_PATH:
     {
       result = mutt_inbox_cmp(b1->path, b2->path);
       if (result == 0)
+      {
         result = mutt_strcoll(b1->path, b2->path);
+      }
       break;
     }
   }
 
   if (SidebarSortMethod & SORT_REVERSE)
+  {
     result = -result;
+  }
 
   return result;
 }
@@ -359,20 +405,28 @@ static void update_entries_visibility(void)
 #endif
 
     if (!new_only)
+    {
       continue;
+    }
 
     if ((i == OpnIndex) || (sbe->buffy->msg_unread > 0) || sbe->buffy->new ||
         (sbe->buffy->msg_flagged > 0))
+    {
       continue;
+    }
 
     if (Context && (mutt_strcmp(sbe->buffy->realpath, Context->realpath) == 0))
+    {
       /* Spool directory */
       continue;
+    }
 
     if (mutt_list_find(&SidebarWhitelist, sbe->buffy->path) ||
         mutt_list_find(&SidebarWhitelist, sbe->buffy->desc))
+    {
       /* Explicitly asked to be visible */
       continue;
+    }
 
     sbe->is_hidden = true;
   }
@@ -391,7 +445,9 @@ static void unsort_entries(void)
   {
     j = i;
     while ((j < EntryCount) && (Entries[j]->buffy != cur))
+    {
       j++;
+    }
     if (j < EntryCount)
     {
       if (j != i)
@@ -421,9 +477,13 @@ static void sort_entries(void)
 
   /* These are the only sort methods we understand */
   if ((ssm == SORT_COUNT) || (ssm == SORT_UNREAD) || (ssm == SORT_FLAGGED) || (ssm == SORT_PATH))
+  {
     qsort(Entries, EntryCount, sizeof(*Entries), cb_qsort_sbe);
+  }
   else if ((ssm == SORT_ORDER) && (SidebarSortMethod != PreviousSort))
+  {
     unsort_entries();
+  }
 }
 
 /**
@@ -436,13 +496,17 @@ static bool select_next(void)
   int entry = HilIndex;
 
   if (!EntryCount || HilIndex < 0)
+  {
     return false;
+  }
 
   do
   {
     entry++;
     if (entry == EntryCount)
+    {
       return false;
+    }
   } while (Entries[entry]->is_hidden);
 
   HilIndex = entry;
@@ -461,7 +525,9 @@ static int select_next_new(void)
   int entry = HilIndex;
 
   if (!EntryCount || HilIndex < 0)
+  {
     return false;
+  }
 
   do
   {
@@ -469,12 +535,18 @@ static int select_next_new(void)
     if (entry == EntryCount)
     {
       if (option(OPT_SIDEBAR_NEXT_NEW_WRAP))
+      {
         entry = 0;
+      }
       else
+      {
         return false;
+      }
     }
     if (entry == HilIndex)
+    {
       return false;
+    }
   } while (!Entries[entry]->buffy->new && !Entries[entry]->buffy->msg_unread);
 
   HilIndex = entry;
@@ -491,13 +563,17 @@ static bool select_prev(void)
   int entry = HilIndex;
 
   if (!EntryCount || HilIndex < 0)
+  {
     return false;
+  }
 
   do
   {
     entry--;
     if (entry < 0)
+    {
       return false;
+    }
   } while (Entries[entry]->is_hidden);
 
   HilIndex = entry;
@@ -516,7 +592,9 @@ static bool select_prev_new(void)
   int entry = HilIndex;
 
   if (!EntryCount || HilIndex < 0)
+  {
     return false;
+  }
 
   do
   {
@@ -524,12 +602,18 @@ static bool select_prev_new(void)
     if (entry < 0)
     {
       if (option(OPT_SIDEBAR_NEXT_NEW_WRAP))
+      {
         entry = EntryCount - 1;
+      }
       else
+      {
         return false;
+      }
     }
     if (entry == HilIndex)
+    {
       return false;
+    }
   } while (!Entries[entry]->buffy->new && !Entries[entry]->buffy->msg_unread);
 
   HilIndex = entry;
@@ -546,13 +630,17 @@ static int select_page_down(void)
   int orig_hil_index = HilIndex;
 
   if (!EntryCount || BotIndex < 0)
+  {
     return 0;
+  }
 
   HilIndex = BotIndex;
   select_next();
   /* If the rest of the entries are hidden, go up to the last unhidden one */
   if (Entries[HilIndex]->is_hidden)
+  {
     select_prev();
+  }
 
   return (orig_hil_index != HilIndex);
 }
@@ -567,13 +655,17 @@ static int select_page_up(void)
   int orig_hil_index = HilIndex;
 
   if (!EntryCount || TopIndex < 0)
+  {
     return 0;
+  }
 
   HilIndex = TopIndex;
   select_prev();
   /* If the rest of the entries are hidden, go down to the last unhidden one */
   if (Entries[HilIndex]->is_hidden)
+  {
     select_next();
+  }
 
   return (orig_hil_index != HilIndex);
 }
@@ -596,12 +688,18 @@ static bool prepare_sidebar(int page_size)
   int page_entries;
 
   if (!EntryCount || (page_size <= 0))
+  {
     return false;
+  }
 
   if (OpnIndex >= 0)
+  {
     opn_entry = Entries[OpnIndex];
+  }
   if (HilIndex >= 0)
+  {
     hil_entry = Entries[HilIndex];
+  }
 
   update_entries_visibility();
   sort_entries();
@@ -609,20 +707,28 @@ static bool prepare_sidebar(int page_size)
   for (int i = 0; i < EntryCount; i++)
   {
     if (opn_entry == Entries[i])
+    {
       OpnIndex = i;
+    }
     if (hil_entry == Entries[i])
+    {
       HilIndex = i;
+    }
   }
 
   if ((HilIndex < 0) || Entries[HilIndex]->is_hidden || (SidebarSortMethod != PreviousSort))
   {
     if (OpnIndex >= 0)
+    {
       HilIndex = OpnIndex;
+    }
     else
     {
       HilIndex = 0;
       if (Entries[HilIndex]->is_hidden)
+      {
         select_next();
+      }
     }
   }
 
@@ -641,9 +747,13 @@ static bool prepare_sidebar(int page_size)
       {
         BotIndex++;
         if (BotIndex >= EntryCount)
+        {
           break;
+        }
         if (!Entries[BotIndex]->is_hidden)
+        {
           page_entries++;
+        }
       }
     }
   }
@@ -655,7 +765,9 @@ static bool prepare_sidebar(int page_size)
   }
 
   if (BotIndex > (EntryCount - 1))
+  {
     BotIndex = EntryCount - 1;
+  }
 
   PreviousSort = SidebarSortMethod;
   return true;
@@ -678,7 +790,9 @@ static bool prepare_sidebar(int page_size)
 static int draw_divider(int num_rows, int num_cols)
 {
   if ((num_rows < 1) || (num_cols < 1))
+  {
     return 0;
+  }
 
   int i;
   int delim_len;
@@ -693,7 +807,9 @@ static int draw_divider(int num_rows, int num_cols)
   else if (delim_len == 0)
   {
     if (SidebarDividerChar)
+    {
       return 0; /* User has set empty string */
+    }
 
     delim_len = 1; /* Unset variable */
   }
@@ -724,7 +840,9 @@ static int draw_divider(int num_rows, int num_cols)
   }
 
   if (delim_len > num_cols)
+  {
     return 0;
+  }
 
   SETCOLOR(MT_COLOR_DIVIDER);
 
@@ -766,14 +884,18 @@ static void fill_empty_space(int first_row, int num_rows, int div_width, int num
   SETCOLOR(MT_COLOR_NORMAL);
 
   if (!option(OPT_SIDEBAR_ON_RIGHT))
+  {
     div_width = 0;
+  }
   for (int r = 0; r < num_rows; r++)
   {
     mutt_window_move(MuttSidebarWindow, first_row + r, div_width);
 
     int i;
     for (i = 0; i < num_cols; i++)
+    {
       addch(' ');
+    }
   }
 }
 
@@ -803,7 +925,9 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
   struct SbEntry *entry = NULL;
   struct Buffy *b = NULL;
   if (TopIndex < 0)
+  {
     return;
+  }
 
   int w = MIN(num_cols, (SidebarWidth - div_width));
   int row = 0;
@@ -811,43 +935,65 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
   {
     entry = Entries[entryidx];
     if (entry->is_hidden)
+    {
       continue;
+    }
     b = entry->buffy;
 
     if (entryidx == OpnIndex)
     {
       if ((ColorDefs[MT_COLOR_SB_INDICATOR] != 0))
+      {
         SETCOLOR(MT_COLOR_SB_INDICATOR);
+      }
       else
+      {
         SETCOLOR(MT_COLOR_INDICATOR);
+      }
     }
     else if (entryidx == HilIndex)
+    {
       SETCOLOR(MT_COLOR_HIGHLIGHT);
+    }
     else if ((b->msg_unread > 0) || (b->new))
+    {
       SETCOLOR(MT_COLOR_NEW);
+    }
     else if (b->msg_flagged > 0)
+    {
       SETCOLOR(MT_COLOR_FLAGGED);
+    }
     else if ((ColorDefs[MT_COLOR_SB_SPOOLFILE] != 0) &&
              (mutt_strcmp(b->path, SpoolFile) == 0))
+    {
       SETCOLOR(MT_COLOR_SB_SPOOLFILE);
+    }
     else
     {
       if (ColorDefs[MT_COLOR_ORDINARY] != 0)
+      {
         SETCOLOR(MT_COLOR_ORDINARY);
+      }
       else
+      {
         SETCOLOR(MT_COLOR_NORMAL);
+      }
     }
 
     int col = 0;
     if (option(OPT_SIDEBAR_ON_RIGHT))
+    {
       col = div_width;
+    }
 
     mutt_window_move(MuttSidebarWindow, row, col);
     if (Context && Context->realpath && (mutt_strcmp(b->realpath, Context->realpath) == 0))
     {
 #ifdef USE_NOTMUCH
       if (b->magic == MUTT_NOTMUCH)
+      {
         nm_nonctx_get_count(b->realpath, &b->msg_count, &b->msg_unread);
+      }
       else
 #endif
       {
@@ -860,14 +1006,18 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
     /* compute length of Folder without trailing separator */
     size_t maildirlen = mutt_strlen(Folder);
     if (maildirlen && SidebarDelimChars && strchr(SidebarDelimChars, Folder[maildirlen - 1]))
+    {
       maildirlen--;
+    }
 
     /* check whether Folder is a prefix of the current folder's path */
     bool maildir_is_prefix = false;
     if ((mutt_strlen(b->path) > maildirlen) &&
         (mutt_strncmp(Folder, b->path, maildirlen) == 0) && SidebarDelimChars &&
         strchr(SidebarDelimChars, b->path[maildirlen]))
+    {
       maildir_is_prefix = true;
+    }
 
     /* calculate depth of current folder and generate its display name with indented spaces */
     int sidebar_folder_depth = 0;
@@ -887,7 +1037,9 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
       }
     }
     else
+    {
       sidebar_folder_name = b->path + maildir_is_prefix * (maildirlen + 1);
+    }
 
     if (b->desc)
     {
@@ -910,13 +1062,17 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
       if (sidebar_folder_depth > 0)
       {
         if (option(OPT_SIDEBAR_SHORT_PATH))
+        {
           tmp_folder_name += lastsep; /* basename */
+        }
         int sfn_len = mutt_strlen(tmp_folder_name) +
                       sidebar_folder_depth * mutt_strlen(SidebarIndentString) + 1;
         sidebar_folder_name = safe_malloc(sfn_len);
         sidebar_folder_name[0] = 0;
         for (i = 0; i < sidebar_folder_depth; i++)
+        {
           safe_strcat(sidebar_folder_name, sfn_len, NONULL(SidebarIndentString));
+        }
         safe_strcat(sidebar_folder_name, sfn_len, tmp_folder_name);
       }
     }
@@ -924,7 +1080,9 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
     make_sidebar_entry(str, sizeof(str), w, sidebar_folder_name, entry);
     printw("%s", str);
     if (sidebar_folder_depth > 0)
+    {
       FREE(&sidebar_folder_name);
+    }
     row++;
   }
 
@@ -940,7 +1098,9 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
 void mutt_sb_draw(void)
 {
   if (!option(OPT_SIDEBAR_VISIBLE))
+  {
     return;
+  }
 
 #ifdef USE_SLANG_CURSES
   int x = SLsmg_get_column();
@@ -956,8 +1116,12 @@ void mutt_sb_draw(void)
   int div_width = draw_divider(num_rows, num_cols);
 
   if (!Entries)
+  {
     for (struct Buffy *b = Incoming; b; b = b->next)
+    {
       mutt_sb_notify_mailbox(b, 1);
+    }
+  }
 
   if (!prepare_sidebar(num_rows))
   {
@@ -986,36 +1150,52 @@ void mutt_sb_draw(void)
 void mutt_sb_change_mailbox(int op)
 {
   if (!option(OPT_SIDEBAR_VISIBLE))
+  {
     return;
+  }
 
-  if (HilIndex < 0) /* It'll get reset on the next draw */
+  if (HilIndex < 0)
+  { /* It'll get reset on the next draw */
     return;
+  }
 
   switch (op)
   {
     case OP_SIDEBAR_NEXT:
       if (!select_next())
+      {
         return;
+      }
       break;
     case OP_SIDEBAR_NEXT_NEW:
       if (!select_next_new())
+      {
         return;
+      }
       break;
     case OP_SIDEBAR_PAGE_DOWN:
       if (!select_page_down())
+      {
         return;
+      }
       break;
     case OP_SIDEBAR_PAGE_UP:
       if (!select_page_up())
+      {
         return;
+      }
       break;
     case OP_SIDEBAR_PREV:
       if (!select_prev())
+      {
         return;
+      }
       break;
     case OP_SIDEBAR_PREV_NEW:
       if (!select_prev_new())
+      {
         return;
+      }
       break;
     default:
       return;
@@ -1036,7 +1216,9 @@ void mutt_sb_set_buffystats(const struct Context *ctx)
    * we should take note of the new data. */
   struct Buffy *b = Incoming;
   if (!ctx || !b)
+  {
     return;
+  }
 
   for (; b; b = b->next)
   {
@@ -1059,10 +1241,14 @@ void mutt_sb_set_buffystats(const struct Context *ctx)
 const char *mutt_sb_get_highlight(void)
 {
   if (!option(OPT_SIDEBAR_VISIBLE))
+  {
     return NULL;
+  }
 
   if (!EntryCount || HilIndex < 0)
+  {
     return NULL;
+  }
 
   return Entries[HilIndex]->buffy->path;
 }
@@ -1078,7 +1264,9 @@ void mutt_sb_set_open_buffy(void)
   OpnIndex = -1;
 
   if (!Context)
+  {
     return;
+  }
 
   for (int entry = 0; entry < EntryCount; entry++)
   {
@@ -1105,7 +1293,9 @@ void mutt_sb_notify_mailbox(struct Buffy *b, int created)
   int del_index;
 
   if (!b)
+  {
     return;
+  }
 
   /* Any new/deleted mailboxes will cause a refresh.  As long as
    * they're valid, our pointers will be updated in prepare_sidebar() */
@@ -1121,37 +1311,61 @@ void mutt_sb_notify_mailbox(struct Buffy *b, int created)
     Entries[EntryCount]->buffy = b;
 
     if (TopIndex < 0)
+    {
       TopIndex = EntryCount;
+    }
     if (BotIndex < 0)
+    {
       BotIndex = EntryCount;
+    }
     if ((OpnIndex < 0) && Context && (mutt_strcmp(b->realpath, Context->realpath) == 0))
+    {
       OpnIndex = EntryCount;
+    }
 
     EntryCount++;
   }
   else
   {
     for (del_index = 0; del_index < EntryCount; del_index++)
+    {
       if (Entries[del_index]->buffy == b)
+      {
         break;
+      }
+    }
     if (del_index == EntryCount)
+    {
       return;
+    }
     FREE(&Entries[del_index]);
     EntryCount--;
 
     if (TopIndex > del_index || TopIndex == EntryCount)
+    {
       TopIndex--;
+    }
     if (OpnIndex == del_index)
+    {
       OpnIndex = -1;
+    }
     else if (OpnIndex > del_index)
+    {
       OpnIndex--;
+    }
     if (HilIndex > del_index || HilIndex == EntryCount)
+    {
       HilIndex--;
+    }
     if (BotIndex > del_index || BotIndex == EntryCount)
+    {
       BotIndex--;
+    }
 
     for (; del_index < EntryCount; del_index++)
+    {
       Entries[del_index] = Entries[del_index + 1];
+    }
   }
 
   mutt_set_current_menu_redraw(REDRAW_SIDEBAR);
@@ -1164,10 +1378,14 @@ void mutt_sb_toggle_virtual(void)
 {
 #ifdef USE_NOTMUCH
   if (sidebar_source == SB_SRC_INCOMING)
+  {
     sidebar_source = SB_SRC_VIRT;
+  }
   else
+  {
 #endif
     sidebar_source = SB_SRC_INCOMING;
+  }
 
   TopIndex = -1;
   OpnIndex = -1;

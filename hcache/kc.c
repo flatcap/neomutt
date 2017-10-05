@@ -53,10 +53,14 @@ static void *hcache_kyotocabinet_open(const char *path)
 
   KCDB *db = kcdbnew();
   if (!db)
+  {
     return NULL;
+  }
 
   if (kcdbopen(db, kcdbpath, KCOWRITER | KCOCREATE))
+  {
     return db;
+  }
   else
   {
 #ifdef DEBUG
@@ -73,7 +77,9 @@ static void *hcache_kyotocabinet_fetch(void *ctx, const char *key, size_t keylen
   size_t sp;
 
   if (!ctx)
+  {
     return NULL;
+  }
 
   KCDB *db = ctx;
   return kcdbget(db, key, keylen, &sp);
@@ -89,7 +95,9 @@ static int hcache_kyotocabinet_store(void *ctx, const char *key, size_t keylen,
                                      void *data, size_t dlen)
 {
   if (!ctx)
+  {
     return -1;
+  }
 
   KCDB *db = ctx;
   if (!kcdbset(db, key, keylen, data, dlen))
@@ -103,7 +111,9 @@ static int hcache_kyotocabinet_store(void *ctx, const char *key, size_t keylen,
 static int hcache_kyotocabinet_delete(void *ctx, const char *key, size_t keylen)
 {
   if (!ctx)
+  {
     return -1;
+  }
 
   KCDB *db = ctx;
   if (!kcdbremove(db, key, keylen))
@@ -117,7 +127,9 @@ static int hcache_kyotocabinet_delete(void *ctx, const char *key, size_t keylen)
 static void hcache_kyotocabinet_close(void **ctx)
 {
   if (!ctx || !*ctx)
+  {
     return;
+  }
 
   KCDB *db = *ctx;
   if (!kcdbclose(db))
@@ -135,7 +147,9 @@ static const char *hcache_kyotocabinet_backend(void)
   /* SHORT_STRING(128) should be more than enough for KCVERSION */
   static char version_cache[SHORT_STRING] = "";
   if (!version_cache[0])
+  {
     snprintf(version_cache, sizeof(version_cache), "kyotocabinet %s", KCVERSION);
+  }
 
   return version_cache;
 }

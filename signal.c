@@ -74,16 +74,22 @@ static void sighandler(int sig)
   {
     case SIGTSTP: /* user requested a suspend */
       if (!option(OPT_SUSPEND))
+      {
         break;
+      }
       IsEndwin = isendwin();
       curs_set(1);
       if (!IsEndwin)
+      {
         endwin();
+      }
       kill(0, SIGSTOP);
 
     case SIGCONT:
       if (!IsEndwin)
+      {
         refresh();
+      }
       mutt_curs_set(-1);
 #if defined(USE_SLANG_CURSES) || defined(HAVE_RESIZETERM)
       /* We don't receive SIGWINCH when suspended; however, no harm is done by
@@ -258,7 +264,9 @@ void mutt_allow_interrupt(int disposition)
   sa.sa_handler = sighandler;
 #ifdef SA_RESTART
   if (disposition == 0)
+  {
     sa.sa_flags |= SA_RESTART;
+  }
 #endif
   sigaction(SIGINT, &sa, NULL);
 }

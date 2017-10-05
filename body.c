@@ -48,7 +48,9 @@ struct Body *mutt_new_body(void)
 int mutt_copy_body(FILE *fp, struct Body **tgt, struct Body *src)
 {
   if (!tgt || !src)
+  {
     return -1;
+  }
 
   char tmp[_POSIX_PATH_MAX];
   struct Body *b = NULL;
@@ -70,7 +72,9 @@ int mutt_copy_body(FILE *fp, struct Body **tgt, struct Body *src)
 
   mutt_adv_mktemp(tmp, sizeof(tmp));
   if (mutt_save_attachment(fp, src, tmp, 0, NULL) == -1)
+  {
     return -1;
+  }
 
   *tgt = mutt_new_body();
   b = *tgt;
@@ -84,7 +88,9 @@ int mutt_copy_body(FILE *fp, struct Body **tgt, struct Body *src)
   b->unlink = true;
 
   if (mutt_is_text_part(b))
+  {
     b->noconv = true;
+  }
 
   b->xtype = safe_strdup(b->xtype);
   b->subtype = safe_strdup(b->subtype);
@@ -93,7 +99,9 @@ int mutt_copy_body(FILE *fp, struct Body **tgt, struct Body *src)
   /* mutt_adv_mktemp() will mangle the filename in tmp,
    * so preserve it in d_filename */
   if (!b->d_filename && use_disp)
+  {
     b->d_filename = safe_strdup(src->filename);
+  }
   b->description = safe_strdup(b->description);
 
   /*
@@ -102,7 +110,9 @@ int mutt_copy_body(FILE *fp, struct Body **tgt, struct Body *src)
    */
 
   if (b->hdr)
+  {
     b->hdr = NULL;
+  }
 
   /* copy parameters */
   for (par = b->parameter, ppar = &b->parameter; par; ppar = &(*ppar)->next, par = par->next)
@@ -127,11 +137,15 @@ void mutt_free_body(struct Body **p)
     a = a->next;
 
     if (b->parameter)
+    {
       mutt_free_parameter(&b->parameter);
+    }
     if (b->filename)
     {
       if (b->unlink)
+      {
         unlink(b->filename);
+      }
       mutt_debug(1, "mutt_free_body: %sunlinking %s.\n",
                  b->unlink ? "" : "not ", b->filename);
     }
@@ -153,7 +167,9 @@ void mutt_free_body(struct Body **p)
     }
 
     if (b->parts)
+    {
       mutt_free_body(&b->parts);
+    }
 
     FREE(&b);
   }

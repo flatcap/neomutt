@@ -70,7 +70,9 @@ int rfc1524_expand_command(struct Body *a, char *filename, char *_type, char *co
   strfcpy(type, _type, sizeof(type));
 
   if (option(OPT_MAILCAP_SANITIZE))
+  {
     mutt_sanitize_filename(type, 0);
+  }
 
   while (x < clen - 1 && command[x] && y < sizeof(buf) - 1)
   {
@@ -91,13 +93,17 @@ int rfc1524_expand_command(struct Body *a, char *filename, char *_type, char *co
 
         x++;
         while (command[x] && command[x] != '}' && z < sizeof(param) - 1)
+        {
           param[z++] = command[x++];
+        }
         param[z] = '\0';
 
         _pvalue = mutt_get_parameter(param, a->parameter);
         strfcpy(pvalue, NONULL(_pvalue), sizeof(pvalue));
         if (option(OPT_MAILCAP_SANITIZE))
+        {
           mutt_sanitize_filename(pvalue, 0);
+        }
 
         y += mutt_quote_filename(buf + y, sizeof(buf) - y, pvalue);
       }
@@ -113,7 +119,9 @@ int rfc1524_expand_command(struct Body *a, char *filename, char *_type, char *co
       x++;
     }
     else
+    {
       buf[y++] = command[x++];
+    }
   }
   buf[y] = '\0';
   strfcpy(command, buf, clen);
@@ -132,7 +140,9 @@ static char *get_field(char *s)
   char *ch = NULL;
 
   if (!s)
+  {
     return NULL;
+  }
 
   while ((ch = strpbrk(s, ";\\")) != NULL)
   {
@@ -140,7 +150,9 @@ static char *get_field(char *s)
     {
       s = ch + 1;
       if (*s)
+      {
         s++;
+      }
     }
     else
     {
@@ -203,7 +215,9 @@ static int rfc1524_mailcap_parse(struct Body *a, char *filename, char *type,
 
   /* find length of basetype */
   if ((ch = strchr(type, '/')) == NULL)
+  {
     return false;
+  }
   btlen = ch - type;
 
   if ((fp = fopen(filename, "r")) != NULL)
@@ -212,22 +226,28 @@ static int rfc1524_mailcap_parse(struct Body *a, char *filename, char *type,
     {
       /* ignore comments */
       if (*buf == '#')
+      {
         continue;
+      }
       mutt_debug(2, "mailcap entry: %s\n", buf);
 
       /* check type */
       ch = get_field(buf);
       if ((mutt_strcasecmp(buf, type) != 0) &&
           ((mutt_strncasecmp(buf, type, btlen) != 0) ||
-           (buf[btlen] != 0 &&                       /* implicit wild */
-            (mutt_strcmp(buf + btlen, "/*") != 0)))) /* wildsubtype */
+           (buf[btlen] != 0 && /* implicit wild */
+            (mutt_strcmp(buf + btlen, "/*") != 0))))
+      { /* wildsubtype */
         continue;
+      }
 
       /* next field is the viewcommand */
       field = ch;
       ch = get_field(ch);
       if (entry)
+      {
         entry->command = safe_strdup(field);
+      }
 
       /* parse the optional fields */
       found = true;
@@ -245,37 +265,49 @@ static int rfc1524_mailcap_parse(struct Body *a, char *filename, char *type,
         if (mutt_strcasecmp(field, "needsterminal") == 0)
         {
           if (entry)
+          {
             entry->needsterminal = true;
+          }
         }
         else if (mutt_strcasecmp(field, "copiousoutput") == 0)
         {
           copiousoutput = true;
           if (entry)
+          {
             entry->copiousoutput = true;
+          }
         }
         else if (mutt_strncasecmp(field, "composetyped", 12) == 0)
         {
           /* this compare most occur before compose to match correctly */
           if (get_field_text(field + 12, entry ? &entry->composetypecommand : NULL,
                              type, filename, line))
+          {
             composecommand = true;
+          }
         }
         else if (mutt_strncasecmp(field, "compose", 7) == 0)
         {
           if (get_field_text(field + 7, entry ? &entry->composecommand : NULL,
                              type, filename, line))
+          {
             composecommand = true;
+          }
         }
         else if (mutt_strncasecmp(field, "print", 5) == 0)
         {
           if (get_field_text(field + 5, entry ? &entry->printcommand : NULL,
                              type, filename, line))
+          {
             printcommand = true;
+          }
         }
         else if (mutt_strncasecmp(field, "edit", 4) == 0)
         {
           if (get_field_text(field + 4, entry ? &entry->editcommand : NULL, type, filename, line))
+          {
             editcommand = true;
+          }
         }
         else if (mutt_strncasecmp(field, "nametemplate", 12) == 0)
         {
@@ -313,22 +345,30 @@ static int rfc1524_mailcap_parse(struct Body *a, char *filename, char *type,
       if (opt == MUTT_AUTOVIEW)
       {
         if (!copiousoutput)
+        {
           found = false;
+        }
       }
       else if (opt == MUTT_COMPOSE)
       {
         if (!composecommand)
+        {
           found = false;
+        }
       }
       else if (opt == MUTT_EDIT)
       {
         if (!editcommand)
+        {
           found = false;
+        }
       }
       else if (opt == MUTT_PRINT)
       {
         if (!printcommand)
+        {
           found = false;
+        }
       }
 
       if (!found)
@@ -425,10 +465,14 @@ int rfc1524_mailcap_lookup(struct Body *a, char *type,
       curr++;
     }
     if (*curr)
+    {
       curr++;
+    }
 
     if (!x)
+    {
       continue;
+    }
 
     path[x] = '\0';
     mutt_expand_path(path, sizeof(path));
@@ -438,7 +482,9 @@ int rfc1524_mailcap_lookup(struct Body *a, char *type,
   }
 
   if (entry && !found)
+  {
     mutt_error(_("mailcap entry for type %s not found"), type);
+  }
 
   return found;
 }
@@ -476,15 +522,21 @@ int rfc1524_expand_filename(char *nametemplate, char *oldfile, char *newfile, si
   /* first, ignore leading path components */
 
   if (nametemplate && (s = strrchr(nametemplate, '/')))
+  {
     nametemplate = s + 1;
+  }
 
   if (oldfile && (s = strrchr(oldfile, '/')))
+  {
     oldfile = s + 1;
+  }
 
   if (!nametemplate)
   {
     if (oldfile)
+    {
       strfcpy(newfile, oldfile, nflen);
+    }
   }
   else if (!oldfile)
   {
@@ -508,7 +560,9 @@ int rfc1524_expand_filename(char *nametemplate, char *oldfile, char *newfile, si
       /* note that the following will _not_ read beyond oldfile's end. */
 
       if (lmatch && nametemplate[i] != oldfile[i])
+      {
         lmatch = false;
+      }
     }
 
     if (ps)
@@ -543,17 +597,27 @@ int rfc1524_expand_filename(char *nametemplate, char *oldfile, char *newfile, si
       /* Now, check if we had a full match. */
 
       if (k >= i + 2)
+      {
         rmatch = false;
+      }
 
       if (lmatch)
+      {
         *left = 0;
+      }
       else
+      {
         strnfcpy(left, nametemplate, sizeof(left), i);
+      }
 
       if (rmatch)
+      {
         *right = 0;
+      }
       else
+      {
         strfcpy(right, nametemplate + i + 2, sizeof(right));
+      }
 
       snprintf(newfile, nflen, "%s%s%s", left, oldfile, right);
     }
@@ -567,9 +631,13 @@ int rfc1524_expand_filename(char *nametemplate, char *oldfile, char *newfile, si
   mutt_adv_mktemp(newfile, nflen);
 
   if (rmatch && lmatch)
+  {
     return 0;
+  }
   else
+  {
     return 1;
+  }
 }
 
 /* If rfc1524_expand_command() is used on a recv'd message, then
@@ -589,11 +657,17 @@ int mutt_rename_file(char *oldfile, char *newfile)
   FILE *ofp = NULL, *nfp = NULL;
 
   if (access(oldfile, F_OK) != 0)
+  {
     return 1;
+  }
   if (access(newfile, F_OK) == 0)
+  {
     return 2;
+  }
   if ((ofp = fopen(oldfile, "r")) == NULL)
+  {
     return 3;
+  }
   if ((nfp = safe_fopen(newfile, "w")) == NULL)
   {
     safe_fclose(&ofp);

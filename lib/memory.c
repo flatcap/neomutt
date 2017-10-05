@@ -59,7 +59,9 @@ void *safe_calloc(size_t nmemb, size_t size)
   void *p = NULL;
 
   if (!nmemb || !size)
+  {
     return NULL;
+  }
 
   if (((size_t) -1) / nmemb <= size)
   {
@@ -85,7 +87,9 @@ void *safe_calloc(size_t nmemb, size_t size)
 void safe_free(void *ptr)
 {
   if (!ptr)
+  {
     return;
+  }
   void **p = (void **) ptr;
   if (*p)
   {
@@ -109,7 +113,9 @@ void *safe_malloc(size_t size)
   void *p = NULL;
 
   if (size == 0)
+  {
     return 0;
+  }
   p = malloc(size);
   if (p == NULL)
   {

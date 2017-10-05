@@ -92,7 +92,9 @@ static int mutt_atol(const char *str, long *dst)
 
   *res = strtol(str, &e, 10);
   if (((*res == LONG_MAX) && (errno == ERANGE)) || (e && (*e != '\0')))
+  {
     return -1;
+  }
   return 0;
 }
 
@@ -120,9 +122,13 @@ int mutt_atos(const char *str, short *dst)
 
   rc = mutt_atol(str, &res);
   if (rc < 0)
+  {
     return rc;
+  }
   if ((short) res != res)
+  {
     return -2;
+  }
 
   *t = (short) res;
   return 0;
@@ -151,9 +157,13 @@ int mutt_atoi(const char *str, int *dst)
 
   rc = mutt_atol(str, &res);
   if (rc < 0)
+  {
     return rc;
+  }
   if ((int) res != res)
+  {
     return -2;
+  }
 
   *t = (int) res;
   return 0;
@@ -171,7 +181,9 @@ char *safe_strdup(const char *s)
   size_t l;
 
   if (!s || !*s)
+  {
     return 0;
+  }
   l = strlen(s) + 1;
   p = safe_malloc(l);
   memcpy(p, s, l);
@@ -190,14 +202,20 @@ char *safe_strcat(char *d, size_t l, const char *s)
   char *p = d;
 
   if (!l)
+  {
     return d;
+  }
 
   l--; /* Space for the trailing '\0'. */
 
   for (; *d && l; l--)
+  {
     d++;
+  }
   for (; *s && l; l--)
+  {
     *d++ = *s++;
+  }
 
   *d = '\0';
 
@@ -219,14 +237,20 @@ char *safe_strncat(char *d, size_t l, const char *s, size_t sl)
   char *p = d;
 
   if (!l)
+  {
     return d;
+  }
 
   l--; /* Space for the trailing '\0'. */
 
   for (; *d && l; l--)
+  {
     d++;
+  }
   for (; *s && l && sl; l--, sl--)
+  {
     *d++ = *s++;
+  }
 
   *d = '\0';
 
@@ -269,7 +293,9 @@ void mutt_str_append_item(char **str, const char *item, int sep)
   safe_realloc(str, ssz + ((ssz && sep) ? 1 : 0) + sz + 1);
   p = *str + ssz;
   if (sep && ssz)
+  {
     *p++ = sep;
+  }
   memcpy(p, item, sz + 1);
 }
 
@@ -285,7 +311,9 @@ void mutt_str_append_item(char **str, const char *item, int sep)
 void mutt_str_adjust(char **p)
 {
   if (!p || !*p)
+  {
     return;
+  }
   safe_realloc(p, strlen(*p) + 1);
 }
 
@@ -325,7 +353,9 @@ char *mutt_strlower(char *s)
 const char *mutt_strchrnul(const char *s, char c)
 {
   for (; *s && (*s != c); s++)
+  {
     ;
+  }
   return s;
 }
 
@@ -343,7 +373,9 @@ char *mutt_substrcpy(char *dest, const char *begin, const char *end, size_t dest
 
   len = end - begin;
   if (len > (destlen - 1))
+  {
     len = destlen - 1;
+  }
   memcpy(dest, begin, len);
   dest[len] = '\0';
   return dest;
@@ -373,7 +405,9 @@ char *mutt_substrdup(const char *begin, const char *end)
   if (end)
   {
     if (begin > end)
+    {
       return NULL;
+    }
     len = end - begin;
   }
   else
@@ -476,17 +510,25 @@ const char *mutt_stristr(const char *haystack, const char *needle)
   const char *p = NULL, *q = NULL;
 
   if (!haystack)
+  {
     return NULL;
+  }
   if (!needle)
+  {
     return haystack;
+  }
 
   while (*(p = haystack))
   {
     for (q = needle;
          *p && *q && tolower((unsigned char) *p) == tolower((unsigned char) *q); p++, q++)
+    {
       ;
+    }
     if (!*q)
+    {
       return haystack;
+    }
     haystack++;
   }
   return NULL;
@@ -515,7 +557,9 @@ void mutt_remove_trailing_ws(char *s)
   char *p = NULL;
 
   for (p = s + mutt_strlen(s) - 1; p >= s && ISSPACE(*p); p--)
+  {
     *p = '\0';
+  }
 }
 
 /**
@@ -529,7 +573,9 @@ char *strfcpy(char *dest, const char *src, size_t dlen)
 {
   char *dest0 = dest;
   while ((--dlen > 0) && (*src != '\0'))
+  {
     *dest++ = *src++;
+  }
 
   *dest = '\0';
   return dest0;
@@ -546,7 +592,9 @@ char *strfcpy(char *dest, const char *src, size_t dlen)
 char *skip_email_wsp(const char *s)
 {
   if (s)
+  {
     return (char *) (s + strspn(s, EMAIL_WSP));
+  }
   return (char *) s;
 }
 
@@ -571,7 +619,9 @@ int is_email_wsp(char c)
 char *strnfcpy(char *dest, char *src, size_t size, size_t dlen)
 {
   if (dlen > size)
+  {
     dlen = size - 1;
+  }
   return strfcpy(dest, src, dlen);
 }
 
@@ -590,7 +640,9 @@ size_t lwslen(const char *s, size_t n)
   size_t len = n;
 
   if (n <= 0)
+  {
     return 0;
+  }
 
   for (; p < (s + n); p++)
   {
@@ -601,8 +653,10 @@ size_t lwslen(const char *s, size_t n)
     }
   }
 
-  if (strchr("\r\n", *(p - 1))) /* LWS doesn't end with CRLF */
+  if (strchr("\r\n", *(p - 1)))
+  { /* LWS doesn't end with CRLF */
     len = 0;
+  }
   return len;
 }
 
@@ -621,10 +675,14 @@ size_t lwsrlen(const char *s, size_t n)
   size_t len = n;
 
   if (n <= 0)
+  {
     return 0;
+  }
 
-  if (strchr("\r\n", *p)) /* LWS doesn't end with CRLF */
+  if (strchr("\r\n", *p))
+  { /* LWS doesn't end with CRLF */
     return 0;
+  }
 
   for (; p >= s; p--)
   {
@@ -653,13 +711,17 @@ void rfc822_dequote_comment(char *s)
     if (*s == '\\')
     {
       if (!*++s)
+      {
         break; /* error? */
+      }
       *w++ = *s;
     }
     else if (*s != '\"')
     {
       if (w != s)
+      {
         *w = *s;
+      }
       w++;
     }
   }
@@ -679,7 +741,9 @@ void rfc822_dequote_comment(char *s)
 const char *next_word(const char *s)
 {
   while (*s && !ISSPACE(*s))
+  {
     s++;
+  }
   SKIPWS(s);
   return s;
 }

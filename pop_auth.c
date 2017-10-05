@@ -62,13 +62,17 @@ static enum PopAuthRes pop_auth_sasl(struct PopData *pop_data, const char *metho
   }
 
   if (!method)
+  {
     method = pop_data->auth_list;
+  }
 
   while (true)
   {
     rc = sasl_client_start(saslconn, method, &interaction, &pc, &olen, &mech);
     if (rc != SASL_INTERACT)
+    {
       break;
+    }
     mutt_sasl_interact(interaction);
   }
 
@@ -114,7 +118,9 @@ static enum PopAuthRes pop_auth_sasl(struct PopData *pop_data, const char *metho
      * by sasl_client_start().
      */
     if (!client_start && rc != SASL_CONTINUE)
+    {
       break;
+    }
 
     if ((mutt_strncmp(inbuf, "+ ", 2) == 0) &&
         sasl_decode64(inbuf + 2, strlen(inbuf + 2), buf, bufsize - 1, &len) != SASL_OK)
@@ -124,13 +130,17 @@ static enum PopAuthRes pop_auth_sasl(struct PopData *pop_data, const char *metho
     }
 
     if (!client_start)
+    {
       while (true)
       {
         rc = sasl_client_step(saslconn, buf, len, &interaction, &pc, &olen);
         if (rc != SASL_INTERACT)
+        {
           break;
+        }
         mutt_sasl_interact(interaction);
       }
+    }
     else
     {
       olen = client_start;
@@ -141,7 +151,9 @@ static enum PopAuthRes pop_auth_sasl(struct PopData *pop_data, const char *metho
      * least one more line to the server.  See #3862.
      */
     if (rc != SASL_CONTINUE && rc != SASL_OK)
+    {
       break;
+    }
 
     /* send out response, or line break if none needed */
     if (pc)
@@ -161,7 +173,9 @@ static enum PopAuthRes pop_auth_sasl(struct PopData *pop_data, const char *metho
   }
 
   if (rc != SASL_OK)
+  {
     goto bail;
+  }
 
   if (mutt_strncmp(inbuf, "+OK", 3) == 0)
   {
@@ -219,7 +233,9 @@ static enum PopAuthRes pop_auth_apop(struct PopData *pop_data, const char *metho
   char buf[LONG_STRING];
 
   if (!pop_data->timestamp)
+  {
     return POP_A_UNAVAIL;
+  }
 
   if (!rfc822_valid_msgid(pop_data->timestamp))
   {
@@ -238,7 +254,9 @@ static enum PopAuthRes pop_auth_apop(struct PopData *pop_data, const char *metho
   md5_finish_ctx(&ctx, digest);
 
   for (size_t i = 0; i < sizeof(digest); i++)
+  {
     sprintf(hash + 2 * i, "%02x", digest[i]);
+  }
 
   /* Send APOP command to server */
   snprintf(buf, sizeof(buf), "APOP %s %s\r\n", pop_data->conn->account.user, hash);
@@ -266,7 +284,9 @@ static enum PopAuthRes pop_auth_user(struct PopData *pop_data, const char *metho
   int ret;
 
   if (!pop_data->cmd_user)
+  {
     return POP_A_UNAVAIL;
+  }
 
   mutt_message(_("Logging in..."));
 
@@ -345,7 +365,9 @@ int pop_authenticate(struct PopData *pop_data)
 
   if (mutt_account_getuser(acct) || !acct->user[0] ||
       mutt_account_getpass(acct) || !acct->pass[0])
+  {
     return -3;
+  }
 
   if (PopAuthenticators && *PopAuthenticators)
   {
@@ -357,7 +379,9 @@ int pop_authenticate(struct PopData *pop_data)
     {
       comma = strchr(method, ':');
       if (comma)
+      {
         *comma++ = '\0';
+      }
       mutt_debug(2, "pop_authenticate: Trying method %s\n", method);
       authenticator = pop_authenticators;
 
@@ -367,6 +391,7 @@ int pop_authenticate(struct PopData *pop_data)
         {
           ret = authenticator->authenticate(pop_data, method);
           if (ret == POP_A_SOCKET)
+          {
             switch (pop_connect(pop_data))
             {
               case 0:
@@ -377,9 +402,12 @@ int pop_authenticate(struct PopData *pop_data)
               case -2:
                 ret = POP_A_FAILURE;
             }
+          }
 
           if (ret != POP_A_UNAVAIL)
+          {
             attempts++;
+          }
           if (ret == POP_A_SUCCESS || ret == POP_A_SOCKET ||
               (ret == POP_A_FAILURE && !option(OPT_POP_AUTH_TRY_ALL)))
           {
@@ -405,6 +433,7 @@ int pop_authenticate(struct PopData *pop_data)
     {
       ret = authenticator->authenticate(pop_data, authenticator->method);
       if (ret == POP_A_SOCKET)
+      {
         switch (pop_connect(pop_data))
         {
           case 0:
@@ -415,12 +444,17 @@ int pop_authenticate(struct PopData *pop_data)
           case -2:
             ret = POP_A_FAILURE;
         }
+      }
 
       if (ret != POP_A_UNAVAIL)
+      {
         attempts++;
+      }
       if (ret == POP_A_SUCCESS || ret == POP_A_SOCKET ||
           (ret == POP_A_FAILURE && !option(OPT_POP_AUTH_TRY_ALL)))
+      {
         break;
+      }
 
       authenticator++;
     }
@@ -434,7 +468,9 @@ int pop_authenticate(struct PopData *pop_data)
       return -1;
     case POP_A_UNAVAIL:
       if (!attempts)
+      {
         mutt_error(_("No authenticators available"));
+      }
   }
 
   return -2;

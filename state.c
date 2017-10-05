@@ -30,24 +30,36 @@
 void state_mark_attach(struct State *s)
 {
   if (!s || !s->fpout)
+  {
     return;
+  }
   if ((s->flags & MUTT_DISPLAY) && (mutt_strcmp(Pager, "builtin") == 0))
+  {
     state_puts(AttachmentMarker, s);
+  }
 }
 
 void state_attach_puts(const char *t, struct State *s)
 {
   if (!t || !s || !s->fpout)
+  {
     return;
+  }
 
   if (*t != '\n')
+  {
     state_mark_attach(s);
+  }
   while (*t)
   {
     state_putc(*t, s);
     if (*t++ == '\n' && *t)
+    {
       if (*t != '\n')
+      {
         state_mark_attach(s);
+      }
+    }
   }
 }
 
@@ -57,9 +69,13 @@ static int state_putwc(wchar_t wc, struct State *s)
   int rc;
 
   if ((rc = wcrtomb(mb, wc, NULL)) < 0)
+  {
     return rc;
+  }
   if (fputs(mb, s->fpout) == EOF)
+  {
     return -1;
+  }
   return 0;
 }
 
@@ -70,7 +86,9 @@ int state_putws(const wchar_t *ws, struct State *s)
   while (p && *p != L'\0')
   {
     if (state_putwc(*p, s) < 0)
+    {
       return -1;
+    }
     p++;
   }
   return 0;
@@ -82,13 +100,17 @@ void state_prefix_putc(char c, struct State *s)
   {
     state_reset_prefix(s);
     if (s->prefix)
+    {
       state_puts(s->prefix, s);
+    }
   }
 
   state_putc(c, s);
 
   if (c == '\n')
+  {
     state_set_prefix(s);
+  }
 }
 
 int state_printf(struct State *s, const char *fmt, ...)
@@ -106,8 +128,14 @@ int state_printf(struct State *s, const char *fmt, ...)
 void state_prefix_put(const char *d, size_t dlen, struct State *s)
 {
   if (s->prefix)
+  {
     while (dlen--)
+    {
       state_prefix_putc(*d++, s);
+    }
+  }
   else
+  {
     fwrite(d, dlen, 1, s->fpout);
+  }
 }
