@@ -9,7 +9,7 @@ AR=		@AR@
 CC=		@CC@
 CC_FOR_BUILD=	@CC_FOR_BUILD@ @CFLAGS_FOR_BUILD@
 CPP=		@CPP@
-CFLAGS=		@CPPFLAGS@ @CFLAGS@ -I. -I@top_srcdir@ -Wall $(EXTRA_CFLAGS)
+CFLAGS=		@CPPFLAGS@ @CFLAGS@ -I. -I@top_srcdir@ -Wall -I$(DEPDIR) $(EXTRA_CFLAGS)
 LDFLAGS=	@LDFLAGS@ $(EXTRA_LDFLAGS)
 EXEEXT=		@EXEEXT@
 LIBS=		@LIBS@
@@ -22,7 +22,7 @@ INSTALL=	@INSTALL@ -c
 INSTALL_DATA=	@INSTALL@ -m 644
 MKDIR_P=	mkdir -p
 RM=		rm -fr
-DEPFILES=	$(ALLOBJS:.o=.Po)
+DEPFILES=	$(ALLOBJS:%.o=$(DEPDIR)/%.Po)
 BINFILES=	$(NEOMUTT)
 @if HAVE_PGP
 LIBBINFILES+=	$(PGPEWRAP) $(PGPRING)
@@ -40,6 +40,13 @@ mandir=		@mandir@
 libdir=		@libdir@
 libexecdir=		@libexecdir@
 sysconfdir=	@SYSCONFDIR@
+
+DEPDIR=		.dep
+OBJDIR=		.obj
+HCACHEDIR=	$(DEPDIR)/hcache
+IMAPDIR=	$(DEPDIR)/imap
+LIBDIR=		$(DEPDIR)/lib
+NCRYPTDIR=	$(DEPDIR)/ncrypt
 
 # targets for specific subdirectories
 ALL_TARGETS=		@ALL_TARGETS@
@@ -202,12 +209,15 @@ CLEANFILES+=	$(GENERATED)
 
 ##############################################################################
 # targets
-all: $(BINFILES) $(LIBBINFILES) $(ALL_TARGETS)
+all: $(DEPDIR) $(OBJDIR) $(HCACHEDIR) $(IMAPDIR) $(LIBDIR) $(NCRYPTDIR) $(BINFILES) $(LIBBINFILES) $(ALL_TARGETS)
+
+$(DEPDIR) $(OBJDIR) $(HCACHEDIR) $(IMAPDIR) $(LIBDIR) $(NCRYPTDIR):
+	$(MKDIR_P) $@
 
 # compile + dependencies
 .c.o:
-	$(CC) $(CFLAGS) -MT $@ -MD -MP -MF $*.Tpo -c -o $@ $<
-	@mv $*.Tpo $*.Po
+	$(CC) $(CFLAGS) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	@mv $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 
 # make sure git_ver.h is built before any .o files
 $(ALLOBJS):	git_ver.h
@@ -262,7 +272,7 @@ $(PGPRING): $(PGPRINGOBJS) $(LIBMUTT) $(LIBNCRYPT)
 
 # generated
 git_ver.h: $(ALL_FILES)
-	version=`git describe --dirty --abbrev=6 --match "neomutt-*" 2> /dev/null | sed -e 's/^neomutt-[0-9]\{8\}//' -e 's/g//'`; \
+	@version=`git describe --dirty --abbrev=6 --match "neomutt-*" 2> /dev/null | sed -e 's/^neomutt-[0-9]\{8\}//' -e 's/g//'`; \
 	echo 'const char *GitVer = "'$$version'";' > git_ver.h.tmp; \
 	cmp -s git_ver.h.tmp git_ver.h || mv git_ver.h.tmp git_ver.h; \
 	rm -f git_ver.h.tmp
