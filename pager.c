@@ -1459,6 +1459,7 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **line_info,
           (*last)--;
         goto out;
       }
+      mutt_debug(1, "buf = >>>%s<<<\n", buf);
 
       resolve_types((char *) fmt, (char *) buf, *line_info, n, *last,
                     quote_list, q_level, force_redraw, flags & MUTT_SHOWCOLOR);
@@ -1470,7 +1471,10 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **line_info,
 
     /* this also prevents searching through the hidden lines */
     if ((flags & MUTT_HIDE) && (*line_info)[n].type == MT_COLOR_QUOTED)
+    {
+      mutt_debug(1, "1, flags = 0\n");
       flags = 0; /* MUTT_NOSHOW */
+    }
   }
 
   /* At this point, (*line_info[n]).quote may still be undefined. We
@@ -1537,12 +1541,14 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **line_info,
   if (!(flags & MUTT_SHOW) && (*line_info)[n + 1].offset > 0)
   {
     /* we've already scanned this line, so just exit */
+    mutt_debug(1, "2, rc = 0\n");
     rc = 0;
     goto out;
   }
   if ((flags & MUTT_SHOWCOLOR) && *force_redraw && (*line_info)[n + 1].offset > 0)
   {
     /* no need to try to display this line... */
+    mutt_debug(1, "3, rc = 1\n");
     rc = 1;
     goto out; /* fake display */
   }
@@ -1599,6 +1605,7 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **line_info,
   /* if we don't need to display the line we are done */
   if (!(flags & MUTT_SHOW))
   {
+    mutt_debug(1, "4, rc = 0\n");
     rc = 0;
     goto out;
   }
@@ -1648,13 +1655,17 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **line_info,
 
   /* build a return code */
   if (!(flags & MUTT_SHOW))
+  {
+    mutt_debug(1, "5, flags = 0\n");
     flags = 0;
+  }
 
   rc = flags;
 
 out:
   FREE(&buf);
   FREE(&fmt);
+  // mutt_debug(1, "ret, %d\n", rc);
   return rc;
 }
 
@@ -1702,38 +1713,38 @@ void mutt_clear_pager_position(void)
  */
 struct PagerRedrawData
 {
-  int flags;
-  struct Pager *extra;
-  int indexlen;
-  int indicator; /**< the indicator line of the PI */
-  int oldtopline;
-  int lines;
-  int max_line;
-  int last_line;
-  int curline;
-  int topline;
-  int force_redraw;
-  int has_types;
-  int hide_quoted;
-  int q_level;
-  struct QClass *quote_list;
-  LOFF_T last_pos;
-  LOFF_T last_offset;
-  struct MuttWindow *index_status_window;
-  struct MuttWindow *index_window;
-  struct MuttWindow *pager_status_window;
-  struct MuttWindow *pager_window;
-  struct Menu *index; /**< the Pager Index (PI) */
-  regex_t search_re;
-  int search_compiled;
-  int search_flag;
-  int search_back;
-  const char *banner;
-  char *helpstr;
-  char *searchbuf;
-  struct Line *line_info;
-  FILE *fp;
-  struct stat sb;
+  int flags;                 /**< Display flags, e.g. #MUTT_PAGER_NOWRAP */
+  struct Pager *extra;       /**< Associated email (if displaying email/attachment) */
+  int indexlen;              /**< Lines in the pager index ($pager_index_lines) */
+  int indicator;             /**< Indicator line in the pager index */
+  int oldtopline;            /**< XXX */
+  int lines;                 /**< XXX */
+  int max_line;              /**< Number of lines on screen */
+  int last_line;             /**< XXX */
+  int curline;               /**< XXX */
+  int topline;               /**< XXX */
+  int force_redraw;          /**< XXX */
+  int has_types;             /**< XXX */
+  int hide_quoted;           /**< XXX */
+  int q_level;               /**< XXX */
+  struct QClass *quote_list; /**< XXX */
+  LOFF_T last_pos;           /**< XXX */
+  LOFF_T last_offset;        /**< XXX */
+  struct MuttWindow *index_status_window; /**< XXX */
+  struct MuttWindow *index_window;        /**< XXX */
+  struct MuttWindow *pager_status_window; /**< XXX */
+  struct MuttWindow *pager_window;        /**< XXX */
+  struct Menu *index;                     /**< the Pager Index (PI) */
+  regex_t search_re;                      /**< XXX */
+  int search_compiled;                    /**< XXX */
+  int search_flag;                        /**< XXX */
+  int search_back;                        /**< XXX */
+  const char *banner;     /**< Message displayed in status bar */
+  char *helpstr;          /**< XXX */
+  char *searchbuf;        /**< XXX */
+  struct Line *line_info; /**< XXX */
+  FILE *fp;               /**< Handle of file to be displayed, e.g. email */
+  struct stat sb;         /**< Current stat() info the file */
 };
 
 static void pager_menu_redraw(struct Menu *pager_menu)
@@ -1892,11 +1903,31 @@ static void pager_menu_redraw(struct Menu *pager_menu)
     }
     i = -1;
     j = -1;
-    while (display_line(rd->fp, &rd->last_pos, &rd->line_info, ++i, &rd->last_line,
-                        &rd->max_line, rd->has_types | rd->search_flag | (rd->flags & MUTT_PAGER_NOWRAP),
-                        &rd->quote_list, &rd->q_level, &rd->force_redraw,
-                        &rd->search_re, rd->pager_window) == 0)
+    mutt_debug(1, "LOOP START\n");
+    mutt_debug(1, "rd: lines = %d, max_line = %d, last_line = %d, curline = %d, topline = %d\n",
+        rd->lines, rd->max_line, rd->last_line, rd->curline, rd->topline);
+    for (int k = 0; k < rd->lines; k++)
     {
+      // mutt_debug(1, "
+    }
+    while(true)
+    {
+      mutt_debug(1, "i=%d, j=%d\n", i, j);
+      if ((display_line(rd->fp,
+                        &rd->last_pos,
+                        &rd->line_info,
+                        ++i,
+                        &rd->last_line,
+                        &rd->max_line,
+                        rd->has_types | rd->search_flag | (rd->flags & MUTT_PAGER_NOWRAP),
+                        &rd->quote_list,
+                        &rd->q_level,
+                        &rd->force_redraw,
+                        &rd->search_re,
+                        rd->pager_window) != 0))
+      {
+        break;
+      }
       if (!rd->line_info[i].continuation && ++j == rd->lines)
       {
         rd->topline = i;
@@ -1904,6 +1935,7 @@ static void pager_menu_redraw(struct Menu *pager_menu)
           break;
       }
     }
+    mutt_debug(1, "LOOP END\n");
   }
 
 #ifdef USE_SIDEBAR
@@ -1922,6 +1954,7 @@ static void pager_menu_redraw(struct Menu *pager_menu)
       rd->lines = 0;
       rd->force_redraw = 0;
 
+      mutt_debug(1, "%s:%d\n", __func__, __LINE__);
       while (rd->lines < rd->pager_window->rows &&
              rd->line_info[rd->curline].offset <= rd->sb.st_size - 1)
       {
@@ -2521,6 +2554,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
           rd.search_compiled = 1;
           /* update the search pointers */
           i = 0;
+          mutt_debug(1, "%s:%d\n", __func__, __LINE__);
           while (display_line(rd.fp, &rd.last_pos, &rd.line_info, i, &rd.last_line, &rd.max_line,
                               MUTT_SEARCH | (flags & MUTT_PAGER_NSKIP) | (flags & MUTT_PAGER_NOWRAP),
                               &rd.quote_list, &rd.q_level, &rd.force_redraw,
