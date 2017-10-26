@@ -131,6 +131,13 @@ LDADD = $(LIBOBJS) $(INTLLIBS)
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
+version.o: version.c
+	@echo --------------------------------------------------------------
+	@echo FORCED
+	@echo --------------------------------------------------------------
+	$(CC) $(CFLAGS) $(DEFS) -c $< -o $@
+	@echo --------------------------------------------------------------
+
 git_ver.h: $(neomutt_SOURCES) $(SUBDIRS)
 	version=`git describe --dirty --abbrev=6 --match "neomutt-*" 2> /dev/null | sed -e 's/^neomutt-[0-9]\{8\}//' -e 's/g//'`; \
 	echo 'const char *GitVer = "'$$version'";' > git_ver.h.tmp; \
@@ -163,4 +170,4 @@ distclean-local:
 html:
 	doxygen doxygen/doxygen.conf
 
-.PHONY: html
+.PHONY: html version.o
