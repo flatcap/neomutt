@@ -20,8 +20,13 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    This is a crytpo module wrapping the classic smime code.
+/**
+ * @page ncrypt_mod_smime_classic Wrappers for calls to CLI SMIME
+ *
+ * Wrappers for calls to CLI SMIME
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
  */
 
 #include "config.h"

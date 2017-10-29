@@ -21,10 +21,28 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-   Common definitions and prototypes for the crypt functions. They are
-   all defined in crypt.c and cryptglue.c
-*/
+/**
+ * @page ncrypt API for encryption/signing of emails
+ *
+ * API for encryption/signing of emails
+ *
+ * -# @subpage ncrypt_crypt
+ * -# @subpage ncrypt_cryptglue
+ * -# @subpage ncrypt_crypt_gpgme
+ * -# @subpage ncrypt_mod
+ * -# @subpage ncrypt_mod_pgp_classic
+ * -# @subpage ncrypt_mod_pgp_gpgme
+ * -# @subpage ncrypt_mod_smime_classic
+ * -# @subpage ncrypt_mod_smime_gpgme
+ * -# @subpage ncrypt_gnupgparse
+ * -# @subpage ncrypt_pgp
+ * -# @subpage ncrypt_pgpinvoke
+ * -# @subpage ncrypt_pgpkey
+ * -# @subpage ncrypt_pgplib
+ * -# @subpage ncrypt_pgpmicalg
+ * -# @subpage ncrypt_pgppacket
+ * -# @subpage ncrypt_smime
+ */
 
 #ifndef _NCRYPT_NCRYPT_H
 #define _NCRYPT_NCRYPT_H

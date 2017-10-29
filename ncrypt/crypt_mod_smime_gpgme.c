@@ -20,8 +20,13 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    This is a crypto module wrapping the gpgme based smime code.
+/**
+ * @page ncrypt_mod_smime_gpgme Wrappers for calls to GPGME SMIME
+ *
+ * Wrappers for calls to GPGME SMIME
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
  */
 
 #include "config.h"

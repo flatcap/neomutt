@@ -20,8 +20,13 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    This is a crytpo module wrapping the classic pgp code.
+/**
+ * @page ncrypt_mod_pgp_classic Wrappers for calls to CLI PGP
+ *
+ * Wrappers for calls to CLI PGP
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
  */
 
 #include "config.h"

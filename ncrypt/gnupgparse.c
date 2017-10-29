@@ -21,13 +21,17 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * NOTE
+/**
+ * @page ncrypt_gnupgparse Parse the output of CLI PGP program
  *
- * This code used to be the parser for GnuPG's output.
+ * Parse the output of CLI PGP program
  *
+ * @note This code used to be the parser for GnuPG's output.
  * Nowadays, we are using an external pubring lister with PGP which mimics
  * gpg's output format.
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
  */
 
 #include "config.h"

@@ -21,6 +21,15 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @page ncrypt_pgpkey PGP key management routines
+ *
+ * PGP key management routines
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
+ */
+
 #include "config.h"
 #include <ctype.h>
 #include <limits.h>

@@ -20,8 +20,13 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-    This is a crypto module wrapping the gpgme based pgp code.
+/**
+ * @page ncrypt_mod_pgp_gpgme Wrappers for calls to GPGME PGP
+ *
+ * Wrappers for calls to GPGME PGP
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
  */
 
 #include "config.h"

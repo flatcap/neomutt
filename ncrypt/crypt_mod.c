@@ -20,6 +20,15 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @page ncrypt_mod Register crypto modules
+ *
+ * Register crypto modules
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
+ */
+
 #include "config.h"
 #include "mutt/mutt.h"
 #include "mutt/queue.h"

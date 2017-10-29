@@ -20,7 +20,14 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Generally useful, pgp-related functions. */
+/**
+ * @page ncrypt_pgplib Misc PGP helper routines
+ *
+ * Misc PGP helper routines
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
+ */
 
 #include "config.h"
 #include <stdbool.h>

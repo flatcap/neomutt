@@ -27,6 +27,15 @@
  * crypt_gpgme.c - GPGME based crypto operations
  */
 
+/**
+ * @page ncrypt_crypt_gpgme Wrapper for PGP/SMIME calls to GPGME
+ *
+ * Wrapper for PGP/SMIME calls to GPGME
+ *
+ * | Function       | Description
+ * | :------------- | :-----------------------------------
+ */
+
 #include "config.h"
 #include <ctype.h>
 #include <errno.h>
