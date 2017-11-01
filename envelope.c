@@ -163,3 +163,27 @@ void mutt_merge_envelopes(struct Envelope *base, struct Envelope **extra)
 
   mutt_free_envelope(extra);
 }
+
+int strict_cmp_envelopes(const struct Envelope *e1, const struct Envelope *e2)
+{
+  if (e1 && e2)
+  {
+    if ((mutt_str_strcmp(e1->message_id, e2->message_id) != 0) ||
+        (mutt_str_strcmp(e1->subject, e2->subject) != 0) ||
+        !mutt_list_compare(&e1->references, &e2->references) ||
+        !strict_addrcmp(e1->from, e2->from) || !strict_addrcmp(e1->sender, e2->sender) ||
+        !strict_addrcmp(e1->reply_to, e2->reply_to) ||
+        !strict_addrcmp(e1->to, e2->to) || !strict_addrcmp(e1->cc, e2->cc) ||
+        !strict_addrcmp(e1->return_path, e2->return_path))
+      return 0;
+    else
+      return 1;
+  }
+  else
+  {
+    if (!e1 && !e2)
+      return 1;
+    else
+      return 0;
+  }
+}

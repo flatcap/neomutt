@@ -356,6 +356,33 @@ void mutt_label_hash_remove(struct Context *ctx, struct Header *hdr)
     label_ref_dec(ctx, hdr->env->x_label);
 }
 
+/**
+ * mbox_strict_cmp_headers - Strictly compare message headers
+ * @retval 1 if headers are strictly identical
+ */
+int mbox_strict_cmp_headers(const struct Header *h1, const struct Header *h2)
+{
+  if (h1 && h2)
+  {
+    if (h1->received != h2->received || h1->date_sent != h2->date_sent ||
+        h1->content->length != h2->content->length || h1->lines != h2->lines ||
+        h1->zhours != h2->zhours || h1->zminutes != h2->zminutes ||
+        h1->zoccident != h2->zoccident || h1->mime != h2->mime ||
+        !strict_cmp_envelopes(h1->env, h2->env) ||
+        !strict_cmp_bodies(h1->content, h2->content))
+      return 0;
+    else
+      return 1;
+  }
+  else
+  {
+    if (!h1 && !h2)
+      return 1;
+    else
+      return 0;
+  }
+}
+
 void mutt_free_header(struct Header **h)
 {
   if (!h || !*h)

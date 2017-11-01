@@ -39,8 +39,8 @@
 #include <wchar.h>
 #include <wctype.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
-#include "address.h"
 #include "body.h"
 #include "context.h"
 #include "copy.h"

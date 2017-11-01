@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt_idna.h"
-#include "address.h"
 #include "charset.h"
 #include "envelope.h"
 #include "globals.h"

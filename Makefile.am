@@ -42,7 +42,7 @@ BUILT_SOURCES = conststrings.c git_ver.h
 
 bin_PROGRAMS = neomutt
 
-neomutt_SOURCES = mutt_account.c addrbook.c address.h alias.c alias.h attach.c \
+neomutt_SOURCES = mutt_account.c addrbook.c alias.c alias.h attach.c \
 	bcache.c body.c body.h browser.c buffy.c charset.c color.c \
 	commands.c complete.c compose.c compress.c content.h context.h copy.c \
 	curs_lib.c curs_main.c edit.c editmsg.c enter.c enter_state.h \

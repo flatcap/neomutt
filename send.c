@@ -33,8 +33,8 @@
 #include <time.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
-#include "address.h"
 #include "alias.h"
 #include "body.h"
 #include "context.h"
@@ -83,37 +83,6 @@ static void append_signature(FILE *f)
     if (thepid != -1)
       mutt_wait_filter(thepid);
   }
-}
-
-/**
- * addrcmp - compare two e-mail addresses
- * @param a Address 1
- * @param b Address 2
- * @retval true if they are equivalent
- */
-static bool addrcmp(struct Address *a, struct Address *b)
-{
-  if (!a->mailbox || !b->mailbox)
-    return false;
-  if (mutt_str_strcasecmp(a->mailbox, b->mailbox) != 0)
-    return false;
-  return true;
-}
-
-/**
- * addrsrc - Search for an e-mail address in a list
- * @param a   Address containing the search email
- * @param lst Address List
- * @retval true If the Address is in the list
- */
-static int addrsrc(struct Address *a, struct Address *lst)
-{
-  for (; lst; lst = lst->next)
-  {
-    if (addrcmp(a, lst))
-      return 1;
-  }
-  return 0;
 }
 
 /**
@@ -212,11 +181,11 @@ static struct Address *find_mailing_lists(struct Address *t, struct Address *c)
       {
         if (top)
         {
-          ptr->next = rfc822_cpy_adr_real(t);
+          ptr->next = rfc822_cpy_adr(t);
           ptr = ptr->next;
         }
         else
-          ptr = top = rfc822_cpy_adr_real(t);
+          ptr = top = rfc822_cpy_adr(t);
       }
     }
   }
@@ -1000,9 +969,9 @@ void mutt_set_followup_to(struct Envelope *e)
     if (e->mail_followup_to && !mutt_is_list_recipient(0, e->to, e->cc))
     {
       if (e->reply_to)
-        from = rfc822_cpy_adr(e->reply_to, 0);
+        from = rfc822_cpy_adrlist(e->reply_to, 0);
       else if (e->from)
-        from = rfc822_cpy_adr(e->from, 0);
+        from = rfc822_cpy_adrlist(e->from, 0);
       else
         from = mutt_default_from();
 
@@ -1049,7 +1018,7 @@ static struct Address *set_reverse_name(struct Envelope *env)
     tmp = env->from;
   if (tmp)
   {
-    tmp = rfc822_cpy_adr_real(tmp);
+    tmp = rfc822_cpy_adr(tmp);
     /* when $reverse_realname is not set, clear the personal name so that it
      * may be set vi a reply- or send-hook.
      */
@@ -1070,7 +1039,7 @@ struct Address *mutt_default_from(void)
    */
 
   if (From)
-    adr = rfc822_cpy_adr_real(From);
+    adr = rfc822_cpy_adr(From);
   else if (option(OPT_USE_DOMAIN))
   {
     adr = rfc822_new_address();
@@ -1215,7 +1184,7 @@ int mutt_compose_to_sender(struct Header *hdr)
     }
   }
   else
-    msg->env->to = rfc822_cpy_adr(hdr->env->from, 0);
+    msg->env->to = rfc822_cpy_adrlist(hdr->env->from, 0);
 
   return ci_send_message(0, msg, NULL, NULL, NULL);
 }
@@ -1260,26 +1229,6 @@ static int is_reply(struct Header *reply, struct Header *orig)
     return 0;
   return mutt_list_find(&orig->env->references, reply->env->message_id) ||
          mutt_list_find(&orig->env->in_reply_to, reply->env->message_id);
-}
-
-/**
- * has_recips - Count the number of Addresses with valid recipients
- * @param a Address list
- * @retval num Number of valid Addresses
- *
- * An Address has a recipient if the mailbox or group is set.
- */
-static int has_recips(struct Address *a)
-{
-  int c = 0;
-
-  for (; a; a = a->next)
-  {
-    if (!a->mailbox || a->group)
-      continue;
-    c++;
-  }
-  return c;
 }
 
 static int search_attach_keyword(char *filename)

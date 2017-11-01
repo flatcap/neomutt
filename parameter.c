@@ -127,3 +127,20 @@ void mutt_delete_parameter(const char *attribute, struct Parameter **p)
     }
   }
 }
+
+int strict_cmp_parameters(const struct Parameter *p1, const struct Parameter *p2)
+{
+  while (p1 && p2)
+  {
+    if ((mutt_str_strcmp(p1->attribute, p2->attribute) != 0) ||
+        (mutt_str_strcmp(p1->value, p2->value) != 0))
+      return 0;
+
+    p1 = p1->next;
+    p2 = p2->next;
+  }
+  if (p1 || p2)
+    return 0;
+
+  return 1;
+}

@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
-#include "address.h"
 #include "alias.h"
 #include "format_flags.h"
 #include "globals.h"

@@ -44,12 +44,12 @@ BUILT_SOURCES = $(HCVERSION)
 $(top_srcdir)/keymap_defs.h:
 	+$(MAKE) -C $(top_srcdir) keymap_defs.h
 
-hcversion.h: $(top_srcdir)/mutt.h $(top_srcdir)/address.h $(top_srcdir)/mutt/list.h \
+hcversion.h: $(top_srcdir)/mutt.h $(top_srcdir)/email/address.h $(top_srcdir)/mutt/list.h \
 		$(top_srcdir)/mutt/buffer.h $(top_srcdir)/parameter.h \
 		$(top_srcdir)/body.h $(top_srcdir)/envelope.h \
 		$(top_srcdir)/header.h $(srcdir)/hcachever.sh
 	( echo '#include "config.h"'; echo '#include "mutt.h"'; \
-	echo '#include "address.h"'; echo '#include "mutt/list.h"'; \
+	echo '#include "email/address.h"'; echo '#include "mutt/list.h"'; \
 	echo '#include "mutt/buffer.h"'; echo '#include "parameter.h"'; \
 	echo '#include "body.h"'; echo '#include "envelope.h"'; \
 	echo '#include "header.h"'; \

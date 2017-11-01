@@ -101,5 +101,6 @@ struct Body
 struct Body *mutt_new_body(void);
 int mutt_copy_body(FILE *fp, struct Body **tgt, struct Body *src);
 void mutt_free_body(struct Body **p);
+int strict_cmp_bodies(const struct Body *b1, const struct Body *b2);
 
 #endif /* _MUTT_BODY_H */

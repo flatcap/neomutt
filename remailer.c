@@ -31,9 +31,9 @@
 #include <string.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "remailer.h"
-#include "address.h"
 #include "envelope.h"
 #include "filter.h"
 #include "format_flags.h"

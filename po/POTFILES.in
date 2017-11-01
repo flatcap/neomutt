@@ -25,6 +25,7 @@ curs_main.c
 doc/makedoc.c
 edit.c
 editmsg.c
+email/address.c
 enter.c
 envelope.c
 filter.c

@@ -31,8 +31,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
-#include "address.h"
 #include "alias.h"
 #include "envelope.h"
 #include "filter.h"
@@ -82,7 +82,7 @@ static struct Address *result_to_addr(struct Query *r)
 {
   static struct Address *tmp = NULL;
 
-  tmp = rfc822_cpy_adr(r->addr, 0);
+  tmp = rfc822_cpy_adrlist(r->addr, 0);
   if (!tmp)
     return NULL;
 

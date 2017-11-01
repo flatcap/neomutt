@@ -27,8 +27,8 @@
 #include <iconv.h>
 #include <string.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "rfc2047.h"
-#include "address.h"
 #include "charset.h"
 #include "globals.h"
 #include "mbyte.h"
@@ -50,8 +50,6 @@
 #define HSPACE(x) ((x) == '\0' || (x) == ' ' || (x) == '\t')
 
 #define CONTINUATION_BYTE(c) (((c) &0xc0) == 0x80)
-
-extern char RFC822Specials[];
 
 typedef size_t (*encoder_t)(char *s, ICONV_CONST char *d, size_t dlen, const char *tocode);
 
@@ -425,8 +423,9 @@ static size_t choose_block(char *d, size_t dlen, int col, const char *fromcode,
  * The input data is assumed to be a single line starting at column col;
  * if col is non-zero, the preceding character was a space.
  */
-static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col, const char *fromcode,
-                          const char *charsets, char **e, size_t *elen, char *specials)
+static int rfc2047_encode(ICONV_CONST char *d, size_t dlen, int col,
+                          const char *fromcode, const char *charsets, char **e,
+                          size_t *elen, const char *specials)
 {
   int ret = 0;
   char *buf = NULL;

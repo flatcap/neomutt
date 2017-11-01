@@ -26,9 +26,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "copy.h"
-#include "address.h"
 #include "body.h"
 #include "context.h"
 #include "envelope.h"

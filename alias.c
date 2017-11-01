@@ -33,8 +33,8 @@
 #include <wchar.h>
 #include <wctype.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
-#include "address.h"
 #include "alias.h"
 #include "charset.h"
 #include "envelope.h"
@@ -84,7 +84,7 @@ static struct Address *expand_aliases_r(struct Address *a, struct ListHead *expn
         if (!i)
         {
           mutt_list_insert_head(expn, mutt_str_strdup(a->mailbox));
-          w = rfc822_cpy_adr(t, 0);
+          w = rfc822_cpy_adrlist(t, 0);
           w = expand_aliases_r(w, expn);
           if (head)
             last->next = w;

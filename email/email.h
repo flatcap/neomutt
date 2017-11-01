@@ -24,9 +24,13 @@
  * @page email Structures that make up an email
  *
  * Structures that make up an email
+ *
+ * -# @subpage email_address
  */
 
 #ifndef _EMAIL_EMAIL_H
 #define _EMAIL_EMAIL_H
+
+#include "address.h"
 
 #endif /* _EMAIL_EMAIL_H */

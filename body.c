@@ -160,3 +160,13 @@ void mutt_free_body(struct Body **p)
 
   *p = 0;
 }
+
+int strict_cmp_bodies(const struct Body *b1, const struct Body *b2)
+{
+  if (b1->type != b2->type || b1->encoding != b2->encoding ||
+      (mutt_str_strcmp(b1->subtype, b2->subtype) != 0) ||
+      (mutt_str_strcmp(b1->description, b2->description) != 0) ||
+      !strict_cmp_parameters(b1->parameter, b2->parameter) || b1->length != b2->length)
+    return 0;
+  return 1;
+}

@@ -67,5 +67,6 @@ struct Envelope
 struct Envelope *mutt_new_envelope(void);
 void mutt_free_envelope(struct Envelope **p);
 void mutt_merge_envelopes(struct Envelope *base, struct Envelope **extra);
+int strict_cmp_envelopes(const struct Envelope *e1, const struct Envelope *e2);
 
 #endif /* _MUTT_ENVELOPE_H */

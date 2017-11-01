@@ -44,8 +44,8 @@
 #include <time.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
-#include "address.h"
 #include "body.h"
 #include "charset.h"
 #include "crypt.h"
