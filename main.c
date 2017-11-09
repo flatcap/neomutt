@@ -728,9 +728,9 @@ int main(int argc, char **argv, char **env)
           }
         }
 
-        rfc822_append(&msg->env->to, opts_env->to, 0);
-        rfc822_append(&msg->env->cc, opts_env->cc, 0);
-        rfc822_append(&msg->env->bcc, opts_env->bcc, 0);
+        rfc822_append(&msg->env->to, opts_env->to, false);
+        rfc822_append(&msg->env->cc, opts_env->cc, false);
+        rfc822_append(&msg->env->bcc, opts_env->bcc, false);
         if (opts_env->subject)
           mutt_str_replace(&msg->env->subject, opts_env->subject);
 

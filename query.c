@@ -82,7 +82,7 @@ static struct Address *result_to_addr(struct Query *r)
 {
   static struct Address *tmp = NULL;
 
-  tmp = rfc822_cpy_adrlist(r->addr, 0);
+  tmp = rfc822_cpy_adrlist(r->addr, false);
   if (!tmp)
     return NULL;
 
@@ -402,7 +402,7 @@ static void query_menu(char *buf, size_t buflen, struct Query *results, int retb
               if (QueryTable[i].tagged)
               {
                 struct Address *a = result_to_addr(QueryTable[i].data);
-                rfc822_append(&naddr, a, 0);
+                rfc822_append(&naddr, a, false);
                 rfc822_free_address(&a);
               }
 
@@ -438,7 +438,7 @@ static void query_menu(char *buf, size_t buflen, struct Query *results, int retb
               if (QueryTable[i].tagged)
               {
                 struct Address *a = result_to_addr(QueryTable[i].data);
-                rfc822_append(&msg->env->to, a, 0);
+                rfc822_append(&msg->env->to, a, false);
                 rfc822_free_address(&a);
               }
           }

@@ -114,7 +114,7 @@ static void group_add_adrlist(struct Group *g, struct Address *a)
   for (p = &g->as; *p; p = &((*p)->next))
     ;
 
-  q = rfc822_cpy_adrlist(a, 0);
+  q = rfc822_cpy_adrlist(a, false);
   q = mutt_remove_xrefs(g->as, q);
   *p = q;
 }

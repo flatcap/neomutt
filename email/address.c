@@ -52,10 +52,10 @@
 
 #include "config.h"
 #include <string.h>
-#include "email/email.h"
-#include "memory.h"
 #include "mutt/memory.h"
 #include "mutt/string2.h"
+#include "email/email.h"
+#include "memory.h"
 
 /**
  * RFC822Specials - Characters with special meaning for email addresses

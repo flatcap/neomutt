@@ -830,9 +830,9 @@ int crypt_get_keys(struct Header *msg, char **keylist, int oppenc_mode)
   if ((WithCrypto & APPLICATION_PGP))
     set_option(OPT_PGP_CHECK_TRUST);
 
-  last = rfc822_append(&adrlist, msg->env->to, 0);
-  last = rfc822_append(last ? &last : &adrlist, msg->env->cc, 0);
-  rfc822_append(last ? &last : &adrlist, msg->env->bcc, 0);
+  last = rfc822_append(&adrlist, msg->env->to, false);
+  last = rfc822_append(last ? &last : &adrlist, msg->env->cc, false);
+  rfc822_append(last ? &last : &adrlist, msg->env->bcc, false);
 
   if (fqdn)
     rfc822_qualify(adrlist, fqdn);
