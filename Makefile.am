@@ -44,7 +44,7 @@ bin_PROGRAMS = neomutt
 
 neomutt_SOURCES = mutt_account.c addrbook.c alias.c alias.h attach.c \
 	bcache.c body.c body.h browser.c buffy.c charset.c color.c \
-	commands.c complete.c compose.c compress.c content.h context.h copy.c \
+	commands.c complete.c compose.c compress.c context.h copy.c \
 	curs_lib.c curs_main.c edit.c editmsg.c enter.c enter_state.h \
 	filter.c flags.c format_flags.h from.c group.c \
 	handler.c hdrline.c header.h header.c help.c history.c hook.c \

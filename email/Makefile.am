@@ -3,7 +3,7 @@ include $(top_srcdir)/flymake.am
 
 AUTOMAKE_OPTIONS = 1.6 foreign
 
-EXTRA_DIST = email.h address.h envelope.h parameter.h
+EXTRA_DIST = email.h address.h content.h envelope.h parameter.h
 
 AM_CPPFLAGS = -I$(top_srcdir)
 

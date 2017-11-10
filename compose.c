@@ -33,12 +33,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "conn/conn.h"
 #include "mutt.h"
 #include "alias.h"
 #include "attach.h"
 #include "body.h"
-#include "content.h"
 #include "context.h"
 #include "format_flags.h"
 #include "globals.h"

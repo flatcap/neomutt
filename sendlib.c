@@ -44,7 +44,6 @@
 #include "body.h"
 #include "buffy.h"
 #include "charset.h"
-#include "content.h"
 #include "context.h"
 #include "copy.h"
 #include "filter.h"

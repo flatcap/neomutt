@@ -34,6 +34,7 @@
 #define _EMAIL_EMAIL_H
 
 #include "address.h"
+#include "content.h"
 #include "envelope.h"
 #include "parameter.h"
 
