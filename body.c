@@ -27,10 +27,10 @@
 #include "mutt/debug.h"
 #include "mutt/memory.h"
 #include "mutt/string2.h"
+#include "email/email.h"
 #include "body.h"
 #include "header.h"
 #include "mime.h"
-#include "parameter.h"
 #include "protos.h"
 
 struct Body *mutt_new_body(void)

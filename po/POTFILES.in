@@ -27,6 +27,7 @@ edit.c
 editmsg.c
 email/address.c
 email/envelope.c
+email/parameter.c
 enter.c
 filter.c
 flags.c
@@ -108,7 +109,6 @@ newsrc.c
 nntp.c
 opcodes.h
 pager.c
-parameter.c
 parse.c
 pattern.c
 pgpewrap.c

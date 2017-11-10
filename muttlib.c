@@ -59,10 +59,10 @@
 #include "mutt_regex.h"
 #include "mutt_tags.h"
 
+#include "email/email.h"
 #include "mx.h"
 #include "ncrypt/ncrypt.h"
 #include "options.h"
-#include "parameter.h"
 #include "protos.h"
 #include "rfc822.h"
 #include "url.h"

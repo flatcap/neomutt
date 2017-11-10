@@ -21,7 +21,7 @@
  */
 
 /**
- * @page parameter Store attributes associated with a MIME part
+ * @page email_parameter Store attributes associated with a MIME part
  *
  * Store attributes associated with a MIME part
  *
@@ -34,7 +34,16 @@
  */
 
 #include "config.h"
-#include "parameter.h"
+#include "email/email.h"
+
+/**
+ * mutt_new_parameter - Create a new Parameter
+ * @retval ptr Newly allocated Parameter
+ */
+struct Parameter *mutt_new_parameter(void)
+{
+  return mutt_mem_calloc(1, sizeof(struct Parameter));
+}
 
 /**
  * mutt_free_parameter - Free a Parameter
@@ -128,6 +137,12 @@ void mutt_delete_parameter(const char *attribute, struct Parameter **p)
   }
 }
 
+/**
+ * strict_cmp_parameters - strictly compare two parameters
+ * @param p1 first parameter
+ * @param p2 second parameter
+ * @retval true parameters are strictly identical
+ */
 int strict_cmp_parameters(const struct Parameter *p1, const struct Parameter *p2)
 {
   while (p1 && p2)

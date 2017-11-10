@@ -38,6 +38,7 @@
 #include <wchar.h>
 #include <wctype.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "body.h"
 #include "charset.h"
@@ -50,7 +51,6 @@
 #include "ncrypt/ncrypt.h"
 #include "opcodes.h"
 #include "options.h"
-#include "parameter.h"
 #include "protos.h"
 #include "rfc1524.h"
 #include "rfc3676.h"

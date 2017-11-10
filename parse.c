@@ -29,6 +29,7 @@
 #include <string.h>
 #include <time.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "body.h"
 #include "charset.h"
@@ -39,7 +40,6 @@
 #include "mutt_regex.h"
 #include "ncrypt/ncrypt.h"
 #include "options.h"
-#include "parameter.h"
 #include "protos.h"
 #include "rfc2047.h"
 #include "rfc2231.h"

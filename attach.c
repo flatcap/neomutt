@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "attach.h"
 #include "body.h"
@@ -45,7 +46,6 @@
 #include "ncrypt/ncrypt.h"
 #include "options.h"
 #include "pager.h"
-#include "parameter.h"
 #include "protos.h"
 #include "rfc1524.h"
 #include "state.h"

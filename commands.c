@@ -35,6 +35,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "alias.h"
 #include "body.h"
@@ -55,7 +56,6 @@
 #include "ncrypt/ncrypt.h"
 #include "options.h"
 #include "pager.h"
-#include "parameter.h"
 #include "protos.h"
 #include "rfc822.h"
 #include "sort.h"

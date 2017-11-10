@@ -35,13 +35,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "rfc2231.h"
 #include "charset.h"
 #include "globals.h"
 #include "mbyte.h"
 #include "mime.h"
 #include "options.h"
-#include "parameter.h"
 #include "protos.h"
 #include "rfc2047.h"
 

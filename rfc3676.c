@@ -30,13 +30,13 @@
 #include <string.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "body.h"
 #include "globals.h"
 #include "header.h"
 #include "mutt_curses.h"
 #include "options.h"
-#include "parameter.h"
 #include "protos.h"
 #include "state.h"
 

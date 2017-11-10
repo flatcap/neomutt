@@ -27,6 +27,7 @@
  *
  * -# @subpage email_address
  * -# @subpage email_envelope
+ * -# @subpage email_parameter
  */
 
 #ifndef _EMAIL_EMAIL_H
@@ -34,5 +35,6 @@
 
 #include "address.h"
 #include "envelope.h"
+#include "parameter.h"
 
 #endif /* _EMAIL_EMAIL_H */

@@ -20,8 +20,8 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MUTT_PARAMETER_H
-#define _MUTT_PARAMETER_H
+#ifndef _EMAIL_PARAMETER_H
+#define _EMAIL_PARAMETER_H
 
 #include "mutt/mutt.h"
 
@@ -35,19 +35,11 @@ struct Parameter
   struct Parameter *next;
 };
 
-/**
- * mutt_new_parameter - Create a new Parameter
- * @retval ptr Newly allocated Parameter
- */
-static inline struct Parameter *mutt_new_parameter(void)
-{
-  return mutt_mem_calloc(1, sizeof(struct Parameter));
-}
+void              mutt_delete_parameter(const char *attribute, struct Parameter **p);
+void              mutt_free_parameter(struct Parameter **p);
+char *            mutt_get_parameter(const char *s, struct Parameter *p);
+struct Parameter *mutt_new_parameter(void);
+void              mutt_set_parameter(const char *attribute, const char *value, struct Parameter **p);
+int               strict_cmp_parameters(const struct Parameter *p1, const struct Parameter *p2);
 
-void mutt_delete_parameter(const char *attribute, struct Parameter **p);
-void mutt_set_parameter(const char *attribute, const char *value, struct Parameter **p);
-void mutt_free_parameter(struct Parameter **p);
-char *mutt_get_parameter(const char *s, struct Parameter *p);
-int strict_cmp_parameters(const struct Parameter *p1, const struct Parameter *p2);
-
-#endif /* _MUTT_PARAMETER_H */
+#endif /* _EMAIL_PARAMETER_H */

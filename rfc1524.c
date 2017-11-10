@@ -36,12 +36,12 @@
 #include <string.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "rfc1524.h"
 #include "body.h"
 #include "globals.h"
 #include "options.h"
-#include "parameter.h"
 #include "protos.h"
 
 /**

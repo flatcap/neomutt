@@ -61,7 +61,7 @@ NEOMUTTOBJS=	mutt_account.o addrbook.o alias.o attach.o bcache.o body.o \
 		header.o help.o history.o hook.o init.o keymap.o main.o \
 		mbox.o mbyte.o menu.o mh.o muttlib.o mutt_idna.o \
 		mutt_socket.o mutt_tags.o mx.o \
-		newsrc.o nntp.o pager.o parameter.o parse.o pattern.o pop.o \
+		newsrc.o nntp.o pager.o parse.o pattern.o pop.o \
 		pop_auth.o pop_lib.o postpone.o query.o recvattach.o recvcmd.o \
 		rfc1524.o rfc2047.o rfc2231.o rfc3676.o rfc822.o \
 		safe_asprintf.o score.o send.o sendlib.o sidebar.o signal.o \
@@ -100,7 +100,7 @@ ALLOBJS+=	$(LIBMUTTOBJS)
 ###############################################################################
 # libemail
 LIBEMAIL=	libemail.a
-LIBEMAILOBJS=	email/address.o email/envelope.o 
+LIBEMAILOBJS=	email/address.o email/envelope.o email/parameter.o
 CLEANFILES+=	$(LIBEMAIL) $(LIBEMAILOBJS)
 MUTTLIBS+=	$(LIBEMAIL)
 ALLOBJS+=	$(LIBEMAILOBJS)
@@ -283,13 +283,13 @@ git_ver.h: $(ALL_FILES)
 
 hcache/hcversion.h:	$(SRCDIR)/mutt.h $(SRCDIR)/email/address.h \
 			$(SRCDIR)/mutt/list.h $(SRCDIR)/mutt/buffer.h \
-			$(SRCDIR)/parameter.h $(SRCDIR)/body.h \
+			$(SRCDIR)/email/parameter.h $(SRCDIR)/body.h \
 			$(SRCDIR)/email/envelope.h $(SRCDIR)/header.h \
 			$(SRCDIR)/hcache/hcachever.sh \
 			$(PWD)/hcache
 	( echo '#include "config.h"'; echo '#include "mutt.h"'; \
 	echo '#include "email/address.h"'; echo '#include "mutt/list.h"'; \
-	echo '#include "mutt/buffer.h"'; echo '#include "parameter.h"'; \
+	echo '#include "mutt/buffer.h"'; echo '#include "email/parameter.h"'; \
 	echo '#include "body.h"'; echo '#include "email/envelope.h"'; \
 	echo '#include "header.h"';) | $(CPP) $(CFLAGS) - | \
 	sh $(SRCDIR)/hcache/hcachever.sh hcache/hcversion.h
