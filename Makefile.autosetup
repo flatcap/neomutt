@@ -98,6 +98,14 @@ MUTTLIBS+=	$(LIBMUTT)
 ALLOBJS+=	$(LIBMUTTOBJS)
 
 ###############################################################################
+# libemail
+LIBEMAIL=	libemail.a
+LIBEMAILOBJS=	
+CLEANFILES+=	$(LIBEMAIL) $(LIBEMAILOBJS)
+MUTTLIBS+=	$(LIBEMAIL)
+ALLOBJS+=	$(LIBEMAILOBJS)
+
+###############################################################################
 # libncrypt
 LIBNCRYPT=	libncrypt.a
 LIBNCRYPTOBJS=	ncrypt/crypt.o ncrypt/crypt_mod.o ncrypt/cryptglue.o
@@ -221,6 +229,13 @@ $(LIBMUTT): $(PWD)/lib $(LIBMUTTOBJS)
 	$(RANLIB) $@
 $(PWD)/lib:
 	$(MKDIR_P) $(PWD)/lib
+
+# libemail
+$(LIBEMAIL): $(PWD)/lib $(LIBEMAILOBJS)
+	$(AR) cr $@ $(LIBEMAILOBJS)
+	$(RANLIB) $@
+$(PWD)/email:
+	$(MKDIR_P) $(PWD)/email
 
 # libncrypt
 $(LIBNCRYPT): $(PWD)/ncrypt $(LIBNCRYPTOBJS)

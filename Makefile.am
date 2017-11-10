@@ -22,7 +22,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--with-sasl \
 	--with-tokyocabinet
 
-SUBDIRS = m4 contrib imap ncrypt mutt conn
+SUBDIRS = m4 contrib imap ncrypt mutt conn email
 
 if BUILD_HCACHE
 SUBDIRS += hcache
@@ -68,11 +68,14 @@ LIBCONNDEPS = $(top_srcdir)/conn/connection.h conn/libconn.a
 LIBMUTT = -Lmutt -lmutt
 LIBMUTTDEPS = $(top_srcdir)/mutt/mutt.h mutt/libmutt.a
 
+LIBEMAIL = -Lemail -lemail
+LIBEMAILDEPS = $(top_srcdir)/mutt/mutt.h email/libemail.a
+
 neomutt_LDADD = $(MUTT_LIB_OBJECTS) $(LIBOBJS) $(HCACHE_LIBS) $(NCRYPT_LIBS) \
-	$(LIBIMAP) $(LIBCONN) $(LIBMUTT) $(LIBICONV) $(GPGME_LIBS) $(INTLLIBS)
+	$(LIBIMAP) $(LIBCONN) $(LIBEMAIL) $(LIBMUTT) $(LIBICONV) $(GPGME_LIBS) $(INTLLIBS)
 
 neomutt_DEPENDENCIES = $(MUTT_LIB_OBJECTS) $(LIBOBJS) $(LIBIMAPDEPS) $(LIBCONNDEPS) \
-	$(LIBMUTTDEPS) $(HCACHE_DEPS) $(NCRYPT_DEPS) $(INTLDEPS)
+	$(LIBEMAILDEPS) $(LIBMUTTDEPS) $(HCACHE_DEPS) $(NCRYPT_DEPS) $(INTLDEPS)
 
 DEFS=-DPKGDATADIR=\"$(pkgdatadir)\" -DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DBINDIR=\"$(bindir)\" -DMUTTLOCALEDIR=\"$(datadir)/locale\"
