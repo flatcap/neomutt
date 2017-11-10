@@ -52,7 +52,6 @@
 #include "body.h"
 #include "charset.h"
 #include "crypt.h"
-#include "envelope.h"
 #include "format_flags.h"
 #include "globals.h"
 #include "header.h"

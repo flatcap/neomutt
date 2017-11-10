@@ -26,8 +26,8 @@ doc/makedoc.c
 edit.c
 editmsg.c
 email/address.c
+email/envelope.c
 enter.c
-envelope.c
 filter.c
 flags.c
 from.c

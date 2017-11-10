@@ -32,7 +32,6 @@
 #include "mutt.h"
 #include "body.h"
 #include "charset.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "mailbox.h"

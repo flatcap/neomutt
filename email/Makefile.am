@@ -3,11 +3,11 @@ include $(top_srcdir)/flymake.am
 
 AUTOMAKE_OPTIONS = 1.6 foreign
 
-EXTRA_DIST = email.h address.h
+EXTRA_DIST = email.h address.h envelope.h
 
 AM_CPPFLAGS = -I$(top_srcdir)
 
 noinst_LIBRARIES = libemail.a
 
-libemail_a_SOURCES = address.c
+libemail_a_SOURCES = address.c envelope.c
 

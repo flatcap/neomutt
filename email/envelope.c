@@ -21,7 +21,7 @@
  */
 
 /**
- * @page envelope Representation of an email header (envelope)
+ * @page email_envelope Representation of an email header (envelope)
  *
  * Representation of an email header (envelope)
  *
@@ -30,6 +30,7 @@
  * | mutt_free_envelope           | Free an Envelope
  * | mutt_merge_envelopes         | Merge the headers of two Envelopes
  * | mutt_new_envelope            | Create a new Envelope
+ * | strict_cmp_envelopes         | Strictly compare two Envelopes
  */
 
 #include "config.h"
@@ -37,7 +38,6 @@
 #include "mutt/buffer.h"
 #include "mutt/memory.h"
 #include "mutt/queue.h"
-#include "envelope.h"
 #include "rfc822.h"
 
 /**
@@ -164,6 +164,12 @@ void mutt_merge_envelopes(struct Envelope *base, struct Envelope **extra)
   mutt_free_envelope(extra);
 }
 
+/**
+ * strict_cmp_envelopes - Strictly compare two Envelopes
+ * @param e1 First Envelope
+ * @param e2 Second Envelope
+ * @retval true Envelopes are strictly identical
+ */
 int strict_cmp_envelopes(const struct Envelope *e1, const struct Envelope *e2)
 {
   if (e1 && e2)

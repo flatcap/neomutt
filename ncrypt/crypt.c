@@ -41,7 +41,6 @@
 #include "context.h"
 #include "copy.h"
 #include "cryptglue.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "mime.h"

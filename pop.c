@@ -29,13 +29,13 @@
 #include <string.h>
 #include <unistd.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "conn/conn.h"
 #include "mutt.h"
 #include "pop.h"
 #include "bcache.h"
 #include "body.h"
 #include "context.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "mailbox.h"

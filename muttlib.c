@@ -49,7 +49,6 @@
 #include "alias.h"
 #include "body.h"
 #include "charset.h"
-#include "envelope.h"
 #include "filter.h"
 #include "format_flags.h"
 #include "globals.h"

@@ -29,12 +29,12 @@
 #include <sys/stat.h>
 #include <time.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "header.h"
 #include "alias.h"
 #include "body.h"
 #include "context.h"
-#include "envelope.h"
 #include "globals.h"
 #include "mutt_idna.h"
 #include "ncrypt/ncrypt.h"

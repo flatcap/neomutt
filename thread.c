@@ -26,11 +26,11 @@
 #include <string.h>
 #include <time.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "mutt.h"
 #include "thread.h"
 #include "body.h"
 #include "context.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "options.h"

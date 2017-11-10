@@ -52,7 +52,6 @@
 #include "backend.h"
 #include "body.h"
 #include "charset.h"
-#include "envelope.h"
 #include "globals.h"
 #include "hcache.h"
 #include "hcache/hcversion.h"

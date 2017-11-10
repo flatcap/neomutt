@@ -81,6 +81,7 @@
 #include <unistd.h>
 #include "imap_private.h"
 #include "mutt/mutt.h"
+#include "email/email.h"
 #include "conn/conn.h"
 #include "mutt.h"
 #include "imap.h"
@@ -88,7 +89,6 @@
 #include "body.h"
 #include "buffy.h"
 #include "context.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "imap/imap.h"

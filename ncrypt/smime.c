@@ -40,7 +40,6 @@
 #include "copy.h"
 #include "crypt.h"
 #include "cryptglue.h"
-#include "envelope.h"
 #include "filter.h"
 #include "format_flags.h"
 #include "globals.h"

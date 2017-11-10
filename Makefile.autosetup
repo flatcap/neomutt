@@ -56,7 +56,7 @@ NEOMUTT=	neomutt$(EXEEXT)
 NEOMUTTOBJS=	mutt_account.o addrbook.o alias.o attach.o bcache.o body.o \
 		browser.o buffy.o charset.o color.o commands.o complete.o \
 		compose.o compress.o conststrings.o copy.o curs_lib.o \
-		curs_main.o edit.o editmsg.o enter.o envelope.o filter.o \
+		curs_main.o edit.o editmsg.o enter.o filter.o \
 		flags.o from.o group.o handler.o hdrline.o \
 		header.o help.o history.o hook.o init.o keymap.o main.o \
 		mbox.o mbyte.o menu.o mh.o muttlib.o mutt_idna.o \
@@ -100,7 +100,7 @@ ALLOBJS+=	$(LIBMUTTOBJS)
 ###############################################################################
 # libemail
 LIBEMAIL=	libemail.a
-LIBEMAILOBJS=	email/address.o
+LIBEMAILOBJS=	email/address.o email/envelope.o 
 CLEANFILES+=	$(LIBEMAIL) $(LIBEMAILOBJS)
 MUTTLIBS+=	$(LIBEMAIL)
 ALLOBJS+=	$(LIBEMAILOBJS)
@@ -284,13 +284,13 @@ git_ver.h: $(ALL_FILES)
 hcache/hcversion.h:	$(SRCDIR)/mutt.h $(SRCDIR)/email/address.h \
 			$(SRCDIR)/mutt/list.h $(SRCDIR)/mutt/buffer.h \
 			$(SRCDIR)/parameter.h $(SRCDIR)/body.h \
-			$(SRCDIR)/envelope.h $(SRCDIR)/header.h \
+			$(SRCDIR)/email/envelope.h $(SRCDIR)/header.h \
 			$(SRCDIR)/hcache/hcachever.sh \
 			$(PWD)/hcache
 	( echo '#include "config.h"'; echo '#include "mutt.h"'; \
 	echo '#include "email/address.h"'; echo '#include "mutt/list.h"'; \
 	echo '#include "mutt/buffer.h"'; echo '#include "parameter.h"'; \
-	echo '#include "body.h"'; echo '#include "envelope.h"'; \
+	echo '#include "body.h"'; echo '#include "email/envelope.h"'; \
 	echo '#include "header.h"';) | $(CPP) $(CFLAGS) - | \
 	sh $(SRCDIR)/hcache/hcachever.sh hcache/hcversion.h
 

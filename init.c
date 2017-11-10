@@ -43,7 +43,6 @@
 #include "alias.h"
 #include "charset.h"
 #include "context.h"
-#include "envelope.h"
 #include "filter.h"
 #include "group.h"
 #include "hcache/hcache.h"

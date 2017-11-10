@@ -31,7 +31,6 @@
 #include "copy.h"
 #include "body.h"
 #include "context.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "mailbox.h"

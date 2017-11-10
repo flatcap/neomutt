@@ -29,7 +29,6 @@
 #include "sort.h"
 #include "body.h"
 #include "context.h"
-#include "envelope.h"
 #include "globals.h"
 #include "header.h"
 #include "mutt_idna.h"

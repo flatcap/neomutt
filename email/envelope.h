@@ -20,11 +20,14 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MUTT_ENVELOPE_H
-#define _MUTT_ENVELOPE_H
+#ifndef _EMAIL_ENVELOPE_H
+#define _EMAIL_ENVELOPE_H
 
 #include <stdbool.h>
 #include "mutt/list.h"
+
+struct Address;
+struct Buffer;
 
 /**
  * struct Envelope - The header of an email
@@ -64,9 +67,9 @@ struct Envelope
   bool refs_changed : 1; /**< References changed to break thread */
 };
 
+void             mutt_free_envelope(struct Envelope **p);
+void             mutt_merge_envelopes(struct Envelope *base, struct Envelope **extra);
 struct Envelope *mutt_new_envelope(void);
-void mutt_free_envelope(struct Envelope **p);
-void mutt_merge_envelopes(struct Envelope *base, struct Envelope **extra);
-int strict_cmp_envelopes(const struct Envelope *e1, const struct Envelope *e2);
+int              strict_cmp_envelopes(const struct Envelope *e1, const struct Envelope *e2);
 
-#endif /* _MUTT_ENVELOPE_H */
+#endif /* _EMAIL_ENVELOPE_H */

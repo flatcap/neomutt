@@ -34,7 +34,6 @@
 #include "email/email.h"
 #include "mutt.h"
 #include "alias.h"
-#include "envelope.h"
 #include "filter.h"
 #include "format_flags.h"
 #include "globals.h"

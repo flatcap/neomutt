@@ -26,11 +26,13 @@
  * Structures that make up an email
  *
  * -# @subpage email_address
+ * -# @subpage email_envelope
  */
 
 #ifndef _EMAIL_EMAIL_H
 #define _EMAIL_EMAIL_H
 
 #include "address.h"
+#include "envelope.h"
 
 #endif /* _EMAIL_EMAIL_H */
