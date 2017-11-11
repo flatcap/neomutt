@@ -58,7 +58,6 @@
 #include "header.h"
 #include "mbyte.h"
 #include "mutt_regex.h"
-#include "mutt_tags.h"
 #include "protos.h"
 #include "rfc822.h"
 

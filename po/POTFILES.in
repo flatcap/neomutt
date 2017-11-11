@@ -28,6 +28,7 @@ editmsg.c
 email/address.c
 email/envelope.c
 email/parameter.c
+email/tags.c
 enter.c
 filter.c
 flags.c
@@ -87,7 +88,6 @@ mutt_idna.c
 mutt_lua.c
 mutt_notmuch.c
 mutt_socket.c
-mutt_tags.c
 mx.c
 ncrypt/crypt.c
 ncrypt/cryptglue.c

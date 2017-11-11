@@ -29,6 +29,7 @@
 #include "doc/makedoc_defs.h"
 #else
 #include <stddef.h>
+#include "email/email.h"
 #include "mutt.h"
 #include "buffy.h"
 #include "globals.h"

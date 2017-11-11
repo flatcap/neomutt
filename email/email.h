@@ -28,6 +28,7 @@
  * -# @subpage email_address
  * -# @subpage email_envelope
  * -# @subpage email_parameter
+ * -# @subpage email_tags
  */
 
 #ifndef _EMAIL_EMAIL_H
@@ -37,5 +38,6 @@
 #include "content.h"
 #include "envelope.h"
 #include "parameter.h"
+#include "tags.h"
 
 #endif /* _EMAIL_EMAIL_H */

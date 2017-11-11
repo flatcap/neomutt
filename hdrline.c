@@ -41,7 +41,6 @@
 #include "mbtable.h"
 #include "mutt_curses.h"
 #include "mutt_idna.h"
-#include "mutt_tags.h"
 #include "ncrypt/ncrypt.h"
 #include "options.h"
 #include "protos.h"

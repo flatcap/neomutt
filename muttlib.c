@@ -57,9 +57,6 @@
 #include "mime.h"
 #include "mutt_curses.h"
 #include "mutt_regex.h"
-#include "mutt_tags.h"
-
-#include "email/email.h"
 #include "mx.h"
 #include "ncrypt/ncrypt.h"
 #include "options.h"

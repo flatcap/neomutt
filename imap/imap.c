@@ -97,7 +97,6 @@
 #include "mutt_account.h"
 #include "mutt_curses.h"
 #include "mutt_socket.h"
-#include "mutt_tags.h"
 #include "mx.h"
 #include "options.h"
 #include "pattern.h"

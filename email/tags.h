@@ -27,6 +27,10 @@
 #include <stddef.h>
 #include "mutt/queue.h"
 
+extern char *HiddenTags;
+extern struct Hash *TagTransforms;
+extern struct Hash *TagFormats;
+
 /**
  * struct TagNode - LinkedList Tag Element
  *
