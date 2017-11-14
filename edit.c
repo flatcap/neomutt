@@ -84,7 +84,7 @@ static char **be_snarf_data(FILE *f, char **buf, int *bufmax, int *buflen,
     tmplen = sizeof(tmp) - tmplen;
   }
 
-  fseeko(f, offset, SEEK_SET);
+  fseeko(f, offset, SEEK_SET); /*QWQ*/
   while (bytes > 0)
   {
     if (fgets(p, tmplen - 1, f) == NULL)
@@ -112,7 +112,7 @@ static char **be_snarf_file(const char *path, char **buf, int *max, int *len, in
   f = fopen(path, "r");
   if (f)
   {
-    fstat(fileno(f), &sb);
+    fstat(fileno(f), &sb); /*QWQ*/
     buf = be_snarf_data(f, buf, max, len, 0, sb.st_size, 0);
     if (verbose)
     {

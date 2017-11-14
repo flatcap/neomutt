@@ -506,7 +506,7 @@ void mutt_parse_part(FILE *fp, struct Body *b)
 #endif
         bound = mutt_param_get(&b->parameter, "boundary");
 
-      fseeko(fp, b->offset, SEEK_SET);
+      fseeko(fp, b->offset, SEEK_SET); /*QWQ*/
       b->parts = mutt_parse_multipart(fp, bound, b->offset + b->length,
                                       (mutt_str_strcasecmp("digest", b->subtype) == 0));
       break;
@@ -514,7 +514,7 @@ void mutt_parse_part(FILE *fp, struct Body *b)
     case TYPEMESSAGE:
       if (b->subtype)
       {
-        fseeko(fp, b->offset, SEEK_SET);
+        fseeko(fp, b->offset, SEEK_SET); /*QWQ*/
         if (mutt_is_message_type(b->type, b->subtype))
           b->parts = mutt_parse_message_rfc822(fp, b);
         else if (mutt_str_strcasecmp(b->subtype, "external-body") == 0)
@@ -1202,7 +1202,7 @@ struct Envelope *mutt_read_rfc822_header(FILE *f, struct Header *hdr,
         continue;
       }
 
-      fseeko(f, loc, SEEK_SET);
+      fseeko(f, loc, SEEK_SET); /*QWQ*/
       break; /* end of header */
     }
 

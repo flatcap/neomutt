@@ -2094,7 +2094,7 @@ static void start_debug(void)
 
     mutt_expand_path(debugfilename, sizeof(debugfilename));
     mutt_expand_path(buf, sizeof(buf));
-    rename(debugfilename, buf);
+    rename(debugfilename, buf); /*QWQ*/
   }
 
   debugfile = mutt_file_fopen(debugfilename, "w");

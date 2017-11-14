@@ -1201,7 +1201,7 @@ void mutt_message_to_7bit(struct Body *a, FILE *fp)
   if (!fpin)
     goto cleanup;
 
-  fseeko(fpin, a->offset, SEEK_SET);
+  fseeko(fpin, a->offset, SEEK_SET); /*QWQ*/
   a->parts = mutt_parse_message_rfc822(fpin, a);
 
   transform_to_7bit(a->parts, fpin);
@@ -2745,7 +2745,7 @@ static int bounce_message(FILE *fp, struct Header *h, struct Address *to,
     if (!BounceDelivered)
       ch_flags |= CH_WEED_DELIVERED;
 
-    fseeko(fp, h->offset, SEEK_SET);
+    fseeko(fp, h->offset, SEEK_SET); /*QWQ*/
     fprintf(f, "Resent-From: %s", resent_from);
     fprintf(f, "\nResent-%s", mutt_date_make_date(date, sizeof(date)));
     msgid_str = gen_msgid();

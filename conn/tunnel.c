@@ -131,8 +131,8 @@ static int tunnel_socket_open(struct Connection *conn)
   if (close(pin[1]) < 0 || close(pout[0]) < 0)
     mutt_perror("close");
 
-  fcntl(pin[0], F_SETFD, FD_CLOEXEC);
-  fcntl(pout[1], F_SETFD, FD_CLOEXEC);
+  fcntl(pin[0], F_SETFD, FD_CLOEXEC); /*QWQ*/
+  fcntl(pout[1], F_SETFD, FD_CLOEXEC); /*QWQ*/
 
   tunnel->readfd = pin[0];
   tunnel->writefd = pout[1];

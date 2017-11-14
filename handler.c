@@ -1018,7 +1018,7 @@ static int alternative_handler(struct Body *a, struct State *s)
   {
     struct stat st;
     mustfree = true;
-    fstat(fileno(s->fpin), &st);
+    fstat(fileno(s->fpin), &st); /*QWQ*/
     b = mutt_new_body();
     b->length = (long) st.st_size;
     b->parts = mutt_parse_multipart(
@@ -1137,7 +1137,7 @@ static int alternative_handler(struct Body *a, struct State *s)
   {
     if (s->flags & MUTT_DISPLAY && !Weed)
     {
-      fseeko(s->fpin, choice->hdr_offset, SEEK_SET);
+      fseeko(s->fpin, choice->hdr_offset, SEEK_SET); /*QWQ*/
       mutt_file_copy_bytes(s->fpin, s->fpout, choice->offset - choice->hdr_offset);
     }
 
@@ -1199,7 +1199,7 @@ static int message_handler(struct Body *a, struct State *s)
 
   if (a->encoding == ENCBASE64 || a->encoding == ENCQUOTEDPRINTABLE || a->encoding == ENCUUENCODED)
   {
-    fstat(fileno(s->fpin), &st);
+    fstat(fileno(s->fpin), &st); /*QWQ*/
     b = mutt_new_body();
     b->length = (LOFF_T) st.st_size;
     b->parts = mutt_parse_message_rfc822(s->fpin, b);
@@ -1280,7 +1280,7 @@ static int multipart_handler(struct Body *a, struct State *s)
 
   if (a->encoding == ENCBASE64 || a->encoding == ENCQUOTEDPRINTABLE || a->encoding == ENCUUENCODED)
   {
-    fstat(fileno(s->fpin), &st);
+    fstat(fileno(s->fpin), &st); /*QWQ*/
     b = mutt_new_body();
     b->length = (long) st.st_size;
     b->parts = mutt_parse_multipart(
@@ -1305,7 +1305,7 @@ static int multipart_handler(struct Body *a, struct State *s)
       print_part_line(s, p, 0);
       if (!Weed)
       {
-        fseeko(s->fpin, p->hdr_offset, SEEK_SET);
+        fseeko(s->fpin, p->hdr_offset, SEEK_SET); /*QWQ*/
         mutt_file_copy_bytes(s->fpin, s->fpout, p->offset - p->hdr_offset);
       }
       else
@@ -1577,7 +1577,7 @@ void mutt_decode_attachment(struct Body *b, struct State *s)
   else if (istext && b->charset)
     cd = mutt_ch_iconv_open(Charset, b->charset, MUTT_ICONV_HOOK_FROM);
 
-  fseeko(s->fpin, b->offset, SEEK_SET);
+  fseeko(s->fpin, b->offset, SEEK_SET); /*QWQ*/
   switch (b->encoding)
   {
     case ENCQUOTEDPRINTABLE:
@@ -1650,7 +1650,7 @@ static int run_decode_and_handler(struct Body *b, struct State *s,
   int decode = 0;
   int rc = 0;
 
-  fseeko(s->fpin, b->offset, SEEK_SET);
+  fseeko(s->fpin, b->offset, SEEK_SET); /*QWQ*/
 
 #ifdef USE_FMEMOPEN
   char *temp = NULL;

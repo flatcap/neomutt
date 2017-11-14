@@ -1190,7 +1190,7 @@ int mutt_file_lock(int fd, int excl, int timeout)
   {
 #ifdef USE_FCNTL
     lck.l_type = F_UNLCK;
-    fcntl(fd, F_SETLK, &lck);
+    fcntl(fd, F_SETLK, &lck); /*QWQ*/
 #endif /* USE_FCNTL */
 
 #ifdef USE_FLOCK
@@ -1214,7 +1214,7 @@ int mutt_file_unlock(int fd)
   memset(&unlockit, 0, sizeof(struct flock));
   unlockit.l_type = F_UNLCK;
   unlockit.l_whence = SEEK_SET;
-  fcntl(fd, F_SETLK, &unlockit);
+  fcntl(fd, F_SETLK, &unlockit); /*QWQ*/
 #endif
 
 #ifdef USE_FLOCK

@@ -87,7 +87,7 @@ void mutt_edit_headers(const char *editor, const char *body, struct Header *msg,
   mtime = mutt_file_decrease_mtime(path, &st);
 
   mutt_edit_file(editor, path);
-  stat(path, &st);
+  stat(path, &st); /*QWQ*/
   if (mtime == st.st_mtime)
   {
     mutt_debug(1, "temp file was not modified.\n");

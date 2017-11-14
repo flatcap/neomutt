@@ -186,7 +186,7 @@ static int smtp_data(struct Connection *conn, const char *msgfile)
     mutt_error(_("SMTP session failed: unable to open %s"), msgfile);
     return -1;
   }
-  stat(msgfile, &st);
+  stat(msgfile, &st); /*QWQ*/
   unlink(msgfile);
   mutt_progress_init(&progress, _("Sending message..."), MUTT_PROGRESS_SIZE,
                      NetInc, st.st_size);

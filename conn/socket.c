@@ -538,7 +538,7 @@ int raw_socket_open(struct Connection *conn)
       rc = socket_connect(fd, cur->ai_addr);
       if (rc == 0)
       {
-        fcntl(fd, F_SETFD, FD_CLOEXEC);
+        fcntl(fd, F_SETFD, FD_CLOEXEC); /*QWQ*/
         conn->fd = fd;
         break;
       }

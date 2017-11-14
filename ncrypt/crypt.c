@@ -644,7 +644,7 @@ int crypt_write_signed(struct Body *a, struct State *s, const char *tempfile)
     return -1;
   }
 
-  fseeko(s->fpin, a->hdr_offset, SEEK_SET);
+  fseeko(s->fpin, a->hdr_offset, SEEK_SET); /*QWQ*/
   bytes = a->length + a->offset - a->hdr_offset;
   hadcr = false;
   while (bytes > 0)

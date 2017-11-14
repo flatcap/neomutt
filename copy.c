@@ -507,7 +507,7 @@ static int count_delete_lines(FILE *fp, struct Body *b, LOFF_T *length, size_t d
 
   if (b->deleted)
   {
-    fseeko(fp, b->offset, SEEK_SET);
+    fseeko(fp, b->offset, SEEK_SET); /*QWQ*/
     for (long l = b->length; l; l--)
     {
       ch = getc(fp);
@@ -586,7 +586,7 @@ int mutt_copy_message_fp(FILE *fpout, FILE *fpin, struct Header *hdr, int flags,
       date[dlen - 1] = '\"';
 
       /* Count the number of lines and bytes to be deleted */
-      fseeko(fpin, body->offset, SEEK_SET);
+      fseeko(fpin, body->offset, SEEK_SET); /*QWQ*/
       new_lines = hdr->lines - count_delete_lines(fpin, body, &new_length, dlen);
 
       /* Copy the headers */
@@ -866,7 +866,7 @@ static int copy_delete_attach(struct Body *b, FILE *fpin, FILE *fpout, char *dat
           return -1;
 
         /* Skip the deleted body */
-        fseeko(fpin, part->offset + part->length, SEEK_SET);
+        fseeko(fpin, part->offset + part->length, SEEK_SET); /*QWQ*/
       }
       else
       {

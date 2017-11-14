@@ -1915,7 +1915,7 @@ restart:
     /*
        * Need to set the length of this body part.
        */
-    fstat(fileno(fpout), &info);
+    fstat(fileno(fpout), &info); /*QWQ*/
     tattach->length = info.st_size - tattach->offset;
 
     tattach->warnsig = anywarn;
@@ -1978,7 +1978,7 @@ int pgp_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body
     }
     unlink(tempfile);
 
-    fseeko(s.fpin, b->offset, SEEK_SET);
+    fseeko(s.fpin, b->offset, SEEK_SET); /*QWQ*/
     s.fpout = decoded_fp;
 
     mutt_decode_attachment(b, &s);
@@ -2052,7 +2052,7 @@ int smime_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Bo
   saved_b_length = b->length;
   memset(&s, 0, sizeof(s));
   s.fpin = fpin;
-  fseeko(s.fpin, b->offset, SEEK_SET);
+  fseeko(s.fpin, b->offset, SEEK_SET); /*QWQ*/
   mutt_mktemp(tempfile, sizeof(tempfile));
   tmpfp = mutt_file_fopen(tempfile, "w+");
   if (!tmpfp)
@@ -2514,7 +2514,7 @@ int pgp_gpgme_application_handler(struct Body *m, struct State *s)
   if (!mutt_get_body_charset(body_charset, sizeof(body_charset), m))
     mutt_str_strfcpy(body_charset, "iso-8859-1", sizeof(body_charset));
 
-  fseeko(s->fpin, m->offset, SEEK_SET);
+  fseeko(s->fpin, m->offset, SEEK_SET); /*QWQ*/
   last_pos = m->offset;
 
   for (bytes = m->length; bytes > 0;)

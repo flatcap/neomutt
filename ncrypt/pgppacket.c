@@ -206,7 +206,7 @@ unsigned char *pgp_read_packet(FILE *fp, size_t *len)
 
 bail:
 
-  fseeko(fp, startpos, SEEK_SET);
+  fseeko(fp, startpos, SEEK_SET); /*QWQ*/
   return NULL;
 }
 

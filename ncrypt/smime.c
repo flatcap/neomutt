@@ -1801,7 +1801,7 @@ static struct Body *smime_handle_entity(struct Body *m, struct State *s, FILE *o
     return NULL;
   }
 
-  fseeko(s->fpin, m->offset, SEEK_SET);
+  fseeko(s->fpin, m->offset, SEEK_SET); /*QWQ*/
 
   mutt_file_copy_bytes(s->fpin, tmpfp, m->length);
 
@@ -1904,7 +1904,7 @@ static struct Body *smime_handle_entity(struct Body *m, struct State *s, FILE *o
     p = mutt_read_mime_header(fpout, 0);
     if (p)
     {
-      fstat(fileno(fpout), &info);
+      fstat(fileno(fpout), &info); /*QWQ*/
       p->length = info.st_size - p->offset;
 
       mutt_parse_part(fpout, p);
@@ -1978,7 +1978,7 @@ int smime_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body **c
 
   memset(&s, 0, sizeof(s));
   s.fpin = fpin;
-  fseeko(s.fpin, b->offset, SEEK_SET);
+  fseeko(s.fpin, b->offset, SEEK_SET); /*QWQ*/
 
   mutt_mktemp(tempfile, sizeof(tempfile));
   tmpfp = mutt_file_fopen(tempfile, "w+");

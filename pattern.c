@@ -956,7 +956,7 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
           return 0;
         }
 
-        fseeko(msg->fp, h->offset, SEEK_SET);
+        fseeko(msg->fp, h->offset, SEEK_SET); /*QWQ*/
         mutt_body_handler(h->content, &s);
       }
 
@@ -986,7 +986,7 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
       fp = s.fpout;
       fflush(fp);
       fseek(fp, 0, SEEK_SET);
-      fstat(fileno(fp), &st);
+      fstat(fileno(fp), &st); /*QWQ*/
       lng = (long) st.st_size;
 #endif
     }
@@ -996,13 +996,13 @@ static int msg_search(struct Context *ctx, struct Pattern *pat, int msgno)
       fp = msg->fp;
       if (pat->op != MUTT_BODY)
       {
-        fseeko(fp, h->offset, SEEK_SET);
+        fseeko(fp, h->offset, SEEK_SET); /*QWQ*/
         lng = h->content->offset - h->offset;
       }
       if (pat->op != MUTT_HEADER)
       {
         if (pat->op == MUTT_BODY)
-          fseeko(fp, h->content->offset, SEEK_SET);
+          fseeko(fp, h->content->offset, SEEK_SET); /*QWQ*/
         lng += h->content->length;
       }
     }

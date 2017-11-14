@@ -346,7 +346,7 @@ int pgp_application_pgp_handler(struct Body *m, struct State *s)
 
   rc = 0; /* silence false compiler warning if (s->flags & MUTT_DISPLAY) */
 
-  fseeko(s->fpin, m->offset, SEEK_SET);
+  fseeko(s->fpin, m->offset, SEEK_SET); /*QWQ*/
   last_pos = m->offset;
 
   for (bytes = m->length; bytes > 0;)
@@ -717,7 +717,7 @@ int pgp_verify_one(struct Body *sigbdy, struct State *s, const char *tempfile)
     return -1;
   }
 
-  fseeko(s->fpin, sigbdy->offset, SEEK_SET);
+  fseeko(s->fpin, sigbdy->offset, SEEK_SET); /*QWQ*/
   mutt_file_copy_bytes(s->fpin, fp, sigbdy->length);
   mutt_file_fclose(&fp);
 
@@ -857,7 +857,7 @@ static struct Body *pgp_decrypt_part(struct Body *a, struct State *s,
    * the temporary file.
    */
 
-  fseeko(s->fpin, a->offset, SEEK_SET);
+  fseeko(s->fpin, a->offset, SEEK_SET); /*QWQ*/
   mutt_file_copy_bytes(s->fpin, pgptmp, a->length);
   mutt_file_fclose(&pgptmp);
 
@@ -937,7 +937,7 @@ static struct Body *pgp_decrypt_part(struct Body *a, struct State *s,
     /*
      * Need to set the length of this body part.
      */
-    fstat(fileno(fpout), &info);
+    fstat(fileno(fpout), &info); /*QWQ*/
     tattach->length = info.st_size - tattach->offset;
 
     /* See if we need to recurse on this MIME part.  */
@@ -988,7 +988,7 @@ int pgp_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body **cur
     }
     unlink(tempfile);
 
-    fseeko(s.fpin, b->offset, SEEK_SET);
+    fseeko(s.fpin, b->offset, SEEK_SET); /*QWQ*/
     s.fpout = decoded_fp;
 
     mutt_decode_attachment(b, &s);

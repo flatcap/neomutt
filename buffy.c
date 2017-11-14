@@ -84,7 +84,7 @@ static int fseek_last_message(FILE *f)
   {
     /* we save in the buffer at the end the first 7 chars from the last read */
     strncpy(buffer + BUFSIZ, buffer, 5 + 2); /* 2 == 2 * mutt_str_strlen(CRLF) */
-    fseeko(f, pos, SEEK_SET);
+    fseeko(f, pos, SEEK_SET); /*QWQ*/
     bytes_read = fread(buffer, sizeof(char), bytes_read, f);
     if (bytes_read == 0)
       return -1;
@@ -94,7 +94,7 @@ static int fseek_last_message(FILE *f)
       if (mutt_str_strncmp(buffer + i, "\n\nFrom ",
                            mutt_str_strlen("\n\nFrom ")) == 0)
       { /* found it - go to the beginning of the From */
-        fseeko(f, pos + i + 2, SEEK_SET);
+        fseeko(f, pos + i + 2, SEEK_SET); /*QWQ*/
         return 0;
       }
     }

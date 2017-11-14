@@ -797,7 +797,7 @@ struct Header *maildir_parse_stream(int magic, FILE *f, const char *fname,
     h = mutt_new_header();
   h->env = mutt_read_rfc822_header(f, h, 0, 0);
 
-  fstat(fileno(f), &st);
+  fstat(fileno(f), &st); /*QWQ*/
 
   if (!h->received)
     h->received = h->date_sent;
@@ -1951,7 +1951,7 @@ int mh_sync_mailbox_message(struct Context *ctx, int msgno)
       {
         snprintf(tmp, sizeof(tmp), "%s/,%s", ctx->path, h->path);
         unlink(tmp);
-        rename(path, tmp);
+        rename(path, tmp); /*QWQ*/
       }
     }
   }

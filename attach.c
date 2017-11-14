@@ -175,7 +175,7 @@ int mutt_compose_attachment(struct Body *a)
 
             /* Remove headers by copying out data to another file, then
              * copying the file back */
-            fseeko(fp, b->offset, SEEK_SET);
+            fseeko(fp, b->offset, SEEK_SET); /*QWQ*/
             mutt_free_body(&b);
             mutt_mktemp(tempfile, sizeof(tempfile));
             tfp = mutt_file_fopen(tempfile, "w");
@@ -831,7 +831,7 @@ int mutt_save_attachment(FILE *fp, struct Body *m, char *path, int flags, struct
         mutt_sleep(2);
         return -1;
       }
-      fseeko((s.fpin = fp), m->offset, SEEK_SET);
+      fseeko((s.fpin = fp), m->offset, SEEK_SET); /*QWQ*/
       mutt_decode_attachment(m, &s);
 
       if (mutt_file_fsync_close(&s.fpout) != 0)

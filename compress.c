@@ -495,7 +495,7 @@ static int comp_open_mailbox(struct Context *ctx)
 
 or_fail:
   /* remove the partial uncompressed file */
-  remove(ctx->path);
+  remove(ctx->path); /*QWQ*/
   free_compress_info(ctx);
   return -1;
 }
@@ -573,7 +573,7 @@ static int comp_open_append_mailbox(struct Context *ctx, int flags)
 
 oa_fail2:
   /* remove the partial uncompressed file */
-  remove(ctx->path);
+  remove(ctx->path); /*QWQ*/
 oa_fail1:
   /* Free the compress_info to prevent close from trying to recompress */
   free_compress_info(ctx);
@@ -614,11 +614,11 @@ static int comp_close_mailbox(struct Context *ctx)
     /* If the file was removed, remove the compressed folder too */
     if ((access(ctx->path, F_OK) != 0) && !SaveEmpty)
     {
-      remove(ctx->realpath);
+      remove(ctx->realpath); /*QWQ*/
     }
     else
     {
-      remove(ctx->path);
+      remove(ctx->path); /*QWQ*/
     }
   }
   else
@@ -645,7 +645,7 @@ static int comp_close_mailbox(struct Context *ctx)
       mutt_error(_("Error. Preserving temporary file: %s"), ctx->path);
     }
     else
-      remove(ctx->path);
+      remove(ctx->path); /*QWQ*/
 
     unlock_realpath(ctx);
   }

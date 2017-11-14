@@ -555,7 +555,7 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
 
   /* parse the message header and MIME structure */
 
-  fseeko(fp, hdr->offset, SEEK_SET);
+  fseeko(fp, hdr->offset, SEEK_SET); /*QWQ*/
   newhdr->offset = hdr->offset;
   /* enable header weeding for resent messages */
   newhdr->env = mutt_read_rfc822_header(fp, newhdr, 1, resend);
