@@ -46,6 +46,9 @@
 #include "sort.h"
 #include "tags.h"
 #include "thread.h"
+#ifdef USE_NOTMUCH
+#include "notmuch/mutt_notmuch.h"
+#endif
 
 /**
  * enum FlagChars - Index into the FlagChars variable ($flag_chars)
