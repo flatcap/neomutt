@@ -225,7 +225,7 @@ int mutt_option_index(const char *s)
 }
 
 #ifdef USE_LUA
-int mutt_option_to_string(const struct Option *opt, char *val, size_t len)
+int mutt_option_to_string(const struct ConfigDef *opt, char *val, size_t len)
 {
   mutt_debug(2, " * mutt_option_to_string(%s)\n", NONULL((char *) opt->var));
   int idx = mutt_option_index((const char *) opt->name);
@@ -234,7 +234,7 @@ int mutt_option_to_string(const struct Option *opt, char *val, size_t len)
   return 0;
 }
 
-bool mutt_option_get(const char *s, struct Option *opt)
+bool mutt_option_get(const char *s, struct ConfigDef *opt)
 {
   mutt_debug(2, " * mutt_option_get(%s)\n", s);
   int idx = mutt_option_index(s);
@@ -344,7 +344,7 @@ static int parse_sort(short *val, const char *s, const struct Mapping *map, stru
 }
 
 #ifdef USE_LUA
-int mutt_option_set(const struct Option *val, struct Buffer *err)
+int mutt_option_set(const struct ConfigDef *val, struct Buffer *err)
 {
   mutt_debug(2, " * mutt_option_set()\n");
   int idx = mutt_option_index(val->name);
@@ -470,10 +470,10 @@ int mutt_option_set(const struct Option *val, struct Buffer *err)
           *(bool *) MuttVars[idx].var = false;
         break;
       case DT_QUAD:
-        *(short *) MuttVars[idx].var = val->var;
+        *(short *) MuttVars[idx].var = *(short *) val->var;
         break;
       case DT_NUMBER:
-        *(short *) MuttVars[idx].var = val->var;
+        *(short *) MuttVars[idx].var = *(short *) val->var;
         break;
       default:
         return -1;
@@ -690,7 +690,7 @@ int mutt_extract_token(struct Buffer *dest, struct Buffer *tok, int flags)
   return 0;
 }
 
-static void free_opt(struct Option *p)
+static void free_opt(struct ConfigDef *p)
 {
   switch (DTYPE(p->type))
   {
@@ -1854,7 +1854,7 @@ static int parse_my_hdr(struct Buffer *buf, struct Buffer *s,
   return 0;
 }
 
-static void set_default(struct Option *p)
+static void set_default(struct ConfigDef *p)
 {
   switch (DTYPE(p->type))
   {
@@ -1889,7 +1889,7 @@ static void set_default(struct Option *p)
   }
 }
 
-static void restore_default(struct Option *p)
+static void restore_default(struct ConfigDef *p)
 {
   switch (DTYPE(p->type))
   {
@@ -2038,7 +2038,7 @@ static void pretty_var2(char *dst, size_t len, const char *option, const char *v
   *p = '\0';
 }
 
-static int check_charset(struct Option *opt, const char *val)
+static int check_charset(struct ConfigDef *opt, const char *val)
 {
   char *q = NULL, *s = mutt_str_strdup(val);
   int rc = 0;
