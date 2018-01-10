@@ -248,6 +248,7 @@ enum MuttMisc
 bool mutt_matches_ignore(const char *s);
 
 void mutt_init(int skip_sys_rc, struct ListHead *commands);
+bool init_config(void);
 
 /* flag to mutt_pattern_comp() */
 #define MUTT_FULL_MSG (1 << 0) /* enable body and header matching */
