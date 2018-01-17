@@ -25,6 +25,7 @@
 #include "globals.h"
 #include "mutt/charset.h"
 #include "mutt/rfc2047.h"
+#include "config/lib.h"
 #include "address.h"
 
 #include <string.h>

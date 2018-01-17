@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <utime.h>
 #include "mutt/mutt.h"
+#include "config/lib.h"
 #include "mutt.h"
 #include "address.h"
 #include "body.h"

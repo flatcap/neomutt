@@ -24,10 +24,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "mutt/mutt.h"
+#include "config/lib.h"
 #include "context.h"
 #include "format_flags.h"
 #include "globals.h"
-#include "mbtable.h"
 #include "mutt_curses.h"
 #include "mutt_menu.h"
 #include "mx.h"

@@ -37,6 +37,7 @@
 #include "mutt_commands.h"
 #include "mutt_options.h"
 #include "mutt/mutt.h"
+#include "config/lib.h"
 #include "mx.h"
 #include "options.h"
 #include "protos.h"
@@ -68,11 +69,6 @@
 #define R_MENU        (1 << 9) /**< redraw all menus */
 #define R_BOTH        (R_INDEX | R_PAGER)
 #define R_RESORT_BOTH (R_RESORT | R_RESORT_SUB)
-
-/* general flags, to be OR'd with the R_ flags above (so keep shifting..) */
-#define F_SENSITIVE   (1 << 10)
-
-#define IS_SENSITIVE(x) (((x).flags & F_SENSITIVE) == F_SENSITIVE)
 
 #define UL (unsigned long)
 #endif /* _MAKEDOC */

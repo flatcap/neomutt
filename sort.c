@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mutt/mutt.h"
+#include "config/lib.h"
 #include "sort.h"
 #include "address.h"
 #include "body.h"

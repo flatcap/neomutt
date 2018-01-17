@@ -57,6 +57,7 @@
 #include "mutt/memory.h"
 #include "mutt/message.h"
 #include "mutt/string2.h"
+#include "config/lib.h"
 #include "mutt.h"
 #include "ssl.h"
 #include "account.h"
