@@ -71,14 +71,6 @@ void mutt_resize_screen(void)
     if (cp && (mutt_str_atoi(cp, &SLtt_Screen_Cols) < 0))
       SLtt_Screen_Cols = 80;
   }
-#ifdef USE_SLANG_CURSES
-  delwin(stdscr);
-  SLsmg_reset_smg();
-  SLsmg_init_smg();
-  stdscr = newwin(0, 0, 0, 0);
-  keypad(stdscr, true);
-#else
   resizeterm(SLtt_Screen_Rows, SLtt_Screen_Cols);
-#endif
   mutt_reflow_windows();
 }

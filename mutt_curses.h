@@ -1,6 +1,6 @@
 /**
  * @file
- * Define wrapper functions around Curses/Slang
+ * Define wrapper functions around Curses
  *
  * @authors
  * Copyright (C) 1996-2000,2012 Michael R. Elkins <me@mutt.org>
@@ -29,43 +29,6 @@
 #include "options.h"
 #include "mutt/queue.h"
 
-#ifdef USE_SLANG_CURSES
-
-#ifndef unix /* this symbol is not defined by the hp-ux compiler (sigh) */
-#define unix
-#endif /* unix */
-
-#include <slang.h> /* in addition to slcurses.h, we need slang.h for the version
-                      number to test for 2.x having UTF-8 support in main.c */
-#ifdef bool
-#undef bool
-#endif
-
-#include <slcurses.h>
-
-#ifdef bool
-#undef bool
-#define bool _Bool
-#endif
-
-/* The prototypes for these four functions use "(char*)",
- * whereas the ncurses versions use "(const char*)" */
-#undef addnstr
-#undef addstr
-#undef mvaddnstr
-#undef mvaddstr
-
-/* We redefine the helper macros to hide the compiler warnings */
-#define addnstr(s, n)         waddnstr(stdscr, ((char *) s), (n))
-#define addstr(x)             waddstr(stdscr, ((char *) x))
-#define mvaddnstr(y, x, s, n) mvwaddnstr(stdscr, (y), (x), ((char *) s), (n))
-#define mvaddstr(y, x, s)     mvwaddstr(stdscr, (y), (x), ((char *) s))
-
-#define KEY_DC SL_KEY_DELETE
-#define KEY_IC SL_KEY_IC
-
-#else /* USE_SLANG_CURSES */
-
 #ifdef HAVE_NCURSESW_NCURSES_H
 #include <ncursesw/ncurses.h>
 #elif HAVE_NCURSES_NCURSES_H
@@ -76,8 +39,6 @@
 #include <curses.h>
 #endif
 
-#endif /* USE_SLANG_CURSES */
-
 #define BEEP()                                                                 \
   do                                                                           \
   {                                                                            \
@@ -85,11 +46,11 @@
       beep();                                                                  \
   } while (0)
 
-#if !(defined(USE_SLANG_CURSES) || defined(HAVE_CURS_SET))
+#ifndef HAVE_CURS_SET
 #define curs_set(x)
 #endif
 
-#if (defined(USE_SLANG_CURSES) || defined(HAVE_CURS_SET))
+#ifdef HAVE_CURS_SET
 void mutt_curs_set(int cursor);
 #else
 #define mutt_curs_set(x)

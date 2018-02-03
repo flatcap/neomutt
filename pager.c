@@ -1606,14 +1606,12 @@ static int display_line(FILE *f, LOFF_T *last_pos, struct Line **line_info,
   /* display the line */
   format_line(line_info, n, buf, flags, &a, cnt, &ch, &vch, &col, &special, pager_window);
 
-/* avoid a bug in ncurses... */
-#ifndef USE_SLANG_CURSES
+  /* avoid a bug in ncurses... */
   if (col == 0)
   {
     NORMAL_COLOR;
     addch(' ');
   }
-#endif
 
   /* end the last color pattern (needed by S-Lang) */
   if (special || (col != pager_window->cols && (flags & (MUTT_SHOWCOLOR | MUTT_SEARCH))))

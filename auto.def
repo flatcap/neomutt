@@ -25,9 +25,7 @@ set subdirs {po doc contrib test}
 # Add any user options here
 options {
 # Curses / S-Lang
-  with-ui:=ncurses          => "Select ncurses or slang for the UI"
   with-ncurses:path         => "Location of ncurses"
-  with-slang:path           => "Location of S-Lang"
 # Features w/o 3rd party dependencies
   doc=1                     => "Disable building the documentation"
   full-doc=0                => "Build the full documentation set"
@@ -109,7 +107,7 @@ if {1} {
   # a shortcut for "--opt --with-opt=/usr".
   foreach opt {
     bdb gdbm gnutls gpgme gss homespool idn kyotocabinet lmdb lua mixmaster 
-    ncurses nls notmuch qdbm sasl slang ssl tokyocabinet
+    ncurses nls notmuch qdbm sasl ssl tokyocabinet
   } {
     if {[opt-val with-$opt] ne {}} {
       define want-$opt 1
@@ -466,72 +464,49 @@ if {[get-define want-fmemopen]} {
 }
 
 ###############################################################################
-# Ncurses / S-Lang
-switch [opt-val with-ui ncurses] {
-  ncurses {
-    define-append CFLAGS -DNCURSES_WIDECHAR
-    # Locate the library defining waddnwstr()
-    set ncurses_prefix [opt-val with-ncurses $prefix]
-    cc-with [list -libs -L$ncurses_prefix/lib] {
-      foreach ncurses_lib {ncursesw ncurses curses} {
-        if {[cc-check-function-in-lib waddnwstr $ncurses_lib]} {
-          break
-        }
-      }
-    }
-    if {![have-feature waddnwstr]} {
-      user-error "Unable to find ncursesw library"
-    }
-
-    # Locate the directory containing ncurses.h
-    # See https://github.com/neomutt/neomutt/pull/679
-    set found 0
-    cc-with [list -cflags -I$ncurses_prefix/include] {
-      foreach ncurses_inc {ncursesw/ ncurses/ curses/ {}} {
-        if {[cc-check-includes ${ncurses_inc}ncurses.h] ||
-            [cc-check-includes ${ncurses_inc}curses.h]} {
-          set found 1
-          break
-        }
-      }
-    }
-    if {!$found} {
-      user-error "Unable to find ncurses headers"
-    }
-
-    cc-with [list -libs -L$ncurses_prefix/lib] {
-      if {![cc-check-function-in-lib tgetent $ncurses_lib]} {
-        cc-check-function-in-lib tgetent tinfo
-      }
-      foreach f {start_color typeahead bkgdset curs_set meta use_default_colors} {
-        cc-check-function-in-lib $f $ncurses_lib
-      }
-      cc-check-functions use_extended_names
-    }
-
-    if {[have-feature start_color]} {
-      define-feature COLOR
+# Ncurses
+define-append CFLAGS -DNCURSES_WIDECHAR
+# Locate the library defining waddnwstr()
+set ncurses_prefix [opt-val with-ncurses $prefix]
+cc-with [list -libs -L$ncurses_prefix/lib] {
+  foreach ncurses_lib {ncursesw ncurses curses} {
+    if {[cc-check-function-in-lib waddnwstr $ncurses_lib]} {
+      break
     }
   }
+}
+if {![have-feature waddnwstr]} {
+  user-error "Unable to find ncursesw library"
+}
 
-  slang {
-    cc-with {-includes sys/param.h} {
-      if {[cc-check-defines BSD]} {
-        cc-check-function-in-lib initscr termlib
-      }
+# Locate the directory containing ncurses.h
+# See https://github.com/neomutt/neomutt/pull/679
+set found 0
+cc-with [list -cflags -I$ncurses_prefix/include] {
+  foreach ncurses_inc {ncursesw/ ncurses/ curses/ {}} {
+    if {[cc-check-includes ${ncurses_inc}ncurses.h] ||
+        [cc-check-includes ${ncurses_inc}curses.h]} {
+      set found 1
+      break
     }
-    if {![check-inc-and-lib slang [opt-val with-slang $prefix] \
-                            slcurses.h SLtt_get_terminfo slang]} {
-      user-error "Unable to find S-Lang"
-    }
-    define USE_SLANG_CURSES
-    define-feature COLOR
   }
+}
+if {!$found} {
+  user-error "Unable to find ncurses headers"
+}
 
-  default {
-    user-error "Invalid value for --with-ui=[opt-val with-ui], select ncurses\
-                or slang"
+cc-with [list -libs -L$ncurses_prefix/lib] {
+  if {![cc-check-function-in-lib tgetent $ncurses_lib]} {
+    cc-check-function-in-lib tgetent tinfo
   }
+  foreach f {start_color typeahead bkgdset curs_set meta use_default_colors resizeterm} {
+    cc-check-function-in-lib $f $ncurses_lib
+  }
+  cc-check-functions use_extended_names
+}
+
+if {[have-feature start_color]} {
+  define-feature COLOR
 }
 
 ###############################################################################

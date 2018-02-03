@@ -715,17 +715,6 @@ int mutt_window_mvaddstr(struct MuttWindow *win, int row, int col, const char *s
   return mvaddstr(win->row_offset + row, win->col_offset + col, str);
 }
 
-#ifdef USE_SLANG_CURSES
-static int vw_printw(SLcurses_Window_Type *win, const char *fmt, va_list ap)
-{
-  char buf[LONG_STRING];
-
-  (void) SLvsnprintf(buf, sizeof(buf), (char *) fmt, ap);
-  SLcurses_waddnstr(win, buf, -1);
-  return 0;
-}
-#endif
-
 int mutt_window_mvprintw(struct MuttWindow *win, int row, int col, const char *fmt, ...)
 {
   va_list ap;
@@ -1017,7 +1006,7 @@ void mutt_flushinp(void)
   flushinp();
 }
 
-#if (defined(USE_SLANG_CURSES) || defined(HAVE_CURS_SET))
+#ifdef HAVE_CURS_SET
 /**
  * mutt_curs_set - Set the cursor position
  * @param cursor

@@ -370,8 +370,6 @@ void print_version(void)
 
 #ifdef NCURSES_VERSION
   printf("\nncurses: %s (compiled with %s)", curses_version(), NCURSES_VERSION);
-#elif defined(USE_SLANG_CURSES)
-  printf("\nslang: %s", SLANG_VERSION_STRING);
 #endif
 
 #ifdef _LIBICONV_VERSION

@@ -102,13 +102,6 @@ static void sighandler(int sig)
   errno = save_errno;
 }
 
-#ifdef USE_SLANG_CURSES
-static int mutt_intr_hook(void)
-{
-  return -1;
-}
-#endif /* USE_SLANG_CURSES */
-
 void mutt_signal_init(void)
 {
   struct sigaction act;
@@ -153,17 +146,6 @@ void mutt_signal_init(void)
   /* we don't want to mess with stopped children */
   act.sa_flags |= SA_NOCLDSTOP;
   sigaction(SIGCHLD, &act, NULL);
-
-#ifdef USE_SLANG_CURSES
-  /* This bit of code is required because of the implementation of
-   * SLcurses_wgetch().  If a signal is received (like SIGWINCH) when we
-   * are in blocking mode, SLsys_getkey() will not return an error unless
-   * a handler function is defined and it returns -1.  This is needed so
-   * that if the user resizes the screen while at a prompt, it will just
-   * abort and go back to the main-menu.
-   */
-  SLang_getkey_intr_hook = mutt_intr_hook;
-#endif
 }
 
 /**

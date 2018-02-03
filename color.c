@@ -83,7 +83,7 @@ static const struct Mapping Colors[] = {
   { "red", COLOR_RED },
   { "white", COLOR_WHITE },
   { "yellow", COLOR_YELLOW },
-#if defined(USE_SLANG_CURSES) || defined(HAVE_USE_DEFAULT_COLORS)
+#ifdef HAVE_USE_DEFAULT_COLORS
   { "default", COLOR_DEFAULT },
 #endif
   { 0, 0 },
@@ -202,52 +202,10 @@ void ci_start_color(void)
 
 #ifdef HAVE_COLOR
 
-#ifdef USE_SLANG_CURSES
-static char *get_color_name(char *dest, size_t destlen, int val)
-{
-  static const char *const missing[3] = { "brown", "lightgray", "default" };
-
-  switch (val)
-  {
-    case COLOR_YELLOW:
-      mutt_str_strfcpy(dest, missing[0], destlen);
-      return dest;
-
-    case COLOR_WHITE:
-      mutt_str_strfcpy(dest, missing[1], destlen);
-      return dest;
-
-    case COLOR_DEFAULT:
-      mutt_str_strfcpy(dest, missing[2], destlen);
-      return dest;
-  }
-
-  for (int i = 0; Colors[i].name; i++)
-  {
-    if (Colors[i].value == val)
-    {
-      mutt_str_strfcpy(dest, Colors[i].name, destlen);
-      return dest;
-    }
-  }
-
-  /* Sigh. If we got this far, the color is of the form 'colorN'
-   * Slang can handle this itself, so just return 'colorN'
-   */
-
-  snprintf(dest, destlen, "color%d", val);
-  return dest;
-}
-#endif
-
 int mutt_alloc_color(int fg, int bg)
 {
   struct ColorList *p = ColorList;
   int i;
-
-#ifdef USE_SLANG_CURSES
-  char fgc[SHORT_STRING], bgc[SHORT_STRING];
-#endif
 
   /* check to see if this color is already allocated to save space */
   while (p)
@@ -289,12 +247,7 @@ int mutt_alloc_color(int fg, int bg)
   p->bg = bg;
   p->fg = fg;
 
-#ifdef USE_SLANG_CURSES
-  if (fg == COLOR_DEFAULT || bg == COLOR_DEFAULT)
-    SLtt_set_color(i, NULL, get_color_name(fgc, sizeof(fgc), fg),
-                   get_color_name(bgc, sizeof(bgc), bg));
-  else
-#elif defined(HAVE_USE_DEFAULT_COLORS)
+#ifdef HAVE_USE_DEFAULT_COLORS
   if (fg == COLOR_DEFAULT)
     fg = -1;
   if (bg == COLOR_DEFAULT)

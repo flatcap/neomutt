@@ -968,13 +968,8 @@ void mutt_sb_draw(void)
   if (!SidebarVisible)
     return;
 
-#ifdef USE_SLANG_CURSES
-  int x = SLsmg_get_column();
-  int y = SLsmg_get_row();
-#else
   int x = getcurx(stdscr);
   int y = getcury(stdscr);
-#endif
 
   int num_rows = MuttSidebarWindow->rows;
   int num_cols = MuttSidebarWindow->cols;

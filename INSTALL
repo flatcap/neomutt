@@ -7,8 +7,6 @@ Notes
   install either
 
 	GNU ncurses, ftp://prep.ai.mit.edu/pub/gnu/
-  or
-	S-Lang, ftp://space.mit.edu/pub/davis/slang/
 
 - Mutt needs an implementation of the iconv API for character set
   conversions.  A free one can be found under the following URL:
@@ -41,12 +39,6 @@ to ``configure'' to help it out, or change the default behavior:
 	use the curses lib in DIR/lib.  If you have ncurses, ``configure''
 	will automatically look in /usr/include/ncurses for the include
 	files.
-
---with-slang[=DIR]
-	use the S-Lang library instead of ncurses.  This library seems to
-	work better for some people because it is less picky about proper
-	termcap entries than ncurses.  It is recommended that you use at
-	*least* version 0.99-38 with Mutt.
 
 --with-mailpath=DIR
 	specify where the spool mailboxes are located on your system
