@@ -46,6 +46,7 @@
 #include "context.h"
 #include "copy.h"
 #include "curs_lib.h"
+#include "dump.h"
 #include "filter.h"
 #include "format_flags.h"
 #include "globals.h"
@@ -271,6 +272,11 @@ int mutt_display_message(struct Email *cur)
     chflags |= CH_VIRTUAL;
 #endif
   res = mutt_copy_message_ctx(fp_out, Context->mailbox, cur, cmflags, chflags);
+
+  // mutt_endwin();
+  // printf("HEADER2: %p\n", (void *) cur);
+  // dump_header(cur, 4);
+  // exit(1);
 
   if (((mutt_file_fclose(&fp_out) != 0) && (errno != EPIPE)) || (res < 0))
   {

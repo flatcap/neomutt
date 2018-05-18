@@ -48,6 +48,7 @@
 #include "commands.h"
 #include "context.h"
 #include "curs_lib.h"
+#include "dump.h"
 #include "format_flags.h"
 #include "globals.h"
 #include "hdrline.h"
@@ -2244,6 +2245,11 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   bool first = true;
   int searchctx = 0;
   bool wrapped = false;
+
+  mutt_endwin();
+  printf("HEADER: %p\n", (void *) extra->email);
+  dump_header(extra->email, 4);
+  exit(1);
 
   struct Menu *pager_menu = NULL;
   int old_PagerIndexLines; /* some people want to resize it while inside the pager */

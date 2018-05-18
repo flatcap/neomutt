@@ -37,6 +37,7 @@
 #include "mutt.h"
 #include "parse.h"
 #include "body.h"
+#include "dump.h"
 #include "email.h"
 #include "email_globals.h"
 #include "envelope.h"

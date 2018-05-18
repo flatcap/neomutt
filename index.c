@@ -46,6 +46,7 @@
 #include "commands.h"
 #include "context.h"
 #include "curs_lib.h"
+#include "dump.h"
 #include "format_flags.h"
 #include "globals.h"
 #include "hdrline.h"

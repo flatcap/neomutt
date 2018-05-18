@@ -39,6 +39,7 @@
 #include "mutt.h"
 #include "copy.h"
 #include "context.h"
+#include "dump.h"
 #include "globals.h"
 #include "handler.h"
 #include "hdrline.h"
@@ -807,6 +808,12 @@ int mutt_copy_message_ctx(FILE *fp_out, struct Mailbox *src, struct Email *e,
     return -1;
   if (!e->content)
     return -1;
+
+  // mutt_endwin();
+  // printf("HEADER3: %p\n", (void *) hdr);
+  // dump_header(hdr, 4);
+  // exit(1);
+
   int rc = mutt_copy_message_fp(fp_out, msg->fp, e, cmflags, chflags);
   if ((rc == 0) && (ferror(fp_out) || feof(fp_out)))
   {

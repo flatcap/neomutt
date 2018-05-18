@@ -34,6 +34,8 @@
 #include "email/lib.h"
 #include "mutt.h"
 #include "mutt_parse.h"
+#include "curs_lib.h"
+#include "dump.h"
 #include "globals.h"
 #include "mx.h"
 #include "ncrypt/ncrypt.h"
@@ -68,6 +70,11 @@ void mutt_parse_mime_message(struct Mailbox *m, struct Email *e)
       mx_msg_close(m, &msg);
     }
   } while (false);
+
+  mutt_endwin();
+  printf("HEADER4: %p\n", (void *) e);
+  dump_header(e, 4);
+  exit(1);
 
   e->attach_valid = false;
 }
