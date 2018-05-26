@@ -348,7 +348,7 @@ static bool rfc1524_mailcap_parse(struct Body *a, char *filename, char *type,
         }
         else if ((plen = mutt_str_startswith(field, "x-convert", CASE_IGNORE)))
         {
-          get_field_text(field + plen, entry ? &entry->convert : NULL, type, filename, line);
+          get_field_text(field + plen, entry ? &entry->conver2 : NULL, type, filename, line);
         }
         else if ((plen = mutt_str_startswith(field, "test", CASE_IGNORE)))
         {
@@ -411,7 +411,7 @@ static bool rfc1524_mailcap_parse(struct Body *a, char *filename, char *type,
           FREE(&entry->editcommand);
           FREE(&entry->printcommand);
           FREE(&entry->nametemplate);
-          FREE(&entry->convert);
+          FREE(&entry->conver2);
           entry->needsterminal = false;
           entry->copiousoutput = false;
           entry->xneomuttkeep = false;

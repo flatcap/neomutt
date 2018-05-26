@@ -43,7 +43,7 @@ struct Rfc1524MailcapEntry
   char *editcommand;
   char *printcommand;
   char *nametemplate;
-  char *convert;
+  char *conver2;
   bool needsterminal : 1; /**< endwin() and system */
   bool copiousoutput : 1; /**< needs pager, basically */
   bool xneomuttkeep  : 1; /**< do not remove the file on command exit */
