@@ -2226,60 +2226,56 @@ static struct Body *smime_handle_entity(struct Body *m, struct State *s, FILE *f
  */
 int smime_class_decrypt_mime(FILE *fp_in, FILE **fp_out, struct Body *b, struct Body **cur)
 {
-  struct State s = { 0 };
-  LOFF_T tmpoffset = b->offset;
-  size_t tmplength = b->length;
-  int orig_type = b->type;
-  int rc = 0;
-
   if (!mutt_is_application_smime(b))
     return -1;
 
   if (b->parts)
     return -1;
 
+  struct State s = { 0 };
+  LOFF_T orig_offset = b->offset;
+  size_t orig_length = b->length;
+  int orig_type = b->type;
+  int rc = -1;
+
   s.fp_in = fp_in;
   fseeko(s.fp_in, b->offset, SEEK_SET);
 
-  FILE *fp_tmp = mutt_file_mkstemp();
-  if (!fp_tmp)
+  s.fp_out = mutt_file_mkstemp();
+  if (!s.fp_out)
   {
     mutt_perror(_("Can't create temporary file"));
     return -1;
   }
 
-  s.fp_out = fp_tmp;
   mutt_decode_attachment(b, &s);
-  fflush(fp_tmp);
+  fflush(s.fp_out);
   b->length = ftello(s.fp_out);
   b->offset = 0;
-  rewind(fp_tmp);
-  s.fp_in = fp_tmp;
-  s.fp_out = 0;
+  rewind(s.fp_out);
+  s.fp_in = s.fp_out;
+  s.fp_out = NULL;
 
   *fp_out = mutt_file_mkstemp();
   if (!*fp_out)
   {
     mutt_perror(_("Can't create temporary file"));
-    rc = -1;
     goto bail;
   }
 
   *cur = smime_handle_entity(b, &s, *fp_out);
   if (!*cur)
-  {
-    rc = -1;
     goto bail;
-  }
 
   (*cur)->goodsig = b->goodsig;
   (*cur)->badsig = b->badsig;
+  rc = 0;
 
 bail:
   b->type = orig_type;
-  b->length = tmplength;
-  b->offset = tmpoffset;
-  mutt_file_fclose(&fp_tmp);
+  b->length = orig_length;
+  b->offset = orig_offset;
+  mutt_file_fclose(&s.fp_in);
   if (*fp_out)
     rewind(*fp_out);
 
