@@ -1354,7 +1354,6 @@ int imap_mailbox_status(struct Mailbox *m, bool queue)
  */
 int imap_search(struct Mailbox *m, const struct PatternHead *pat)
 {
-  struct Buffer buf;
   struct ImapAccountData *adata = imap_adata_get(m);
   for (int i = 0; i < m->msg_count; i++)
     m->emails[i]->matched = false;
@@ -1362,7 +1361,7 @@ int imap_search(struct Mailbox *m, const struct PatternHead *pat)
   if (do_search(pat, true) == 0)
     return 0;
 
-  mutt_buffer_init(&buf);
+  struct Buffer buf = { 0 };
   mutt_buffer_addstr(&buf, "UID SEARCH ");
   if (compile_search(m, pat, &buf) < 0)
   {
@@ -1391,8 +1390,6 @@ int imap_subscribe(char *path, bool subscribe)
   struct ImapAccountData *adata = NULL;
   struct ImapMboxData *mdata = NULL;
   char buf[2048];
-  char errstr[256];
-  struct Buffer err, token;
 
   if (imap_adata_find(path, &adata, &mdata) < 0)
     return -1;
@@ -1400,8 +1397,9 @@ int imap_subscribe(char *path, bool subscribe)
   if (C_ImapCheckSubscribed)
   {
     char mbox[1024];
-    mutt_buffer_init(&token);
-    mutt_buffer_init(&err);
+    char errstr[256];
+    struct Buffer err = { 0 };
+    struct Buffer token = { 0 };
     err.data = errstr;
     err.dsize = sizeof(errstr);
     size_t len = snprintf(mbox, sizeof(mbox), "%smailboxes ", subscribe ? "" : "un");
@@ -2114,8 +2112,7 @@ static int imap_mbox_open(struct Mailbox *m)
     else
     {
       struct ListNode *np = NULL;
-      struct Buffer flag_buffer;
-      mutt_buffer_init(&flag_buffer);
+      struct Buffer flag_buffer = { 0 };
       mutt_buffer_printf(&flag_buffer, "Mailbox flags: ");
       STAILQ_FOREACH(np, &mdata->flags, entries)
       {

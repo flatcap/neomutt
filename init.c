@@ -752,7 +752,6 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
 {
   int line = 0, rc = 0, warnings = 0;
   enum CommandResult line_rc;
-  struct Buffer token;
   char *linebuf = NULL;
   char *currentline = NULL;
   char rcfile[PATH_MAX];
@@ -804,7 +803,7 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
     return -1;
   }
 
-  mutt_buffer_init(&token);
+  struct Buffer token = { 0 };
   while ((linebuf = mutt_file_read_line(linebuf, &buflen, fp, &line, MUTT_CONT)))
   {
     const bool conv = C_ConfigCharset && C_Charset;
@@ -1942,9 +1941,7 @@ static enum CommandResult parse_source(struct Buffer *buf, struct Buffer *s,
 static enum CommandResult parse_spam_list(struct Buffer *buf, struct Buffer *s,
                                           unsigned long data, struct Buffer *err)
 {
-  struct Buffer templ;
-
-  mutt_buffer_init(&templ);
+  struct Buffer templ = { 0 };
 
   /* Insist on at least one parameter */
   if (!MoreArgs(s))
@@ -2755,7 +2752,6 @@ int mutt_extract_token(struct Buffer *dest, struct Buffer *tok, TokenFlags flags
       pid_t pid;
       char *ptr = NULL;
       size_t expnlen;
-      struct Buffer expn;
       int line = 0;
 
       pc = tok->dptr;
@@ -2774,8 +2770,7 @@ int mutt_extract_token(struct Buffer *dest, struct Buffer *tok, TokenFlags flags
         mutt_debug(LL_DEBUG1, "mismatched backticks\n");
         return -1;
       }
-      struct Buffer cmd;
-      mutt_buffer_init(&cmd);
+      struct Buffer cmd = { 0 };
       *pc = '\0';
       if (flags & MUTT_TOKEN_BACKTICK_VARS)
       {
@@ -2801,7 +2796,7 @@ int mutt_extract_token(struct Buffer *dest, struct Buffer *tok, TokenFlags flags
       tok->dptr = pc + 1;
 
       /* read line */
-      mutt_buffer_init(&expn);
+      struct Buffer expn = { 0 };
       expn.data = mutt_file_read_line(NULL, &expn.dsize, fp, &line, 0);
       mutt_file_fclose(&fp);
       mutt_wait_filter(pid);
@@ -3007,7 +3002,7 @@ int mutt_init(bool skip_sys_rc, struct ListHead *commands)
 {
   char buf[1024];
   int need_pause = 0;
-  struct Buffer err;
+  struct Buffer err = { 0 };
 
   mutt_buffer_init(&err);
   mutt_buffer_increase_size(&err, 256);
@@ -3046,16 +3041,15 @@ int mutt_init(bool skip_sys_rc, struct ListHead *commands)
   p = mutt_str_getenv("REPLYTO");
   if (p)
   {
-    struct Buffer tmp, token;
+    struct Buffer tmp = { 0 };
+    struct Buffer token = { 0 };
 
     snprintf(buf, sizeof(buf), "Reply-To: %s", p);
 
-    mutt_buffer_init(&tmp);
     tmp.data = buf;
     tmp.dptr = buf;
     tmp.dsize = mutt_str_strlen(buf);
 
-    mutt_buffer_init(&token);
     parse_my_hdr(&token, &tmp, 0, &err); /* adds to UserHeader */
     FREE(&token.data);
   }
@@ -3266,12 +3260,11 @@ enum CommandResult mutt_parse_rc_line(/* const */ char *line,
 {
   int i;
   enum CommandResult rc = MUTT_CMD_SUCCESS;
-  struct Buffer expn;
 
   if (!line || !*line)
     return 0;
 
-  mutt_buffer_init(&expn);
+  struct Buffer expn = { 0 };
   expn.data = line;
   expn.dptr = line;
   expn.dsize = mutt_str_strlen(line);

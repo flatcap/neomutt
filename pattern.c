@@ -209,7 +209,6 @@ static bool eat_regex(struct Pattern *pat, int flags, struct Buffer *s, struct B
 {
   struct Buffer buf;
 
-  mutt_buffer_init(&buf);
   char *pexpr = s->dptr;
   if ((mutt_extract_token(&buf, s, MUTT_TOKEN_PATTERN | MUTT_TOKEN_COMMENT) != 0) || !buf.data)
   {
@@ -1402,9 +1401,8 @@ struct PatternHead *mutt_pattern_comp(const char *s, int flags, struct Buffer *e
   const struct PatternFlags *entry = NULL;
   char *p = NULL;
   char *buf = NULL;
-  struct Buffer ps;
+  struct Buffer ps = { 0 };
 
-  mutt_buffer_init(&ps);
   ps.dptr = (char *) s;
   ps.dsize = mutt_str_strlen(s);
 
@@ -2416,7 +2414,6 @@ bool mutt_limit_current_thread(struct Email *e)
  */
 int mutt_pattern_func(int op, char *prompt)
 {
-  struct Buffer err;
   int rc = -1;
   struct Progress progress;
   struct Buffer *buf = mutt_buffer_pool_get();
@@ -2438,7 +2435,7 @@ int mutt_pattern_func(int op, char *prompt)
   char *simple = mutt_str_strdup(mutt_b2s(buf));
   mutt_check_simple(buf, NONULL(C_SimpleSearch));
 
-  mutt_buffer_init(&err);
+  struct Buffer err = { 0 };
   err.dsize = 256;
   err.data = mutt_mem_malloc(err.dsize);
   struct PatternHead *pat = mutt_pattern_comp(buf->data, MUTT_FULL_MSG, &err);
@@ -2587,8 +2584,7 @@ int mutt_search_command(int cur, int op)
 
     if (!SearchPattern || (mutt_str_strcmp(mutt_b2s(tmp), LastSearchExpn) != 0))
     {
-      struct Buffer err;
-      mutt_buffer_init(&err);
+      struct Buffer err = { 0 };
       OptSearchInvalid = true;
       mutt_str_strfcpy(LastSearch, buf, sizeof(LastSearch));
       mutt_str_strfcpy(LastSearchExpn, mutt_b2s(tmp), sizeof(LastSearchExpn));

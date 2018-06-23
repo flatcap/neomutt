@@ -87,7 +87,8 @@ enum CommandResult mutt_parse_hook(struct Buffer *buf, struct Buffer *s,
                                    unsigned long data, struct Buffer *err)
 {
   struct Hook *ptr = NULL;
-  struct Buffer cmd, pattern;
+  struct Buffer cmd = { 0 };
+  struct Buffer pattern = { 0 };
   int rc;
   bool not = false, warning = false;
   regex_t *rx = NULL;
@@ -808,14 +809,12 @@ void mutt_account_hook(const char *url)
 void mutt_timeout_hook(void)
 {
   struct Hook *hook = NULL;
-  struct Buffer token;
-  struct Buffer err;
+  struct Buffer token = { 0 };
+  struct Buffer err = { 0 };
   char buf[256];
 
-  mutt_buffer_init(&err);
   err.data = buf;
   err.dsize = sizeof(buf);
-  mutt_buffer_init(&token);
 
   TAILQ_FOREACH(hook, &Hooks, entries)
   {
