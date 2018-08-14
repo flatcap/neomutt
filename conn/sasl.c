@@ -50,6 +50,7 @@
 #include "sasl.h"
 #include "account.h"
 #include "connection.h"
+#include "context.h"
 #include "curs_lib.h"
 #include "mutt_account.h"
 #include "options.h"
@@ -321,6 +322,7 @@ static sasl_callback_t *mutt_sasl_get_callbacks(struct Account *account)
 
 /**
  * mutt_sasl_conn_open - empty wrapper for underlying open function
+ * @param ctx  Mailbox
  * @param conn Connection to the server
  * @retval  0 Success
  * @retval -1 Error
@@ -329,11 +331,11 @@ static sasl_callback_t *mutt_sasl_get_callbacks(struct Account *account)
  * conn's methods with sasl methods when authentication is successful, using
  * mutt_sasl_setup_conn
  */
-static int mutt_sasl_conn_open(struct Connection *conn)
+static int mutt_sasl_conn_open(struct Context *ctx, struct Connection *conn)
 {
   struct SaslData *sasldata = (struct SaslData *) conn->sockdata;
   conn->sockdata = sasldata->sockdata;
-  int rc = (sasldata->msasl_open)(conn);
+  int rc = (sasldata->msasl_open)(ctx, conn);
   conn->sockdata = sasldata;
 
   return rc;

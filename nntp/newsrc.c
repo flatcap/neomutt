@@ -998,6 +998,7 @@ const char *nntp_format_str(char *buf, size_t buflen, size_t col, int cols, char
 
 /**
  * nntp_select_server - Open a connection to an NNTP server
+ * @param ctx        Mailbox
  * @param server     Server URI
  * @param leave_lock Leave the server locked?
  * @retval ptr  NNTP server
@@ -1008,7 +1009,7 @@ const char *nntp_format_str(char *buf, size_t buflen, size_t col, int cols, char
  * system has broken mtimes, this might mean the file is reloaded every time,
  * which we'd have to fix.
  */
-struct NntpServer *nntp_select_server(char *server, bool leave_lock)
+struct NntpServer *nntp_select_server(struct Context *ctx, char *server, bool leave_lock)
 {
   char file[PATH_MAX];
 #ifdef USE_HCACHE
@@ -1063,7 +1064,7 @@ struct NntpServer *nntp_select_server(char *server, bool leave_lock)
   {
     if (nserv->status == NNTP_BYE)
       nserv->status = NNTP_NONE;
-    if (nntp_open_connection(nserv) < 0)
+    if (nntp_open_connection(ctx, nserv) < 0)
       return NULL;
 
     rc = nntp_newsrc_parse(nserv);
@@ -1071,7 +1072,7 @@ struct NntpServer *nntp_select_server(char *server, bool leave_lock)
       return NULL;
 
     /* check for new newsgroups */
-    if (!leave_lock && nntp_check_new_groups(nserv) < 0)
+    if (!leave_lock && nntp_check_new_groups(ctx, nserv) < 0)
       rc = -1;
 
     /* .newsrc has been externally modified */
@@ -1090,7 +1091,7 @@ struct NntpServer *nntp_select_server(char *server, bool leave_lock)
   nserv->groups_max = 16;
   nserv->groups_list = mutt_mem_malloc(nserv->groups_max * sizeof(nntp_data));
 
-  rc = nntp_open_connection(nserv);
+  rc = nntp_open_connection(ctx, nserv);
 
   /* try to create cache directory and enable caching */
   nserv->cacheable = false;
@@ -1117,11 +1118,11 @@ struct NntpServer *nntp_select_server(char *server, bool leave_lock)
   {
     /* try to load list of newsgroups from cache */
     if (nserv->cacheable && active_get_cache(nserv) == 0)
-      rc = nntp_check_new_groups(nserv);
+      rc = nntp_check_new_groups(ctx, nserv);
 
     /* load list of newsgroups from server */
     else
-      rc = nntp_active_fetch(nserv, false);
+      rc = nntp_active_fetch(ctx, nserv, false);
   }
 
   if (rc >= 0)
@@ -1299,12 +1300,13 @@ struct NntpData *mutt_newsgroup_unsubscribe(struct NntpServer *nserv, char *grou
 
 /**
  * mutt_newsgroup_catchup - Catchup newsgroup
+ * @param ctx   Mailbox
  * @param nserv NNTP server
  * @param group Newsgroup
  * @retval ptr  NNTP data
  * @retval NULL Error
  */
-struct NntpData *mutt_newsgroup_catchup(struct NntpServer *nserv, char *group)
+struct NntpData *mutt_newsgroup_catchup(struct Context *ctx, struct NntpServer *nserv, char *group)
 {
   struct NntpData *nntp_data = NULL;
 
@@ -1323,22 +1325,23 @@ struct NntpData *mutt_newsgroup_catchup(struct NntpServer *nserv, char *group)
     nntp_data->newsrc_ent[0].last = nntp_data->last_message;
   }
   nntp_data->unread = 0;
-  if (Context && Context->data == nntp_data)
+  if (ctx && ctx->data == nntp_data)
   {
-    for (unsigned int i = 0; i < Context->msgcount; i++)
-      mutt_set_flag(Context, Context->hdrs[i], MUTT_READ, 1);
+    for (unsigned int i = 0; i < ctx->msgcount; i++)
+      mutt_set_flag(ctx, ctx->hdrs[i], MUTT_READ, 1);
   }
   return nntp_data;
 }
 
 /**
  * mutt_newsgroup_uncatchup - Uncatchup newsgroup
+ * @param ctx   Mailbox
  * @param nserv NNTP server
  * @param group Newsgroup
  * @retval ptr  NNTP data
  * @retval NULL Error
  */
-struct NntpData *mutt_newsgroup_uncatchup(struct NntpServer *nserv, char *group)
+struct NntpData *mutt_newsgroup_uncatchup(struct Context *ctx, struct NntpServer *nserv, char *group)
 {
   struct NntpData *nntp_data = NULL;
 
@@ -1356,11 +1359,11 @@ struct NntpData *mutt_newsgroup_uncatchup(struct NntpServer *nserv, char *group)
     nntp_data->newsrc_ent[0].first = 1;
     nntp_data->newsrc_ent[0].last = nntp_data->first_message - 1;
   }
-  if (Context && Context->data == nntp_data)
+  if (ctx && ctx->data == nntp_data)
   {
-    nntp_data->unread = Context->msgcount;
-    for (unsigned int i = 0; i < Context->msgcount; i++)
-      mutt_set_flag(Context, Context->hdrs[i], MUTT_READ, 0);
+    nntp_data->unread = ctx->msgcount;
+    for (unsigned int i = 0; i < ctx->msgcount; i++)
+      mutt_set_flag(ctx, ctx->hdrs[i], MUTT_READ, 0);
   }
   else
   {
@@ -1373,10 +1376,11 @@ struct NntpData *mutt_newsgroup_uncatchup(struct NntpServer *nserv, char *group)
 
 /**
  * nntp_mailbox - Get first newsgroup with new messages
+ * @param ctx Mailbox
  * @param buf Buffer for result
  * @param buflen Length of buffer
  */
-void nntp_mailbox(char *buf, size_t buflen)
+void nntp_mailbox(struct Context *ctx, char *buf, size_t buflen)
 {
   for (unsigned int i = 0; i < CurrentNewsSrv->groups_num; i++)
   {
@@ -1385,13 +1389,13 @@ void nntp_mailbox(char *buf, size_t buflen)
     if (!nntp_data || !nntp_data->subscribed || !nntp_data->unread)
       continue;
 
-    if (Context && Context->magic == MUTT_NNTP &&
-        (mutt_str_strcmp(nntp_data->group, ((struct NntpData *) Context->data)->group) == 0))
+    if (ctx && ctx->magic == MUTT_NNTP &&
+        (mutt_str_strcmp(nntp_data->group, ((struct NntpData *) ctx->data)->group) == 0))
     {
       unsigned int unread = 0;
 
-      for (unsigned int j = 0; j < Context->msgcount; j++)
-        if (!Context->hdrs[j]->read && !Context->hdrs[j]->deleted)
+      for (unsigned int j = 0; j < ctx->msgcount; j++)
+        if (!ctx->hdrs[j]->read && !ctx->hdrs[j]->deleted)
           unread++;
       if (!unread)
         continue;

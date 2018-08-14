@@ -50,12 +50,12 @@ void nntp_acache_free(struct NntpData *nntp_data);
 int  nntp_active_save_cache(struct NntpServer *nserv);
 int  nntp_add_group(char *line, void *data);
 void nntp_bcache_update(struct NntpData *nntp_data);
-int  nntp_check_new_groups(struct NntpServer *nserv);
+int  nntp_check_new_groups(struct Context *ctx, struct NntpServer *nserv);
 void nntp_data_free(void *data);
 void nntp_delete_group_cache(struct NntpData *nntp_data);
 void nntp_group_unread_stat(struct NntpData *nntp_data);
 void nntp_newsrc_gen_entries(struct Context *ctx);
-int  nntp_open_connection(struct NntpServer *nserv);
+int  nntp_open_connection(struct Context *ctx, struct NntpServer *nserv);
 
 #ifdef USE_HCACHE
 header_cache_t *nntp_hcache_open(struct NntpData *nntp_data);

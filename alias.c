@@ -578,6 +578,7 @@ void mutt_alias_delete_reverse(struct Alias *t)
 
 /**
  * mutt_alias_complete - alias completion routine
+ * @param ctx    Mailbox
  * @param buf    Partial Alias to complete
  * @param buflen Length of buffer
  * @retval 1 Success
@@ -587,7 +588,7 @@ void mutt_alias_delete_reverse(struct Alias *t)
  * from the alias list as much as possible. if given empty search string
  * or found nothing, present all aliases
  */
-int mutt_alias_complete(char *buf, size_t buflen)
+int mutt_alias_complete(struct Context *ctx, char *buf, size_t buflen)
 {
   struct Alias *a = NULL, *tmp = NULL;
   struct AliasList a_list = TAILQ_HEAD_INITIALIZER(a_list);
@@ -637,7 +638,7 @@ int mutt_alias_complete(char *buf, size_t buflen)
   }
 
   bestname[0] = '\0';
-  mutt_alias_menu(bestname, sizeof(bestname), !TAILQ_EMPTY(&a_list) ? &a_list : &Aliases);
+  mutt_alias_menu(ctx, bestname, sizeof(bestname), !TAILQ_EMPTY(&a_list) ? &a_list : &Aliases);
   if (bestname[0] != 0)
     mutt_str_strfcpy(buf, bestname, buflen);
 

@@ -34,6 +34,7 @@ extern bool  MenuMoveOff; /**< allow menu to scroll past last entry */
 extern bool  MenuScroll;  /**< scroll menu instead of implicit next-page */
 
 struct ConfigSet;
+struct Context;
 struct HashElem;
 
 #define REDRAW_INDEX          (1 << 0)
@@ -123,15 +124,15 @@ void         menu_redraw_full(struct Menu *menu);
 void         menu_redraw_index(struct Menu *menu);
 void         menu_redraw_motion(struct Menu *menu);
 #ifdef USE_SIDEBAR
-void         menu_redraw_sidebar(struct Menu *menu);
+void         menu_redraw_sidebar(struct Context *ctx, struct Menu *menu);
 #endif
 void         menu_redraw_status(struct Menu *menu);
-int          menu_redraw(struct Menu *menu);
+int          menu_redraw(struct Context *ctx, struct Menu *menu);
 void         menu_top_page(struct Menu *menu);
-void         mutt_menu_current_redraw(void);
+void         mutt_menu_current_redraw(struct Context *ctx);
 void         mutt_menu_destroy(struct Menu **p);
 void         mutt_menu_init(void);
-int          mutt_menu_loop(struct Menu *menu);
+int          mutt_menu_loop(struct Context *ctx, struct Menu *menu);
 struct Menu *mutt_menu_new(int menu);
 void         mutt_menu_pop_current(struct Menu *menu);
 void         mutt_menu_push_current(struct Menu *menu);

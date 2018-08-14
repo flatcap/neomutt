@@ -337,6 +337,7 @@ static const struct PopAuth pop_authenticators[] = {
 
 /**
  * pop_authenticate - Authenticate with a POP server
+ * @param ctx      Mailbox
  * @param pop_data POP Server data
  * @retval num Result, e.g. #POP_A_SUCCESS
  * @retval  0 Successful
@@ -344,7 +345,7 @@ static const struct PopAuth pop_authenticators[] = {
  * @retval -2 Login failed
  * @retval -3 Authentication cancelled
  */
-int pop_authenticate(struct PopData *pop_data)
+int pop_authenticate(struct Context *ctx, struct PopData *pop_data)
 {
   struct Account *acct = &pop_data->conn->account;
   const struct PopAuth *authenticator = NULL;
@@ -382,7 +383,7 @@ int pop_authenticate(struct PopData *pop_data)
           ret = authenticator->authenticate(pop_data, method);
           if (ret == POP_A_SOCKET)
           {
-            switch (pop_connect(pop_data))
+            switch (pop_connect(ctx, pop_data))
             {
               case 0:
               {
@@ -422,7 +423,7 @@ int pop_authenticate(struct PopData *pop_data)
       ret = authenticator->authenticate(pop_data, authenticator->method);
       if (ret == POP_A_SOCKET)
       {
-        switch (pop_connect(pop_data))
+        switch (pop_connect(ctx, pop_data))
         {
           case 0:
           {

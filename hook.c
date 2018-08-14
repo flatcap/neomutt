@@ -525,14 +525,15 @@ static int addr_hook(char *path, size_t pathlen, int type, struct Context *ctx,
 
 /**
  * mutt_default_save - Find the default save path for an email
+ * @param ctx     Mailbox
  * @param path    Buffer for the path
  * @param pathlen Length of buffer
  * @param hdr     Email Header
  */
-void mutt_default_save(char *path, size_t pathlen, struct Header *hdr)
+void mutt_default_save(struct Context *ctx, char *path, size_t pathlen, struct Header *hdr)
 {
   *path = '\0';
-  if (addr_hook(path, pathlen, MUTT_SAVE_HOOK, Context, hdr) == 0)
+  if (addr_hook(path, pathlen, MUTT_SAVE_HOOK, ctx, hdr) == 0)
     return;
 
   struct Address *addr = NULL;

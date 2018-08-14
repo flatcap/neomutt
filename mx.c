@@ -161,7 +161,7 @@ int mx_access(const char *path, int flags)
 {
 #ifdef USE_IMAP
   if (imap_path_probe(path, NULL) == MUTT_IMAP)
-    return imap_access(path);
+    return imap_access(Context, path);
 #endif
 
   return access(path, flags);
@@ -452,9 +452,9 @@ static int trash_append(struct Context *ctx)
   }
 
 #ifdef USE_IMAP
-  if (Context->magic == MUTT_IMAP && (imap_path_probe(Trash, NULL) == MUTT_IMAP))
+  if (ctx->magic == MUTT_IMAP && (imap_path_probe(Trash, NULL) == MUTT_IMAP))
   {
-    if (imap_fast_trash(Context, Trash) == 0)
+    if (imap_fast_trash(ctx, Trash) == 0)
       return 0;
   }
 #endif
@@ -528,7 +528,7 @@ int mx_mbox_close(struct Context **pctx, int *index_hint)
         return -1;
       }
       else if (rc == MUTT_YES)
-        mutt_newsgroup_catchup(nntp_data->nserv, nntp_data->group);
+        mutt_newsgroup_catchup(ctx, nntp_data->nserv, nntp_data->group);
     }
   }
 #endif
@@ -1425,7 +1425,7 @@ int mx_path_canon(char *buf, size_t buflen, const char *folder)
       h->env = mutt_env_new();
       h->env->from = alias;
       h->env->to = alias;
-      mutt_default_save(buf, buflen, h);
+      mutt_default_save(Context, buf, buflen, h);
       h->env->from = NULL;
       h->env->to = NULL;
       mutt_header_free(&h);

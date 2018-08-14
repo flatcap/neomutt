@@ -4268,6 +4268,7 @@ static void crypt_add_string_to_hints(const char *str, struct ListHead *hints)
 
 /**
  * crypt_select_key - Get the user to select a key
+ * @param[in]  ctx          Mailbox
  * @param[in]  keys         List of keys to select from
  * @param[in]  p            Address to match
  * @param[in]  s            Real name to display
@@ -4277,7 +4278,7 @@ static void crypt_add_string_to_hints(const char *str, struct ListHead *hints)
  *
  * Display a menu to select a key from the array of keys.
  */
-static struct CryptKeyInfo *crypt_select_key(struct CryptKeyInfo *keys,
+static struct CryptKeyInfo *crypt_select_key(struct Context *ctx, struct CryptKeyInfo *keys,
                                              struct Address *p, const char *s,
                                              unsigned int app, int *forced_valid)
 {
@@ -4393,7 +4394,7 @@ static struct CryptKeyInfo *crypt_select_key(struct CryptKeyInfo *keys,
   while (!done)
   {
     *forced_valid = 0;
-    switch (mutt_menu_loop(menu))
+    switch (mutt_menu_loop(ctx, menu))
     {
       case OP_VERIFY_KEY:
         verify_key(key_table[menu->current]);
@@ -4482,6 +4483,7 @@ static struct CryptKeyInfo *crypt_select_key(struct CryptKeyInfo *keys,
 
 /**
  * crypt_getkeybyaddr - Find a key by email address
+ * @param[in]  ctx          Mailbox
  * @param[in]  a            Address to match
  * @param[in]  abilities    Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param[in]  app          Application type, e.g. #APPLICATION_PGP
@@ -4489,7 +4491,7 @@ static struct CryptKeyInfo *crypt_select_key(struct CryptKeyInfo *keys,
  * @param[in]  oppenc_mode  If true, use opportunistic encryption
  * @retval ptr Matching key
  */
-static struct CryptKeyInfo *crypt_getkeybyaddr(struct Address *a,
+static struct CryptKeyInfo *crypt_getkeybyaddr(struct Context *ctx, struct Address *a,
                                                short abilities, unsigned int app,
                                                int *forced_valid, bool oppenc_mode)
 {
@@ -4601,7 +4603,7 @@ static struct CryptKeyInfo *crypt_getkeybyaddr(struct Address *a,
     else
     {
       /* Else: Ask the user.  */
-      k = crypt_select_key(matches, a, NULL, app, forced_valid);
+      k = crypt_select_key(ctx, matches, a, NULL, app, forced_valid);
     }
 
     crypt_free_key(&matches);
@@ -4614,13 +4616,14 @@ static struct CryptKeyInfo *crypt_getkeybyaddr(struct Address *a,
 
 /**
  * crypt_getkeybystr - Find a key by string
+ * @param[in]  ctx          Mailbox
  * @param[in]  p            String to match
  * @param[in]  abilities    Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param[in]  app          Application type, e.g. #APPLICATION_PGP
  * @param[out] forced_valid Set to true if user overrode key's validity
  * @retval ptr Matching key
  */
-static struct CryptKeyInfo *crypt_getkeybystr(char *p, short abilities,
+static struct CryptKeyInfo *crypt_getkeybystr(struct Context *ctx, char *p, short abilities,
                                               unsigned int app, int *forced_valid)
 {
   struct ListHead hints = STAILQ_HEAD_INITIALIZER(hints);
@@ -4676,7 +4679,7 @@ static struct CryptKeyInfo *crypt_getkeybystr(char *p, short abilities,
 
   if (matches)
   {
-    k = crypt_select_key(matches, NULL, p, app, forced_valid);
+    k = crypt_select_key(ctx, matches, NULL, p, app, forced_valid);
     crypt_free_key(&matches);
     return k;
   }
@@ -4686,6 +4689,7 @@ static struct CryptKeyInfo *crypt_getkeybystr(char *p, short abilities,
 
 /**
  * crypt_ask_for_key - Ask the user for a key
+ * @param[in]  ctx          Mailbox
  * @param[in]  tag          Prompt to display
  * @param[in]  whatfor      Label to use (OPTIONAL)
  * @param[in]  abilities    Flags, e.g. #KEYFLAG_CANSIGN
@@ -4696,7 +4700,8 @@ static struct CryptKeyInfo *crypt_getkeybystr(char *p, short abilities,
  * If whatfor is not null use it as default and store it under that label as
  * the next default.
  */
-static struct CryptKeyInfo *crypt_ask_for_key(char *tag, char *whatfor, short abilities,
+static struct CryptKeyInfo *crypt_ask_for_key(struct Context *ctx, char *tag,
+                                              char *whatfor, short abilities,
                                               unsigned int app, int *forced_valid)
 {
   struct CryptKeyInfo *key = NULL;
@@ -4743,7 +4748,7 @@ static struct CryptKeyInfo *crypt_ask_for_key(char *tag, char *whatfor, short ab
       }
     }
 
-    key = crypt_getkeybystr(resp, abilities, app, forced_valid);
+    key = crypt_getkeybystr(ctx, resp, abilities, app, forced_valid);
     if (key)
       return key;
 
@@ -4754,6 +4759,7 @@ static struct CryptKeyInfo *crypt_ask_for_key(char *tag, char *whatfor, short ab
 
 /**
  * find_keys - Find keys of the recipients of the message
+ * @param ctx         Mailbox
  * @param addrlist    Address List
  * @param app         Application type, e.g. #APPLICATION_PGP
  * @param oppenc_mode If true, use opportunistic encryption
@@ -4763,7 +4769,8 @@ static struct CryptKeyInfo *crypt_ask_for_key(char *tag, char *whatfor, short ab
  * If oppenc_mode is true, only keys that can be determined without prompting
  * will be used.
  */
-static char *find_keys(struct Address *addrlist, unsigned int app, bool oppenc_mode)
+static char *find_keys(struct Context *ctx, struct Address *addrlist,
+                       unsigned int app, bool oppenc_mode)
 {
   struct ListHead crypt_hook_list = STAILQ_HEAD_INITIALIZER(crypt_hook_list);
   struct ListNode *crypt_hook = NULL;
@@ -4822,7 +4829,7 @@ static char *find_keys(struct Address *addrlist, unsigned int app, bool oppenc_m
           }
           else if (!oppenc_mode)
           {
-            k_info = crypt_getkeybystr(crypt_hook_val, KEYFLAG_CANENCRYPT, app, &forced_valid);
+            k_info = crypt_getkeybystr(ctx, crypt_hook_val, KEYFLAG_CANENCRYPT, app, &forced_valid);
           }
         }
         else if (r == MUTT_NO)
@@ -4844,14 +4851,14 @@ static char *find_keys(struct Address *addrlist, unsigned int app, bool oppenc_m
 
       if (!k_info)
       {
-        k_info = crypt_getkeybyaddr(q, KEYFLAG_CANENCRYPT, app, &forced_valid, oppenc_mode);
+        k_info = crypt_getkeybyaddr(ctx, q, KEYFLAG_CANENCRYPT, app, &forced_valid, oppenc_mode);
       }
 
       if (!k_info && !oppenc_mode)
       {
         snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), q->mailbox);
 
-        k_info = crypt_ask_for_key(buf, q->mailbox, KEYFLAG_CANENCRYPT, app, &forced_valid);
+        k_info = crypt_ask_for_key(ctx, buf, q->mailbox, KEYFLAG_CANENCRYPT, app, &forced_valid);
       }
 
       if (!k_info)
@@ -4889,23 +4896,23 @@ static char *find_keys(struct Address *addrlist, unsigned int app, bool oppenc_m
 /**
  * pgp_gpgme_find_keys - Implements CryptModuleSpecs::find_keys()
  */
-char *pgp_gpgme_find_keys(struct Address *addrlist, bool oppenc_mode)
+char *pgp_gpgme_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode)
 {
-  return find_keys(addrlist, APPLICATION_PGP, oppenc_mode);
+  return find_keys(ctx, addrlist, APPLICATION_PGP, oppenc_mode);
 }
 
 /**
  * smime_gpgme_find_keys - Implements CryptModuleSpecs::find_keys()
  */
-char *smime_gpgme_find_keys(struct Address *addrlist, bool oppenc_mode)
+char *smime_gpgme_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode)
 {
-  return find_keys(addrlist, APPLICATION_SMIME, oppenc_mode);
+  return find_keys(ctx, addrlist, APPLICATION_SMIME, oppenc_mode);
 }
 
 /**
  * pgp_gpgme_make_key_attachment - Implements CryptModuleSpecs::pgp_make_key_attachment()
  */
-struct Body *pgp_gpgme_make_key_attachment(void)
+struct Body *pgp_gpgme_make_key_attachment(struct Context *ctx)
 {
 #ifdef HAVE_GPGME_OP_EXPORT_KEYS
   gpgme_ctx_t context = NULL;
@@ -4918,7 +4925,7 @@ struct Body *pgp_gpgme_make_key_attachment(void)
 
   OptPgpCheckTrust = false;
 
-  struct CryptKeyInfo *key = crypt_ask_for_key(_("Please enter the key ID: "),
+  struct CryptKeyInfo *key = crypt_ask_for_key(ctx, _("Please enter the key ID: "),
                                                NULL, 0, APPLICATION_PGP, NULL);
   if (!key)
     goto bail;
@@ -5029,11 +5036,12 @@ void smime_gpgme_init(void)
 
 /**
  * gpgme_send_menu - Show the user the encryption/signing menu
+ * @param ctx      Mailbox
  * @param msg      Header of email
  * @param is_smime True if an SMIME message
  * @retval num Flags, e.g. #APPLICATION_SMIME | #ENCRYPT
  */
-static int gpgme_send_menu(struct Header *msg, int is_smime)
+static int gpgme_send_menu(struct Context *ctx, struct Header *msg, int is_smime)
 {
   struct CryptKeyInfo *p = NULL;
   const char *prompt = NULL;
@@ -5122,7 +5130,7 @@ static int gpgme_send_menu(struct Header *msg, int is_smime)
     switch (choices[choice - 1])
     {
       case 'a': /* sign (a)s */
-        p = crypt_ask_for_key(_("Sign as: "), NULL, KEYFLAG_CANSIGN,
+        p = crypt_ask_for_key(ctx, _("Sign as: "), NULL, KEYFLAG_CANSIGN,
                               is_smime ? APPLICATION_SMIME : APPLICATION_PGP, NULL);
         if (p)
         {
@@ -5165,12 +5173,12 @@ static int gpgme_send_menu(struct Header *msg, int is_smime)
           msg->security &= ~APPLICATION_SMIME;
           msg->security |= APPLICATION_PGP;
         }
-        crypt_opportunistic_encrypt(msg);
+        crypt_opportunistic_encrypt(ctx, msg);
         break;
 
       case 'O': /* oppenc mode on */
         msg->security |= OPPENCRYPT;
-        crypt_opportunistic_encrypt(msg);
+        crypt_opportunistic_encrypt(ctx, msg);
         break;
 
       case 'o': /* oppenc mode off */
@@ -5194,17 +5202,17 @@ static int gpgme_send_menu(struct Header *msg, int is_smime)
 /**
  * pgp_gpgme_send_menu - Implements CryptModuleSpecs::send_menu()
  */
-int pgp_gpgme_send_menu(struct Header *msg)
+int pgp_gpgme_send_menu(struct Context *ctx, struct Header *msg)
 {
-  return gpgme_send_menu(msg, 0);
+  return gpgme_send_menu(ctx, msg, 0);
 }
 
 /**
  * smime_gpgme_send_menu - Implements CryptModuleSpecs::send_menu()
  */
-int smime_gpgme_send_menu(struct Header *msg)
+int smime_gpgme_send_menu(struct Context *ctx, struct Header *msg)
 {
-  return gpgme_send_menu(msg, 1);
+  return gpgme_send_menu(ctx, msg, 1);
 }
 
 /**
@@ -5289,7 +5297,7 @@ static bool verify_sender(struct Header *h)
 /**
  * smime_gpgme_verify_sender - Implements CryptModuleSpecs::smime_verify_sender()
  */
-int smime_gpgme_verify_sender(struct Header *h)
+int smime_gpgme_verify_sender(struct Context *ctx, struct Header *h)
 {
   return verify_sender(h);
 }

@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 
+struct Context;
 struct Header;
 
 /* These Config Variables are only used in compose.c */

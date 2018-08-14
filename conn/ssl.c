@@ -929,6 +929,7 @@ static int ssl_cache_trusted_cert(X509 *c)
 
 /**
  * interactive_check_cert - Ask the user if a certificate is valid
+ * @param ctx          Mailbox
  * @param cert         Certificate
  * @param idx          Place of certificate in the chain
  * @param len          Length of the certificate chain
@@ -937,7 +938,7 @@ static int ssl_cache_trusted_cert(X509 *c)
  * @retval true  User selected 'skip'
  * @retval false Otherwise
  */
-static bool interactive_check_cert(X509 *cert, int idx, size_t len, SSL *ssl, bool allow_always)
+static bool interactive_check_cert(struct Context *ctx, X509 *cert, int idx, size_t len, SSL *ssl, bool allow_always)
 {
   static const int part[] = {
     NID_commonName,             /* CN */
@@ -1051,7 +1052,7 @@ static bool interactive_check_cert(X509 *cert, int idx, size_t len, SSL *ssl, bo
   OptIgnoreMacroEvents = true;
   while (!done)
   {
-    switch (mutt_menu_loop(menu))
+    switch (mutt_menu_loop(ctx, menu))
     {
       case -1:         /* abort */
       case OP_MAX + 1: /* reject */
@@ -1194,7 +1195,7 @@ static int ssl_verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
       mutt_error(_("Certificate host check failed: %s"), buf);
       /* we disallow (a)ccept always in the prompt, because it will have no effect
        * for hostname mismatches. */
-      return interactive_check_cert(cert, pos, len, ssl, false);
+      return interactive_check_cert(Context, cert, pos, len, ssl, false);
     }
     mutt_debug(2, "hostname check passed\n");
   }
@@ -1215,7 +1216,7 @@ static int ssl_verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
     mutt_debug(2, "X509_verify_cert: %s\n", buf);
 
     /* prompt user */
-    return interactive_check_cert(cert, pos, len, ssl, true);
+    return interactive_check_cert(Context, cert, pos, len, ssl, true);
   }
 
   return true;
@@ -1394,15 +1395,16 @@ free_sasldata:
 
 /**
  * ssl_socket_open - Open an SSL socket
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval  0 Success
  * @retval -1 Error
  */
-static int ssl_socket_open(struct Connection *conn)
+static int ssl_socket_open(struct Context *ctx, struct Connection *conn)
 {
   int ret;
 
-  if (raw_socket_open(conn) < 0)
+  if (raw_socket_open(ctx, conn) < 0)
     return -1;
 
   ret = ssl_setup(conn);

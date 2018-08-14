@@ -272,11 +272,11 @@ int imap_create_mailbox(struct ImapData *idata, char *mailbox);
 int imap_rename_mailbox(struct ImapData *idata, struct ImapMbox *mx, const char *newname);
 struct ImapStatus *imap_mboxcache_get(struct ImapData *idata, const char *mbox, bool create);
 void imap_mboxcache_free(struct ImapData *idata);
-int imap_exec_msgset(struct ImapData *idata, const char *pre, const char *post,
-                     int flag, bool changed, bool invert);
-int imap_open_connection(struct ImapData *idata);
+int imap_exec_msgset(struct Context *ctx, struct ImapData *idata, const char *pre,
+                     const char *post, int flag, bool changed, bool invert);
+int imap_open_connection(struct Context *ctx, struct ImapData *idata);
 void imap_close_connection(struct ImapData *idata);
-struct ImapData *imap_conn_find(const struct Account *account, int flags);
+struct ImapData *imap_conn_find(struct Context *ctx, const struct Account *account, int flags);
 int imap_read_literal(FILE *fp, struct ImapData *idata, unsigned long bytes, struct Progress *pbar);
 void imap_expunge_mailbox(struct ImapData *idata);
 void imap_logout(struct ImapData **idata);

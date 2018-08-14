@@ -29,22 +29,24 @@
 #include <stdio.h>
 
 struct AttachCtx;
-struct Menu;
-struct Header;
 struct Body;
+struct Context;
+struct Header;
+struct Menu;
 
 int mutt_tag_attach(struct Menu *menu, int n, int m);
-int mutt_attach_display_loop(struct Menu *menu, int op, struct Header *hdr,
-                             struct AttachCtx *actx, bool recv);
+int mutt_attach_display_loop(struct Menu *menu, int op, struct Context *ctx,
+                             struct Header *hdr, struct AttachCtx *actx, bool recv);
 
 void mutt_save_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
-                               struct Body *top, struct Header *hdr, struct Menu *menu);
+                               struct Body *top, struct Context *ctx,
+                               struct Header *hdr, struct Menu *menu);
 void mutt_pipe_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
                                struct Body *top, bool filter);
 void mutt_print_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
                                 struct Body *top);
 
-int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr, struct AttachCtx *actx);
+int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Context *ctx, struct Header *hdr, struct AttachCtx *actx);
 
 void mutt_check_lookup_list(struct Body *b, char *type, size_t len);
 int mutt_compose_attachment(struct Body *a);

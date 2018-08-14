@@ -30,6 +30,7 @@
 #include <time.h>
 
 struct Connection;
+struct Context;
 
 int mutt_sasl_client_new(struct Connection *conn, sasl_conn_t **saslconn);
 int mutt_sasl_interact(sasl_interact_t *interaction);
@@ -52,7 +53,7 @@ struct SaslData
 
   /* underlying socket data */
   void *sockdata;
-  int (*msasl_open)(struct Connection *conn);
+  int (*msasl_open)(struct Context *ctx, struct Connection *conn);
   int (*msasl_close)(struct Connection *conn);
   int (*msasl_read)(struct Connection *conn, char *buf, size_t len);
   int (*msasl_write)(struct Connection *conn, const char *buf, size_t count);

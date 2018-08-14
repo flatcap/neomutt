@@ -92,18 +92,19 @@ static int socket_preconnect(void)
 
 /**
  * mutt_socket_open - Simple wrapper
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval  0 Success
  * @retval -1 Error
  */
-int mutt_socket_open(struct Connection *conn)
+int mutt_socket_open(struct Context *ctx, struct Connection *conn)
 {
   int rc;
 
   if (socket_preconnect())
     return -1;
 
-  rc = conn->conn_open(conn);
+  rc = conn->conn_open(ctx, conn);
 
   mutt_debug(2, "Connected to %s:%d on fd=%d\n", conn->account.host,
              conn->account.port, conn->fd);

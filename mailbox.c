@@ -694,7 +694,7 @@ int mutt_parse_mailboxes(struct Buffer *path, struct Buffer *s,
     STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
 
 #ifdef USE_SIDEBAR
-    mutt_sb_notify_mailbox(b, true);
+    mutt_sb_notify_mailbox(Context, b, true);
 #endif
   }
   return 0;
@@ -753,7 +753,7 @@ int mutt_parse_unmailboxes(struct Buffer *path, struct Buffer *s,
           (mutt_str_strcasecmp(buf, np->b->desc) == 0))
       {
 #ifdef USE_SIDEBAR
-        mutt_sb_notify_mailbox(np->b, false);
+        mutt_sb_notify_mailbox(Context, np->b, false);
 #endif
         STAILQ_REMOVE(&AllMailboxes, np, MailboxNode, entries);
         mailbox_free(&np->b);
@@ -810,7 +810,7 @@ int mutt_mailbox_check(int force)
   MailboxNotify = 0;
 
 #ifdef USE_IMAP
-  MailboxCount += imap_mailbox_check(check_stats);
+  MailboxCount += imap_mailbox_check(Context, check_stats);
 #endif
 
   /* check device ID and serial number instead of comparing paths */

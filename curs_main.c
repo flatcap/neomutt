@@ -562,7 +562,7 @@ static int main_change_folder(struct Menu *menu, int op, char *buf,
     collapse_all(menu, 0);
 
 #ifdef USE_SIDEBAR
-  mutt_sb_set_open_mailbox();
+  mutt_sb_set_open_mailbox(Context);
 #endif
 
   mutt_clear_error();
@@ -849,7 +849,7 @@ static void index_menu_redraw(struct Menu *menu)
   if (menu->redraw & REDRAW_SIDEBAR)
   {
     mutt_sb_set_mailbox_stats(Context);
-    menu_redraw_sidebar(menu);
+    menu_redraw_sidebar(Context, menu);
   }
 #endif
 
@@ -871,7 +871,7 @@ static void index_menu_redraw(struct Menu *menu)
   if (menu->redraw & REDRAW_STATUS)
   {
     char buf[LONG_STRING];
-    menu_status_line(buf, sizeof(buf), menu, NONULL(StatusFormat));
+    menu_status_line(Context, buf, sizeof(buf), menu, NONULL(StatusFormat));
     mutt_window_move(MuttStatusWindow, 0, 0);
     SETCOLOR(MT_COLOR_STATUS);
     mutt_draw_statusline(MuttStatusWindow->cols, buf, sizeof(buf));
@@ -879,9 +879,9 @@ static void index_menu_redraw(struct Menu *menu)
     menu->redraw &= ~REDRAW_STATUS;
     if (TsEnabled && TsSupported)
     {
-      menu_status_line(buf, sizeof(buf), menu, NONULL(TsStatusFormat));
+      menu_status_line(Context, buf, sizeof(buf), menu, NONULL(TsStatusFormat));
       mutt_ts_status(buf);
-      menu_status_line(buf, sizeof(buf), menu, NONULL(TsIconFormat));
+      menu_status_line(Context, buf, sizeof(buf), menu, NONULL(TsIconFormat));
       mutt_ts_icon(buf);
     }
   }
@@ -1011,7 +1011,7 @@ int mutt_index_menu(void)
               if (NewMailCommand)
               {
                 char cmd[LONG_STRING];
-                menu_status_line(cmd, sizeof(cmd), menu, NONULL(NewMailCommand));
+                menu_status_line(Context, cmd, sizeof(cmd), menu, NONULL(NewMailCommand));
                 if (mutt_system(cmd) != 0)
                   mutt_error(_("Error running \"%s\""), cmd);
               }
@@ -1054,7 +1054,7 @@ int mutt_index_menu(void)
           if (NewMailCommand)
           {
             char cmd[LONG_STRING];
-            menu_status_line(cmd, sizeof(cmd), menu, NONULL(NewMailCommand));
+            menu_status_line(Context, cmd, sizeof(cmd), menu, NONULL(NewMailCommand));
             if (mutt_system(cmd) != 0)
               mutt_error(_("Error running \"%s\""), cmd);
           }
@@ -1470,7 +1470,7 @@ int mutt_index_menu(void)
       case OP_MAIN_FETCH_MAIL:
 
         CHECK_ATTACH;
-        pop_fetch_mail();
+        pop_fetch_mail(Context);
         menu->redraw = REDRAW_FULL;
         break;
 #endif /* USE_POP */
@@ -1712,7 +1712,7 @@ int mutt_index_menu(void)
       case OP_COMPOSE_TO_SENDER:
         if (Context)
         {
-          mutt_compose_to_sender(tag ? NULL : CURHDR);
+          mutt_compose_to_sender(Context, tag ? NULL : CURHDR);
           menu->redraw = REDRAW_FULL;
         }
         break;
@@ -2119,14 +2119,14 @@ int mutt_index_menu(void)
           if (op == OP_MAIN_CHANGE_GROUP || op == OP_MAIN_CHANGE_GROUP_READONLY)
           {
             OptNews = true;
-            CurrentNewsSrv = nntp_select_server(NewsServer, false);
+            CurrentNewsSrv = nntp_select_server(Context, NewsServer, false);
             if (!CurrentNewsSrv)
               break;
             if (flags)
               cp = _("Open newsgroup in read-only mode");
             else
               cp = _("Open newsgroup");
-            nntp_mailbox(buf, sizeof(buf));
+            nntp_mailbox(Context, buf, sizeof(buf));
           }
           else
 #endif
@@ -2164,7 +2164,7 @@ int mutt_index_menu(void)
 #endif
         mutt_expand_path(buf, sizeof(buf));
 #ifdef USE_SIDEBAR
-        mutt_sb_set_open_mailbox();
+        mutt_sb_set_open_mailbox(Context);
 #endif
         break;
 
@@ -2825,7 +2825,7 @@ int mutt_index_menu(void)
 
       case OP_QUERY:
         CHECK_ATTACH;
-        mutt_query_menu(NULL, 0);
+        mutt_query_menu(Context, NULL, 0);
         break;
 
       case OP_PURGE_MESSAGE:
@@ -2919,7 +2919,7 @@ int mutt_index_menu(void)
         if (Context && Context->magic == MUTT_NNTP)
         {
           struct NntpData *nntp_data = Context->data;
-          if (mutt_newsgroup_catchup(nntp_data->nserv, nntp_data->group))
+          if (mutt_newsgroup_catchup(Context, nntp_data->nserv, nntp_data->group))
             menu->redraw = REDRAW_INDEX | REDRAW_STATUS;
         }
         break;
@@ -3363,7 +3363,7 @@ int mutt_index_menu(void)
       case OP_VIEW_ATTACHMENTS:
         CHECK_MSGCOUNT;
         CHECK_VISIBLE;
-        mutt_view_attachments(CURHDR);
+        mutt_view_attachments(Context, CURHDR);
         if (Context && CURHDR->attach_del)
           Context->changed = true;
         menu->redraw = REDRAW_FULL;
@@ -3392,7 +3392,7 @@ int mutt_index_menu(void)
         break;
 
       case OP_SIDEBAR_TOGGLE_VIRTUAL:
-        mutt_sb_toggle_virtual();
+        mutt_sb_toggle_virtual(Context);
         break;
 #endif
       default:

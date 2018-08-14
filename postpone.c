@@ -113,7 +113,7 @@ int mutt_num_postponed(bool force)
     {
       short newpc;
 
-      newpc = imap_status(Postponed, false);
+      newpc = imap_status(Context, Postponed, false);
       if (newpc >= 0)
       {
         PostCount = newpc;
@@ -226,7 +226,7 @@ static struct Header *select_msg(void)
 
   while (!done)
   {
-    const int i = mutt_menu_loop(menu);
+    const int i = mutt_menu_loop(Context, menu);
     switch (i)
     {
       case OP_DELETE:
@@ -410,7 +410,7 @@ int mutt_get_postponed(struct Context *ctx, struct Header *hdr,
   }
 
   if (CryptOpportunisticEncrypt)
-    crypt_opportunistic_encrypt(hdr);
+    crypt_opportunistic_encrypt(ctx, hdr);
 
   return code;
 }
@@ -719,7 +719,7 @@ int mutt_prepare_template(FILE *fp, struct Context *ctx, struct Header *newhdr,
       {
         if (!crypt_valid_passphrase(APPLICATION_SMIME))
           goto bail;
-        crypt_smime_getkeys(newhdr->env);
+        crypt_smime_getkeys(Context, newhdr->env);
         mutt_message(_("Decrypting message..."));
       }
 

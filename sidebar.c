@@ -76,6 +76,7 @@ struct SbEntry
   char box[STRING];        /**< formatted mailbox name */
   struct Mailbox *mailbox; /**< Mailbox this represents */
   bool is_hidden;          /**< Don't show, e.g. $sidebar_new_mail_only */
+  struct Context *ctx;     /**< Current Mailbox */
 };
 
 static int EntryCount = 0;
@@ -139,7 +140,7 @@ static const char *sidebar_format_str(char *buf, size_t buflen, size_t col, int 
   if (!b)
     return src;
 
-  int c = Context && (mutt_str_strcmp(Context->realpath, b->realpath) == 0);
+  int c = sbe->ctx && (mutt_str_strcmp(sbe->ctx->realpath, b->realpath) == 0);
 
   optional = flags & MUTT_FORMAT_OPTIONAL;
 
@@ -153,9 +154,9 @@ static const char *sidebar_format_str(char *buf, size_t buflen, size_t col, int 
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, c ? Context->deleted : 0);
+        snprintf(buf, buflen, fmt, c ? sbe->ctx->deleted : 0);
       }
-      else if ((c && Context->deleted == 0) || !c)
+      else if ((c && sbe->ctx->deleted == 0) || !c)
         optional = 0;
       break;
 
@@ -173,9 +174,9 @@ static const char *sidebar_format_str(char *buf, size_t buflen, size_t col, int 
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, c ? Context->vcount : b->msg_count);
+        snprintf(buf, buflen, fmt, c ? sbe->ctx->vcount : b->msg_count);
       }
-      else if ((c && Context->vcount == b->msg_count) || !c)
+      else if ((c && sbe->ctx->vcount == b->msg_count) || !c)
         optional = 0;
       break;
 
@@ -213,9 +214,9 @@ static const char *sidebar_format_str(char *buf, size_t buflen, size_t col, int 
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, c ? Context->tagged : 0);
+        snprintf(buf, buflen, fmt, c ? sbe->ctx->tagged : 0);
       }
-      else if ((c && Context->tagged == 0) || !c)
+      else if ((c && sbe->ctx->tagged == 0) || !c)
         optional = 0;
       break;
 
@@ -347,6 +348,7 @@ static int cb_qsort_sbe(const void *a, const void *b)
 
 /**
  * update_entries_visibility - Should a sidebar_entry be displayed in the sidebar
+ * @param ctx Mailbox
  *
  * For each SbEntry in the Entries array, check whether we should display it.
  * This is determined by several criteria.  If the Mailbox:
@@ -356,7 +358,7 @@ static int cb_qsort_sbe(const void *a, const void *b)
  * * has flagged messages
  * * is whitelisted
  */
-static void update_entries_visibility(void)
+static void update_entries_visibility(struct Context *ctx)
 {
   short new_only = SidebarNewMailOnly;
   struct SbEntry *sbe = NULL;
@@ -384,7 +386,7 @@ static void update_entries_visibility(void)
       continue;
     }
 
-    if (Context && (mutt_str_strcmp(sbe->mailbox->realpath, Context->realpath) == 0))
+    if (ctx && (mutt_str_strcmp(sbe->mailbox->realpath, ctx->realpath) == 0))
     {
       /* Spool directory */
       continue;
@@ -604,6 +606,7 @@ static int select_page_up(void)
 
 /**
  * prepare_sidebar - Prepare the list of SbEntry's for the sidebar display
+ * @param ctx        Mailbox
  * @param page_size  The number of lines on a page
  * @retval false No, don't draw the sidebar
  * @retval true  Yes, draw the sidebar
@@ -614,7 +617,7 @@ static int select_page_up(void)
  * This is a lot of work to do each refresh, but there are many things that
  * can change outside of the sidebar that we don't hear about.
  */
-static bool prepare_sidebar(int page_size)
+static bool prepare_sidebar(struct Context *ctx, int page_size)
 {
   if (!EntryCount || (page_size <= 0))
     return false;
@@ -622,7 +625,7 @@ static bool prepare_sidebar(int page_size)
   const struct SbEntry *opn_entry = (OpnIndex >= 0) ? Entries[OpnIndex] : NULL;
   const struct SbEntry *hil_entry = (HilIndex >= 0) ? Entries[HilIndex] : NULL;
 
-  update_entries_visibility();
+  update_entries_visibility(ctx);
   sort_entries();
 
   for (int i = 0; i < EntryCount; i++)
@@ -797,6 +800,7 @@ static void fill_empty_space(int first_row, int num_rows, int div_width, int num
 
 /**
  * draw_sidebar - Write out a list of mailboxes, in a panel
+ * @param ctx        Mailbox
  * @param num_rows   Height of the Sidebar
  * @param num_cols   Width of the Sidebar
  * @param div_width  Width in screen characters taken by the divider
@@ -816,7 +820,7 @@ static void fill_empty_space(int first_row, int num_rows, int div_width, int num
  * "sidebar_indent_string" and sorted: "sidebar_sort_method".  Finally, they're
  * trimmed to fit the available space.
  */
-static void draw_sidebar(int num_rows, int num_cols, int div_width)
+static void draw_sidebar(struct Context *ctx, int num_rows, int num_cols, int div_width)
 {
   struct SbEntry *entry = NULL;
   struct Mailbox *b = NULL;
@@ -863,8 +867,8 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
       col = div_width;
 
     mutt_window_move(MuttSidebarWindow, row, col);
-    if (Context && Context->realpath &&
-        (mutt_str_strcmp(b->realpath, Context->realpath) == 0))
+    if (ctx && ctx->realpath &&
+        (mutt_str_strcmp(b->realpath, ctx->realpath) == 0))
     {
 #ifdef USE_NOTMUCH
       if (b->magic == MUTT_NOTMUCH)
@@ -872,10 +876,10 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
       else
 #endif
       {
-        b->msg_unread = Context->unread;
-        b->msg_count = Context->msgcount;
+        b->msg_unread = ctx->unread;
+        b->msg_count = ctx->msgcount;
       }
-      b->msg_flagged = Context->flagged;
+      b->msg_flagged = ctx->flagged;
     }
 
     /* compute length of Folder without trailing separator */
@@ -954,6 +958,7 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
       }
     }
     char str[STRING];
+    entry->ctx = ctx;
     make_sidebar_entry(str, sizeof(str), w, sidebar_folder_name, entry);
     printw("%s", str);
     if (sidebar_folder_depth > 0)
@@ -966,11 +971,12 @@ static void draw_sidebar(int num_rows, int num_cols, int div_width)
 
 /**
  * mutt_sb_draw - Completely redraw the sidebar
+ * @param ctx Mailbox
  *
  * Completely refresh the sidebar region.  First draw the divider; then, for
  * each Mailbox, call make_sidebar_entry; finally blank out any remaining space.
  */
-void mutt_sb_draw(void)
+void mutt_sb_draw(struct Context *ctx)
 {
   if (!SidebarVisible)
     return;
@@ -993,17 +999,17 @@ void mutt_sb_draw(void)
     struct MailboxNode *np = NULL;
     STAILQ_FOREACH(np, &AllMailboxes, entries)
     {
-      mutt_sb_notify_mailbox(np->b, true);
+      mutt_sb_notify_mailbox(ctx, np->b, true);
     }
   }
 
-  if (!prepare_sidebar(num_rows))
+  if (!prepare_sidebar(ctx, num_rows))
   {
     fill_empty_space(0, num_rows, div_width, num_cols - div_width);
     return;
   }
 
-  draw_sidebar(num_rows, num_cols, div_width);
+  draw_sidebar(ctx, num_rows, num_cols, div_width);
   move(y, x);
 }
 
@@ -1106,20 +1112,21 @@ const char *mutt_sb_get_highlight(void)
 
 /**
  * mutt_sb_set_open_mailbox - Set the OpnMailbox based on the global Context
+ * @param ctx Mailbox
  *
  * Search through the list of mailboxes.  If a Mailbox has a matching path, set
  * OpnMailbox to it.
  */
-void mutt_sb_set_open_mailbox(void)
+void mutt_sb_set_open_mailbox(struct Context *ctx)
 {
   OpnIndex = -1;
 
-  if (!Context)
+  if (!ctx)
     return;
 
   for (int entry = 0; entry < EntryCount; entry++)
   {
-    if (mutt_str_strcmp(Entries[entry]->mailbox->realpath, Context->realpath) == 0)
+    if (mutt_str_strcmp(Entries[entry]->mailbox->realpath, ctx->realpath) == 0)
     {
       OpnIndex = entry;
       HilIndex = entry;
@@ -1130,6 +1137,7 @@ void mutt_sb_set_open_mailbox(void)
 
 /**
  * mutt_sb_notify_mailbox - The state of a Mailbox is about to change
+ * @param ctx     Mailbox
  * @param b       Folder
  * @param created True if folder created, false if deleted
  *
@@ -1139,7 +1147,7 @@ void mutt_sb_set_open_mailbox(void)
  *
  * Before a deletion, check that our pointers won't be invalidated.
  */
-void mutt_sb_notify_mailbox(struct Mailbox *b, bool created)
+void mutt_sb_notify_mailbox(struct Context *ctx, struct Mailbox *b, bool created)
 {
   if (!b)
     return;
@@ -1161,7 +1169,7 @@ void mutt_sb_notify_mailbox(struct Mailbox *b, bool created)
       TopIndex = EntryCount;
     if (BotIndex < 0)
       BotIndex = EntryCount;
-    if ((OpnIndex < 0) && Context && (mutt_str_strcmp(b->realpath, Context->realpath) == 0))
+    if ((OpnIndex < 0) && ctx && (mutt_str_strcmp(b->realpath, ctx->realpath) == 0))
       OpnIndex = EntryCount;
 
     EntryCount++;
@@ -1197,8 +1205,9 @@ void mutt_sb_notify_mailbox(struct Mailbox *b, bool created)
 
 /**
  * mutt_sb_toggle_virtual - Switch between regular and virtual folders
+ * @param ctx Mailbox
  */
-void mutt_sb_toggle_virtual(void)
+void mutt_sb_toggle_virtual(struct Context *ctx)
 {
 #ifdef USE_NOTMUCH
   if (sidebar_source == SB_SRC_INCOMING)
@@ -1223,7 +1232,7 @@ void mutt_sb_toggle_virtual(void)
     if (((np->b->magic == MUTT_NOTMUCH) && (sidebar_source == SB_SRC_VIRT)) ||
         ((np->b->magic != MUTT_NOTMUCH) && (sidebar_source == SB_SRC_INCOMING)))
     {
-      mutt_sb_notify_mailbox(np->b, true);
+      mutt_sb_notify_mailbox(ctx, np->b, true);
     }
   }
 

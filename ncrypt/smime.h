@@ -29,6 +29,7 @@
 
 struct Address;
 struct Body;
+struct Context;
 struct Envelope;
 struct Header;
 struct State;
@@ -50,14 +51,14 @@ struct SmimeKey
 int          smime_class_application_handler(struct Body *m, struct State *s);
 struct Body *smime_class_build_smime_entity(struct Body *a, char *certlist);
 int          smime_class_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body **cur);
-char *       smime_class_find_keys(struct Address *addrlist, bool oppenc_mode);
-void         smime_class_getkeys(struct Envelope *env);
+char *       smime_class_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode);
+void         smime_class_getkeys(struct Context *ctx, struct Envelope *env);
 void         smime_class_invoke_import(char *infile, char *mailbox);
-int          smime_class_send_menu(struct Header *msg);
+int          smime_class_send_menu(struct Context *ctx, struct Header *msg);
 struct Body *smime_class_sign_message(struct Body *a);
 int          smime_class_valid_passphrase(void);
 int          smime_class_verify_one(struct Body *sigbdy, struct State *s, const char *tempfile);
-int          smime_class_verify_sender(struct Header *h);
+int          smime_class_verify_sender(struct Context *ctx, struct Header *h);
 void         smime_class_void_passphrase(void);
 
 #endif /* _NCRYPT_SMIME_H */

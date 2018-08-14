@@ -1442,7 +1442,7 @@ int imap_copy_messages(struct Context *ctx, struct Header *h, char *dest, bool d
         }
       }
 
-      rc = imap_exec_msgset(idata, "UID COPY", mmbox, MUTT_TAG, false, false);
+      rc = imap_exec_msgset(ctx, idata, "UID COPY", mmbox, MUTT_TAG, false, false);
       if (!rc)
       {
         mutt_debug(1, "No messages tagged\n");

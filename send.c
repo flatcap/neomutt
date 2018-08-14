@@ -1118,7 +1118,7 @@ static int generate_body(FILE *tempfp, struct Header *msg, int flags,
   {
     struct Body *b = NULL;
 
-    if (((WithCrypto & APPLICATION_PGP) != 0) && !(b = crypt_pgp_make_key_attachment()))
+    if (((WithCrypto & APPLICATION_PGP) != 0) && !(b = crypt_pgp_make_key_attachment(Context)))
     {
       return -1;
     }
@@ -1403,22 +1403,23 @@ static void fix_end_of_file(const char *data)
 
 /**
  * mutt_compose_to_sender - Compose an email to the sender
+ * @param ctx Mailbox
  * @param hdr Header of original email
  * @retval  0 Message was successfully sent
  * @retval -1 Message was aborted or an error occurred
  * @retval  1 Message was postponed
  */
-int mutt_compose_to_sender(struct Header *hdr)
+int mutt_compose_to_sender(struct Context *ctx, struct Header *hdr)
 {
   struct Header *msg = mutt_header_new();
 
   msg->env = mutt_env_new();
   if (!hdr)
   {
-    for (int i = 0; i < Context->msgcount; i++)
+    for (int i = 0; i < ctx->msgcount; i++)
     {
-      if (message_is_tagged(Context, i))
-        mutt_addr_append(&msg->env->to, Context->hdrs[i]->env->from, false);
+      if (message_is_tagged(ctx, i))
+        mutt_addr_append(&msg->env->to, ctx->hdrs[i]->env->from, false);
     }
   }
   else
@@ -1463,7 +1464,7 @@ int mutt_resend_message(FILE *fp, struct Context *ctx, struct Header *cur)
     if (CryptOpportunisticEncrypt)
     {
       msg->security |= OPPENCRYPT;
-      crypt_opportunistic_encrypt(msg);
+      crypt_opportunistic_encrypt(ctx, msg);
     }
   }
 
@@ -2019,7 +2020,7 @@ int ci_send_message(int flags, struct Header *msg, char *tempfile,
       if (!(msg->security & ENCRYPT))
       {
         msg->security |= OPPENCRYPT;
-        crypt_opportunistic_encrypt(msg);
+        crypt_opportunistic_encrypt(ctx, msg);
       }
     }
 
@@ -2236,7 +2237,7 @@ int ci_send_message(int flags, struct Header *msg, char *tempfile,
       /* save the decrypted attachments */
       clear_content = msg->content;
 
-      if ((crypt_get_keys(msg, &pgpkeylist, 0) == -1) || mutt_protect(msg, pgpkeylist) == -1)
+      if ((crypt_get_keys(ctx, msg, &pgpkeylist, 0) == -1) || mutt_protect(msg, pgpkeylist) == -1)
       {
         msg->content = mutt_remove_multipart(msg->content);
 

@@ -542,6 +542,7 @@ static int tls_check_preauth(const gnutls_datum_t *certdata,
 
 /**
  * tls_check_one_certificate - Check a GnuTLS certificate
+ * @param ctx      Mailbox
  * @param certdata List of GnuTLS certificates
  * @param certstat GnuTLS certificate status
  * @param hostname Hostname
@@ -550,7 +551,7 @@ static int tls_check_preauth(const gnutls_datum_t *certdata,
  * @retval 0  Failure
  * @retval >0 Success
  */
-static int tls_check_one_certificate(const gnutls_datum_t *certdata,
+static int tls_check_one_certificate(struct Context *ctx, const gnutls_datum_t *certdata,
                                      gnutls_certificate_status_t certstat,
                                      const char *hostname, int idx, size_t len)
 {
@@ -802,7 +803,7 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
   OptIgnoreMacroEvents = true;
   while (!done)
   {
-    switch (mutt_menu_loop(menu))
+    switch (mutt_menu_loop(ctx, menu))
     {
       case -1:         /* abort */
       case OP_MAX + 1: /* reject */
@@ -860,11 +861,12 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
 
 /**
  * tls_check_certificate - Check a connection's certificate
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval >0 Certificate is valid
  * @retval 0  Error, or certificate is invalid
  */
-static int tls_check_certificate(struct Connection *conn)
+static int tls_check_certificate(struct Context *ctx, struct Connection *conn)
 {
   struct TlsSockData *data = conn->sockdata;
   gnutls_session_t state = data->state;
@@ -918,7 +920,7 @@ static int tls_check_certificate(struct Connection *conn)
   /* then check interactively, starting from chain root */
   for (int i = cert_list_size - 1; i >= 0; i--)
   {
-    rc = tls_check_one_certificate(&cert_list[i], certstat, conn->account.host,
+    rc = tls_check_one_certificate(ctx, &cert_list[i], certstat, conn->account.host,
                                    i, cert_list_size);
 
     /* add signers to trust set, then reverify */
@@ -1108,6 +1110,7 @@ static int tls_set_priority(struct TlsSockData *data)
 
 /**
  * tls_negotiate - Negotiate TLS connection
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval  0 Success
  * @retval -1 Error
@@ -1115,7 +1118,7 @@ static int tls_set_priority(struct TlsSockData *data)
  * After TLS state has been initialized, attempt to negotiate TLS over the
  * wire, including certificate checks.
  */
-static int tls_negotiate(struct Connection *conn)
+static int tls_negotiate(struct Context *ctx, struct Connection *conn)
 {
   struct TlsSockData *data = mutt_mem_calloc(1, sizeof(struct TlsSockData));
   conn->sockdata = data;
@@ -1199,7 +1202,7 @@ static int tls_negotiate(struct Connection *conn)
     goto fail;
   }
 
-  if (tls_check_certificate(conn) == 0)
+  if (tls_check_certificate(ctx, conn) == 0)
     goto fail;
 
   /* set Security Strength Factor (SSF) for SASL */
@@ -1229,16 +1232,17 @@ fail:
 
 /**
  * tls_socket_open - Open a TLS socket
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval  0 Success
  * @retval -1 Error
  */
-static int tls_socket_open(struct Connection *conn)
+static int tls_socket_open(struct Context *ctx, struct Connection *conn)
 {
-  if (raw_socket_open(conn) < 0)
+  if (raw_socket_open(ctx, conn) < 0)
     return -1;
 
-  if (tls_negotiate(conn) < 0)
+  if (tls_negotiate(ctx, conn) < 0)
   {
     tls_socket_close(conn);
     return -1;
@@ -1269,16 +1273,17 @@ int mutt_ssl_socket_setup(struct Connection *conn)
 
 /**
  * mutt_ssl_starttls - Set up TLS multiplexor
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval  0 Success
  * @retval -1 Error
  */
-int mutt_ssl_starttls(struct Connection *conn)
+int mutt_ssl_starttls(struct Context *ctx, struct Connection *conn)
 {
   if (tls_init() < 0)
     return -1;
 
-  if (tls_negotiate(conn) < 0)
+  if (tls_negotiate(ctx, conn) < 0)
     return -1;
 
   conn->conn_read = tls_socket_read;

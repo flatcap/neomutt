@@ -211,7 +211,7 @@ int mutt_get_field_full(const char *field, char *buf, size_t buflen,
       SigWinch = 0;
       mutt_resize_screen();
       clearok(stdscr, TRUE);
-      mutt_menu_current_redraw();
+      mutt_menu_current_redraw(Context);
     }
     mutt_window_clearline(MuttMessageWindow, 0);
     SETCOLOR(MT_COLOR_PROMPT);
@@ -318,7 +318,7 @@ int mutt_yesorno(const char *msg, int def)
         SigWinch = 0;
         mutt_resize_screen();
         clearok(stdscr, TRUE);
-        mutt_menu_current_redraw();
+        mutt_menu_current_redraw(Context);
       }
       if (MuttMessageWindow->cols)
       {
@@ -329,7 +329,7 @@ int mutt_yesorno(const char *msg, int def)
       if (prompt_lines != MuttMessageWindow->rows)
       {
         mutt_window_reflow_message_rows(prompt_lines);
-        mutt_menu_current_redraw();
+        mutt_menu_current_redraw(Context);
       }
 
       /* maxlen here is sort of arbitrary, so pick a reasonable upper bound */
@@ -387,7 +387,7 @@ int mutt_yesorno(const char *msg, int def)
   if (MuttMessageWindow->rows != 1)
   {
     mutt_window_reflow_message_rows(1);
-    mutt_menu_current_redraw();
+    mutt_menu_current_redraw(Context);
   }
   else
     mutt_window_clearline(MuttMessageWindow, 0);
@@ -584,7 +584,7 @@ int mutt_enter_fname_full(const char *prompt, char *buf, size_t buflen, bool mai
       flags |= MUTT_SEL_MULTI;
     if (mailbox)
       flags |= MUTT_SEL_MAILBOX;
-    mutt_select_file(buf, buflen, flags, files, numfiles);
+    mutt_select_file(Context, buf, buflen, flags, files, numfiles);
   }
   else
   {
@@ -756,7 +756,7 @@ int mutt_multi_choice(const char *prompt, const char *letters)
         SigWinch = 0;
         mutt_resize_screen();
         clearok(stdscr, TRUE);
-        mutt_menu_current_redraw();
+        mutt_menu_current_redraw(Context);
       }
       if (MuttMessageWindow->cols)
       {
@@ -767,7 +767,7 @@ int mutt_multi_choice(const char *prompt, const char *letters)
       if (prompt_lines != MuttMessageWindow->rows)
       {
         mutt_window_reflow_message_rows(prompt_lines);
-        mutt_menu_current_redraw();
+        mutt_menu_current_redraw(Context);
       }
 
       SETCOLOR(MT_COLOR_PROMPT);
@@ -809,7 +809,7 @@ int mutt_multi_choice(const char *prompt, const char *letters)
   if (MuttMessageWindow->rows != 1)
   {
     mutt_window_reflow_message_rows(1);
-    mutt_menu_current_redraw();
+    mutt_menu_current_redraw(Context);
   }
   else
     mutt_window_clearline(MuttMessageWindow, 0);

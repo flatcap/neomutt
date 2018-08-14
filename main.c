@@ -1136,7 +1136,7 @@ int main(int argc, char *argv[], char *envp[])
       if (flags & MUTT_NEWS)
       {
         OptNews = true;
-        CurrentNewsSrv = nntp_select_server(NewsServer, false);
+        CurrentNewsSrv = nntp_select_server(Context, NewsServer, false);
         if (!CurrentNewsSrv)
           goto main_curses; // TEST38: neomutt -G (unset news_server)
       }
@@ -1148,7 +1148,7 @@ int main(int argc, char *argv[], char *envp[])
         goto main_curses; // TEST39: neomutt -n -F /dev/null -y
       }
       folder[0] = '\0';
-      mutt_select_file(folder, sizeof(folder),
+      mutt_select_file(Context, folder, sizeof(folder),
                        MUTT_SEL_FOLDER | MUTT_SEL_MAILBOX, NULL, NULL);
       if (folder[0] == '\0')
       {
@@ -1200,7 +1200,7 @@ int main(int argc, char *argv[], char *envp[])
     if (Context || !explicit_folder)
     {
 #ifdef USE_SIDEBAR
-      mutt_sb_set_open_mailbox();
+      mutt_sb_set_open_mailbox(Context);
 #endif
       mutt_index_menu();
       if (Context)

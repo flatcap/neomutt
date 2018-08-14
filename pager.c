@@ -2087,7 +2087,7 @@ static void pager_menu_redraw(struct Menu *pager_menu)
 #ifdef USE_SIDEBAR
   if (pager_menu->redraw & REDRAW_SIDEBAR)
   {
-    menu_redraw_sidebar(pager_menu);
+    menu_redraw_sidebar(Context, pager_menu);
   }
 #endif
 
@@ -2181,9 +2181,9 @@ static void pager_menu_redraw(struct Menu *pager_menu)
     NORMAL_COLOR;
     if (TsEnabled && TsSupported && rd->index)
     {
-      menu_status_line(buffer, sizeof(buffer), rd->index, NONULL(TsStatusFormat));
+      menu_status_line(Context, buffer, sizeof(buffer), rd->index, NONULL(TsStatusFormat));
       mutt_ts_status(buffer);
-      menu_status_line(buffer, sizeof(buffer), rd->index, NONULL(TsIconFormat));
+      menu_status_line(Context, buffer, sizeof(buffer), rd->index, NONULL(TsIconFormat));
       mutt_ts_icon(buffer);
     }
   }
@@ -2196,7 +2196,7 @@ static void pager_menu_redraw(struct Menu *pager_menu)
       menu_redraw_current(rd->index);
 
     /* print out the index status bar */
-    menu_status_line(buffer, sizeof(buffer), rd->index, NONULL(StatusFormat));
+    menu_status_line(Context, buffer, sizeof(buffer), rd->index, NONULL(StatusFormat));
 
     mutt_window_move(rd->index_status_window, 0, 0);
     SETCOLOR(MT_COLOR_STATUS);
@@ -2433,7 +2433,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
         if (NewMailCommand)
         {
           char cmd[LONG_STRING];
-          menu_status_line(cmd, sizeof(cmd), rd.index, NONULL(NewMailCommand));
+          menu_status_line(Context, cmd, sizeof(cmd), rd.index, NONULL(NewMailCommand));
           if (mutt_system(cmd) != 0)
             mutt_error(_("Error running \"%s\""), cmd);
         }
@@ -2931,7 +2931,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
         break;
 
       case OP_COMPOSE_TO_SENDER:
-        mutt_compose_to_sender(extra->hdr);
+        mutt_compose_to_sender(Context, extra->hdr);
         pager_menu->redraw = REDRAW_FULL;
         break;
 
@@ -3231,7 +3231,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
         if (IsAttach(extra))
         {
           mutt_save_attachment_list(extra->actx, extra->fp, false, extra->bdy,
-                                    extra->hdr, NULL);
+                                    Context, extra->hdr, NULL);
           break;
         }
       /* fallthrough */
@@ -3372,7 +3372,7 @@ int mutt_pager(const char *banner, const char *fname, int flags, struct Pager *e
           break;
         }
         CHECK_MODE(IsHeader(extra));
-        mutt_view_attachments(extra->hdr);
+        mutt_view_attachments(Context, extra->hdr);
         if (Context && extra->hdr->attach_del)
           Context->changed = true;
         pager_menu->redraw = REDRAW_FULL;

@@ -26,6 +26,7 @@
 #include <stdbool.h>
 
 struct Address;
+struct Context;
 
 /**
  * enum PgpRing - PGP ring type
@@ -36,10 +37,10 @@ enum PgpRing
   PGP_SECRING, /**< Secret keys */
 };
 
-struct Body *pgp_class_make_key_attachment(void);
+struct Body *pgp_class_make_key_attachment(struct Context *ctx);
 
-struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, short abilities, enum PgpRing keyring);
-struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities, enum PgpRing keyring, bool oppenc_mode);
-struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, enum PgpRing keyring);
+struct PgpKeyInfo *pgp_ask_for_key(struct Context *ctx, char *tag, char *whatfor, short abilities, enum PgpRing keyring);
+struct PgpKeyInfo *pgp_getkeybyaddr(struct Context *ctx, struct Address *a, short abilities, enum PgpRing keyring, bool oppenc_mode);
+struct PgpKeyInfo *pgp_getkeybystr(struct Context *ctx, char *p, short abilities, enum PgpRing keyring);
 
 #endif /* _NCRYPT_PGPKEY_H */

@@ -931,6 +931,7 @@ void crypt_extract_keys_from_messages(struct Header *h)
 
 /**
  * crypt_get_keys - Check we have all the keys we need
+ * @param[in]  ctx         Mailbox
  * @param[in]  msg         Message with addresses to match
  * @param[out] keylist     Keys needed
  * @param[in]  oppenc_mode If true, use opportunistic encryption
@@ -943,7 +944,7 @@ void crypt_extract_keys_from_messages(struct Header *h)
  * If oppenc_mode is true, only keys that can be determined without
  * prompting will be used.
  */
-int crypt_get_keys(struct Header *msg, char **keylist, bool oppenc_mode)
+int crypt_get_keys(struct Context *ctx, struct Header *msg, char **keylist, bool oppenc_mode)
 {
   struct Address *addrlist = NULL, *last = NULL;
   const char *fqdn = mutt_fqdn(true);
@@ -973,7 +974,7 @@ int crypt_get_keys(struct Header *msg, char **keylist, bool oppenc_mode)
   {
     if (((WithCrypto & APPLICATION_PGP) != 0) && (msg->security & APPLICATION_PGP))
     {
-      *keylist = crypt_pgp_find_keys(addrlist, oppenc_mode);
+      *keylist = crypt_pgp_find_keys(ctx, addrlist, oppenc_mode);
       if (!*keylist)
       {
         mutt_addr_free(&addrlist);
@@ -985,7 +986,7 @@ int crypt_get_keys(struct Header *msg, char **keylist, bool oppenc_mode)
     }
     if (((WithCrypto & APPLICATION_SMIME) != 0) && (msg->security & APPLICATION_SMIME))
     {
-      *keylist = crypt_smime_find_keys(addrlist, oppenc_mode);
+      *keylist = crypt_smime_find_keys(ctx, addrlist, oppenc_mode);
       if (!*keylist)
       {
         mutt_addr_free(&addrlist);
@@ -1010,12 +1011,13 @@ int crypt_get_keys(struct Header *msg, char **keylist, bool oppenc_mode)
 
 /**
  * crypt_opportunistic_encrypt - Can all recipients be determined
+ * @param ctx Mailbox
  * @param msg Header of email
  *
  * Check if all recipients keys can be automatically determined.
  * Enable encryption if they can, otherwise disable encryption.
  */
-void crypt_opportunistic_encrypt(struct Header *msg)
+void crypt_opportunistic_encrypt(struct Context *ctx, struct Header *msg)
 {
   char *pgpkeylist = NULL;
 
@@ -1025,7 +1027,7 @@ void crypt_opportunistic_encrypt(struct Header *msg)
   if (!(CryptOpportunisticEncrypt && (msg->security & OPPENCRYPT)))
     return;
 
-  crypt_get_keys(msg, &pgpkeylist, 1);
+  crypt_get_keys(ctx, msg, &pgpkeylist, 1);
   if (pgpkeylist)
   {
     msg->security |= ENCRYPT;

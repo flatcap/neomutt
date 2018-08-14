@@ -392,12 +392,13 @@ void menu_redraw_status(struct Menu *menu)
 #ifdef USE_SIDEBAR
 /**
  * menu_redraw_sidebar - Force the redraw of the sidebar
+ * @param ctx  Mailbox
  * @param menu Current Menu
  */
-void menu_redraw_sidebar(struct Menu *menu)
+void menu_redraw_sidebar(struct Context *ctx, struct Menu *menu)
 {
   menu->redraw &= ~REDRAW_SIDEBAR;
-  mutt_sb_draw();
+  mutt_sb_draw(ctx);
 }
 #endif
 
@@ -1115,19 +1116,20 @@ void mutt_menu_set_redraw_full(int menu_type)
 
 /**
  * mutt_menu_current_redraw - Redraw the current menu
+ * @param ctx Mailbox
  */
-void mutt_menu_current_redraw(void)
+void mutt_menu_current_redraw(struct Context *ctx)
 {
   struct Menu *current_menu = get_current_menu();
   if (current_menu)
   {
-    if (menu_redraw(current_menu) == OP_REDRAW)
+    if (menu_redraw(ctx, current_menu) == OP_REDRAW)
     {
       /* On a REDRAW_FULL with a non-customized redraw, menu_redraw()
        * will return OP_REDRAW to give the calling menu-loop a chance to
        * customize output.
        */
-      menu_redraw(current_menu);
+      menu_redraw(ctx, current_menu);
     }
   }
 }
@@ -1270,11 +1272,12 @@ static int menu_dialog_dokey(struct Menu *menu, int *ip)
 
 /**
  * menu_redraw - Redraw the parts of the screen that have been flagged to be redrawn
+ * @param ctx  Mailbox
  * @param menu Menu to redraw
  * @retval OP_NULL   Menu was redrawn
  * @retval OP_REDRAW Full redraw required
  */
-int menu_redraw(struct Menu *menu)
+int menu_redraw(struct Context *ctx, struct Menu *menu)
 {
   if (menu->custom_menu_redraw)
   {
@@ -1297,7 +1300,7 @@ int menu_redraw(struct Menu *menu)
     menu_redraw_status(menu);
 #ifdef USE_SIDEBAR
   if (menu->redraw & REDRAW_SIDEBAR)
-    menu_redraw_sidebar(menu);
+    menu_redraw_sidebar(ctx, menu);
 #endif
   if (menu->redraw & REDRAW_INDEX)
     menu_redraw_index(menu);
@@ -1314,10 +1317,11 @@ int menu_redraw(struct Menu *menu)
 
 /**
  * mutt_menu_loop - Menu event loop
+ * @param ctx  Mailbox
  * @param menu Current Menu
  * @retval num An event id that the menu can't process
  */
-int mutt_menu_loop(struct Menu *menu)
+int mutt_menu_loop(struct Context *ctx, struct Menu *menu)
 {
   static int last_position = -1;
   int i = OP_NULL;
@@ -1346,7 +1350,7 @@ int mutt_menu_loop(struct Menu *menu)
 
     mutt_curs_set(0);
 
-    if (menu_redraw(menu) == OP_REDRAW)
+    if (menu_redraw(ctx, menu) == OP_REDRAW)
       return OP_REDRAW;
 
     /* give visual indication that the next command is a tag- command */

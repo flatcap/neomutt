@@ -1207,7 +1207,7 @@ static void init_menu(struct BrowserState *state, struct Menu *menu,
     if (imap_path_probe(OldLastDir, NULL) == MUTT_IMAP)
     {
       mutt_str_strfcpy(TargetDir, OldLastDir, sizeof(TargetDir));
-      imap_clean_path(TargetDir, sizeof(TargetDir));
+      imap_clean_path(Context, TargetDir, sizeof(TargetDir));
     }
     else
 #endif
@@ -1278,13 +1278,14 @@ void mutt_browser_select_dir(char *f)
 
 /**
  * mutt_select_file - Let the user select a file
+ * @param[in]  ctx      Mailbox
  * @param[in]  file     Buffer for the result
  * @param[in]  filelen  Length of buffer
  * @param[in]  flags    Flags, e.g. MUTT_SEL_MULTI
  * @param[out] files    Array of selected files
  * @param[out] numfiles Number of selected files
  */
-void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int *numfiles)
+void mutt_select_file(struct Context *ctx, char *file, size_t filelen, int flags, char ***files, int *numfiles)
 {
   char buf[PATH_MAX];
   char prefix[PATH_MAX] = "";
@@ -1337,7 +1338,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
     {
       init_state(&state, NULL);
       state.imap_browse = true;
-      if (imap_browse(file, &state) == 0)
+      if (imap_browse(Context, file, &state) == 0)
       {
         mutt_str_strfcpy(LastDir, state.folder, sizeof(LastDir));
         browser_sort(&state);
@@ -1467,7 +1468,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
     {
       init_state(&state, NULL);
       state.imap_browse = true;
-      imap_browse(LastDir, &state);
+      imap_browse(Context, LastDir, &state);
       browser_sort(&state);
     }
     else
@@ -1532,7 +1533,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
 
   while (true)
   {
-    switch (i = mutt_menu_loop(menu))
+    switch (i = mutt_menu_loop(ctx, menu))
     {
       case OP_GENERIC_SELECT_ENTRY:
 
@@ -1643,7 +1644,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
             {
               init_state(&state, NULL);
               state.imap_browse = true;
-              imap_browse(LastDir, &state);
+              imap_browse(Context, LastDir, &state);
               browser_sort(&state);
               menu->data = state.entry;
             }
@@ -1745,14 +1746,14 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
           break;
         }
 
-        if (imap_mailbox_create(LastDir) == 0)
+        if (imap_mailbox_create(Context, LastDir) == 0)
         {
           /* TODO: find a way to detect if the new folder would appear in
            *   this window, and insert it without starting over. */
           destroy_state(&state);
           init_state(&state, NULL);
           state.imap_browse = true;
-          imap_browse(LastDir, &state);
+          imap_browse(Context, LastDir, &state);
           browser_sort(&state);
           menu->data = state.entry;
           browser_highlight_default(&state, menu);
@@ -1768,12 +1769,12 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
         {
           int nentry = menu->current;
 
-          if (imap_mailbox_rename(state.entry[nentry].name) >= 0)
+          if (imap_mailbox_rename(ctx, state.entry[nentry].name) >= 0)
           {
             destroy_state(&state);
             init_state(&state, NULL);
             state.imap_browse = true;
-            imap_browse(LastDir, &state);
+            imap_browse(Context, LastDir, &state);
             browser_sort(&state);
             menu->data = state.entry;
             browser_highlight_default(&state, menu);
@@ -1873,7 +1874,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
             destroy_state(&state);
             init_state(&state, NULL);
             state.imap_browse = true;
-            imap_browse(LastDir, &state);
+            imap_browse(Context, LastDir, &state);
             browser_sort(&state);
             menu->data = state.entry;
             browser_highlight_default(&state, menu);
@@ -1952,7 +1953,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
         {
           init_state(&state, NULL);
           state.imap_browse = true;
-          imap_browse(LastDir, &state);
+          imap_browse(Context, LastDir, &state);
           browser_sort(&state);
           menu->data = state.entry;
           init_menu(&state, menu, title, sizeof(title), mailbox);
@@ -2081,7 +2082,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
         {
           init_state(&state, NULL);
           state.imap_browse = true;
-          imap_browse(LastDir, &state);
+          imap_browse(Context, LastDir, &state);
           browser_sort(&state);
           menu->data = state.entry;
         }
@@ -2138,7 +2139,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
           struct Body *b = mutt_make_file_attach(buf2);
           if (b)
           {
-            mutt_view_attachment(NULL, b, MUTT_REGULAR, NULL, NULL);
+            mutt_view_attachment(NULL, b, MUTT_REGULAR, Context, NULL, NULL);
             mutt_body_free(&b);
             menu->redraw = REDRAW_FULL;
           }
@@ -2160,9 +2161,9 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
             break;
 
           if (i == OP_CATCHUP)
-            nntp_data = mutt_newsgroup_catchup(CurrentNewsSrv, ff->name);
+            nntp_data = mutt_newsgroup_catchup(Context, CurrentNewsSrv, ff->name);
           else
-            nntp_data = mutt_newsgroup_uncatchup(CurrentNewsSrv, ff->name);
+            nntp_data = mutt_newsgroup_uncatchup(Context, CurrentNewsSrv, ff->name);
 
           if (nntp_data)
           {
@@ -2191,7 +2192,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
             if (nntp_data)
               nntp_data->deleted = true;
           }
-          nntp_active_fetch(nserv, true);
+          nntp_active_fetch(Context, nserv, true);
           nntp_newsrc_update(nserv);
           nntp_newsrc_close(nserv);
 
@@ -2310,9 +2311,9 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
 #ifdef USE_IMAP
         {
           if (i == OP_BROWSER_SUBSCRIBE)
-            imap_subscribe(state.entry[menu->current].name, 1);
+            imap_subscribe(Context, state.entry[menu->current].name, 1);
           else
-            imap_subscribe(state.entry[menu->current].name, 0);
+            imap_subscribe(Context, state.entry[menu->current].name, 0);
         }
 #endif /* USE_IMAP */
     }

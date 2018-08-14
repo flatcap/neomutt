@@ -524,11 +524,12 @@ static void smime_entry(char *buf, size_t buflen, struct Menu *menu, int num)
 
 /**
  * smime_select_key - Get the user to select a key
+ * @param ctx Mailbox
  * @param keys  List of keys to select from
  * @param query String to match
  * @retval ptr Key selected by user
  */
-static struct SmimeKey *smime_select_key(struct SmimeKey *keys, char *query)
+static struct SmimeKey *smime_select_key(struct Context *ctx, struct SmimeKey *keys, char *query)
 {
   struct SmimeKey **table = NULL;
   int table_size = 0;
@@ -579,7 +580,7 @@ static struct SmimeKey *smime_select_key(struct SmimeKey *keys, char *query)
   done = false;
   while (!done)
   {
-    switch (mutt_menu_loop(menu))
+    switch (mutt_menu_loop(ctx, menu))
     {
       case OP_GENERIC_SELECT_ENTRY:
         if (table[menu->current]->trust != 't')
@@ -781,14 +782,15 @@ static struct SmimeKey *smime_get_key_by_hash(char *hash, bool public)
 
 /**
  * smime_get_key_by_addr - Find an SIME key by address
+ * @param ctx       Mailbox
  * @param mailbox   Email address to match
  * @param abilities Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param public    If true, only get the public keys
  * @param may_ask   If true, the user may be asked to select a key
  * @retval ptr Matching key
  */
-static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
-                                              bool public, bool may_ask)
+static struct SmimeKey *smime_get_key_by_addr(struct Context *ctx, char *mailbox,
+                                              short abilities, bool public, bool may_ask)
 {
   struct SmimeKey *results = NULL, *result = NULL;
   struct SmimeKey *matches = NULL;
@@ -850,7 +852,7 @@ static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
     }
     else
     {
-      return_key = smime_copy_key(smime_select_key(matches, mailbox));
+      return_key = smime_copy_key(smime_select_key(ctx, matches, mailbox));
     }
 
     smime_free_key(&matches);
@@ -861,12 +863,13 @@ static struct SmimeKey *smime_get_key_by_addr(char *mailbox, short abilities,
 
 /**
  * smime_get_key_by_str - Find an SMIME key by string
+ * @param ctx       Mailbox
  * @param str       String to match
  * @param abilities Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param public    If true, only get the public keys
  * @retval ptr Matching key
  */
-static struct SmimeKey *smime_get_key_by_str(char *str, short abilities, bool public)
+static struct SmimeKey *smime_get_key_by_str(struct Context *ctx, char *str, short abilities, bool public)
 {
   struct SmimeKey *results = NULL, *result = NULL;
   struct SmimeKey *matches = NULL;
@@ -898,7 +901,7 @@ static struct SmimeKey *smime_get_key_by_str(char *str, short abilities, bool pu
 
   if (matches)
   {
-    return_key = smime_copy_key(smime_select_key(matches, str));
+    return_key = smime_copy_key(smime_select_key(ctx, matches, str));
     smime_free_key(&matches);
   }
 
@@ -907,12 +910,13 @@ static struct SmimeKey *smime_get_key_by_str(char *str, short abilities, bool pu
 
 /**
  * smime_ask_for_key - Ask the user to select a key
+ * @param ctx       Mailbox
  * @param prompt    Prompt to show the user
  * @param abilities Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param public    If true, only get the public keys
  * @retval ptr Selected SMIME key
  */
-static struct SmimeKey *smime_ask_for_key(char *prompt, short abilities, bool public)
+static struct SmimeKey *smime_ask_for_key(struct Context *ctx, char *prompt, short abilities, bool public)
 {
   struct SmimeKey *key = NULL;
   char resp[SHORT_STRING];
@@ -928,7 +932,7 @@ static struct SmimeKey *smime_ask_for_key(char *prompt, short abilities, bool pu
     if (mutt_get_field(prompt, resp, sizeof(resp), MUTT_CLEAR) != 0)
       return NULL;
 
-    key = smime_get_key_by_str(resp, abilities, public);
+    key = smime_get_key_by_str(ctx, resp, abilities, public);
     if (key)
       return key;
 
@@ -938,22 +942,23 @@ static struct SmimeKey *smime_ask_for_key(char *prompt, short abilities, bool pu
 
 /**
  * getkeys - Get the keys for a mailbox
+ * @param ctx     Mailbox
  * @param mailbox Email address
  *
  * This sets the '*ToUse' variables for an upcoming decryption, where the
  * required key is different from SmimeDefaultKey.
  */
-static void getkeys(char *mailbox)
+static void getkeys(struct Context *ctx, char *mailbox)
 {
   char *k = NULL;
 
-  struct SmimeKey *key = smime_get_key_by_addr(mailbox, KEYFLAG_CANENCRYPT, false, true);
+  struct SmimeKey *key = smime_get_key_by_addr(ctx, mailbox, KEYFLAG_CANENCRYPT, false, true);
 
   if (!key)
   {
     char buf[STRING];
     snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), mailbox);
-    key = smime_ask_for_key(buf, KEYFLAG_CANENCRYPT, false);
+    key = smime_ask_for_key(ctx, buf, KEYFLAG_CANENCRYPT, false);
   }
 
   if (key)
@@ -1001,8 +1006,9 @@ static void getkeys(char *mailbox)
 
 /**
  * smime_class_getkeys - Implements CryptModuleSpecs::smime_getkeys()
+ * @param ctx Mailbox
  */
-void smime_class_getkeys(struct Envelope *env)
+void smime_class_getkeys(struct Context *ctx, struct Envelope *env)
 {
   struct Address *t = NULL;
   bool found = false;
@@ -1022,7 +1028,7 @@ void smime_class_getkeys(struct Envelope *env)
     if (mutt_addr_is_user(t))
     {
       found = true;
-      getkeys(t->mailbox);
+      getkeys(ctx, t->mailbox);
     }
   }
   for (t = env->cc; !found && t; t = t->next)
@@ -1030,12 +1036,12 @@ void smime_class_getkeys(struct Envelope *env)
     if (mutt_addr_is_user(t))
     {
       found = true;
-      getkeys(t->mailbox);
+      getkeys(ctx, t->mailbox);
     }
   }
   if (!found && (t = mutt_default_from()))
   {
-    getkeys(t->mailbox);
+    getkeys(ctx, t->mailbox);
     mutt_addr_free(&t);
   }
 }
@@ -1043,7 +1049,7 @@ void smime_class_getkeys(struct Envelope *env)
 /**
  * smime_class_find_keys - Implements CryptModuleSpecs::find_keys()
  */
-char *smime_class_find_keys(struct Address *addrlist, bool oppenc_mode)
+char *smime_class_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode)
 {
   struct SmimeKey *key = NULL;
   char *keyID = NULL, *keylist = NULL;
@@ -1055,12 +1061,12 @@ char *smime_class_find_keys(struct Address *addrlist, bool oppenc_mode)
   {
     q = p;
 
-    key = smime_get_key_by_addr(q->mailbox, KEYFLAG_CANENCRYPT, true, !oppenc_mode);
+    key = smime_get_key_by_addr(ctx, q->mailbox, KEYFLAG_CANENCRYPT, true, !oppenc_mode);
     if (!key && !oppenc_mode)
     {
       char buf[LONG_STRING];
       snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), q->mailbox);
-      key = smime_ask_for_key(buf, KEYFLAG_CANENCRYPT, true);
+      key = smime_ask_for_key(ctx, buf, KEYFLAG_CANENCRYPT, true);
     }
     if (!key)
     {
@@ -1427,7 +1433,7 @@ void smime_class_invoke_import(char *infile, char *mailbox)
 /**
  * smime_class_verify_sender - Implements CryptModuleSpecs::smime_verify_sender()
  */
-int smime_class_verify_sender(struct Header *h)
+int smime_class_verify_sender(struct Context *ctx, struct Header *h)
 {
   char *mbox = NULL, *certfile = NULL, tempfname[PATH_MAX];
   int retval = 1;
@@ -1442,11 +1448,11 @@ int smime_class_verify_sender(struct Header *h)
 
   if (h->security & ENCRYPT)
   {
-    mutt_copy_message_ctx(fpout, Context, h, MUTT_CM_DECODE_CRYPT & MUTT_CM_DECODE_SMIME,
+    mutt_copy_message_ctx(fpout, ctx, h, MUTT_CM_DECODE_CRYPT & MUTT_CM_DECODE_SMIME,
                           CH_MIME | CH_WEED | CH_NONEWLINE);
   }
   else
-    mutt_copy_message_ctx(fpout, Context, h, 0, 0);
+    mutt_copy_message_ctx(fpout, ctx, h, 0, 0);
 
   fflush(fpout);
   mutt_file_fclose(&fpout);
@@ -2278,7 +2284,7 @@ int smime_class_application_handler(struct Body *m, struct State *s)
 /**
  * smime_class_send_menu - Implements CryptModuleSpecs::send_menu()
  */
-int smime_class_send_menu(struct Header *msg)
+int smime_class_send_menu(struct Context *ctx, struct Header *msg)
 {
   struct SmimeKey *key = NULL;
   const char *prompt = NULL;
@@ -2333,7 +2339,7 @@ int smime_class_send_menu(struct Header *msg)
     switch (choices[choice - 1])
     {
       case 'a': /* sign (a)s */
-        key = smime_ask_for_key(_("Sign as: "), KEYFLAG_CANSIGN, false);
+        key = smime_ask_for_key(ctx, _("Sign as: "), KEYFLAG_CANSIGN, false);
         if (key)
         {
           mutt_str_replace(&SmimeSignAs, key->hash);
@@ -2366,7 +2372,7 @@ int smime_class_send_menu(struct Header *msg)
 
       case 'O': /* oppenc mode on */
         msg->security |= OPPENCRYPT;
-        crypt_opportunistic_encrypt(msg);
+        crypt_opportunistic_encrypt(ctx, msg);
         break;
 
       case 'o': /* oppenc mode off */

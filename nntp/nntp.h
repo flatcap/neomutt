@@ -150,19 +150,19 @@ struct NntpData
   struct BodyCache *bcache;
 };
 
-struct NntpServer *nntp_select_server(char *server, bool leave_lock);
+struct NntpServer *nntp_select_server(struct Context *ctx, char *server, bool leave_lock);
 struct NntpData *mutt_newsgroup_subscribe(struct NntpServer *nserv, char *group);
 struct NntpData *mutt_newsgroup_unsubscribe(struct NntpServer *nserv, char *group);
-struct NntpData *mutt_newsgroup_catchup(struct NntpServer *nserv, char *group);
-struct NntpData *mutt_newsgroup_uncatchup(struct NntpServer *nserv, char *group);
-int nntp_active_fetch(struct NntpServer *nserv, bool new);
+struct NntpData *mutt_newsgroup_catchup(struct Context *ctx, struct NntpServer *nserv, char *group);
+struct NntpData *mutt_newsgroup_uncatchup(struct Context *ctx, struct NntpServer *nserv, char *group);
+int nntp_active_fetch(struct Context *ctx, struct NntpServer *nserv, bool new);
 int nntp_newsrc_update(struct NntpServer *nserv);
-int nntp_post(const char *msg);
+int nntp_post(struct Context *ctx, const char *msg);
 int nntp_check_msgid(struct Context *ctx, const char *msgid);
 int nntp_check_children(struct Context *ctx, const char *msgid);
 int nntp_newsrc_parse(struct NntpServer *nserv);
 void nntp_newsrc_close(struct NntpServer *nserv);
-void nntp_mailbox(char *buf, size_t buflen);
+void nntp_mailbox(struct Context *ctx, char *buf, size_t buflen);
 void nntp_expand_path(char *buf, size_t buflen, struct Account *acct);
 void nntp_clear_cache(struct NntpServer *nserv);
 const char *nntp_format_str(char *buf, size_t buflen, size_t col, int cols, char op,

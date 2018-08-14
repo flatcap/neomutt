@@ -308,10 +308,11 @@ static int compare_label(const void *a, const void *b)
 
 /**
  * mutt_get_sort_func - Get the sort function for a given sort id
+ * @param ctx    Mailbox
  * @param method Sort id, e.g. #SORT_DATE
  * @retval ptr sort function - Implements ::sort_t
  */
-sort_t *mutt_get_sort_func(int method)
+sort_t *mutt_get_sort_func(struct Context *ctx, int method)
 {
   switch (method & SORT_MASK)
   {
@@ -323,7 +324,7 @@ sort_t *mutt_get_sort_func(int method)
       return compare_label;
     case SORT_ORDER:
 #ifdef USE_NNTP
-      if (Context && (Context->magic == MUTT_NNTP))
+      if (ctx && (ctx->magic == MUTT_NNTP))
         return nntp_compare_order;
       else
 #endif
@@ -408,8 +409,8 @@ void mutt_sort_headers(struct Context *ctx, bool init)
     }
     mutt_sort_threads(ctx, init);
   }
-  else if (!(sortfunc = mutt_get_sort_func(Sort)) ||
-           !(AuxSort = mutt_get_sort_func(SortAux)))
+  else if (!(sortfunc = mutt_get_sort_func(ctx, Sort)) ||
+           !(AuxSort = mutt_get_sort_func(ctx, SortAux)))
   {
     mutt_error(_("Could not find sorting function [report this bug]"));
     return;

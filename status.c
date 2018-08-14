@@ -48,6 +48,15 @@
 struct MbTable *StatusChars; ///< Config: Indicator characters for the status bar
 
 /**
+ * struct StatusData - XXX
+ */
+struct StatusData
+{
+  struct Menu *menu;
+  struct Context *ctx;
+};
+
+/**
  * get_sort_str - Get the sort method as a string
  * @param buf    Buffer for the sort string
  * @param buflen Length of the bufer
@@ -96,7 +105,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
 {
   char fmt[SHORT_STRING], tmp[SHORT_STRING], *cp = NULL;
   int count, optional = (flags & MUTT_FORMAT_OPTIONAL);
-  struct Menu *menu = (struct Menu *) data;
+  struct StatusData *sd = (struct StatusData *) data;
 
   *buf = 0;
   switch (op)
@@ -115,9 +124,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->deleted : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->deleted : 0);
       }
-      else if (!Context || !Context->deleted)
+      else if (!sd->ctx || !sd->ctx->deleted)
         optional = 0;
       break;
 
@@ -125,21 +134,21 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
     {
 #ifdef USE_NOTMUCH
       char *p = NULL;
-      if (Context && Context->magic == MUTT_NOTMUCH && (p = nm_get_description(Context)))
+      if (sd->ctx && sd->ctx->magic == MUTT_NOTMUCH && (p = nm_get_description(sd->ctx)))
         mutt_str_strfcpy(tmp, p, sizeof(tmp));
       else
 #endif
 #ifdef USE_COMPRESSED
-          if (Context && Context->compress_info && Context->realpath)
+          if (sd->ctx && sd->ctx->compress_info && sd->ctx->realpath)
       {
-        mutt_str_strfcpy(tmp, Context->realpath, sizeof(tmp));
+        mutt_str_strfcpy(tmp, sd->ctx->realpath, sizeof(tmp));
         mutt_pretty_mailbox(tmp, sizeof(tmp));
       }
       else
 #endif
-          if (Context && Context->path)
+          if (sd->ctx && sd->ctx->path)
       {
-        mutt_str_strfcpy(tmp, Context->path, sizeof(tmp));
+        mutt_str_strfcpy(tmp, sd->ctx->path, sizeof(tmp));
         mutt_pretty_mailbox(tmp, sizeof(tmp));
       }
       else
@@ -153,9 +162,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->flagged : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->flagged : 0);
       }
-      else if (!Context || !Context->flagged)
+      else if (!sd->ctx || !sd->ctx->flagged)
         optional = 0;
       break;
 
@@ -168,10 +177,10 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%ss", prec);
-        mutt_str_pretty_size(tmp, sizeof(tmp), Context ? Context->size : 0);
+        mutt_str_pretty_size(tmp, sizeof(tmp), sd->ctx ? sd->ctx->size : 0);
         snprintf(buf, buflen, fmt, tmp);
       }
-      else if (!Context || !Context->size)
+      else if (!sd->ctx || !sd->ctx->size)
         optional = 0;
       break;
 
@@ -179,10 +188,10 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%ss", prec);
-        mutt_str_pretty_size(tmp, sizeof(tmp), Context ? Context->vsize : 0);
+        mutt_str_pretty_size(tmp, sizeof(tmp), sd->ctx ? sd->ctx->vsize : 0);
         snprintf(buf, buflen, fmt, tmp);
       }
-      else if (!Context || !Context->pattern)
+      else if (!sd->ctx || !sd->ctx->pattern)
         optional = 0;
       break;
 
@@ -190,9 +199,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->msgcount : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->msgcount : 0);
       }
-      else if (!Context || !Context->msgcount)
+      else if (!sd->ctx || !sd->ctx->msgcount)
         optional = 0;
       break;
 
@@ -200,9 +209,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->vcount : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->vcount : 0);
       }
-      else if (!Context || !Context->pattern)
+      else if (!sd->ctx || !sd->ctx->pattern)
         optional = 0;
       break;
 
@@ -210,9 +219,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->new : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->new : 0);
       }
-      else if (!Context || !Context->new)
+      else if (!sd->ctx || !sd->ctx->new)
         optional = 0;
       break;
 
@@ -220,9 +229,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->unread - Context->new : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->unread - sd->ctx->new : 0);
       }
-      else if (!Context || !(Context->unread - Context->new))
+      else if (!sd->ctx || !(sd->ctx->unread - sd->ctx->new))
         optional = 0;
       break;
 
@@ -238,11 +247,11 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       break;
 
     case 'P':
-      if (!menu)
+      if (!sd->menu)
         break;
-      if (menu->top + menu->pagelen >= menu->max)
+      if (sd->menu->top + sd->menu->pagelen >= sd->menu->max)
       {
-        cp = menu->top ?
+        cp = sd->menu->top ?
                  /* L10N: Status bar message: the end of the list emails is visible in the index */
                  _("end") :
                  /* L10N: Status bar message: all the emails are visible in the index */
@@ -250,7 +259,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       }
       else
       {
-        count = (100 * (menu->top + menu->pagelen)) / menu->max;
+        count = (100 * (sd->menu->top + sd->menu->pagelen)) / sd->menu->max;
         snprintf(tmp, sizeof(tmp), "%d%%", count);
         cp = tmp;
       }
@@ -262,14 +271,14 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
     {
       size_t i = 0;
 
-      if (Context)
+      if (sd->ctx)
       {
         i = OptAttachMsg ? 3 :
-                           ((Context->readonly || Context->dontwrite) ?
+                           ((sd->ctx->readonly || sd->ctx->dontwrite) ?
                                 2 :
-                                (Context->changed ||
+                                (sd->ctx->changed ||
                                  /* deleted doesn't necessarily mean changed in IMAP */
-                                 (Context->magic != MUTT_IMAP && Context->deleted)) ?
+                                 (sd->ctx->magic != MUTT_IMAP && sd->ctx->deleted)) ?
                                 1 :
                                 0);
       }
@@ -285,7 +294,7 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
 
     case 'R':
     {
-      int read = Context ? Context->msgcount - Context->unread : 0;
+      int read = sd->ctx ? sd->ctx->msgcount - sd->ctx->unread : 0;
 
       if (!optional)
       {
@@ -311,9 +320,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->tagged : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->tagged : 0);
       }
-      else if (!Context || !Context->tagged)
+      else if (!sd->ctx || !sd->ctx->tagged)
         optional = 0;
       break;
 
@@ -321,9 +330,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, Context ? Context->unread : 0);
+        snprintf(buf, buflen, fmt, sd->ctx ? sd->ctx->unread : 0);
       }
-      else if (!Context || !Context->unread)
+      else if (!sd->ctx || !sd->ctx->unread)
         optional = 0;
       break;
 
@@ -335,9 +344,9 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
       if (!optional)
       {
         snprintf(fmt, sizeof(fmt), "%%%ss", prec);
-        snprintf(buf, buflen, fmt, (Context && Context->pattern) ? Context->pattern : "");
+        snprintf(buf, buflen, fmt, (sd->ctx && sd->ctx->pattern) ? sd->ctx->pattern : "");
       }
-      else if (!Context || !Context->pattern)
+      else if (!sd->ctx || !sd->ctx->pattern)
         optional = 0;
       break;
 
@@ -353,12 +362,12 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
   if (optional)
   {
     mutt_expando_format(buf, buflen, col, cols, if_str, status_format_str,
-                        (unsigned long) menu, 0);
+                        (unsigned long) data, 0);
   }
   else if (flags & MUTT_FORMAT_OPTIONAL)
   {
     mutt_expando_format(buf, buflen, col, cols, else_str, status_format_str,
-                        (unsigned long) menu, 0);
+                        (unsigned long) data, 0);
   }
 
   return src;
@@ -366,14 +375,17 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
 
 /**
  * menu_status_line - Create the status line
+ * @param[in]  ctx      Mailbox
  * @param[out] buf      Buffer in which to save string
  * @param[in]  buflen   Buffer length
  * @param[in]  menu     Current menu
  * @param[in]  p        Format string
  */
-void menu_status_line(char *buf, size_t buflen, struct Menu *menu, const char *p)
+void menu_status_line(struct Context *ctx, char *buf, size_t buflen,
+                      struct Menu *menu, const char *p)
 {
+  struct StatusData sd = { menu, ctx };
   mutt_expando_format(buf, buflen, 0,
                       menu ? menu->statuswin->cols : MuttStatusWindow->cols, p,
-                      status_format_str, (unsigned long) menu, 0);
+                      status_format_str, (unsigned long) &sd, 0);
 }

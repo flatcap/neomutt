@@ -29,7 +29,7 @@
 extern char *QueryCommand;
 extern char *QueryFormat;
 
-int  mutt_query_complete(char *buf, size_t buflen);
-void mutt_query_menu(char *buf, size_t buflen);
+int  mutt_query_complete(struct Context *ctx, char *buf, size_t buflen);
+void mutt_query_menu(struct Context *ctx, char *buf, size_t buflen);
 
 #endif /* MUTT_QUERY_H */

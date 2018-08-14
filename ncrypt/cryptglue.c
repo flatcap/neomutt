@@ -257,10 +257,10 @@ struct Body *crypt_pgp_traditional_encryptsign(struct Body *a, int flags, char *
 /**
  * crypt_pgp_make_key_attachment - Wrapper for CryptModuleSpecs::pgp_make_key_attachment()
  */
-struct Body *crypt_pgp_make_key_attachment(void)
+struct Body *crypt_pgp_make_key_attachment(struct Context *ctx)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, pgp_make_key_attachment))
-    return CRYPT_MOD_CALL(PGP, pgp_make_key_attachment)();
+    return CRYPT_MOD_CALL(PGP, pgp_make_key_attachment)(ctx);
 
   return NULL;
 }
@@ -268,10 +268,10 @@ struct Body *crypt_pgp_make_key_attachment(void)
 /**
  * crypt_pgp_find_keys - Wrapper for CryptModuleSpecs::find_keys()
  */
-char *crypt_pgp_find_keys(struct Address *addrlist, bool oppenc_mode)
+char *crypt_pgp_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, find_keys))
-    return CRYPT_MOD_CALL(PGP, find_keys)(addrlist, oppenc_mode);
+    return CRYPT_MOD_CALL(PGP, find_keys)(ctx, addrlist, oppenc_mode);
 
   return NULL;
 }
@@ -321,10 +321,10 @@ int crypt_pgp_verify_one(struct Body *sigbdy, struct State *s, const char *tempf
 /**
  * crypt_pgp_send_menu - Wrapper for CryptModuleSpecs::send_menu()
  */
-int crypt_pgp_send_menu(struct Header *msg)
+int crypt_pgp_send_menu(struct Context *ctx, struct Header *msg)
 {
   if (CRYPT_MOD_CALL_CHECK(PGP, send_menu))
-    return CRYPT_MOD_CALL(PGP, send_menu)(msg);
+    return CRYPT_MOD_CALL(PGP, send_menu)(ctx, msg);
 
   return 0;
 }
@@ -403,19 +403,19 @@ void crypt_smime_encrypted_handler(struct Body *a, struct State *s)
 /**
  * crypt_smime_getkeys - Wrapper for CryptModuleSpecs::smime_getkeys()
  */
-void crypt_smime_getkeys(struct Envelope *env)
+void crypt_smime_getkeys(struct Context *ctx, struct Envelope *env)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, smime_getkeys))
-    CRYPT_MOD_CALL(SMIME, smime_getkeys)(env);
+    CRYPT_MOD_CALL(SMIME, smime_getkeys)(ctx, env);
 }
 
 /**
  * crypt_smime_verify_sender - Wrapper for CryptModuleSpecs::smime_verify_sender()
  */
-int crypt_smime_verify_sender(struct Header *h)
+int crypt_smime_verify_sender(struct Context *ctx, struct Header *h)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, smime_verify_sender))
-    return CRYPT_MOD_CALL(SMIME, smime_verify_sender)(h);
+    return CRYPT_MOD_CALL(SMIME, smime_verify_sender)(ctx, h);
 
   return 1;
 }
@@ -423,10 +423,10 @@ int crypt_smime_verify_sender(struct Header *h)
 /**
  * crypt_smime_find_keys - Wrapper for CryptModuleSpecs::find_keys()
  */
-char *crypt_smime_find_keys(struct Address *addrlist, bool oppenc_mode)
+char *crypt_smime_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, find_keys))
-    return CRYPT_MOD_CALL(SMIME, find_keys)(addrlist, oppenc_mode);
+    return CRYPT_MOD_CALL(SMIME, find_keys)(ctx, addrlist, oppenc_mode);
 
   return NULL;
 }
@@ -476,10 +476,10 @@ int crypt_smime_verify_one(struct Body *sigbdy, struct State *s, const char *tem
 /**
  * crypt_smime_send_menu - Wrapper for CryptModuleSpecs::send_menu()
  */
-int crypt_smime_send_menu(struct Header *msg)
+int crypt_smime_send_menu(struct Context *ctx, struct Header *msg)
 {
   if (CRYPT_MOD_CALL_CHECK(SMIME, send_menu))
-    return CRYPT_MOD_CALL(SMIME, send_menu)(msg);
+    return CRYPT_MOD_CALL(SMIME, send_menu)(ctx, msg);
 
   return 0;
 }

@@ -25,6 +25,7 @@
 
 #include <stddef.h>
 
+struct Context;
 struct ListHead;
 struct Header;
 
@@ -59,6 +60,6 @@ struct MixChain
 
 int mix_send_message(struct ListHead *chain, const char *tempfile);
 int mix_check_message(struct Header *msg);
-void mix_make_chain(struct ListHead *chainhead);
+void mix_make_chain(struct Context *ctx, struct ListHead *chainhead);
 
 #endif /* _MUTT_REMAILER_H */

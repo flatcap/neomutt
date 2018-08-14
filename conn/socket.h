@@ -52,7 +52,7 @@ struct ConnectionList *mutt_socket_head(void);
 struct Connection *mutt_socket_new(enum ConnectionType type);
 void mutt_socket_free(struct Connection *conn);
 
-int mutt_socket_open(struct Connection *conn);
+int mutt_socket_open(struct Context *ctx, struct Connection *conn);
 int mutt_socket_close(struct Connection *conn);
 int mutt_socket_read(struct Connection *conn, char *buf, size_t len);
 int mutt_socket_write(struct Connection *conn, const char *buf, size_t len);
@@ -63,7 +63,7 @@ int mutt_socket_write_d(struct Connection *conn, const char *buf, int len, int d
 
 int raw_socket_read(struct Connection *conn, char *buf, size_t len);
 int raw_socket_write(struct Connection *conn, const char *buf, size_t count);
-int raw_socket_open(struct Connection *conn);
+int raw_socket_open(struct Context *ctx, struct Connection *conn);
 int raw_socket_close(struct Connection *conn);
 int raw_socket_poll(struct Connection *conn, time_t wait_secs);
 

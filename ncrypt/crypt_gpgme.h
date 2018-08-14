@@ -28,6 +28,7 @@
 
 struct Address;
 struct Body;
+struct Context;
 struct Header;
 struct State;
 
@@ -38,23 +39,23 @@ int          pgp_gpgme_check_traditional(FILE *fp, struct Body *b, bool just_one
 int          pgp_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body **cur);
 int          pgp_gpgme_encrypted_handler(struct Body *a, struct State *s);
 struct Body *pgp_gpgme_encrypt_message(struct Body *a, char *keylist, bool sign);
-char *       pgp_gpgme_find_keys(struct Address *addrlist, bool oppenc_mode);
+char *       pgp_gpgme_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode);
 void         pgp_gpgme_init(void);
 void         pgp_gpgme_invoke_import(const char *fname);
-struct Body *pgp_gpgme_make_key_attachment(void);
-int          pgp_gpgme_send_menu(struct Header *msg);
+struct Body *pgp_gpgme_make_key_attachment(struct Context *ctx);
+int          pgp_gpgme_send_menu(struct Context *ctx, struct Header *msg);
 struct Body *pgp_gpgme_sign_message(struct Body *a);
 int          pgp_gpgme_verify_one(struct Body *sigbdy, struct State *s, const char *tempfile);
 
 int          smime_gpgme_application_handler(struct Body *a, struct State *s);
 struct Body *smime_gpgme_build_smime_entity(struct Body *a, char *keylist);
 int          smime_gpgme_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body **cur);
-char *       smime_gpgme_find_keys(struct Address *addrlist, bool oppenc_mode);
+char *       smime_gpgme_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode);
 void         smime_gpgme_init(void);
-int          smime_gpgme_send_menu(struct Header *msg);
+int          smime_gpgme_send_menu(struct Context *ctx, struct Header *msg);
 struct Body *smime_gpgme_sign_message(struct Body *a);
 int          smime_gpgme_verify_one(struct Body *sigbdy, struct State *s, const char *tempfile);
-int          smime_gpgme_verify_sender(struct Header *h);
+int          smime_gpgme_verify_sender(struct Context *ctx, struct Header *h);
 
 const char  *mutt_gpgme_print_version(void);
 

@@ -33,6 +33,7 @@
 #include "mutt_thread.h"
 #include "context.h"
 #include "curs_lib.h"
+#include "globals.h"
 #include "protos.h"
 #include "sort.h"
 
@@ -610,7 +611,7 @@ static int compare_threads(const void *a, const void *b)
    */
   else
   {
-    sort_func = mutt_get_sort_func(Sort);
+    sort_func = mutt_get_sort_func(Context, Sort);
     return sort_func ? 1 : 0;
   }
 }

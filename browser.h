@@ -27,6 +27,8 @@
 #include <sys/types.h>
 #include <time.h>
 
+struct Context;
+
 /* These Config Variables are only used in browser.c */
 extern bool  BrowserAbbreviateMailboxes;
 extern char *FolderFormat;
@@ -93,7 +95,7 @@ struct BrowserState
 #endif
 };
 
-void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int *numfiles);
+void mutt_select_file(struct Context *ctx, char *file, size_t filelen, int flags, char ***files, int *numfiles);
 void mutt_browser_select_dir(char *f);
 
 #endif /* _MUTT_BROWSER_H */

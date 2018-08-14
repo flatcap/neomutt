@@ -330,12 +330,13 @@ static int query_tag(struct Menu *menu, int n, int m)
 
 /**
  * query_menu - Get the user to enter an Address Query
+ * @param ctx     Mailbox
  * @param buf     Buffer for the query
  * @param buflen  Length of buffer
  * @param results Query List
  * @param retbuf  If true, populate the results
  */
-static void query_menu(char *buf, size_t buflen, struct Query *results, bool retbuf)
+static void query_menu(struct Context *ctx, char *buf, size_t buflen, struct Query *results, bool retbuf)
 {
   struct Menu *menu = NULL;
   struct Header *msg = NULL;
@@ -379,7 +380,7 @@ static void query_menu(char *buf, size_t buflen, struct Query *results, bool ret
     int done = 0;
     while (!done)
     {
-      const int op = mutt_menu_loop(menu);
+      const int op = mutt_menu_loop(ctx, menu);
       switch (op)
       {
         case OP_QUERY_APPEND:
@@ -507,7 +508,7 @@ static void query_menu(char *buf, size_t buflen, struct Query *results, bool ret
               }
             }
           }
-          ci_send_message(0, msg, NULL, Context, NULL);
+          ci_send_message(0, msg, NULL, ctx, NULL);
           menu->redraw = REDRAW_FULL;
           break;
 
@@ -569,11 +570,12 @@ static void query_menu(char *buf, size_t buflen, struct Query *results, bool ret
 
 /**
  * mutt_query_complete - Perform auto-complete using an Address Query
+ * @param ctx    Mailbox
  * @param buf    Buffer for completion
  * @param buflen Length of buffer
  * @retval 0 Always
  */
-int mutt_query_complete(char *buf, size_t buflen)
+int mutt_query_complete(struct Context *ctx, char *buf, size_t buflen)
 {
   struct Query *results = NULL;
   struct Address *tmpa = NULL;
@@ -600,17 +602,18 @@ int mutt_query_complete(char *buf, size_t buflen)
       return 0;
     }
     /* multiple results, choose from query menu */
-    query_menu(buf, buflen, results, true);
+    query_menu(ctx, buf, buflen, results, true);
   }
   return 0;
 }
 
 /**
  * mutt_query_menu - Show the user the results of a Query
+ * @param ctx    Mailbox
  * @param buf    Buffer for the query
  * @param buflen Length of buffer
  */
-void mutt_query_menu(char *buf, size_t buflen)
+void mutt_query_menu(struct Context *ctx, char *buf, size_t buflen)
 {
   if (!QueryCommand)
   {
@@ -622,10 +625,10 @@ void mutt_query_menu(char *buf, size_t buflen)
   {
     char buffer[STRING] = "";
 
-    query_menu(buffer, sizeof(buffer), NULL, false);
+    query_menu(ctx, buffer, sizeof(buffer), NULL, false);
   }
   else
   {
-    query_menu(buf, buflen, NULL, true);
+    query_menu(ctx, buf, buflen, NULL, true);
   }
 }

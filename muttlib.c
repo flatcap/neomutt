@@ -223,7 +223,7 @@ char *mutt_expand_path_regex(char *buf, size_t buflen, bool regex)
           h->env = mutt_env_new();
           h->env->from = alias;
           h->env->to = alias;
-          mutt_default_save(p, sizeof(p), h);
+          mutt_default_save(Context, p, sizeof(p), h);
           h->env->from = NULL;
           h->env->to = NULL;
           mutt_header_free(&h);
@@ -301,7 +301,7 @@ char *mutt_expand_path_regex(char *buf, size_t buflen, bool regex)
   /* Rewrite IMAP path in canonical form - aids in string comparisons of
    * folders. May possibly fail, in which case buf should be the same. */
   if (imap_path_probe(buf, NULL) == MUTT_IMAP)
-    imap_expand_path(buf, buflen);
+    imap_expand_path(Context, buf, buflen);
 #endif
 
   return buf;
@@ -1525,7 +1525,7 @@ void mutt_get_parent_path(char *path, char *buf, size_t buflen)
 {
 #ifdef USE_IMAP
   if (imap_path_probe(path, NULL) == MUTT_IMAP)
-    imap_get_parent_path(path, buf, buflen);
+    imap_get_parent_path(Context, path, buf, buflen);
   else
 #endif
 #ifdef USE_NOTMUCH

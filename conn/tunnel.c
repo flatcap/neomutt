@@ -54,11 +54,12 @@ struct TunnelData
 
 /**
  * tunnel_socket_open - Open a tunnel socket
+ * @param ctx  Mailbox
  * @param conn Connection to a server
  * @retval  0 Success
  * @retval -1 Error
  */
-static int tunnel_socket_open(struct Connection *conn)
+static int tunnel_socket_open(struct Context *ctx, struct Connection *conn)
 {
   int pin[2], pout[2];
 

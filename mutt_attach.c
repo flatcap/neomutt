@@ -359,6 +359,7 @@ void mutt_check_lookup_list(struct Body *b, char *type, size_t len)
  * @param fp     Source file stream. Can be NULL
  * @param a      The message body containing the attachment
  * @param flag   Option flag for how the attachment should be viewed
+ * @param ctx    Mailbox
  * @param hdr    Message header for the current message. Can be NULL
  * @param actx   Attachment context
  * @retval 0   If the viewer is run and exited successfully
@@ -373,8 +374,8 @@ void mutt_check_lookup_list(struct Body *b, char *type, size_t len)
  * attachment this way will block the main neomutt process until the viewer process
  * exits.
  */
-int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
-                         struct AttachCtx *actx)
+int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Context *ctx,
+                         struct Header *hdr, struct AttachCtx *actx)
 {
   char tempfile[PATH_MAX] = "";
   char pagerfile[PATH_MAX] = "";
@@ -617,7 +618,7 @@ int mutt_view_attachment(FILE *fp, struct Body *a, int flag, struct Header *hdr,
     struct Pager info = { 0 };
     info.fp = fp;
     info.bdy = a;
-    info.ctx = Context;
+    info.ctx = ctx;
     info.actx = actx;
     info.hdr = hdr;
 

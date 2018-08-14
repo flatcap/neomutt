@@ -28,6 +28,7 @@
 
 struct Address;
 struct Body;
+struct Context;
 struct Envelope;
 struct Header;
 struct State;
@@ -94,7 +95,7 @@ struct CryptModuleSpecs
    * If oppenc_mode is true, only keys that can be determined without prompting
    * will be used.
    */
-  char *       (*find_keys)(struct Address *addrlist, bool oppenc_mode);
+  char *       (*find_keys)(struct Context *ctx, struct Address *addrlist, bool oppenc_mode);
   /**
    * sign_message - Cryptographically sign the Body of a message
    * @param a Body of the message
@@ -113,10 +114,11 @@ struct CryptModuleSpecs
   int          (*verify_one)(struct Body *sigbdy, struct State *s, const char *tempf);
   /**
    * send_menu - Ask the user whether to sign and/or encrypt the email
+   * @param ctx Mailbox
    * @param msg Header of the email
    * @retval num Flags, e.g. #APPLICATION_PGP | #ENCRYPT
    */
-  int          (*send_menu)(struct Header *msg);
+  int          (*send_menu)(struct Context *ctx, struct Header *msg);
   /**
    * set_sender - Set the sender of the email
    * @param sender Email address
@@ -139,7 +141,7 @@ struct CryptModuleSpecs
    * @retval ptr  New Body containing the attachment
    * @retval NULL Error
    */
-  struct Body *(*pgp_make_key_attachment)(void);
+  struct Body *(*pgp_make_key_attachment)(struct Context *ctx);
   /**
    * pgp_check_traditional - Look for inline (non-MIME) PGP content
    * @param fp       File pointer to the current attachment
@@ -179,14 +181,15 @@ struct CryptModuleSpecs
    * smime_getkeys - Get the S/MIME keys required to encrypt this email
    * @param env Envelope of the email
    */
-  void         (*smime_getkeys)(struct Envelope *env);
+  void         (*smime_getkeys)(struct Context *ctx, struct Envelope *env);
   /**
    * smime_verify_sender - Does the sender match the certificate?
-   * @param h Header of the email
+   * @param ctx Mailbox
+   * @param h   Header of the email
    * @retval 0 Success
    * @retval 1 Failure
    */
-  int          (*smime_verify_sender)(struct Header *h);
+  int          (*smime_verify_sender)(struct Context *ctx, struct Header *h);
   /**
    * smime_build_smime_entity - Encrypt the email body to all recipients
    * @param a        Body of email

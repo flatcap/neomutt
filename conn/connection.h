@@ -29,6 +29,8 @@
 #include "mutt/mutt.h"
 #include "account.h"
 
+struct Context;
+
 #define LONG_STRING 1024
 
 /**
@@ -51,7 +53,7 @@ struct Connection
   void *sockdata;
   int (*conn_read)(struct Connection *conn, char *buf, size_t len);
   int (*conn_write)(struct Connection *conn, const char *buf, size_t count);
-  int (*conn_open)(struct Connection *conn);
+  int (*conn_open)(struct Context *ctx, struct Connection *conn);
   int (*conn_close)(struct Connection *conn);
   int (*conn_poll)(struct Connection *conn, time_t wait_secs);
 };

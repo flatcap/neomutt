@@ -1382,7 +1382,7 @@ struct Body *pgp_class_sign_message(struct Body *a)
 /**
  * pgp_class_find_keys - Implements CryptModuleSpecs::find_keys()
  */
-char *pgp_class_find_keys(struct Address *addrlist, bool oppenc_mode)
+char *pgp_class_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode)
 {
   struct ListHead crypt_hook_list = STAILQ_HEAD_INITIALIZER(crypt_hook_list);
   struct ListNode *crypt_hook = NULL;
@@ -1435,7 +1435,7 @@ char *pgp_class_find_keys(struct Address *addrlist, bool oppenc_mode)
           }
           else if (!oppenc_mode)
           {
-            k_info = pgp_getkeybystr(keyID, KEYFLAG_CANENCRYPT, PGP_PUBRING);
+            k_info = pgp_getkeybystr(ctx, keyID, KEYFLAG_CANENCRYPT, PGP_PUBRING);
           }
         }
         else if (r == MUTT_NO)
@@ -1458,13 +1458,13 @@ char *pgp_class_find_keys(struct Address *addrlist, bool oppenc_mode)
       if (!k_info)
       {
         pgp_class_invoke_getkeys(q);
-        k_info = pgp_getkeybyaddr(q, KEYFLAG_CANENCRYPT, PGP_PUBRING, oppenc_mode);
+        k_info = pgp_getkeybyaddr(ctx, q, KEYFLAG_CANENCRYPT, PGP_PUBRING, oppenc_mode);
       }
 
       if (!k_info && !oppenc_mode)
       {
         snprintf(buf, sizeof(buf), _("Enter keyID for %s: "), q->mailbox);
-        k_info = pgp_ask_for_key(buf, q->mailbox, KEYFLAG_CANENCRYPT, PGP_PUBRING);
+        k_info = pgp_ask_for_key(ctx, buf, q->mailbox, KEYFLAG_CANENCRYPT, PGP_PUBRING);
       }
 
       if (!k_info)
@@ -1808,7 +1808,7 @@ struct Body *pgp_class_traditional_encryptsign(struct Body *a, int flags, char *
 /**
  * pgp_class_send_menu - Implements CryptModuleSpecs::send_menu()
  */
-int pgp_class_send_menu(struct Header *msg)
+int pgp_class_send_menu(struct Context *ctx, struct Header *msg)
 {
   struct PgpKeyInfo *p = NULL;
   const char *prompt = NULL;
@@ -1936,7 +1936,7 @@ int pgp_class_send_menu(struct Header *msg)
       case 'a': /* sign (a)s */
         OptPgpCheckTrust = false;
 
-        p = pgp_ask_for_key(_("Sign as: "), NULL, 0, PGP_SECRING);
+        p = pgp_ask_for_key(ctx, _("Sign as: "), NULL, 0, PGP_SECRING);
         if (p)
         {
           char input_signas[SHORT_STRING];
@@ -1973,7 +1973,7 @@ int pgp_class_send_menu(struct Header *msg)
 
       case 'O': /* oppenc mode on */
         msg->security |= OPPENCRYPT;
-        crypt_opportunistic_encrypt(msg);
+        crypt_opportunistic_encrypt(ctx, msg);
         break;
 
       case 'o': /* oppenc mode off */

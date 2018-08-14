@@ -180,8 +180,8 @@ extern char *SmimeVerifyOpaqueCommand;
 /* crypt.c */
 void         crypt_extract_keys_from_messages(struct Header *h);
 void         crypt_forget_passphrase(void);
-int          crypt_get_keys(struct Header *msg, char **keylist, bool oppenc_mode);
-void         crypt_opportunistic_encrypt(struct Header *msg);
+int          crypt_get_keys(struct Context *ctx, struct Header *msg, char **keylist, bool oppenc_mode);
+void         crypt_opportunistic_encrypt(struct Context *ctx, struct Header *msg);
 int          crypt_query(struct Body *m);
 int          crypt_valid_passphrase(int flags);
 int          mutt_is_application_pgp(struct Body *m);
@@ -203,13 +203,13 @@ int          crypt_pgp_decrypt_mime(FILE *a, FILE **b, struct Body *c, struct Bo
 int          crypt_pgp_encrypted_handler(struct Body *a, struct State *s);
 void         crypt_pgp_extract_key_from_attachment(FILE *fp, struct Body *top);
 void         crypt_pgp_invoke_getkeys(struct Address *addr);
-struct Body *crypt_pgp_make_key_attachment(void);
-int          crypt_pgp_send_menu(struct Header *msg);
+struct Body *crypt_pgp_make_key_attachment(struct Context *ctx);
+int          crypt_pgp_send_menu(struct Context *ctx, struct Header *msg);
 int          crypt_smime_application_handler(struct Body *m, struct State *s);
 int          crypt_smime_decrypt_mime(FILE *a, FILE **b, struct Body *c, struct Body **d);
-void         crypt_smime_getkeys(struct Envelope *env);
-int          crypt_smime_send_menu(struct Header *msg);
-int          crypt_smime_verify_sender(struct Header *h);
+void         crypt_smime_getkeys(struct Context *ctx, struct Envelope *env);
+int          crypt_smime_send_menu(struct Context *ctx, struct Header *msg);
+int          crypt_smime_verify_sender(struct Context *ctx, struct Header *h);
 
 /* crypt_mod.c */
 void crypto_module_free(void);

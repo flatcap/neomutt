@@ -112,7 +112,7 @@ int mutt_display_message(struct Header *cur)
     if (cur->security & ENCRYPT)
     {
       if (cur->security & APPLICATION_SMIME)
-        crypt_smime_getkeys(cur->env);
+        crypt_smime_getkeys(Context, cur->env);
       if (!crypt_valid_passphrase(cur->security))
         return 0;
 
@@ -221,7 +221,7 @@ int mutt_display_message(struct Header *cur)
     {
       if (cur->security & GOODSIGN)
       {
-        if (crypt_smime_verify_sender(cur) == 0)
+        if (crypt_smime_verify_sender(Context, cur) == 0)
           mutt_message(_("S/MIME signature successfully verified"));
         else
           mutt_error(_("S/MIME certificate owner does not match sender"));
@@ -906,7 +906,7 @@ int mutt_save_message(struct Header *h, bool delete, bool decode, bool decrypt)
       app = h->security;
     }
     mutt_message_hook(Context, h, MUTT_MESSAGE_HOOK);
-    mutt_default_save(buf, sizeof(buf), h);
+    mutt_default_save(Context, buf, sizeof(buf), h);
   }
   else
   {
@@ -923,7 +923,7 @@ int mutt_save_message(struct Header *h, bool delete, bool decode, bool decrypt)
     if (h)
     {
       mutt_message_hook(Context, h, MUTT_MESSAGE_HOOK);
-      mutt_default_save(buf, sizeof(buf), h);
+      mutt_default_save(Context, buf, sizeof(buf), h);
       if (WithCrypto)
       {
         need_passphrase = (h->security & ENCRYPT);

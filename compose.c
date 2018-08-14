@@ -712,7 +712,7 @@ static void compose_menu_redraw(struct Menu *menu)
 
 #ifdef USE_SIDEBAR
   if (menu->redraw & REDRAW_SIDEBAR)
-    menu_redraw_sidebar(menu);
+    menu_redraw_sidebar(Context, menu);
 #endif
 
   if (menu->redraw & REDRAW_INDEX)
@@ -937,7 +937,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
 #ifdef USE_NNTP
     OptNews = false; /* for any case */
 #endif
-    const int op = mutt_menu_loop(menu);
+    const int op = mutt_menu_loop(Context, menu);
     switch (op)
     {
       case OP_COMPOSE_EDIT_FROM:
@@ -952,7 +952,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
         edit_address_list(HDR_TO, &msg->env->to);
         if (CryptOpportunisticEncrypt)
         {
-          crypt_opportunistic_encrypt(msg);
+          crypt_opportunistic_encrypt(Context, msg);
           redraw_crypt_lines(msg);
         }
         mutt_message_hook(NULL, msg, MUTT_SEND2_HOOK);
@@ -965,7 +965,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
         edit_address_list(HDR_BCC, &msg->env->bcc);
         if (CryptOpportunisticEncrypt)
         {
-          crypt_opportunistic_encrypt(msg);
+          crypt_opportunistic_encrypt(Context, msg);
           redraw_crypt_lines(msg);
         }
         mutt_message_hook(NULL, msg, MUTT_SEND2_HOOK);
@@ -978,7 +978,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
         edit_address_list(HDR_CC, &msg->env->cc);
         if (CryptOpportunisticEncrypt)
         {
-          crypt_opportunistic_encrypt(msg);
+          crypt_opportunistic_encrypt(Context, msg);
           redraw_crypt_lines(msg);
         }
         mutt_message_hook(NULL, msg, MUTT_SEND2_HOOK);
@@ -1095,7 +1095,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
             FREE(&err);
           }
           if (CryptOpportunisticEncrypt)
-            crypt_opportunistic_encrypt(msg);
+            crypt_opportunistic_encrypt(Context, msg);
         }
         else
         {
@@ -1122,7 +1122,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
         if (!(WithCrypto & APPLICATION_PGP))
           break;
         new = mutt_mem_calloc(1, sizeof(struct AttachPtr));
-        new->content = crypt_pgp_make_key_attachment();
+        new->content = crypt_pgp_make_key_attachment(Context);
         if (new->content)
         {
           update_idx(menu, actx, new);
@@ -1407,7 +1407,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
         OptNews = false;
         if (op == OP_COMPOSE_ATTACH_NEWS_MESSAGE)
         {
-          CurrentNewsSrv = nntp_select_server(NewsServer, false);
+          CurrentNewsSrv = nntp_select_server(Context, NewsServer, false);
           if (!CurrentNewsSrv)
             break;
 
@@ -1836,7 +1836,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
       case OP_VIEW_ATTACH:
       case OP_DISPLAY_HEADERS:
         CHECK_COUNT;
-        mutt_attach_display_loop(menu, op, NULL, actx, false);
+        mutt_attach_display_loop(menu, op, Context, NULL, actx, false);
         menu->redraw = REDRAW_FULL;
         /* no send2hook, since this doesn't modify the message */
         break;
@@ -1844,7 +1844,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
       case OP_SAVE:
         CHECK_COUNT;
         mutt_save_attachment_list(actx, NULL, menu->tagprefix,
-                                  CURATTACH->content, NULL, menu);
+                                  CURATTACH->content, Context, NULL, menu);
         /* no send2hook, since this doesn't modify the message */
         break;
 
@@ -1963,10 +1963,10 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
           }
           msg->security &= ~APPLICATION_SMIME;
           msg->security |= APPLICATION_PGP;
-          crypt_opportunistic_encrypt(msg);
+          crypt_opportunistic_encrypt(Context, msg);
           redraw_crypt_lines(msg);
         }
-        msg->security = crypt_pgp_send_menu(msg);
+        msg->security = crypt_pgp_send_menu(Context, msg);
         redraw_crypt_lines(msg);
         mutt_message_hook(NULL, msg, MUTT_SEND2_HOOK);
         break;
@@ -1997,10 +1997,10 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
           }
           msg->security &= ~APPLICATION_PGP;
           msg->security |= APPLICATION_SMIME;
-          crypt_opportunistic_encrypt(msg);
+          crypt_opportunistic_encrypt(Context, msg);
           redraw_crypt_lines(msg);
         }
-        msg->security = crypt_smime_send_menu(msg);
+        msg->security = crypt_smime_send_menu(Context, msg);
         redraw_crypt_lines(msg);
         mutt_message_hook(NULL, msg, MUTT_SEND2_HOOK);
         break;
@@ -2008,7 +2008,7 @@ int mutt_compose_menu(struct Header *msg, char *fcc, size_t fcclen,
 #ifdef MIXMASTER
       case OP_COMPOSE_MIX:
 
-        mix_make_chain(&msg->chain);
+        mix_make_chain(Context, &msg->chain);
         mutt_message_hook(NULL, msg, MUTT_SEND2_HOOK);
         break;
 #endif

@@ -623,16 +623,17 @@ error:
 
 /**
  * smtp_open - Open an SMTP Connection
+ * @param ctx   Mailbox
  * @param conn  SMTP Connection
  * @param esmtp If true, use ESMTP
  * @retval  0 Success
  * @retval -1 Error
  */
-static int smtp_open(struct Connection *conn, bool esmtp)
+static int smtp_open(struct Context *ctx, struct Connection *conn, bool esmtp)
 {
   int rc;
 
-  if (mutt_socket_open(conn))
+  if (mutt_socket_open(ctx, conn))
     return -1;
 
   /* get greeting string */
@@ -738,7 +739,7 @@ int mutt_smtp_send(const struct Address *from, const struct Address *to,
   do
   {
     /* send our greeting */
-    rc = smtp_open(conn, eightbit);
+    rc = smtp_open(Context, conn, eightbit);
     if (rc != 0)
       break;
     FREE(&AuthMechs);

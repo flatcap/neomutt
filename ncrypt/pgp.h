@@ -30,6 +30,7 @@
 
 struct Address;
 struct Body;
+struct Context;
 struct Header;
 struct PgpKeyInfo;
 struct State;
@@ -46,7 +47,7 @@ char *pgp_fpr_or_lkeyid(struct PgpKeyInfo * k);
 
 int pgp_class_decrypt_mime(FILE *fpin, FILE **fpout, struct Body *b, struct Body **cur);
 
-char *pgp_class_find_keys(struct Address *addrlist, bool oppenc_mode);
+char *pgp_class_find_keys(struct Context *ctx, struct Address *addrlist, bool oppenc_mode);
 
 int pgp_class_application_handler(struct Body *m, struct State *s);
 int pgp_class_encrypted_handler(struct Body *a, struct State *s);
@@ -59,6 +60,6 @@ struct Body *pgp_class_traditional_encryptsign(struct Body *a, int flags, char *
 struct Body *pgp_class_encrypt_message(struct Body *a, char *keylist, bool sign);
 struct Body *pgp_class_sign_message(struct Body *a);
 
-int pgp_class_send_menu(struct Header *msg);
+int pgp_class_send_menu(struct Context *ctx, struct Header *msg);
 
 #endif /* _NCRYPT_PGP_H */

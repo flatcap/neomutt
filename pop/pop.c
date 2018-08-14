@@ -509,7 +509,7 @@ static int pop_mbox_open(struct Context *ctx)
   pop_data->conn = conn;
   ctx->data = pop_data;
 
-  if (pop_open_connection(pop_data) < 0)
+  if (pop_open_connection(ctx, pop_data) < 0)
     return -1;
 
   conn->data = pop_data;
@@ -864,7 +864,7 @@ static int pop_mbox_check(struct Context *ctx, int *index_hint)
 
   mutt_socket_close(pop_data->conn);
 
-  if (pop_open_connection(pop_data) < 0)
+  if (pop_open_connection(ctx, pop_data) < 0)
     return -1;
 
   ctx->size = pop_data->size;
@@ -885,14 +885,16 @@ static int pop_mbox_check(struct Context *ctx, int *index_hint)
 
 /**
  * pop_fetch_mail - Fetch messages and save them in $spoolfile
+ * @param ctx Mailbox
  */
-void pop_fetch_mail(void)
+void pop_fetch_mail(struct Context *ctx)
 {
   char buffer[LONG_STRING];
   char msgbuf[SHORT_STRING];
   char *url = NULL, *p = NULL;
   int delanswer, last = 0, msgs, bytes, rset = 0, ret;
   struct Connection *conn = NULL;
+  struct Context spool_ctx;
   struct Message *msg = NULL;
   struct Account acct;
   struct PopData *pop_data = NULL;
@@ -927,7 +929,7 @@ void pop_fetch_mail(void)
   pop_data = mutt_mem_calloc(1, sizeof(struct PopData));
   pop_data->conn = conn;
 
-  if (pop_open_connection(pop_data) < 0)
+  if (pop_open_connection(ctx, pop_data) < 0)
   {
     mutt_socket_free(pop_data->conn);
     FREE(&pop_data);
@@ -968,8 +970,8 @@ void pop_fetch_mail(void)
     goto finish;
   }
 
-  struct Context *ctx = mx_mbox_open(Spoolfile, MUTT_APPEND);
-  if (!ctx)
+  struct Context *spool_ctx = mx_mbox_open(Spoolfile, MUTT_APPEND);
+  if (!spool_ctx)
     goto finish;
 
   delanswer = query_quadoption(PopDelete, _("Delete messages from server?"));
@@ -982,7 +984,7 @@ void pop_fetch_mail(void)
 
   for (int i = last + 1; i <= msgs; i++)
   {
-    msg = mx_msg_open_new(ctx, NULL, MUTT_ADD_FROM);
+    msg = mx_msg_open_new(spool_ctx, NULL, MUTT_ADD_FROM);
     if (!msg)
       ret = -3;
     else
@@ -992,13 +994,13 @@ void pop_fetch_mail(void)
       if (ret == -3)
         rset = 1;
 
-      if (ret == 0 && mx_msg_commit(ctx, msg) != 0)
+      if (ret == 0 && mx_msg_commit(spool_ctx, msg) != 0)
       {
         rset = 1;
         ret = -3;
       }
 
-      mx_msg_close(ctx, &msg);
+      mx_msg_close(spool_ctx, &msg);
     }
 
     if (ret == 0 && delanswer == MUTT_YES)
@@ -1010,7 +1012,7 @@ void pop_fetch_mail(void)
 
     if (ret == -1)
     {
-      mx_mbox_close(&ctx, NULL);
+      mx_mbox_close(&spool_ctx, NULL);
       goto fail;
     }
     if (ret == -2)
@@ -1031,7 +1033,7 @@ void pop_fetch_mail(void)
                  msgbuf, i - last, msgs - last);
   }
 
-  mx_mbox_close(&ctx, NULL);
+  mx_mbox_close(&spool_ctx, NULL);
 
   if (rset)
   {

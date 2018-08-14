@@ -588,12 +588,13 @@ static int pgp_id_matches_addr(struct Address *addr, struct Address *u_addr, str
 
 /**
  * pgp_select_key - Let the user select a key to use
+ * @param ctx  Mailbox
  * @param keys List of PGP keys
  * @param p    Address to match
  * @param s    String to match
  * @retval ptr Selected PGP key
  */
-static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
+static struct PgpKeyInfo *pgp_select_key(struct Context *ctx, struct PgpKeyInfo *keys,
                                          struct Address *p, const char *s)
 {
   int keymax;
@@ -693,7 +694,7 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
 
   while (!done)
   {
-    switch (mutt_menu_loop(menu))
+    switch (mutt_menu_loop(ctx, menu))
     {
       case OP_VERIFY_KEY:
 
@@ -815,13 +816,14 @@ static struct PgpKeyInfo *pgp_select_key(struct PgpKeyInfo *keys,
 
 /**
  * pgp_ask_for_key - Ask the user for a PGP key
+ * @param ctx       Mailbox
  * @param tag       Prompt for the user
  * @param whatfor   Use for key, e.g. "signing"
  * @param abilities Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param keyring   PGP keyring to use
  * @retval ptr Selected PGP key
  */
-struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, short abilities, enum PgpRing keyring)
+struct PgpKeyInfo *pgp_ask_for_key(struct Context *ctx, char *tag, char *whatfor, short abilities, enum PgpRing keyring)
 {
   struct PgpKeyInfo *key = NULL;
   char resp[SHORT_STRING];
@@ -862,7 +864,7 @@ struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, short abilities, en
       }
     }
 
-    key = pgp_getkeybystr(resp, abilities, keyring);
+    key = pgp_getkeybystr(ctx, resp, abilities, keyring);
     if (key)
       return key;
 
@@ -874,7 +876,7 @@ struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, short abilities, en
 /**
  * pgp_class_make_key_attachment - Implements CryptModuleSpecs::pgp_make_key_attachment()
  */
-struct Body *pgp_class_make_key_attachment(void)
+struct Body *pgp_class_make_key_attachment(struct Context *ctx)
 {
   struct Body *att = NULL;
   char buf[LONG_STRING];
@@ -886,7 +888,7 @@ struct Body *pgp_class_make_key_attachment(void)
   OptPgpCheckTrust = false;
 
   struct PgpKeyInfo *key =
-      pgp_ask_for_key(_("Please enter the key ID: "), NULL, 0, PGP_PUBRING);
+      pgp_ask_for_key(ctx, _("Please enter the key ID: "), NULL, 0, PGP_PUBRING);
 
   if (!key)
     return NULL;
@@ -985,14 +987,15 @@ static struct PgpKeyInfo **pgp_get_lastp(struct PgpKeyInfo *p)
 
 /**
  * pgp_getkeybyaddr - Find a PGP key by address
+ * @param ctx         Mailbox
  * @param a           Email address to match
  * @param abilities   Abilities to match, e.g. #KEYFLAG_CANENCRYPT
  * @param keyring     PGP keyring to use
  * @param oppenc_mode If true, use opportunistic encryption
  * @retval ptr Matching PGP key
  */
-struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
-                                    enum PgpRing keyring, bool oppenc_mode)
+struct PgpKeyInfo *pgp_getkeybyaddr(struct Context *ctx, struct Address *a,
+                                    short abilities, enum PgpRing keyring, bool oppenc_mode)
 {
   if (!a)
     return NULL;
@@ -1106,7 +1109,7 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
     else
     {
       /* Else: Ask the user.  */
-      k = pgp_select_key(matches, a, NULL);
+      k = pgp_select_key(ctx, matches, a, NULL);
       if (k)
         pgp_remove_key(&matches, k);
     }
@@ -1121,12 +1124,13 @@ struct PgpKeyInfo *pgp_getkeybyaddr(struct Address *a, short abilities,
 
 /**
  * pgp_getkeybystr - Find a PGP key by string
+ * @param ctx       Mailbox
  * @param p         String to match
- * @param abilities   Abilities to match, e.g. #KEYFLAG_CANENCRYPT
- * @param keyring     PGP keyring to use
+ * @param abilities Abilities to match, e.g. #KEYFLAG_CANENCRYPT
+ * @param keyring   PGP keyring to use
  * @retval ptr Matching PGP key
  */
-struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, enum PgpRing keyring)
+struct PgpKeyInfo *pgp_getkeybystr(struct Context *ctx, char *p, short abilities, enum PgpRing keyring)
 {
   struct ListHead hints = STAILQ_HEAD_INITIALIZER(hints);
   struct PgpKeyInfo *keys = NULL;
@@ -1201,7 +1205,7 @@ struct PgpKeyInfo *pgp_getkeybystr(char *p, short abilities, enum PgpRing keyrin
 
   if (matches)
   {
-    k = pgp_select_key(matches, NULL, p);
+    k = pgp_select_key(ctx, matches, NULL, p);
     if (k)
       pgp_remove_key(&matches, k);
 

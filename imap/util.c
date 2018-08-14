@@ -65,8 +65,9 @@ short ImapPipelineDepth; ///< Config: (imap) Number of IMAP commands that may be
 
 /**
  * imap_expand_path - Canonicalise an IMAP path
- * @param buf Buffer containing path
- * @param buflen  Buffer length
+ * @param ctx  Mailbox
+ * @param path Buffer containing path
+ * @param len  Buffer length
  * @retval  0 Success
  * @retval -1 Error
  *
@@ -77,7 +78,7 @@ short ImapPipelineDepth; ///< Config: (imap) Number of IMAP commands that may be
  * Function can fail if imap_parse_path() or url_tostring() fail,
  * of if the buffer isn't large enough.
  */
-int imap_expand_path(char *buf, size_t buflen)
+int imap_expand_path(struct Context *ctx, char *buf, size_t buflen)
 {
   struct ImapMbox mx;
   struct ImapData *idata = NULL;
@@ -88,7 +89,7 @@ int imap_expand_path(char *buf, size_t buflen)
   if (imap_parse_path(buf, &mx) < 0)
     return -1;
 
-  idata = imap_conn_find(&mx.account, MUTT_IMAP_CONN_NONEW);
+  idata = imap_conn_find(ctx, &mx.account, MUTT_IMAP_CONN_NONEW);
   mutt_account_tourl(&mx.account, &url);
   imap_fix_path(idata, mx.mbox, fixedpath, sizeof(fixedpath));
   url.path = fixedpath;
@@ -145,6 +146,7 @@ void imap_get_parent(const char *mbox, char delim, char *buf, size_t buflen)
 
 /**
  * imap_get_parent_path - Get the path of the parent folder
+ * @param ctx    Mailbox
  * @param path   Mailbox whose parent is to be determined
  * @param buf    Buffer for the result
  * @param buflen Length of the buffer
@@ -152,7 +154,7 @@ void imap_get_parent(const char *mbox, char delim, char *buf, size_t buflen)
  * Provided an imap path, returns in buf the parent directory if
  * existent. Else returns the same path.
  */
-void imap_get_parent_path(const char *path, char *buf, size_t buflen)
+void imap_get_parent_path(struct Context *ctx, const char *path, char *buf, size_t buflen)
 {
   struct ImapMbox mx;
   struct ImapData *idata = NULL;
@@ -164,7 +166,7 @@ void imap_get_parent_path(const char *path, char *buf, size_t buflen)
     return;
   }
 
-  idata = imap_conn_find(&mx.account, MUTT_IMAP_CONN_NONEW);
+  idata = imap_conn_find(ctx, &mx.account, MUTT_IMAP_CONN_NONEW);
   if (!idata)
   {
     mutt_str_strfcpy(buf, path, buflen);
@@ -184,12 +186,13 @@ void imap_get_parent_path(const char *path, char *buf, size_t buflen)
 
 /**
  * imap_clean_path - Cleans an IMAP path using imap_fix_path
+ * @param ctx  Mailbox
  * @param path Path to be cleaned
  * @param plen Length of the buffer
  *
  * Does it in place.
  */
-void imap_clean_path(char *path, size_t plen)
+void imap_clean_path(struct Context *ctx, char *path, size_t plen)
 {
   struct ImapMbox mx;
   struct ImapData *idata = NULL;
@@ -198,7 +201,7 @@ void imap_clean_path(char *path, size_t plen)
   if (imap_parse_path(path, &mx) < 0)
     return;
 
-  idata = imap_conn_find(&mx.account, MUTT_IMAP_CONN_NONEW);
+  idata = imap_conn_find(ctx, &mx.account, MUTT_IMAP_CONN_NONEW);
   if (!idata)
     return;
 
@@ -1018,8 +1021,8 @@ void imap_disallow_reopen(struct Context *ctx)
  */
 int imap_account_match(const struct Account *a1, const struct Account *a2)
 {
-  struct ImapData *a1_idata = imap_conn_find(a1, MUTT_IMAP_CONN_NONEW);
-  struct ImapData *a2_idata = imap_conn_find(a2, MUTT_IMAP_CONN_NONEW);
+  struct ImapData *a1_idata = imap_conn_find(Context, a1, MUTT_IMAP_CONN_NONEW);
+  struct ImapData *a2_idata = imap_conn_find(Context, a2, MUTT_IMAP_CONN_NONEW);
   const struct Account *a1_canon = a1_idata ? &a1_idata->conn->account : a1;
   const struct Account *a2_canon = a2_idata ? &a2_idata->conn->account : a2;
 

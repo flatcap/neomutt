@@ -28,6 +28,7 @@
 #include "mutt/mutt.h"
 
 struct Address;
+struct Context;
 struct Envelope;
 
 /**
@@ -54,7 +55,7 @@ struct Address *mutt_expand_aliases(struct Address *a);
 struct Address *mutt_get_address(struct Envelope *env, const char **pfxp);
 
 bool mutt_addr_is_user(struct Address *addr);
-int mutt_alias_complete(char *buf, size_t buflen);
+int mutt_alias_complete(struct Context *ctx, char *buf, size_t buflen);
 void mutt_alias_add_reverse(struct Alias *t);
 void mutt_alias_delete_reverse(struct Alias *t);
 struct Address *mutt_alias_reverse_lookup(struct Address *a);

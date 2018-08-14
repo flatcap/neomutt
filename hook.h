@@ -62,7 +62,7 @@ extern bool  SaveName;
 
 void  mutt_account_hook(const char *url);
 void  mutt_crypt_hook(struct ListHead *list, struct Address *addr);
-void  mutt_default_save(char *path, size_t pathlen, struct Header *hdr);
+void  mutt_default_save(struct Context *ctx, char *path, size_t pathlen, struct Header *hdr);
 void  mutt_delete_hooks(int type);
 char *mutt_find_hook(int type, const char *pat);
 void  mutt_folder_hook(const char *path);

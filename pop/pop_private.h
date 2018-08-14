@@ -110,14 +110,14 @@ struct PopAuth
 };
 
 /* pop_auth.c */
-int pop_authenticate(struct PopData *pop_data);
+int pop_authenticate(struct Context *ctx, struct PopData *pop_data);
 void pop_apop_timestamp(struct PopData *pop_data, char *buf);
 
 /* pop_lib.c */
 #define pop_query(A, B, C) pop_query_d(A, B, C, NULL)
 int pop_parse_path(const char *path, struct Account *acct);
-int pop_connect(struct PopData *pop_data);
-int pop_open_connection(struct PopData *pop_data);
+int pop_connect(struct Context *ctx, struct PopData *pop_data);
+int pop_open_connection(struct Context *ctx, struct PopData *pop_data);
 int pop_query_d(struct PopData *pop_data, char *buf, size_t buflen, char *msg);
 int pop_fetch_data(struct PopData *pop_data, const char *query, struct Progress *progressbar,
                    int (*func)(char *, void *), void *data);

@@ -188,11 +188,12 @@ static int alias_sort_address(const void *a, const void *b)
 
 /**
  * mutt_alias_menu - Display a menu of Aliases
+ * @param ctx    Mailbox
  * @param buf    Buffer for expanded aliases
  * @param buflen Length of buffer
  * @param aliases Alias List
  */
-void mutt_alias_menu(char *buf, size_t buflen, struct AliasList *aliases)
+void mutt_alias_menu(struct Context *ctx, char *buf, size_t buflen, struct AliasList *aliases)
 {
   struct Alias *a = NULL, *last = NULL;
   struct Menu *menu = NULL;
@@ -263,7 +264,7 @@ new_aliases:
       a = TAILQ_NEXT(last, entries);
       goto new_aliases;
     }
-    switch ((op = mutt_menu_loop(menu)))
+    switch ((op = mutt_menu_loop(ctx, menu)))
     {
       case OP_DELETE:
       case OP_UNDELETE:

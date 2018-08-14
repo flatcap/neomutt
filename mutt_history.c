@@ -26,6 +26,7 @@
 #include "mutt.h"
 #include "curs_lib.h"
 #include "format_flags.h"
+#include "globals.h"
 #include "keymap.h"
 #include "menu.h"
 #include "mutt_window.h"
@@ -105,7 +106,7 @@ static void history_menu(char *buf, size_t buflen, char **matches, int match_cou
 
   while (!done)
   {
-    switch (mutt_menu_loop(menu))
+    switch (mutt_menu_loop(Context, menu))
     {
       case OP_GENERIC_SELECT_ENTRY:
         mutt_str_strfcpy(buf, matches[menu->current], buflen);

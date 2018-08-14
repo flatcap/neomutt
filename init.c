@@ -2023,7 +2023,7 @@ static int parse_subscribe_to(struct Buffer *buf, struct Buffer *s,
     if (buf->data && *buf->data)
     {
       /* Expand and subscribe */
-      if (imap_subscribe(mutt_expand_path(buf->data, buf->dsize), 1) != 0)
+      if (imap_subscribe(Context, mutt_expand_path(buf->data, buf->dsize), 1) != 0)
       {
         mutt_buffer_printf(err, _("Could not subscribe to %s"), buf->data);
         return -1;
@@ -2405,7 +2405,7 @@ static int parse_unsubscribe_from(struct Buffer *buf, struct Buffer *s,
     if (buf->data && *buf->data)
     {
       /* Expand and subscribe */
-      if (imap_subscribe(mutt_expand_path(buf->data, buf->dsize), 0) != 0)
+      if (imap_subscribe(Context, mutt_expand_path(buf->data, buf->dsize), 0) != 0)
       {
         mutt_buffer_printf(err, _("Could not unsubscribe from %s"), buf->data);
         return -1;
@@ -3088,7 +3088,7 @@ int mutt_init(bool skip_sys_rc, struct ListHead *commands)
       if (mp->b->magic == MUTT_NOTMUCH)
       {
         cs_str_string_set(Config, "spoolfile", mp->b->path, NULL);
-        mutt_sb_toggle_virtual();
+        mutt_sb_toggle_virtual(Context);
         break;
       }
     }

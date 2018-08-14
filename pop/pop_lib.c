@@ -261,17 +261,18 @@ static int pop_capabilities(struct PopData *pop_data, int mode)
 
 /**
  * pop_connect - Open connection
+ * @param ctx      Mailbox
  * @param pop_data POP data
  * @retval  0 Successful
  * @retval -1 Connection lost
  * @retval -2 Invalid response
 */
-int pop_connect(struct PopData *pop_data)
+int pop_connect(struct Context *ctx, struct PopData *pop_data)
 {
   char buf[LONG_STRING];
 
   pop_data->status = POP_NONE;
-  if (mutt_socket_open(pop_data->conn) < 0 ||
+  if (mutt_socket_open(ctx, pop_data->conn) < 0 ||
       mutt_socket_readln(buf, sizeof(buf), pop_data->conn) < 0)
   {
     mutt_error(_("Error connecting to server: %s"), pop_data->conn->account.host);
@@ -295,19 +296,20 @@ int pop_connect(struct PopData *pop_data)
 
 /**
  * pop_open_connection - Open connection and authenticate
+ * @param ctx      Mailbox
  * @param pop_data POP data
  * @retval  0 Successful
  * @retval -1 Connection lost
  * @retval -2 Invalid command or execution error
  * @retval -3 Authentication cancelled
 */
-int pop_open_connection(struct PopData *pop_data)
+int pop_open_connection(struct Context *ctx, struct PopData *pop_data)
 {
   int rc;
   unsigned int n, size;
   char buf[LONG_STRING];
 
-  rc = pop_connect(pop_data);
+  rc = pop_connect(ctx, pop_data);
   if (rc < 0)
   {
     mutt_sleep(2);
@@ -375,7 +377,7 @@ int pop_open_connection(struct PopData *pop_data)
   }
 #endif
 
-  rc = pop_authenticate(pop_data);
+  rc = pop_authenticate(ctx, pop_data);
   if (rc == -1)
     goto err_conn;
   if (rc == -3)
@@ -617,7 +619,7 @@ int pop_reconnect(struct Context *ctx)
   {
     mutt_socket_close(pop_data->conn);
 
-    int ret = pop_open_connection(pop_data);
+    int ret = pop_open_connection(ctx, pop_data);
     if (ret == 0)
     {
       struct Progress progressbar;

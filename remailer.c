@@ -545,11 +545,12 @@ static const struct Mapping RemailerHelp[] = {
 
 /**
  * mix_make_chain - Create a Mixmaster chain
+ * @param ctx       Mailbox
  * @param chainhead List if chain links
  *
  * Ask the user to select Mixmaster hosts to create a chain.
  */
-void mix_make_chain(struct ListHead *chainhead)
+void mix_make_chain(struct Context *ctx, struct ListHead *chainhead)
 {
   int c_cur = 0, c_old = 0;
   bool c_redraw = true;
@@ -620,7 +621,7 @@ void mix_make_chain(struct ListHead *chainhead)
 
     c_old = c_cur;
 
-    const int op = mutt_menu_loop(menu);
+    const int op = mutt_menu_loop(ctx, menu);
     switch (op)
     {
       case OP_REDRAW:
