@@ -815,7 +815,7 @@ static int read_headers_qresync_eval_cache(struct ImapData *idata, char *uid_seq
       idata->msn_index[msn - 1] = h;
 
       if (ctx->mailbox->msg_count >= ctx->mailbox->hdrmax)
-        mx_alloc_memory(ctx);
+        mx_alloc_memory(ctx->mailbox);
 
       struct ImapHeaderData *ihd = mutt_mem_calloc(1, sizeof(struct ImapHeaderData));
       h->data = ihd;
@@ -1118,7 +1118,7 @@ static int read_headers_fetch_new(struct ImapData *idata, unsigned int msn_begin
       msn_begin = idata->max_msn + 1;
       msn_end = idata->new_mail_count;
       while (msn_end > ctx->mailbox->hdrmax)
-        mx_alloc_memory(ctx);
+        mx_alloc_memory(ctx->mailbox);
       alloc_msn_index(idata, msn_end);
       idata->reopen &= ~IMAP_NEWMAIL_PENDING;
       idata->new_mail_count = 0;
@@ -1173,7 +1173,7 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin,
 
   /* make sure context has room to hold the mailbox */
   while (msn_end > ctx->mailbox->hdrmax)
-    mx_alloc_memory(ctx);
+    mx_alloc_memory(ctx->mailbox);
   alloc_msn_index(idata, msn_end);
   imap_alloc_uid_hash(idata, msn_end);
 
@@ -1313,7 +1313,7 @@ int imap_read_headers(struct ImapData *idata, unsigned int msn_begin,
   {
     /* TODO: it's not clear to me why we are calling mx_alloc_memory
      *       yet again. */
-    mx_alloc_memory(ctx);
+    mx_alloc_memory(ctx->mailbox);
     mx_update_context(ctx, ctx->mailbox->msg_count - oldmsgcount);
   }
 
