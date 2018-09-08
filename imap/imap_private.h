@@ -250,7 +250,7 @@ struct ImapData
 
   /* The following data is all specific to the currently SELECTED mbox */
   char delim;
-  struct Context *ctx;
+  struct Mailbox *mbox;
   char *mailbox;
   unsigned short check_status;
   unsigned char reopen;

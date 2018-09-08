@@ -298,7 +298,7 @@ header_cache_t *imap_hcache_open(struct ImapData *idata, const char *path)
     imap_cachepath(idata, path, mbox, sizeof(mbox));
   else
   {
-    if (!idata->ctx || imap_parse_path(idata->ctx->mailbox->path, &mx) < 0)
+    if (!idata->mbox || imap_parse_path(idata->mbox->path, &mx) < 0)
       return NULL;
 
     imap_cachepath(idata, mx.mbox, mbox, sizeof(mbox));
@@ -1112,7 +1112,7 @@ void imap_allow_reopen(struct Context *ctx)
     return;
 
   idata = ctx->mailbox->data;
-  if (idata->ctx == ctx)
+  if (idata->mbox == ctx->mailbox)
     idata->reopen |= IMAP_REOPEN_ALLOW;
 }
 
@@ -1127,7 +1127,7 @@ void imap_disallow_reopen(struct Context *ctx)
     return;
 
   idata = ctx->mailbox->data;
-  if (idata->ctx == ctx)
+  if (idata->mbox == ctx->mailbox)
     idata->reopen &= ~IMAP_REOPEN_ALLOW;
 }
 

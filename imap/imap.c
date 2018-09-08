@@ -159,7 +159,7 @@ static char *get_flags(struct ListHead *hflags, char *s)
 static void set_flag(struct ImapData *idata, int aclbit, int flag,
                      const char *str, char *flags, size_t flsize)
 {
-  if (mutt_bit_isset(idata->ctx->mailbox->rights, aclbit))
+  if (mutt_bit_isset(idata->mbox->rights, aclbit))
     if (flag && imap_has_flag(&idata->flags, str))
       mutt_str_strcat(flags, flsize, str);
 }
@@ -184,9 +184,9 @@ static int make_msg_set(struct ImapData *idata, struct Buffer *buf, int flag,
   unsigned int setstart = 0; /* start of current message range */
   int n;
   bool started = false;
-  struct Header **hdrs = idata->ctx->mailbox->hdrs;
+  struct Header **hdrs = idata->mbox->hdrs;
 
-  for (n = *pos; n < idata->ctx->mailbox->msg_count && buf->dptr - buf->data < IMAP_MAX_CMDLEN;
+  for (n = *pos; n < idata->mbox->msg_count && buf->dptr - buf->data < IMAP_MAX_CMDLEN;
        n++)
   {
     bool match = false; /* whether current message matches flag condition */
@@ -241,12 +241,12 @@ static int make_msg_set(struct ImapData *idata, struct Buffer *buf, int flag,
           mutt_buffer_printf(buf, ",%u", HEADER_DATA(hdrs[n])->uid);
       }
       /* tie up if the last message also matches */
-      else if (n == idata->ctx->mailbox->msg_count - 1)
+      else if (n == idata->mbox->msg_count - 1)
         mutt_buffer_printf(buf, ":%u", HEADER_DATA(hdrs[n])->uid);
     }
     /* End current set if message doesn't match or we've reached the end
      * of the mailbox via inactive messages following the last match. */
-    else if (setstart && (hdrs[n]->active || n == idata->ctx->mailbox->msg_count - 1))
+    else if (setstart && (hdrs[n]->active || n == idata->mbox->msg_count - 1))
     {
       if (HEADER_DATA(hdrs[n - 1])->uid > setstart)
         mutt_buffer_printf(buf, ":%u", HEADER_DATA(hdrs[n - 1])->uid);
@@ -298,10 +298,10 @@ static int sync_helper(struct ImapData *idata, int right, int flag, const char *
   int rc;
   char buf[LONG_STRING];
 
-  if (!idata->ctx)
+  if (!idata->mbox)
     return -1;
 
-  if (!mutt_bit_isset(idata->ctx->mailbox->rights, right))
+  if (!mutt_bit_isset(idata->mbox->rights, right))
     return 0;
 
   if (right == MUTT_ACL_WRITE && !imap_has_flag(&idata->flags, name))
@@ -843,18 +843,18 @@ void imap_expunge_mailbox(struct ImapData *idata)
 
   old_sort = Sort;
   Sort = SORT_ORDER;
-  mutt_sort_headers(idata->ctx, false);
+  //QWQ mutt_sort_headers(idata->ctx, false);
 
-  for (int i = 0; i < idata->ctx->mailbox->msg_count; i++)
+  for (int i = 0; i < idata->mbox->msg_count; i++)
   {
-    h = idata->ctx->mailbox->hdrs[i];
+    h = idata->mbox->hdrs[i];
 
     if (h->index == INT_MAX)
     {
       mutt_debug(2, "Expunging message UID %u.\n", HEADER_DATA(h)->uid);
 
       h->active = false;
-      idata->ctx->mailbox->size -= h->content->length;
+      idata->mbox->size -= h->content->length;
 
       imap_cache_del(idata, h);
 #ifdef USE_HCACHE
@@ -903,9 +903,9 @@ void imap_expunge_mailbox(struct ImapData *idata)
 
   /* We may be called on to expunge at any time. We can't rely on the caller
    * to always know to rethread */
-  mx_update_tables(idata->ctx, false);
+  //QWQ mx_update_tables(idata->mbox, false);
   Sort = old_sort;
-  mutt_sort_headers(idata->ctx, true);
+  //QWQ mutt_sort_headers(idata->mbox, true);
 }
 
 /**
@@ -1203,14 +1203,14 @@ int imap_exec_msgset(struct ImapData *idata, const char *pre, const char *post,
   oldsort = Sort;
   if (Sort != SORT_ORDER)
   {
-    hdrs = idata->ctx->mailbox->hdrs;
-    idata->ctx->mailbox->hdrs =
-        mutt_mem_malloc(idata->ctx->mailbox->msg_count * sizeof(struct Header *));
-    memcpy(idata->ctx->mailbox->hdrs, hdrs,
-           idata->ctx->mailbox->msg_count * sizeof(struct Header *));
+    hdrs = idata->mbox->hdrs;
+    idata->mbox->hdrs =
+        mutt_mem_malloc(idata->mbox->msg_count * sizeof(struct Header *));
+    memcpy(idata->mbox->hdrs, hdrs,
+           idata->mbox->msg_count * sizeof(struct Header *));
 
     Sort = SORT_ORDER;
-    qsort(idata->ctx->mailbox->hdrs, idata->ctx->mailbox->msg_count,
+    qsort(idata->mbox->hdrs, idata->mbox->msg_count,
           sizeof(struct Header *), mutt_get_sort_func(SORT_ORDER));
   }
 
@@ -1240,8 +1240,8 @@ out:
   if (oldsort != Sort)
   {
     Sort = oldsort;
-    FREE(&idata->ctx->mailbox->hdrs);
-    idata->ctx->mailbox->hdrs = hdrs;
+    FREE(&idata->mbox->hdrs);
+    idata->mbox->hdrs = hdrs;
   }
 
   return rc;
@@ -1290,7 +1290,7 @@ int imap_sync_message_for_copy(struct ImapData *idata, struct Header *hdr,
   set_flag(idata, MUTT_ACL_DELETE, HEADER_DATA(hdr)->deleted, "\\Deleted ",
            flags, sizeof(flags));
 
-  if (mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_WRITE))
+  if (mutt_bit_isset(idata->mbox->rights, MUTT_ACL_WRITE))
   {
     /* restore system flags */
     if (HEADER_DATA(hdr)->flags_system)
@@ -1318,7 +1318,7 @@ int imap_sync_message_for_copy(struct ImapData *idata, struct Header *hdr,
              flags, sizeof(flags));
 
     /* erase custom flags */
-    if (mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_WRITE) &&
+    if (mutt_bit_isset(idata->mbox->rights, MUTT_ACL_WRITE) &&
         HEADER_DATA(hdr)->flags_remote)
       mutt_str_strcat(flags, sizeof(flags), HEADER_DATA(hdr)->flags_remote);
 
@@ -1560,8 +1560,8 @@ int imap_status(const char *path, bool queue)
    *
    * Note that imap_mxcmp() converts NULL to "INBOX", so we need to
    * make sure the idata really is open to a folder. */
-  if (idata->ctx && !imap_mxcmp(buf, idata->mailbox))
-    return idata->ctx->mailbox->msg_count;
+  if (idata->mbox && !imap_mxcmp(buf, idata->mailbox))
+    return idata->mbox->msg_count;
   else if (mutt_bit_isset(idata->capabilities, IMAP4REV1) ||
            mutt_bit_isset(idata->capabilities, STATUS))
   {
@@ -2035,11 +2035,11 @@ static int imap_mbox_open(struct Context *ctx)
   mutt_str_strfcpy(ctx->mailbox->realpath, ctx->mailbox->path,
                    sizeof(ctx->mailbox->realpath));
 
-  idata->ctx = ctx;
+  idata->mbox = ctx->mailbox;
 
   /* clear mailbox status */
   idata->status = false;
-  memset(idata->ctx->mailbox->rights, 0, sizeof(idata->ctx->mailbox->rights));
+  memset(idata->mbox->rights, 0, sizeof(idata->mbox->rights));
   idata->new_mail_count = 0;
   idata->max_msn = 0;
 
@@ -2055,14 +2055,14 @@ static int imap_mbox_open(struct Context *ctx)
   /* assume we have all rights if ACL is unavailable */
   else
   {
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_LOOKUP);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_READ);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_SEEN);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_WRITE);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_INSERT);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_POST);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_CREATE);
-    mutt_bit_set(idata->ctx->mailbox->rights, MUTT_ACL_DELETE);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_LOOKUP);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_READ);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_SEEN);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_WRITE);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_INSERT);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_POST);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_CREATE);
+    mutt_bit_set(idata->mbox->rights, MUTT_ACL_DELETE);
   }
   /* pipeline the postponed count if possible */
   pmx.mbox = NULL;
@@ -2210,10 +2210,10 @@ static int imap_mbox_open(struct Context *ctx)
     }
   }
 
-  if (!(mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_DELETE) ||
-        mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_SEEN) ||
-        mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_WRITE) ||
-        mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_INSERT)))
+  if (!(mutt_bit_isset(idata->mbox->rights, MUTT_ACL_DELETE) ||
+        mutt_bit_isset(idata->mbox->rights, MUTT_ACL_SEEN) ||
+        mutt_bit_isset(idata->mbox->rights, MUTT_ACL_WRITE) ||
+        mutt_bit_isset(idata->mbox->rights, MUTT_ACL_INSERT)))
   {
     ctx->mailbox->readonly = true;
   }
@@ -2308,7 +2308,7 @@ static int imap_mbox_close(struct Context *ctx)
    * mailbox and should clean up idata.  Otherwise, we don't want to
    * touch idata - it's still being used.
    */
-  if (ctx == idata->ctx)
+  if (ctx->mailbox == idata->mbox)
   {
     if (idata->status != IMAP_FATAL && idata->state >= IMAP_SELECTED)
     {
@@ -2322,7 +2322,7 @@ static int imap_mbox_close(struct Context *ctx)
     idata->reopen &= IMAP_REOPEN_ALLOW;
     FREE(&(idata->mailbox));
     mutt_list_free(&idata->flags);
-    idata->ctx = NULL;
+    idata->mbox = NULL;
 
     mutt_hash_destroy(&idata->uid_hash);
     FREE(&idata->msn_index);
@@ -2693,7 +2693,7 @@ static int imap_tags_commit(struct Context *ctx, struct Header *hdr, char *buf)
   if (*buf == '\0')
     buf = NULL;
 
-  if (!mutt_bit_isset(idata->ctx->mailbox->rights, MUTT_ACL_WRITE))
+  if (!mutt_bit_isset(idata->mbox->rights, MUTT_ACL_WRITE))
     return 0;
 
   snprintf(uid, sizeof(uid), "%u", HEADER_DATA(hdr)->uid);
