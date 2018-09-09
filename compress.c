@@ -57,11 +57,9 @@ struct Header;
  */
 
 /**
- * struct CompressInfo - Private data for compress
- *
- * This object gets attached to the Mailbox.
+ * struct MboxData - Private data attached to an email
  */
-struct CompressInfo
+struct MboxData
 {
   const char *append;            /**< append-hook command */
   const char *close;             /**< close-hook  command */
@@ -73,7 +71,121 @@ struct CompressInfo
 };
 
 /**
- * lock_realpath - Try to lock the ctx->realpath
+ * find_hook - Find a hook to match a path
+ * @param type Type of hook, e.g. #MUTT_CLOSE_HOOK
+ * @param path Filename to test
+ * @retval ptr  Matching hook command
+ * @retval NULL No matches
+ *
+ * Each hook has a type and a pattern.
+ * Find a command that matches the type and path supplied. e.g.
+ *
+ * User config:
+ *      open-hook '\.gz$' "gzip -cd '%f' > '%t'"
+ *
+ * Call:
+ *      find_hook (#MUTT_OPEN_HOOK, "myfile.gz");
+ */
+static const char *find_hook(int type, const char *path)
+{
+  if (!path)
+    return NULL;
+
+  const char *c = mutt_find_hook(type, path);
+  if (!c || !*c)
+    return NULL;
+
+  return c;
+}
+
+/**
+ * new_mboxdata - Create a new MboxData struct
+ * @retval ptr New MboxData
+ */
+static struct MboxData *new_mboxdata(const char *path)
+{
+  if (!path)
+    return NULL;
+
+  /* Open is compulsory */
+  const char *o = find_hook(MUTT_OPEN_HOOK, path);
+  if (!o)
+    return NULL;
+
+  const char *c = find_hook(MUTT_CLOSE_HOOK, path);
+  const char *a = find_hook(MUTT_APPEND_HOOK, path);
+
+  struct MboxData *data = mutt_mem_calloc(1, sizeof(struct MboxData));
+
+  data->open = mutt_str_strdup(o);
+  data->close = mutt_str_strdup(c);
+  data->append = mutt_str_strdup(a);
+
+  return data;
+}
+
+/**
+ * free_mboxdata - Free data attached to the Mailbox
+ * @param data Private mailbox data
+ */
+static void free_mboxdata(void *ptr)
+{
+  struct MboxData *data = ptr;
+  if (!data)
+    return;
+
+  FREE(&data->append);
+  FREE(&data->close);
+  FREE(&data->open);
+
+  if (data->locked)
+  {
+    mutt_file_unlock(fileno(data->lockfp));
+    mutt_file_fclose(&data->lockfp);
+  }
+
+  FREE(&data);
+}
+
+/**
+ * get_mboxdata - Get the private data associated with a Mailbox
+ * @param mailbox Mailbox
+ * @retval ptr Private data
+ */
+static struct MboxData *get_mboxdata(struct Mailbox *mailbox)
+{
+  if (mailbox)
+    return mailbox->compress_info;
+
+  return NULL;
+}
+
+/**
+ * init_mailbox - Add Mbox data to the Maibox
+ * @param mailbox Mailbox
+ * @retval ptr  MboxData for the mailbox's path
+ * @retval NULL Error
+ *
+ * When a mailbox is opened, we check if there are any matching hooks.
+ */
+static struct MboxData *init_mailbox(struct Mailbox *mailbox)
+{
+  if (!mailbox)
+    return NULL;
+
+  if (mailbox->compress_info)
+    return mailbox->compress_info;
+
+  mailbox->compress_info = new_mboxdata(mailbox->path);
+  if (!mailbox->compress_info)
+    return NULL;
+
+  mailbox->free_data = free_mboxdata;
+  return mailbox->compress_info;
+}
+
+/**
+ * lock_realpath - Try to lock the mailbox->realpath
  * @param mailbox Mailbox to lock
  * @param excl    Lock exclusively?
  * @retval true  Success (locked or readonly)
@@ -85,32 +197,29 @@ struct CompressInfo
  */
 static bool lock_realpath(struct Mailbox *mailbox, bool excl)
 {
-  if (!mailbox)
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
     return false;
 
-  struct CompressInfo *ci = mailbox->compress_info;
-  if (!ci)
-    return false;
-
-  if (ci->locked)
+  if (data->locked)
     return true;
 
   if (excl)
-    ci->lockfp = fopen(mailbox->realpath, "a");
+    data->lockfp = fopen(mailbox->realpath, "a");
   else
-    ci->lockfp = fopen(mailbox->realpath, "r");
-  if (!ci->lockfp)
+    data->lockfp = fopen(mailbox->realpath, "r");
+  if (!data->lockfp)
   {
     mutt_perror(mailbox->realpath);
     return false;
   }
 
-  int r = mutt_file_lock(fileno(ci->lockfp), excl, 1);
+  int r = mutt_file_lock(fileno(data->lockfp), excl, 1);
   if (r == 0)
-    ci->locked = true;
-  else if (excl)
+    data->locked = true;
+  else if (!excl)
   {
-    mutt_file_fclose(&ci->lockfp);
+    mutt_file_fclose(&data->lockfp);
     mailbox->readonly = true;
     return true;
   }
@@ -126,20 +235,17 @@ static bool lock_realpath(struct Mailbox *mailbox, bool excl)
  */
 static void unlock_realpath(struct Mailbox *mailbox)
 {
-  if (!mailbox)
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
     return;
 
-  struct CompressInfo *ci = mailbox->compress_info;
-  if (!ci)
+  if (!data->locked)
     return;
 
-  if (!ci->locked)
-    return;
+  mutt_file_unlock(fileno(data->lockfp));
 
-  mutt_file_unlock(fileno(ci->lockfp));
-
-  ci->locked = false;
-  mutt_file_fclose(&ci->lockfp);
+  data->locked = false;
+  mutt_file_fclose(&data->lockfp);
 }
 
 /**
@@ -190,105 +296,6 @@ static long get_size(const char *path)
     return 0;
 
   return sb.st_size;
-}
-
-/**
- * store_size - Save the size of the compressed file
- * @param mailbox Mailbox
- *
- * Save the compressed file size in the compress_info struct.
- */
-static void store_size(const struct Mailbox *mailbox)
-{
-  if (!mailbox)
-    return;
-
-  struct CompressInfo *ci = mailbox->compress_info;
-  if (!ci)
-    return;
-
-  ci->size = get_size(mailbox->realpath);
-}
-
-/**
- * find_hook - Find a hook to match a path
- * @param type Type of hook, e.g. #MUTT_CLOSE_HOOK
- * @param path Filename to test
- * @retval ptr  Matching hook command
- * @retval NULL No matches
- *
- * Each hook has a type and a pattern.
- * Find a command that matches the type and path supplied. e.g.
- *
- * User config:
- *      open-hook '\.gz$' "gzip -cd '%f' > '%t'"
- *
- * Call:
- *      find_hook (#MUTT_OPEN_HOOK, "myfile.gz");
- */
-static const char *find_hook(int type, const char *path)
-{
-  if (!path)
-    return NULL;
-
-  const char *c = mutt_find_hook(type, path);
-  if (!c || !*c)
-    return NULL;
-
-  return c;
-}
-
-/**
- * set_compress_info - Find the compress hooks for a mailbox
- * @param mailbox Mailbox to examine
- * @retval ptr  CompressInfo Hook info for the mailbox's path
- * @retval NULL Error
- *
- * When a mailbox is opened, we check if there are any matching hooks.
- */
-static struct CompressInfo *set_compress_info(struct Mailbox *mailbox)
-{
-  if (!mailbox)
-    return NULL;
-
-  if (mailbox->compress_info)
-    return mailbox->compress_info;
-
-  /* Open is compulsory */
-  const char *o = find_hook(MUTT_OPEN_HOOK, mailbox->path);
-  if (!o)
-    return NULL;
-
-  const char *c = find_hook(MUTT_CLOSE_HOOK, mailbox->path);
-  const char *a = find_hook(MUTT_APPEND_HOOK, mailbox->path);
-
-  struct CompressInfo *ci = mutt_mem_calloc(1, sizeof(struct CompressInfo));
-  mailbox->compress_info = ci;
-
-  ci->open = mutt_str_strdup(o);
-  ci->close = mutt_str_strdup(c);
-  ci->append = mutt_str_strdup(a);
-
-  return ci;
-}
-
-/**
- * free_compress_info - Frees the compress info members and structure
- * @param mailbox Mailbox to free compress_info for
- */
-static void free_compress_info(struct Mailbox *mailbox)
-{
-  if (!mailbox || !mailbox->compress_info)
-    return;
-
-  struct CompressInfo *ci = mailbox->compress_info;
-  FREE(&ci->open);
-  FREE(&ci->close);
-  FREE(&ci->append);
-
-  unlock_realpath(mailbox);
-
-  FREE(&mailbox->compress_info);
 }
 
 /**
@@ -446,17 +453,14 @@ static int execute_command(struct Mailbox *mailbox, const char *command, const c
  */
 bool mutt_comp_can_append(struct Mailbox *mailbox)
 {
-  if (!mailbox)
-    return false;
-
   /* If this succeeds, we know there's an open-hook */
-  struct CompressInfo *ci = set_compress_info(mailbox);
-  if (!ci)
+  struct MboxData *data = init_mailbox(mailbox);
+  if (!data)
     return false;
 
   /* We have an open-hook, so to append we need an append-hook,
    * or a close-hook. */
-  if (ci->append || ci->close)
+  if (data->append || data->close)
     return true;
 
   mutt_error(_("Cannot append without an append-hook or close-hook : %s"),
@@ -512,53 +516,56 @@ int mutt_comp_valid_command(const char *cmd)
  */
 static int comp_mbox_open(struct Context *ctx)
 {
-  if (!ctx || (ctx->mailbox->magic != MUTT_COMPRESSED))
+  if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = set_compress_info(ctx->mailbox);
-  if (!ci)
+  struct Mailbox *mailbox = ctx->mailbox;
+
+  struct MboxData *data = init_mailbox(mailbox);
+  if (!data)
     return -1;
 
   /* If there's no close-hook, or the file isn't writable */
-  if (!ci->close || (access(ctx->mailbox->path, W_OK) != 0))
-    ctx->mailbox->readonly = true;
+  if (!data->close || (access(mailbox->path, W_OK) != 0))
+    mailbox->readonly = true;
 
-  if (setup_paths(ctx->mailbox) != 0)
+  if (setup_paths(mailbox) != 0)
     goto cmo_fail;
-  store_size(ctx->mailbox);
+  data->size = get_size(mailbox->realpath);
 
-  if (!lock_realpath(ctx->mailbox, false))
+  if (!lock_realpath(mailbox, false))
   {
     mutt_error(_("Unable to lock mailbox"));
     goto cmo_fail;
   }
 
-  int rc = execute_command(ctx->mailbox, ci->open, _("Decompressing %s"));
+  int rc = execute_command(mailbox, data->open, _("Decompressing %s"));
   if (rc == 0)
     goto cmo_fail;
 
-  unlock_realpath(ctx->mailbox);
+  unlock_realpath(mailbox);
 
-  ctx->mailbox->magic = mx_path_probe(ctx->mailbox->path, NULL);
-  if (ctx->mailbox->magic == MUTT_UNKNOWN)
+  mailbox->magic = mx_path_probe(mailbox->path, NULL);
+  if (mailbox->magic == MUTT_UNKNOWN)
   {
     mutt_error(_("Can't identify the contents of the compressed file"));
     goto cmo_fail;
   }
 
-  ci->child_ops = mx_get_ops(ctx->mailbox->magic);
-  if (!ci->child_ops)
+  data->child_ops = mx_get_ops(ctx->mailbox->magic);
+  if (!data->child_ops)
   {
     mutt_error(_("Can't find mailbox ops for mailbox type %d"), ctx->mailbox->magic);
     goto cmo_fail;
   }
 
-  return ci->child_ops->mbox_open(ctx);
+  return data->child_ops->mbox_open(ctx);
 
 cmo_fail:
   /* remove the partial uncompressed file */
   remove(ctx->mailbox->path);
-  free_compress_info(ctx->mailbox);
+  free_mboxdata(ctx->mailbox->data);
+  ctx->mailbox->data = NULL;
   return -1;
 }
 
@@ -575,70 +582,72 @@ static int comp_mbox_open_append(struct Context *ctx, int flags)
   if (!ctx)
     return -1;
 
+  struct Mailbox *mailbox = ctx->mailbox;
+
   /* If this succeeds, we know there's an open-hook */
-  struct CompressInfo *ci = set_compress_info(ctx->mailbox);
-  if (!ci)
+  struct MboxData *data = init_mailbox(mailbox);
+  if (!data)
     return -1;
 
   /* To append we need an append-hook or a close-hook */
-  if (!ci->append && !ci->close)
+  if (!data->append && !data->close)
   {
     mutt_error(_("Cannot append without an append-hook or close-hook : %s"),
-               ctx->mailbox->path);
+               mailbox->path);
     goto cmoa_fail1;
   }
 
-  if (setup_paths(ctx->mailbox) != 0)
+  if (setup_paths(mailbox) != 0)
     goto cmoa_fail2;
 
   /* Lock the realpath for the duration of the append.
    * It will be unlocked in the close */
-  if (!lock_realpath(ctx->mailbox, true))
+  if (!lock_realpath(mailbox, true))
   {
     mutt_error(_("Unable to lock mailbox"));
     goto cmoa_fail2;
   }
 
   /* Open the existing mailbox, unless we are appending */
-  if (!ci->append && (get_size(ctx->mailbox->realpath) > 0))
+  if (!data->append && (get_size(mailbox->realpath) > 0))
   {
-    int rc = execute_command(ctx->mailbox, ci->open, _("Decompressing %s"));
+    int rc = execute_command(mailbox, data->open, _("Decompressing %s"));
     if (rc == 0)
     {
-      mutt_error(_("Compress command failed: %s"), ci->open);
+      mutt_error(_("Compress command failed: %s"), data->open);
       goto cmoa_fail2;
     }
-    ctx->mailbox->magic = mx_path_probe(ctx->mailbox->path, NULL);
+    mailbox->magic = mx_path_probe(mailbox->path, NULL);
   }
   else
-    ctx->mailbox->magic = MboxType;
+    mailbox->magic = MboxType;
 
   /* We can only deal with mbox and mmdf mailboxes */
-  if ((ctx->mailbox->magic != MUTT_MBOX) && (ctx->mailbox->magic != MUTT_MMDF))
+  if ((mailbox->magic != MUTT_MBOX) && (mailbox->magic != MUTT_MMDF))
   {
     mutt_error(_("Unsupported mailbox type for appending"));
     goto cmoa_fail2;
   }
 
-  ci->child_ops = mx_get_ops(ctx->mailbox->magic);
-  if (!ci->child_ops)
+  data->child_ops = mx_get_ops(mailbox->magic);
+  if (!data->child_ops)
   {
-    mutt_error(_("Can't find mailbox ops for mailbox type %d"), ctx->mailbox->magic);
+    mutt_error(_("Can't find mailbox ops for mailbox type %d"), mailbox->magic);
     goto cmoa_fail2;
   }
 
-  if (ci->child_ops->mbox_open_append(ctx, flags) != 0)
+  if (data->child_ops->mbox_open_append(ctx, flags) != 0)
     goto cmoa_fail2;
 
   return 0;
 
 cmoa_fail2:
   /* remove the partial uncompressed file */
-  remove(ctx->mailbox->path);
+  remove(mailbox->path);
 cmoa_fail1:
   /* Free the compress_info to prevent close from trying to recompress */
-  free_compress_info(ctx->mailbox);
-
+  free_mboxdata(mailbox->data);
+  mailbox->data = NULL;
   return -1;
 }
 
@@ -662,27 +671,29 @@ static int comp_mbox_check(struct Context *ctx, int *index_hint)
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
     return -1;
 
-  int size = get_size(ctx->mailbox->realpath);
-  if (size == ci->size)
+  long size = get_size(mailbox->realpath);
+  if (size == data->size)
     return 0;
 
-  if (!lock_realpath(ctx->mailbox, false))
+  if (!lock_realpath(mailbox, false))
   {
     mutt_error(_("Unable to lock mailbox"));
     return -1;
   }
 
-  int rc = execute_command(ctx->mailbox, ci->open, _("Decompressing %s"));
-  store_size(ctx->mailbox);
-  unlock_realpath(ctx->mailbox);
+  int rc = execute_command(mailbox, data->open, _("Decompressing %s"));
+  data->size = get_size(mailbox->realpath);
+  unlock_realpath(mailbox);
   if (rc == 0)
     return -1;
 
@@ -700,21 +711,17 @@ static int comp_mbox_sync(struct Context *ctx, int *index_hint)
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  if (!ci->close)
-  {
-    mutt_error(_("Can't sync a compressed file without a close-hook"));
-    return -1;
-  }
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
 
-  const struct MxOps *ops = ci->child_ops;
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
     return -1;
 
-  if (!lock_realpath(ctx->mailbox, true))
+  if (!lock_realpath(mailbox, true))
   {
     mutt_error(_("Unable to lock mailbox"));
     return -1;
@@ -728,7 +735,7 @@ static int comp_mbox_sync(struct Context *ctx, int *index_hint)
   if (rc != 0)
     goto sync_cleanup;
 
-  rc = execute_command(ctx->mailbox, ci->close, _("Compressing %s"));
+  rc = execute_command(mailbox, data->close, _("Compressing %s"));
   if (rc == 0)
   {
     rc = -1;
@@ -738,8 +745,8 @@ static int comp_mbox_sync(struct Context *ctx, int *index_hint)
   rc = 0;
 
 sync_cleanup:
-  store_size(ctx->mailbox);
-  unlock_realpath(ctx->mailbox);
+  data->size = get_size(mailbox->realpath);
+  unlock_realpath(mailbox);
   return rc;
 }
 
@@ -754,14 +761,17 @@ static int comp_mbox_close(struct Context *ctx)
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
   {
-    free_compress_info(ctx->mailbox);
+    free_mboxdata(data);
+    mailbox->data = NULL;
     return -1;
   }
 
@@ -771,13 +781,13 @@ static int comp_mbox_close(struct Context *ctx)
   if (!ctx->append)
   {
     /* If the file was removed, remove the compressed folder too */
-    if ((access(ctx->mailbox->path, F_OK) != 0) && !SaveEmpty)
+    if ((access(mailbox->path, F_OK) != 0) && !SaveEmpty)
     {
-      remove(ctx->mailbox->realpath);
+      remove(mailbox->realpath);
     }
     else
     {
-      remove(ctx->mailbox->path);
+      remove(mailbox->path);
     }
   }
   else
@@ -786,30 +796,31 @@ static int comp_mbox_close(struct Context *ctx)
     const char *msg = NULL;
 
     /* The file exists and we can append */
-    if ((access(ctx->mailbox->realpath, F_OK) == 0) && ci->append)
+    if ((access(mailbox->realpath, F_OK) == 0) && data->append)
     {
-      append = ci->append;
+      append = data->append;
       msg = _("Compressed-appending to %s...");
     }
     else
     {
-      append = ci->close;
+      append = data->close;
       msg = _("Compressing %s...");
     }
 
-    int rc = execute_command(ctx->mailbox, append, msg);
+    int rc = execute_command(mailbox, append, msg);
     if (rc == 0)
     {
       mutt_any_key_to_continue(NULL);
-      mutt_error(_("Error. Preserving temporary file: %s"), ctx->mailbox->path);
+      mutt_error(_("Error. Preserving temporary file: %s"), mailbox->path);
     }
     else
-      remove(ctx->mailbox->path);
+      remove(mailbox->path);
 
-    unlock_realpath(ctx->mailbox);
+    unlock_realpath(mailbox);
   }
 
-  free_compress_info(ctx->mailbox);
+  free_mboxdata(data);
+  mailbox->data = NULL;
 
   return 0;
 }
@@ -822,11 +833,13 @@ static int comp_msg_open(struct Context *ctx, struct Message *msg, int msgno)
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
     return -1;
 
@@ -842,11 +855,13 @@ static int comp_msg_open_new(struct Context *ctx, struct Message *msg, struct He
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
     return -1;
 
@@ -862,11 +877,13 @@ static int comp_msg_commit(struct Context *ctx, struct Message *msg)
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
     return -1;
 
@@ -882,11 +899,13 @@ static int comp_msg_close(struct Context *ctx, struct Message *msg)
   if (!ctx)
     return -1;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return -1;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops)
     return -1;
 
@@ -904,11 +923,13 @@ static int comp_msg_padding_size(struct Context *ctx)
   if (!ctx)
     return 0;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return 0;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops || !ops->msg_padding_size)
     return 0;
 
@@ -918,16 +939,18 @@ static int comp_msg_padding_size(struct Context *ctx)
 /**
  * comp_tags_edit - Implements MxOps::tags_edit
  */
-static int comp_tags_edit(struct Context *ctx, const char *tags, char *buf, size_t buflen)
+int comp_tags_edit(struct Context *ctx, const char *tags, char *buf, size_t buflen)
 {
   if (!ctx)
     return 0;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return 0;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops || !ops->tags_edit)
     return 0;
 
@@ -937,16 +960,18 @@ static int comp_tags_edit(struct Context *ctx, const char *tags, char *buf, size
 /**
  * comp_tags_commit - Implements MxOps::tags_commit
  */
-static int comp_tags_commit(struct Context *ctx, struct Header *hdr, char *buf)
+int comp_tags_commit(struct Context *ctx, struct Header *hdr, char *buf)
 {
   if (!ctx)
     return 0;
 
-  struct CompressInfo *ci = ctx->mailbox->compress_info;
-  if (!ci)
-    return 0;
+  struct Mailbox *mailbox = ctx->mailbox;
 
-  const struct MxOps *ops = ci->child_ops;
+  struct MboxData *data = get_mboxdata(mailbox);
+  if (!data)
+    return false;
+
+  const struct MxOps *ops = data->child_ops;
   if (!ops || !ops->tags_commit)
     return 0;
 
