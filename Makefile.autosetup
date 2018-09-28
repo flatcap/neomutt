@@ -256,6 +256,9 @@ LIBMUTTOBJS=	mutt/base64.o mutt/buffer.o mutt/charset.o mutt/date.o \
 CLEANFILES+=	$(LIBMUTT) $(LIBMUTTOBJS)
 MUTTLIBS+=	$(LIBMUTT)
 ALLOBJS+=	$(LIBMUTTOBJS)
+@if HAVE_LIBUNWIND
+LIBMUTTOBJS+=	mutt/backtrace.o
+@endif
 
 ###############################################################################
 # generated
