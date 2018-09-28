@@ -1619,6 +1619,7 @@ int mutt_index_menu(void)
         }
 
         log_queue_save(fp);
+        dot_dump("index");
         mutt_file_fclose(&fp);
 
         mutt_do_pager("messages", tempfile, MUTT_PAGER_LOGS, NULL);

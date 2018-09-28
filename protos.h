@@ -88,4 +88,6 @@ int wcscasecmp(const wchar_t *a, const wchar_t *b);
 
 int mutt_reply_observer(struct NotifyCallback *nc);
 
+void dot_dump(const char *title);
+
 #endif /* MUTT_PROTOS_H */
