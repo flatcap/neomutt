@@ -78,4 +78,6 @@ int wcscasecmp(const wchar_t *a, const wchar_t *b);
 bool mutt_reply_listener(const struct ConfigSet *cs, struct HashElem *he,
                          const char *name, enum ConfigEvent ev);
 
+void dot_dump(void);
+
 #endif /* MUTT_PROTOS_H */
