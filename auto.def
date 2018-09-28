@@ -38,6 +38,7 @@ options {
   locales-fix=0             => "Enable locales fix"
   pgp=1                     => "Disable PGP support"
   smime=1                   => "Disable SMIME support"
+  libunwind=0               => "libunwind backtrace support"
   mixmaster=0               => "Enable Mixmaster support"
   with-mixmaster:=mixmaster => "Location of the mixmaster executable"
   homespool=0               => "Enable new mail spooling in the user's HOME"
@@ -102,7 +103,7 @@ if {1} {
   # Keep sorted, please.
   foreach opt {
     bdb doc everything fmemopen full-doc gdbm gnutls gpgme gss
-    homespool idn idn2 inotify kyotocabinet lmdb locales-fix lua mixmaster nls
+    homespool idn idn2 inotify kyotocabinet libunwind lmdb locales-fix lua mixmaster nls
     notmuch pgp qdbm sasl smime ssl tokyocabinet
   } {
     define want-$opt [opt-bool $opt]
@@ -586,6 +587,13 @@ if {[get-define want-homespool]} {
   define HOMESPOOL 1
 } else {
   define MAILPATH [opt-val with-mailpath /var/mail]
+}
+
+###############################################################################
+# libunwind
+if {[get-define want-libunwind]} {
+  define HAVE_LIBUNWIND
+  define-append LIBS -lunwind -lunwind-generic
 }
 
 ###############################################################################

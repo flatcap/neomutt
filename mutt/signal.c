@@ -36,6 +36,10 @@
 #include "curs_lib.h"
 #include "message.h"
 #include "signal2.h"
+#include "curs_lib.h"
+#ifdef HAVE_LIBUNWIND
+#include "mutt.h"
+#endif
 
 static sigset_t Sigset;
 static sigset_t SigsetSys;
@@ -76,6 +80,24 @@ void mutt_sig_exit_handler(int sig)
   exit(0);
 }
 
+void dot_dump(void);
+
+void mutt_sig_segv_handler(int sig)
+{
+  mutt_endwin();
+#ifdef HAVE_LIBUNWIND
+  show_backtrace();
+#endif
+  dot_dump();
+
+  struct sigaction act;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = 0;
+  act.sa_handler = SIG_DFL;
+  sigaction(sig, &act, NULL);
+  raise(sig);
+}
+
 /**
  * mutt_sig_init - Initialise the signal handling
  * @param sig_fn  Function to handle signals
@@ -98,6 +120,9 @@ void mutt_sig_init(sig_handler_t sig_fn, sig_handler_t exit_fn)
   act.sa_flags = 0;
   act.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &act, NULL);
+
+  act.sa_handler = mutt_sig_segv_handler;
+  sigaction(SIGSEGV, &act, NULL);
 
   act.sa_handler = exit_handler;
   sigaction(SIGTERM, &act, NULL);

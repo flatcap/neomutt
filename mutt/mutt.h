@@ -27,6 +27,7 @@
  *
  * | File             | Description        |
  * | :--------------- | :----------------- |
+ * | mutt/backtrace.c | @subpage backtrace |
  * | mutt/base64.c    | @subpage base64    |
  * | mutt/buffer.c    | @subpage buffer    |
  * | mutt/charset.c   | @subpage charset   |
@@ -77,5 +78,9 @@
 #include "sha1.h"
 #include "signal2.h"
 #include "string2.h"
+
+#ifdef HAVE_LIBUNWIND
+void show_backtrace(void);
+#endif
 
 #endif /* MUTT_LIB_MUTT_H */
