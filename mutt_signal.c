@@ -33,6 +33,7 @@
 #include "globals.h"
 #include "mutt_attach.h"
 #include "mutt_curses.h"
+#include "protos.h"
 
 static int IsEndwin = 0;
 
@@ -99,6 +100,7 @@ static void curses_segv_handler(int sig)
 #ifdef HAVE_LIBUNWIND
   show_backtrace();
 #endif
+  dot_dump("segfault");
 
   struct sigaction act;
   sigemptyset(&act.sa_mask);
