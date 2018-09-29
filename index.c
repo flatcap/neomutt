@@ -40,6 +40,7 @@
 #include "commands.h"
 #include "context.h"
 #include "curs_lib.h"
+#include "dump.h"
 #include "format_flags.h"
 #include "globals.h"
 #include "hdrline.h"
@@ -1551,7 +1552,8 @@ int mutt_index_menu(void)
           break;
         }
 
-        log_queue_save(fp);
+        // log_queue_save(fp);
+        dump_accounts(fp);
         mutt_file_fclose(&fp);
 
         mutt_do_pager("messages", tempfile, MUTT_PAGER_LOGS, NULL);
