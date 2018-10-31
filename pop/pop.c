@@ -593,27 +593,39 @@ void pop_fetch_mail(void)
   }
   strcpy(p, C_PopHost);
 
+  struct Account *np = NULL;
+  TAILQ_FOREACH(np, &AllAccounts, entries)
+  {
+    if (pop_ac_find(np, url))
+      break;
+  }
+
   ret = pop_parse_path(url, &acct);
-  FREE(&url);
   if (ret)
   {
     mutt_error(_("%s is an invalid POP path"), C_PopHost);
+    FREE(&url);
     return;
   }
 
-  struct Connection *conn = mutt_conn_find(NULL, &acct);
-  if (!conn)
+  mutt_account_hook(url);
+  FREE(&url);
+
+  if (!np)
     return;
 
-  struct PopAccountData *adata = pop_adata_new();
-  adata->conn = conn;
+  struct PopAccountData *adata = np->adata;
+  struct Connection *conn = adata->conn;
+  if (!conn)
+  {
+    adata->conn = mutt_conn_new(&acct);
+    conn = adata->conn;
+    if (!conn)
+      return;
+  }
 
   if (pop_open_connection(adata) < 0)
-  {
-    //XXX mutt_socket_free(adata->conn);
-    pop_adata_free((void **) &adata);
     return;
-  }
 
   mutt_message(_("Checking for new messages..."));
 
@@ -735,14 +747,14 @@ finish:
   mutt_str_strfcpy(buf, "QUIT\r\n", sizeof(buf));
   if (pop_query(adata, buf, sizeof(buf)) == -1)
     goto fail;
-  mutt_socket_close(conn);
-  FREE(&conn);
+  mutt_socket_close(adata->conn);
+  FREE(&adata->conn);
   pop_adata_free((void **) &adata);
   return;
 
 fail:
   mutt_error(_("Server closed connection"));
-  mutt_socket_close(conn);
+  mutt_socket_close(adata->conn);
   pop_adata_free((void **) &adata);
 }
 
