@@ -302,6 +302,9 @@ int pop_connect(struct PopAccountData *adata)
 */
 int pop_open_connection(struct PopAccountData *adata)
 {
+  if (!adata)
+    return -2;
+
   char buf[LONG_STRING];
 
   int rc = pop_connect(adata);

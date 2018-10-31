@@ -121,6 +121,8 @@ struct PopAuth
   const char *method;
 };
 
+struct Account *pop_ac_find(struct Account *a, const char *path);
+
 /* pop_auth.c */
 int pop_authenticate(struct PopAccountData *adata);
 void pop_apop_timestamp(struct PopAccountData *adata, char *buf);
