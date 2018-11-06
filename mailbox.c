@@ -111,9 +111,11 @@ void mailbox_free(struct Mailbox **m)
     FREE(&Context);
   }
 
+  mutt_debug(1, "MAILBOX FREE %p %s %s\n", (*m), (*m)->path, (*m)->realpath);
   FREE(&(*m)->desc);
   if ((*m)->mdata && (*m)->free_mdata)
     (*m)->free_mdata(&(*m)->mdata);
+  memset(*m, 'R', sizeof(**m));
   FREE(m);
 }
 
@@ -370,6 +372,7 @@ int mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
 
     mutt_str_strfcpy(m->path, buf->data, sizeof(m->path));
     /* int rc = */ mx_path_canon2(m, Folder);
+    mutt_debug(1, "MAILBOX1 %p %s %s\n", m, m->path, m->realpath);
 
     bool new_account = false;
     struct Account *a = mx_ac_find(m);

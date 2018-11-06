@@ -271,6 +271,7 @@ struct Context *mx_mbox_open(struct Mailbox *m, const char *path, int flags)
     m->flags = MB_HIDDEN;
     mutt_str_strfcpy(m->path, path, sizeof(m->path));
     /* int rc = */ mx_path_canon2(m, Folder);
+    mutt_debug(1, "MAILBOX NEW2 %p %s %s\n", ctx->mailbox, ctx->mailbox->path, ctx->mailbox->realpath);
   }
 
   if (!m->account)

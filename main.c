@@ -197,6 +197,7 @@ static void reset_tilde(struct ConfigSet *cs)
 void mutt_exit(int code)
 {
   mutt_endwin();
+  mutt_debug(1, "LEFTOVER2: %p\n", STAILQ_FIRST(&AllMailboxes));
   exit(code);
 }
 
@@ -1249,5 +1250,23 @@ main_exit:
   mutt_free_opts();
   mutt_free_keys();
   cs_free(&Config);
+
+  struct MailboxNode *np = NULL;
+  struct MailboxNode *nptmp = NULL;
+  int count = 0;
+  STAILQ_FOREACH(np, &AllMailboxes, entries)
+  {
+    count++;
+  }
+  printf("LEFTOVER %d\n", count);
+
+  STAILQ_FOREACH_SAFE(np, &AllMailboxes, entries, nptmp)
+  {
+    printf("LEFTOVER %p %d %s %s\n", (void *) np->m, np->m->flags, np->m->path, np->m->realpath);
+    STAILQ_REMOVE(&AllMailboxes, np, MailboxNode, entries);
+    mailbox_free(&np->m);
+    FREE(&np);
+  }
+
   return rc;
 }
