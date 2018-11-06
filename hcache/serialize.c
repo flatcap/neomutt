@@ -427,8 +427,6 @@ unsigned char *serial_dump_body(struct Body *c, unsigned char *d, int *off, bool
   nb.parts = NULL;
   nb.email = NULL;
   nb.aptr = NULL;
-  nb.mime_headers = NULL;
-  nb.language = NULL;
 
   lazy_realloc(&d, *off + sizeof(struct Body));
   memcpy(d + *off, &nb, sizeof(struct Body));
@@ -436,6 +434,7 @@ unsigned char *serial_dump_body(struct Body *c, unsigned char *d, int *off, bool
 
   d = serial_dump_char(nb.xtype, d, off, false);
   d = serial_dump_char(nb.subtype, d, off, false);
+  d = serial_dump_char(nb.language, d, off, false);
 
   d = serial_dump_parameter(&nb.parameter, d, off, convert);
 
@@ -458,10 +457,10 @@ void serial_restore_body(struct Body *c, const unsigned char *d, int *off, bool 
 {
   memcpy(c, d + *off, sizeof(struct Body));
   *off += sizeof(struct Body);
-  c->language = NULL;
 
   serial_restore_char(&c->xtype, d, off, false);
   serial_restore_char(&c->subtype, d, off, false);
+  serial_restore_char(&c->language, d, off, false);
 
   TAILQ_INIT(&c->parameter);
   serial_restore_parameter(&c->parameter, d, off, convert);
