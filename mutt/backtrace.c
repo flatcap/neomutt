@@ -40,7 +40,7 @@ void show_backtrace(void)
   unw_word_t ip, sp;
   char buf[256];
 
-  printf("\nBacktrace\n");
+  mutt_debug(1, "Backtrace\n");
   unw_getcontext(&uc);
   unw_init_local(&cursor, &uc);
   while (unw_step(&cursor) > 0)
@@ -50,7 +50,7 @@ void show_backtrace(void)
     unw_get_proc_name(&cursor, buf, sizeof(buf), &ip);
     if (buf[0] == '_')
       break;
-    printf("\t%s() ip = %lx, sp = %lx\n", buf, (long) ip, (long) sp);
+    mutt_debug(1, "\t%s() ip = %lx, sp = %lx\n", buf, (long) ip, (long) sp);
   }
-  printf("\n");
+  mutt_debug(1, "\n");
 }
