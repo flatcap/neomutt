@@ -1446,7 +1446,7 @@ int mutt_compose_menu(struct Email *msg, char *fcc, size_t fcclen, struct Email 
 
         menu->redraw = REDRAW_FULL;
 
-        ctx = mx_mbox_open(NULL, fname, MUTT_READONLY);
+        ctx = mx_mbox_open_path(fname, MUTT_READONLY); //QWQ should be Mailbox
         if (!ctx)
         {
           mutt_error(_("Unable to open mailbox %s"), fname);

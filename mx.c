@@ -399,6 +399,42 @@ struct Context *mx_mbox_open(struct Mailbox *m, const char *path, int flags)
 }
 
 /**
+ * mx_mbox_open_path - Open a mailbox - Wrapper for mx_mbox_open()
+ * @param path  Path to the mailbox
+ * @param flags See mx_mbox_open()
+ * @retval ptr  Mailbox context
+ * @retval NULL Error
+ */
+struct Context *mx_mbox_open_path(const char *path, int flags)
+{
+  if (!path || !path[0])
+    return NULL;
+
+  struct Mailbox *m = mx_mbox_find2(path);
+  if (!m)
+  {
+    m = mailbox_new();
+    m->flags = MB_HIDDEN;
+    mutt_str_strfcpy(m->path, path, sizeof(m->path));
+    /* int rc = */ mx_path_canon2(m, Folder);
+  }
+
+  if (!m->account)
+    m->account = mx_ac_find(m);
+
+  if (!m->account)
+  {
+    struct Account *a = account_create();
+    m->account = a;
+    a->magic = m->magic;
+    TAILQ_INSERT_TAIL(&AllAccounts, a, entries);
+    mx_ac_add(a, m);
+  }
+
+  return mx_mbox_open(m, NULL, flags);
+}
+
+/**
  * mx_fastclose_mailbox - free up memory associated with the mailbox context
  * @param ctx Mailbox
  */
@@ -530,7 +566,7 @@ static int trash_append(struct Mailbox *m)
   }
 #endif
 
-  struct Context *ctx_trash = mx_mbox_open(NULL, Trash, MUTT_APPEND);
+  struct Context *ctx_trash = mx_mbox_open_path(Trash, MUTT_APPEND);
   if (ctx_trash)
   {
     /* continue from initial scan above */
@@ -705,7 +741,7 @@ int mx_mbox_close(struct Context **pctx, int *index_hint)
     else /* use regular append-copy mode */
 #endif
     {
-      struct Context *f = mx_mbox_open(NULL, mbox, MUTT_APPEND);
+      struct Context *f = mx_mbox_open_path(mbox, MUTT_APPEND);
       if (!f)
         return -1;
 

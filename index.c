@@ -620,7 +620,10 @@ static int main_change_folder(struct Menu *menu, int op, struct Mailbox *m,
 
   const int flags =
       (ReadOnly || (op == OP_MAIN_CHANGE_FOLDER_READONLY)) ? MUTT_READONLY : 0;
-  Context = mx_mbox_open(m, buf, flags);
+  if (m)
+    Context = mx_mbox_open(m, NULL, flags);
+  else
+    Context = mx_mbox_open_path(buf, flags);
   if (Context)
   {
     menu->current = ci_first_message();

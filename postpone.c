@@ -170,7 +170,7 @@ int mutt_num_postponed(struct Mailbox *m, bool force)
     if (optnews)
       OptNews = false;
 #endif
-    struct Context *ctx = mx_mbox_open(NULL, Postponed, MUTT_NOSORT | MUTT_QUIET);
+    struct Context *ctx = mx_mbox_open_path(Postponed, MUTT_NOSORT | MUTT_QUIET);
     if (!ctx)
       PostCount = 0;
     else
@@ -299,7 +299,7 @@ int mutt_get_postponed(struct Context *ctx, struct Email *hdr,
   if (ctx->mailbox == m)
     PostContext = ctx;
   else
-    PostContext = mx_mbox_open(m, Postponed, MUTT_NOSORT);
+    PostContext = mx_mbox_open_path(Postponed, MUTT_NOSORT);
 
   if (!PostContext)
   {
