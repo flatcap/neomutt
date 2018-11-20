@@ -33,10 +33,12 @@
 #include "mutt/mutt.h"
 #include "config/lib.h"
 #include "conn/conn.h"
+#include "mailbox.h"
 #include "hcache/hcache.h"
 
 struct Email;
 struct Mailbox;
+struct MailboxList;
 struct Message;
 struct Progress;
 
@@ -202,7 +204,8 @@ struct ImapAccountData
   struct Buffer *cmdbuf;
 
   char delim;
-  struct Mailbox *mailbox;     /* Current selected mailbox */
+  struct Mailbox *mailbox;          /* Current selected mailbox */
+  struct MailboxList mailboxes;     /* Previous selected mailbox */
 };
 
 /**

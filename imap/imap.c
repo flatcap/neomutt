@@ -1999,6 +1999,7 @@ void imap_select_mailbox(struct Mailbox *m)
   adata->mailbox = m;
 
   imap_cmd_start(adata, buf);
+  mutt_message(_("%s selected"), mdata->name);
 }
 
 int imap_fetch_mailbox(struct Mailbox *m)
@@ -2175,7 +2176,6 @@ static int imap_mbox_open(struct Mailbox *m)
   mutt_str_replace(&m->realpath, mutt_b2s(m->pathbuf));
 
   // NOTE(sileht): looks like we have two not obvious loop here
-  // ctx->mailbox->account->adata->ctx
   // mailbox->account->adata->mailbox
   // this is used only by imap_mbox_close() to detect if the
   // adata/mailbox is a normal or append one, looks a bit dirty
@@ -2201,6 +2201,26 @@ static int imap_mbox_open_append(struct Mailbox *m, OpenMailboxFlags flags)
    * ctx is brand new and mostly empty */
   struct ImapAccountData *adata = imap_adata_get(m);
   struct ImapMboxData *mdata = imap_mdata_get(m);
+
+  adata->mailbox = m;
+
+  /**
+   * NOTE(sileht): IMAP backend use only one tcp connection, so we can have
+   * only one selected mailbox at once, we have some use case where that can
+   * cause issue, for example the postponed recalled messages flow:
+   *  imap_mbox_open("INBOX")
+   *  imap_mbox_open("DRAFT")
+   *  imap_mbox_close("DRAFT")
+   *  imap_mbox_close("INBOX")
+   * This queue is used to track the stack of consecutive selected mailbox.
+   * To be able to select back the previous opened mailbox when the current one
+   * is closed.
+   * This assumes that mbox_close() are always called in reverse order as
+   * mbox_open() have been called
+   */
+  struct MailboxNode *np = mutt_mem_calloc(1, sizeof(*np));
+  np->mailbox = m;
+  STAILQ_INSERT_HEAD(&adata->mailboxes, np, entries);
 
   int rc = imap_mailbox_status(m, false);
   if (rc >= 0)
@@ -2255,29 +2275,41 @@ static int imap_mbox_close(struct Mailbox *m)
   if (!adata || !mdata)
     return 0;
 
+  STAILQ_REMOVE_HEAD(&adata->mailboxes, entries);
+
+  if (!STAILQ_EMPTY(&adata->mailboxes))
+  {
+    adata->mailbox = STAILQ_FIRST(&adata->mailboxes)->mailbox;
+    imap_select_mailbox(adata->mailbox);
+    mutt_debug(3, "IMAP Mailbox %s Closed, reselect %s\n", mdata->name,
+               imap_mdata_get(adata->mailbox)->name);
+    return 0;
+  }
+
+  mutt_debug(3, "IMAP Mailbox %s Closed, no previous mailboxes selected.\n",
+             mdata->name);
+
   /* imap_mbox_open_append() borrows the struct ImapAccountData temporarily,
    * just for the connection.
    *
    * So when these are equal, it means we are actually closing the
    * mailbox and should clean up adata.  Otherwise, we don't want to
    * touch adata - it's still being used.  */
-  if (m == adata->mailbox)
+  if (adata->status != IMAP_FATAL && adata->state >= IMAP_SELECTED)
   {
-    if ((adata->status != IMAP_FATAL) && (adata->state >= IMAP_SELECTED))
+    /* mx_mbox_close won't sync if there are no deleted messages
+     * and the mailbox is unchanged, so we may have to close here */
+    if (!m->msg_deleted)
     {
-      /* mx_mbox_close won't sync if there are no deleted messages
-       * and the mailbox is unchanged, so we may have to close here */
-      if (m->msg_deleted == 0)
-      {
-        adata->closing = true;
-        imap_exec(adata, "CLOSE", IMAP_CMD_QUEUE);
-      }
-      adata->state = IMAP_AUTHENTICATED;
+      adata->closing = true;
+      imap_exec(adata, "CLOSE", IMAP_CMD_QUEUE);
     }
-
-    adata->mailbox = NULL;
-    imap_mdata_cache_reset(m->mdata);
+    adata->state = IMAP_AUTHENTICATED;
   }
+
+  adata->mailbox = NULL;
+
+  imap_mdata_cache_reset(m->mdata);
 
   return 0;
 }
