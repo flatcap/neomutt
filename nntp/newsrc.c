@@ -172,6 +172,17 @@ int nntp_newsrc_parse(struct NntpAccountData *adata)
   if (!adata)
     return -1;
 
+  if (!adata->newsrc_file)
+  {
+    /* generate newsrc file name */
+    char file[PATH_MAX];
+    mutt_expando_format(file, sizeof(file), 0, sizeof(file), NONULL(Newsrc), nntp_format_str, (unsigned long) adata, 0);
+    mutt_expand_path(file, sizeof(file));
+    adata->newsrc_file = mutt_str_strdup(file);
+  }
+
+  if (!adata->newsrc_file)
+    return -1;
 
   if (adata->newsrc_fp)
   {
@@ -827,17 +838,12 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool
 
   /* load .newsrc */
   if (rc >= 0)
-  {
-    mutt_expando_format(file, sizeof(file), 0, MuttIndexWindow->cols,
-                        NONULL(Newsrc), nntp_format_str, (unsigned long) adata, 0);
-    mutt_expand_path(file, sizeof(file));
-    adata->newsrc_file = mutt_str_strdup(file);
     rc = nntp_newsrc_parse(adata);
-  }
+
   if (rc >= 0)
   {
     /* try to load list of newsgroups from cache */
-    if (adata->cacheable && active_get_cache(adata) == 0)
+    if (adata->cacheable && (active_get_cache(adata) == 0))
       rc = nntp_check_new_groups(adata);
 
     /* load list of newsgroups from server */
@@ -869,6 +875,92 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool
   }
 
   return adata;
+}
+
+/**
+ * nntp_select_server2 - Open a connection to an NNTP server
+ * @param m Mailbox
+ * @retval ptr  NNTP server
+ * @retval  0 Success
+ * @retval -1 Failure
+ */
+int nntp_select_server2(struct NntpAccountData *adata)
+{
+  if (!adata)
+    return -1;
+
+  if (adata->status == NNTP_BYE)
+    adata->status = NNTP_NONE;
+  if (nntp_open_connection(adata) < 0)
+    return -1;
+
+  if (nntp_newsrc_parse(adata) < 0)
+    return -1;
+
+  /* check for new newsgroups */
+  if (nntp_check_new_groups(adata) < 0)
+    return -1;
+
+  /* try to create cache directory and enable caching */
+  adata->cacheable = false;
+  if (NewsCacheDir)
+  {
+    char file[PATH_MAX];
+    cache_expand(file, sizeof(file), &adata->conn_account, NULL);
+    if (mutt_file_mkdir(file, S_IRWXU) < 0)
+      mutt_error(_("Can't create %s: %s"), file, strerror(errno));
+    else
+      adata->cacheable = true;
+  }
+
+#if 0
+  int rc;
+  struct Connection *conn = NULL;
+
+  /* .newsrc has been externally modified */
+  if (rc > 0)
+    nntp_clear_cache(adata);
+  if (rc < 0)
+    nntp_newsrc_close(adata);
+  return (rc < 0) ? NULL : adata;
+
+  if (rc >= 0)
+  {
+    /* try to load list of newsgroups from cache */
+    if (adata->cacheable && active_get_cache(adata) == 0)
+      rc = nntp_check_new_groups(m, adata);
+
+    /* load list of newsgroups from server */
+    else
+      rc = nntp_active_fetch(adata, false);
+  }
+
+  if (rc >= 0)
+    nntp_clear_cache(adata);
+
+#ifdef USE_HCACHE
+  if (rc >= 0)
+    nntp_hcache_check_files(m, adata);
+#endif
+
+  if (rc < 0 || !leave_lock)
+    nntp_newsrc_close(adata);
+
+  if (rc < 0)
+  {
+    mutt_hash_destroy(&adata->groups_hash);
+    FREE(&adata->groups_list);
+    FREE(&adata->newsrc_file);
+    FREE(&adata->authenticators);
+    FREE(&adata);
+    mutt_socket_close(conn);
+    FREE(&conn);
+    return NULL;
+  }
+
+  return adata;
+#endif
+  return 0;
 }
 
 /**

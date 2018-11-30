@@ -162,6 +162,7 @@ struct NntpMboxData
 };
 
 struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool leave_lock);
+int nntp_select_server2(struct NntpAccountData *adata);
 struct NntpMboxData *mutt_newsgroup_subscribe(struct NntpAccountData *adata, char *group);
 struct NntpMboxData *mutt_newsgroup_unsubscribe(struct NntpAccountData *adata, char *group);
 int mutt_newsgroup_catchup(struct Mailbox *m);

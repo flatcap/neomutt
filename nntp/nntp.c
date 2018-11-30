@@ -184,6 +184,17 @@ void nntp_mdata_free(void **ptr)
 }
 
 /**
+ * nntp_mdata_new - Allocate and initialise a new NntpMboxData structure
+ * @retval ptr New NntpMboxData
+ */
+struct NntpMboxData *nntp_mdata_new(struct NntpAccountData *adata, const char *name)
+{
+  struct NntpMboxData *mdata = mutt_mem_calloc(1, sizeof(struct NntpMboxData));
+
+  return mdata;
+}
+
+/**
  * nntp_mdata_get - Get the Mailbox data for this mailbox
  */
 struct NntpMboxData *nntp_mdata_get(struct Mailbox *m)
@@ -2495,8 +2506,15 @@ int nntp_ac_add(struct Account *a, struct Mailbox *m)
  */
 static int nntp_mbox_open(struct Mailbox *m, struct Context *ctx)
 {
-  if (!m || !m->account)
+  struct NntpAccountData *adata = nntp_adata_get(m);
+  if (!adata)
     return -1;
+
+  if (!adata->conn || (adata->conn->fd < 0))
+  {
+    if (nntp_select_server2(adata) < 0)
+      return -1;
+  }
 
   char buf[HUGE_STRING];
   char server[LONG_STRING];
@@ -2521,7 +2539,7 @@ static int nntp_mbox_open(struct Mailbox *m, struct Context *ctx)
   url_tostring(url, server, sizeof(server), 0);
 
   mutt_account_hook(m->realpath);
-  struct NntpAccountData *adata = m->account->adata;
+  // struct NntpAccountData *adata = m->account->adata;
   if (!adata)
   {
     adata = nntp_select_server(m, server, true);

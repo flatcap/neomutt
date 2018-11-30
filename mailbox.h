@@ -46,8 +46,9 @@ extern bool  MaildirCheckCur;
 #define MUTT_NAMED   (1 << 0)
 #define MUTT_VIRTUAL (1 << 1)
 
-#define MB_NORMAL 0
-#define MB_HIDDEN 1
+#define MB_NORMAL  0
+#define MB_HIDDEN  (1 << 0)
+#define MB_ACCOUNT (1 << 1)
 
 /**
  * enum AclRights - ACL Rights
