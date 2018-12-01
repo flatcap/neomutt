@@ -683,7 +683,8 @@ static int tls_check_one_certificate(const gnutls_datum_t *certdata,
   OptIgnoreMacroEvents = true;
   while (!done)
   {
-    switch (mutt_menu_loop(menu))
+    // switch (mutt_menu_loop(menu))
+    switch (OP_MAX + 3)
     {
       case -1:         /* abort */
       case OP_MAX + 1: /* reject */
