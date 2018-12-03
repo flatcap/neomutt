@@ -58,6 +58,8 @@ const char *group_index_format_str(char *buf, size_t buflen, size_t col, int col
 {
   char fn[SHORT_STRING], fmt[SHORT_STRING];
   struct Folder *folder = (struct Folder *) data;
+  struct FolderFile *ff = folder->ff;
+  struct NntpMboxData *mdata = ff->nd;
 
   switch (op)
   {
@@ -67,9 +69,9 @@ const char *group_index_format_str(char *buf, size_t buflen, size_t col, int col
       break;
 
     case 'd':
-      if (folder->ff->nd->desc)
+      if (mdata->desc)
       {
-        char *desc = mutt_str_strdup(folder->ff->nd->desc);
+        char *desc = mutt_str_strdup(mdata->desc);
         if (NewsgroupsCharset && *NewsgroupsCharset)
           mutt_ch_convert_string(&desc, NewsgroupsCharset, Charset, MUTT_ICONV_HOOK_FROM);
         mutt_mb_filter_unprintable(&desc);
@@ -86,50 +88,50 @@ const char *group_index_format_str(char *buf, size_t buflen, size_t col, int col
       break;
 
     case 'f':
-      mutt_str_strfcpy(fn, folder->ff->name, sizeof(fn));
+      mutt_str_strfcpy(fn, ff->name, sizeof(fn));
       snprintf(fmt, sizeof(fmt), "%%%ss", prec);
       snprintf(buf, buflen, fmt, fn);
       break;
 
     case 'M':
       snprintf(fmt, sizeof(fmt), "%%%sc", prec);
-      if (folder->ff->nd->deleted)
+      if (mdata->deleted)
         snprintf(buf, buflen, fmt, 'D');
       else
-        snprintf(buf, buflen, fmt, folder->ff->nd->allowed ? ' ' : '-');
+        snprintf(buf, buflen, fmt, mdata->allowed ? ' ' : '-');
       break;
 
     case 'N':
       snprintf(fmt, sizeof(fmt), "%%%sc", prec);
-      if (folder->ff->nd->subscribed)
+      if (mdata->subscribed)
         snprintf(buf, buflen, fmt, ' ');
       else
-        snprintf(buf, buflen, fmt, folder->ff->new ? 'N' : 'u');
+        snprintf(buf, buflen, fmt, ff->new ? 'N' : 'u');
       break;
 
     case 'n':
-      if (Context && Context->mailbox->mdata == folder->ff->nd)
+      if (Context && Context->mailbox->mdata == mdata)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
         snprintf(buf, buflen, fmt, Context->mailbox->msg_new);
       }
-      else if (MarkOld && folder->ff->nd->last_cached >= folder->ff->nd->first_message &&
-               folder->ff->nd->last_cached <= folder->ff->nd->last_message)
+      else if (MarkOld && mdata->last_cached >= mdata->first_message &&
+               mdata->last_cached <= mdata->last_message)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, folder->ff->nd->last_message - folder->ff->nd->last_cached);
+        snprintf(buf, buflen, fmt, mdata->last_message - mdata->last_cached);
       }
       else
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, folder->ff->nd->unread);
+        snprintf(buf, buflen, fmt, mdata->unread);
       }
       break;
 
     case 's':
       if (flags & MUTT_FORMAT_OPTIONAL)
       {
-        if (folder->ff->nd->unread != 0)
+        if (mdata->unread != 0)
         {
           mutt_expando_format(buf, buflen, col, cols, if_str,
                               group_index_format_str, data, flags);
@@ -140,7 +142,7 @@ const char *group_index_format_str(char *buf, size_t buflen, size_t col, int col
                               group_index_format_str, data, flags);
         }
       }
-      else if (Context && Context->mailbox->mdata == folder->ff->nd)
+      else if (Context && Context->mailbox->mdata == mdata)
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
         snprintf(buf, buflen, fmt, Context->mailbox->msg_unread);
@@ -148,7 +150,7 @@ const char *group_index_format_str(char *buf, size_t buflen, size_t col, int col
       else
       {
         snprintf(fmt, sizeof(fmt), "%%%sd", prec);
-        snprintf(buf, buflen, fmt, folder->ff->nd->unread);
+        snprintf(buf, buflen, fmt, mdata->unread);
       }
       break;
   }
