@@ -2282,6 +2282,14 @@ struct ConfigDef MuttVars[] = {
   ** the previous methods are unavailable. If a method is available but
   ** authentication fails, NeoMutt will not connect to the IMAP server.
   */
+  { "nntp_check_subscribed",  DT_BOOL, R_NONE, &NntpCheckSubscribed, false },
+  /*
+  ** .pp
+  ** When \fIset\fP, NeoMutt will read the set of subscribed folders from
+  ** the \fC.newsrc\fP whenever a mailbox is \fBselected\fP, and add them to the
+  ** set of mailboxes it polls for new mail just as if you had issued individual
+  ** ``$mailboxes'' commands.
+  */
   { "nntp_context",     DT_NUMBER|DT_NOT_NEGATIVE, R_NONE, &NntpContext, 1000 },
   /*
   ** .pp
@@ -2289,6 +2297,13 @@ struct ConfigDef MuttVars[] = {
   ** newsgroup entered.  If active newsgroup have more articles than this
   ** number, oldest articles will be ignored.  Also controls how many
   ** articles headers will be saved in cache when you quit newsgroup.
+  */
+  { "nntp_list_subscribed",     DT_BOOL, R_NONE, &NntpListSubscribed, false },
+  /*
+  ** .pp
+  ** This variable configures whether NNTP folder browsing will look for
+  ** only subscribed folders or all folders.  This can be toggled in the
+  ** NNTP browser with the \fC<toggle-subscribed>\fP function.
   */
   { "nntp_listgroup",   DT_BOOL, R_NONE, &NntpListgroup, true },
   /*

@@ -71,7 +71,9 @@
 
 /* These Config Variables are only used in nntp/nntp.c */
 char *NntpAuthenticators; ///< Config: (nntp) Allowed authentication methods
+bool NntpCheckSubscribed; ///< Config: (nntp) When opening a mailbox, read the .newsrc for a list of subscribed folders
 short NntpContext; ///< Config: (nntp) Maximum number of articles to list (0 for all articles)
+bool NntpListSubscribed; ///< Config: (nntp) When browsing a mailbox, only display subscribed folders
 bool NntpListgroup; ///< Config: (nntp) Check all articles when opening a newsgroup
 bool NntpLoadDescription; ///< Config: (nntp) Load descriptions for newsgroups when adding to the list
 short NntpPoll; ///< Config: (nntp) Interval between checks for new posts

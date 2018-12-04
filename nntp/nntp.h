@@ -53,7 +53,9 @@ struct stat;
 
 /* These Config Variables are only used in nntp/nntp.c */
 extern char *NntpAuthenticators;
+extern bool  NntpCheckSubscribed;
 extern short NntpContext;
+extern bool  NntpListSubscribed;
 extern bool  NntpListgroup;
 extern bool  NntpLoadDescription;
 extern short NntpPoll;
