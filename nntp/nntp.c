@@ -2104,13 +2104,12 @@ int nntp_active_fetch(struct NntpAccountData *adata, bool new)
 
 /**
  * nntp_check_new_groups - Check for new groups/articles in subscribed groups
- * @param m     Mailbox
  * @param adata NNTP server
  * @retval  1 New groups found
  * @retval  0 No new groups
  * @retval -1 Error
  */
-int nntp_check_new_groups(struct Mailbox *m, struct NntpAccountData *adata)
+int nntp_check_new_groups(struct NntpAccountData *adata)
 {
   struct NntpMboxData tmp_mdata;
   time_t now;

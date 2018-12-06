@@ -1056,7 +1056,7 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool
       return NULL;
 
     /* check for new newsgroups */
-    if (!leave_lock && nntp_check_new_groups(m, adata) < 0)
+    if (!leave_lock && nntp_check_new_groups(adata) < 0)
       rc = -1;
 
     /* .newsrc has been externally modified */
@@ -1097,7 +1097,7 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool
   {
     /* try to load list of newsgroups from cache */
     if (adata->cacheable && active_get_cache(adata) == 0)
-      rc = nntp_check_new_groups(m, adata);
+      rc = nntp_check_new_groups(adata);
 
     /* load list of newsgroups from server */
     else
