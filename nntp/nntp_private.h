@@ -53,7 +53,7 @@ int  nntp_active_save_cache(struct NntpAccountData *adata);
 struct NntpAccountData *nntp_adata_new(struct Connection *conn);
 int  nntp_add_group(char *line, void *data);
 void nntp_bcache_update(struct NntpMboxData *mdata);
-int  nntp_check_new_groups(struct Mailbox *m, struct NntpAccountData *adata);
+int  nntp_check_new_groups(struct NntpAccountData *adata);
 void nntp_delete_group_cache(struct NntpMboxData *mdata);
 struct NntpEmailData *nntp_edata_get(struct Email *e);
 void nntp_group_unread_stat(struct NntpMboxData *mdata);
