@@ -67,7 +67,7 @@ void nntp_article_status(struct Mailbox *m, struct Email *e, char *group, anum_t
 
 #ifdef USE_HCACHE
 header_cache_t *nntp_hcache_open(struct Mailbox *m);
-void nntp_hcache_update(struct NntpMboxData *mdata, header_cache_t *hc);
+void nntp_hcache_update(struct Mailbox *m, header_cache_t *hc);
 #endif
 
 #endif /* MUTT_NNTP_NNTP_PRIVATE_H */
