@@ -1527,7 +1527,7 @@ static int nntp_group_poll(struct NntpMboxData *mdata, bool update_stat)
 
 /**
  * check_mailbox - Check current newsgroup for new articles
- * @param ctx Mailbox
+ * @param m Mailbox
  * @retval #MUTT_REOPENED Articles have been renumbered or removed from server
  * @retval #MUTT_NEW_MAIL New articles found
  * @retval  0             No change
@@ -1535,12 +1535,10 @@ static int nntp_group_poll(struct NntpMboxData *mdata, bool update_stat)
  *
  * Leave newsrc locked
  */
-static int check_mailbox(struct Context *ctx)
+static int check_mailbox(struct Mailbox *m)
 {
-  if (!ctx || !ctx->mailbox)
+  if (!m)
     return -1;
-
-  struct Mailbox *m = ctx->mailbox;
 
   struct NntpMboxData *mdata = m->mdata;
   struct NntpAccountData *adata = mdata->adata;
@@ -1701,12 +1699,6 @@ static int check_mailbox(struct Context *ctx)
     ret = MUTT_REOPENED;
   }
 
-  /* some headers were removed, context must be updated */
-  if (ret == MUTT_REOPENED)
-  {
-    mx_update_context(ctx);
-  }
-
   /* fetch headers of new articles */
   if (mdata->last_message > mdata->last_loaded)
   {
@@ -1720,15 +1712,11 @@ static int check_mailbox(struct Context *ctx)
       nntp_hcache_update(m, hc);
     }
 #endif
-    int old_msg_count = m->msg_count;
     rc = nntp_fetch_headers(m, hc, mdata->last_loaded + 1, mdata->last_message, false);
     m->quiet = quiet;
     if (rc == 0)
-    {
-      if (m->msg_count > old_msg_count)
-        mx_update_context(ctx);
       mdata->last_loaded = mdata->last_message;
-    }
+
     if (ret == 0 && m->msg_count > oldmsgcount)
       ret = MUTT_NEW_MAIL;
   }
@@ -2601,7 +2589,7 @@ static int nntp_mbox_check(struct Context *ctx, int *index_hint)
 
   struct Mailbox *m = ctx->mailbox;
 
-  int ret = check_mailbox(ctx);
+  int ret = check_mailbox(m);
   if (ret == 0)
   {
     struct NntpMboxData *mdata = m->mdata;
@@ -2631,8 +2619,10 @@ static int nntp_mbox_sync(struct Context *ctx, int *index_hint)
 
   /* check for new articles */
   mdata->adata->check_time = 0;
-  rc = check_mailbox(ctx);
-  if (rc)
+  rc = check_mailbox(m);
+  if ((rc == MUTT_NEW_MAIL) || (rc == MUTT_REOPENED))
+    mx_update_context(ctx);
+  if (rc != 0)
     return rc;
 
 #ifdef USE_HCACHE
