@@ -714,22 +714,26 @@ static int nntp_hcache_namer(const char *path, char *dest, size_t destlen)
 
 /**
  * nntp_hcache_open - Open newsgroup hcache
- * @param mdata NNTP Mailbox data
+ * @param m Mailbox
  * @retval ptr  Header cache
  * @retval NULL Error
  */
-header_cache_t *nntp_hcache_open(struct NntpMboxData *mdata)
+header_cache_t *nntp_hcache_open(struct Mailbox *m)
 {
-  struct Url url;
-  char file[PATH_MAX];
+  struct NntpMboxData *mdata = nntp_mdata_get(m);
+  struct NntpAccountData *adata = nntp_adata_get(m);
 
-  if (!mdata->adata || !mdata->adata->cacheable || !mdata->adata->conn ||
-      !mdata->group || !(mdata->newsrc_ent || mdata->subscribed || SaveUnsubscribed))
+  if (!adata || !mdata || !mdata->adata || !mdata->adata->cacheable ||
+      !mdata->adata->conn || !mdata->group ||
+      !(mdata->newsrc_ent || mdata->subscribed || SaveUnsubscribed))
   {
     return NULL;
   }
 
-  mutt_account_tourl(&mdata->adata->conn->account, &url);
+  struct Url url;
+  char file[PATH_MAX];
+
+  mutt_account_tourl(&adata->conn->account, &url);
   url.path = mdata->group;
   url_tostring(&url, file, sizeof(file), U_PATH);
   return mutt_hcache_open(NewsCacheDir, file, nntp_hcache_namer);
@@ -1130,7 +1134,7 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool
         if (!mdata)
           continue;
 
-        hc = nntp_hcache_open(mdata);
+        hc = nntp_hcache_open(m);
         if (!hc)
           continue;
 
