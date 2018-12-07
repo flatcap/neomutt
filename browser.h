@@ -79,9 +79,7 @@ struct FolderFile
   bool has_mailbox : 1;
   bool local : 1; /**< folder is on local filesystem */
   bool tagged : 1;
-#ifdef USE_NNTP
-  struct NntpMboxData *nd;
-#endif
+  struct Mailbox *mailbox;
 };
 
 /**

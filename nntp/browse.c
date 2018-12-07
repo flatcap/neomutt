@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include <stdio.h>
+#include "nntp_private.h"
 #include "mutt/mutt.h"
 #include "email/lib.h"
 #include "browser.h"
@@ -59,7 +60,7 @@ const char *group_index_format_str(char *buf, size_t buflen, size_t col, int col
   char fn[SHORT_STRING], fmt[SHORT_STRING];
   struct Folder *folder = (struct Folder *) data;
   struct FolderFile *ff = folder->ff;
-  struct NntpMboxData *mdata = ff->nd;
+  struct NntpMboxData *mdata = nntp_mdata_get(ff->mailbox);
 
   switch (op)
   {

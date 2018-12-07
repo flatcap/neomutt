@@ -597,11 +597,10 @@ static const char *folder_format_str(char *buf, size_t buflen, size_t col, int c
  * @param desc  Description of folder
  * @param s     stat info for the folder
  * @param m     Mailbox
- * @param data  Data to associate with the folder
  */
 static void add_folder(struct Menu *menu, struct BrowserState *state,
                        const char *name, const char *desc, const struct stat *s,
-                       struct Mailbox *m, void *data)
+                       struct Mailbox *m)
 {
   if (state->entrylen == state->entrymax)
   {
@@ -639,10 +638,7 @@ static void add_folder(struct Menu *menu, struct BrowserState *state,
 #ifdef USE_IMAP
   (state->entry)[state->entrylen].imap = false;
 #endif
-#ifdef USE_NNTP
-  if (OptNews)
-    (state->entry)[state->entrylen].nd = data;
-#endif
+  (state->entry)[state->entrylen].mailbox = m;
   (state->entrylen)++;
 }
 
@@ -694,7 +690,7 @@ static int examine_directory(struct Menu *menu, struct BrowserState *state,
       {
         continue;
       }
-      add_folder(menu, state, mdata->group, NULL, NULL, NULL, mdata);
+      add_folder(menu, state, mdata->group, NULL, NULL, NULL);
     }
   }
   else
@@ -777,7 +773,7 @@ static int examine_directory(struct Menu *menu, struct BrowserState *state,
         np->m->msg_count = Context->mailbox->msg_count;
         np->m->msg_unread = Context->mailbox->msg_unread;
       }
-      add_folder(menu, state, de->d_name, NULL, &s, np ? np->m : NULL, NULL);
+      add_folder(menu, state, de->d_name, NULL, &s, np ? np->m : NULL);
     }
     closedir(dp);
   }
@@ -808,7 +804,7 @@ static int examine_mailboxes(struct Menu *menu, struct BrowserState *state)
       struct NntpMboxData *mdata = adata->groups_list[i];
       if (mdata && (mdata->new || (mdata->subscribed && (mdata->unread || !ShowOnlyUnread))))
       {
-        add_folder(menu, state, mdata->group, NULL, NULL, NULL, mdata);
+        add_folder(menu, state, mdata->group, NULL, NULL, NULL);
       }
     }
   }
@@ -839,11 +835,11 @@ static int examine_mailboxes(struct Menu *menu, struct BrowserState *state)
       {
         case MUTT_IMAP:
         case MUTT_POP:
-          add_folder(menu, state, buffer, np->m->desc, NULL, np->m, NULL);
+          add_folder(menu, state, buffer, np->m->desc, NULL, np->m);
           continue;
         case MUTT_NOTMUCH:
         case MUTT_NNTP:
-          add_folder(menu, state, np->m->path, np->m->desc, NULL, np->m, NULL);
+          add_folder(menu, state, np->m->path, np->m->desc, NULL, np->m);
           continue;
         default: /* Continue */
           break;
@@ -870,7 +866,7 @@ static int examine_mailboxes(struct Menu *menu, struct BrowserState *state)
           s.st_mtime = st2.st_mtime;
       }
 
-      add_folder(menu, state, buffer, np->m->desc, &s, np->m, NULL);
+      add_folder(menu, state, buffer, np->m->desc, &s, np->m);
     }
   }
   browser_sort(state);
@@ -2054,7 +2050,7 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
                 if (regexec(&rx, mdata->group, 0, NULL, 0) == 0)
                 {
                   mutt_newsgroup_subscribe(adata, mdata->group);
-                  add_folder(menu, &state, mdata->group, NULL, NULL, NULL, mdata);
+                  add_folder(menu, &state, mdata->group, NULL, NULL, NULL);
                 }
               }
             }
