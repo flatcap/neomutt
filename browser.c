@@ -1921,18 +1921,19 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
         if (OptNews)
         {
           struct FolderFile *ff = &state.entry[menu->current];
-          struct NntpMboxData *mdata = NULL;
 
           int rc = nntp_newsrc_parse(CurrentNewsSrv);
           if (rc < 0)
             break;
 
+          rc = -1;
+          struct NntpMboxData *mdata = NULL;
           if (i == OP_CATCHUP)
-            mdata = mutt_newsgroup_catchup(Context->mailbox, CurrentNewsSrv, ff->name);
+            rc = mutt_newsgroup_catchup(Context->mailbox);
           else
             mdata = mutt_newsgroup_uncatchup(Context->mailbox, CurrentNewsSrv, ff->name);
 
-          if (mdata)
+          if (mdata || (rc == 0))
           {
             nntp_newsrc_update(CurrentNewsSrv);
             if (menu->current + 1 < menu->max)

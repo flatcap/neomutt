@@ -1270,23 +1270,15 @@ struct NntpMboxData *mutt_newsgroup_unsubscribe(struct NntpAccountData *adata, c
 
 /**
  * mutt_newsgroup_catchup - Catchup newsgroup
- * @param m     Mailbox
- * @param adata NNTP server
- * @param group Newsgroup
- * @retval ptr  NNTP data
- * @retval NULL Error
+ * @param m Mailbox
+ * @retval  0 Success
+ * @retval -1 Failure
  */
-struct NntpMboxData *mutt_newsgroup_catchup(struct Mailbox *m,
-                                            struct NntpAccountData *adata, char *group)
+int mutt_newsgroup_catchup(struct Mailbox *m)
 {
-  struct NntpMboxData *mdata = NULL;
-
-  if (!adata || !adata->groups_hash || !group || !*group)
-    return NULL;
-
-  mdata = mutt_hash_find(adata->groups_hash, group);
+  struct NntpMboxData *mdata = nntp_mdata_get(m);
   if (!mdata)
-    return NULL;
+    return -1;
 
   if (mdata->newsrc_ent)
   {
@@ -1295,13 +1287,14 @@ struct NntpMboxData *mutt_newsgroup_catchup(struct Mailbox *m,
     mdata->newsrc_ent[0].first = 1;
     mdata->newsrc_ent[0].last = mdata->last_message;
   }
+
   mdata->unread = 0;
   if (m && (m->mdata == mdata))
   {
     for (unsigned int i = 0; i < m->msg_count; i++)
       mutt_set_flag(m, m->emails[i], MUTT_READ, 1);
   }
-  return mdata;
+  return 0;
 }
 
 /**
