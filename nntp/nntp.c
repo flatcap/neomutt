@@ -1596,7 +1596,7 @@ static int check_mailbox(struct Context *ctx)
       first = mdata->last_message - NntpContext + 1;
     messages = mutt_mem_calloc(mdata->last_loaded - first + 1, sizeof(unsigned char));
     hc = nntp_hcache_open(m);
-    nntp_hcache_update(mdata, hc);
+    nntp_hcache_update(m, hc);
 #endif
 
     /* update flags according to .newsrc */
@@ -1717,7 +1717,7 @@ static int check_mailbox(struct Context *ctx)
     if (!hc)
     {
       hc = nntp_hcache_open(m);
-      nntp_hcache_update(mdata, hc);
+      nntp_hcache_update(m, hc);
     }
 #endif
     int old_msg_count = m->msg_count;
@@ -2566,7 +2566,7 @@ static int nntp_mbox_open(struct Mailbox *m, struct Context *ctx)
   mdata->first_message = count;
 #ifdef USE_HCACHE
   hc = nntp_hcache_open(m);
-  nntp_hcache_update(mdata, hc);
+  nntp_hcache_update(m, hc);
 #endif
   if (!hc)
   {

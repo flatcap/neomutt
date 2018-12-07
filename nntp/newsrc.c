@@ -741,21 +741,21 @@ header_cache_t *nntp_hcache_open(struct Mailbox *m)
 
 /**
  * nntp_hcache_update - Remove stale cached headers
- * @param mdata NNTP Mailbox data
- * @param hc    Header cache
+ * @param m  Mailbox
+ * @param hc Header cache
  */
-void nntp_hcache_update(struct NntpMboxData *mdata, header_cache_t *hc)
+void nntp_hcache_update(struct Mailbox *m, header_cache_t *hc)
 {
-  char buf[16];
-  bool old = false;
-  void *hdata = NULL;
-  anum_t first = 0, last = 0;
-
-  if (!hc)
+  struct NntpMboxData *mdata = nntp_mdata_get(m);
+  if (!mdata || !hc)
     return;
 
+  char buf[16];
+  bool old = false;
+  anum_t first = 0, last = 0;
+
   /* fetch previous values of first and last */
-  hdata = mutt_hcache_fetch_raw(hc, "index", 5);
+  void *hdata = mutt_hcache_fetch_raw(hc, "index", 5);
   if (hdata)
   {
     mutt_debug(2, "mutt_hcache_fetch index: %s\n", (char *) hdata);
