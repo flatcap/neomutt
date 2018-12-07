@@ -1602,7 +1602,7 @@ static int check_mailbox(struct Context *ctx)
     if (NntpContext && mdata->last_message - first + 1 > NntpContext)
       first = mdata->last_message - NntpContext + 1;
     messages = mutt_mem_calloc(mdata->last_loaded - first + 1, sizeof(unsigned char));
-    hc = nntp_hcache_open(mdata);
+    hc = nntp_hcache_open(m);
     nntp_hcache_update(mdata, hc);
 #endif
 
@@ -1723,7 +1723,7 @@ static int check_mailbox(struct Context *ctx)
 #ifdef USE_HCACHE
     if (!hc)
     {
-      hc = nntp_hcache_open(mdata);
+      hc = nntp_hcache_open(m);
       nntp_hcache_update(mdata, hc);
     }
 #endif
@@ -2361,7 +2361,7 @@ int nntp_check_children(struct Context *ctx, const char *msgid)
   quiet = m->quiet;
   m->quiet = true;
 #ifdef USE_HCACHE
-  hc = nntp_hcache_open(mdata);
+  hc = nntp_hcache_open(m);
 #endif
   int old_msg_count = m->msg_count;
   for (int i = 0; i < cc.num; i++)
@@ -2572,7 +2572,7 @@ static int nntp_mbox_open(struct Mailbox *m, struct Context *ctx)
   nntp_bcache_update(mdata);
   mdata->first_message = count;
 #ifdef USE_HCACHE
-  hc = nntp_hcache_open(mdata);
+  hc = nntp_hcache_open(m);
   nntp_hcache_update(mdata, hc);
 #endif
   if (!hc)
@@ -2644,7 +2644,7 @@ static int nntp_mbox_sync(struct Context *ctx, int *index_hint)
 
 #ifdef USE_HCACHE
   mdata->last_cached = 0;
-  hc = nntp_hcache_open(mdata);
+  hc = nntp_hcache_open(m);
 #endif
 
   for (int i = 0; i < m->msg_count; i++)

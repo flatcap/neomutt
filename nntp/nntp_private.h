@@ -58,6 +58,7 @@ void nntp_delete_group_cache(struct NntpMboxData *mdata);
 struct NntpEmailData *nntp_edata_get(struct Email *e);
 void nntp_group_unread_stat(struct NntpMboxData *mdata);
 void nntp_hash_destructor_t(int type, void *obj, intptr_t data);
+struct NntpAccountData *nntp_adata_get(struct Mailbox *m);
 void nntp_mdata_free(void **ptr);
 struct NntpMboxData *nntp_mdata_get(struct Mailbox *m);
 void nntp_newsrc_gen_entries(struct Context *ctx);
@@ -65,7 +66,7 @@ int  nntp_open_connection(struct NntpAccountData *adata);
 void nntp_article_status(struct Mailbox *m, struct Email *e, char *group, anum_t anum);
 
 #ifdef USE_HCACHE
-header_cache_t *nntp_hcache_open(struct NntpMboxData *mdata);
+header_cache_t *nntp_hcache_open(struct Mailbox *m);
 void nntp_hcache_update(struct NntpMboxData *mdata, header_cache_t *hc);
 #endif
 
