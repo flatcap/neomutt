@@ -184,6 +184,16 @@ void nntp_mdata_free(void **ptr)
 }
 
 /**
+ * nntp_mdata_get - Get the Mailbox data for this mailbox
+ */
+struct NntpMboxData *nntp_mdata_get(struct Mailbox *m)
+{
+  if (!m || (m->magic != MUTT_NNTP) || !m->mdata)
+    return NULL;
+  return m->mdata;
+}
+
+/**
  * nntp_edata_free - Free data attached to an Email
  * @param data Email data
  */

@@ -3009,11 +3009,10 @@ int mutt_index_menu(void)
         CHECK_MSGCOUNT;
         CHECK_READONLY;
         CHECK_ATTACH
-        if (Context && Context->mailbox->magic == MUTT_NNTP)
+        if (Context->mailbox && (Context->mailbox->magic == MUTT_NNTP) &&
+            (mutt_newsgroup_catchup(Context->mailbox) == 0))
         {
-          struct NntpMboxData *mdata = Context->mailbox->mdata;
-          if (mutt_newsgroup_catchup(Context->mailbox, mdata->adata, mdata->group))
-            menu->redraw = REDRAW_INDEX | REDRAW_STATUS;
+          menu->redraw = REDRAW_INDEX | REDRAW_STATUS;
         }
         break;
 #endif

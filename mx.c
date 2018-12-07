@@ -580,16 +580,11 @@ int mx_mbox_close(struct Context **pctx, int *index_hint)
 #ifdef USE_NNTP
   if (m->msg_unread && m->magic == MUTT_NNTP)
   {
-    struct NntpMboxData *mdata = m->mdata;
-
-    if (mdata && mdata->adata && mdata->group)
-    {
-      int rc = query_quadoption(CatchupNewsgroup, _("Mark all articles read?"));
-      if (rc == MUTT_ABORT)
-        return -1;
-      else if (rc == MUTT_YES)
-        mutt_newsgroup_catchup(Context->mailbox, mdata->adata, mdata->group);
-    }
+    int rc = query_quadoption(CatchupNewsgroup, _("Mark all articles read?"));
+    if (rc == MUTT_ABORT)
+      return -1;
+    else if (rc == MUTT_YES)
+      mutt_newsgroup_catchup(m);
   }
 #endif
 
