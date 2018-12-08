@@ -1267,14 +1267,8 @@ static int nntp_fetch_headers(struct Mailbox *m, void *hc, anum_t first, anum_t 
     return -1;
   fc.hc = hc;
 
-  if (!m->emails)
-  {
-    /* Allocate some memory to get started */
-    m->email_max = m->msg_count;
-    m->msg_count = 0;
-    m->vcount = 0;
-    mx_alloc_memory(m);
-  }
+  m->email_max = m->msg_count;
+  mx_alloc_memory(m);
 
   /* fetch list of articles */
   if (C_NntpListgroup && mdata->adata->hasLISTGROUP && !mdata->deleted)

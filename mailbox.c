@@ -92,6 +92,7 @@ struct MailboxList AllMailboxes = STAILQ_HEAD_INITIALIZER(AllMailboxes);
 struct Mailbox *mailbox_new(void)
 {
   struct Mailbox *m = mutt_mem_calloc(1, sizeof(struct Mailbox));
+  mx_alloc_memory(m);
 
   m->pathbuf = mutt_buffer_new();
 

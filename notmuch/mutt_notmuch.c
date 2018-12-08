@@ -2187,15 +2187,8 @@ static int nm_mbox_open(struct Mailbox *m)
 
   progress_reset(m);
 
-  if (!m->emails)
-  {
-    /* Allocate some memory to get started */
-    m->email_max = m->msg_count;
-    m->msg_count = 0;
-    m->vcount = 0;
-    m->size = 0;
-    mx_alloc_memory(m);
-  }
+  m->email_max = m->msg_count;
+  mx_alloc_memory(m);
 
   int rc = -1;
 

@@ -387,15 +387,8 @@ static int pop_fetch_headers(struct Mailbox *m)
   time(&adata->check_time);
   adata->clear_cache = false;
 
-  if (!m->emails)
-  {
-    /* Allocate some memory to get started */
-    m->email_max = m->msg_count;
-    m->msg_count = 0;
-    m->msg_unread = 0;
-    m->vcount = 0;
-    mx_alloc_memory(m);
-  }
+  m->email_max = m->msg_count;
+  mx_alloc_memory(m);
 
   for (int i = 0; i < m->msg_count; i++)
     m->emails[i]->refno = -1;
