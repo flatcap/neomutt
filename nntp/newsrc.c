@@ -808,7 +808,8 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, char *server, bool
   }
 
   /* new news server */
-  adata = nntp_adata_new(conn);
+  adata = nntp_adata_new();
+  adata->conn = conn;
 
   rc = nntp_open_connection(adata);
 

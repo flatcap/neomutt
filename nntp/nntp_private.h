@@ -50,7 +50,7 @@ enum NntpStatus
 
 void nntp_acache_free(struct NntpMboxData *mdata);
 int  nntp_active_save_cache(struct NntpAccountData *adata);
-struct NntpAccountData *nntp_adata_new(struct Connection *conn);
+struct NntpAccountData *nntp_adata_new(void);
 int  nntp_add_group(char *line, void *data);
 void nntp_bcache_update(struct NntpMboxData *mdata);
 int  nntp_check_new_groups(struct NntpAccountData *adata);
