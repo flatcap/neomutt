@@ -30,6 +30,7 @@
  * | File            | Description            |
  * | :-------------- | :--------------------- |
  * | nntp/browse.c   | @subpage nntp_browse   |
+ * | nntp/cache.c    | @subpage nntp_cache    |
  * | nntp/complete.c | @subpage nntp_complete |
  * | nntp/newsrc.c   | @subpage nntp_newsrc   |
  * | nntp/nntp.c     | @subpage nntp_nntp     |

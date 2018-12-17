@@ -64,6 +64,8 @@ struct NntpMboxData *nntp_mdata_get(struct Mailbox *m);
 void nntp_newsrc_gen_entries(struct Context *ctx);
 int  nntp_open_connection(struct NntpAccountData *adata);
 void nntp_article_status(struct Mailbox *m, struct Email *e, char *group, anum_t anum);
+void cache_expand(char *dst, size_t dstlen, struct ConnAccount *acct, const char *src);
+void nntp_hcache_check_files(struct Mailbox *m, struct NntpAccountData *adata);
 
 #ifdef USE_HCACHE
 header_cache_t *nntp_hcache_open(struct Mailbox *m);

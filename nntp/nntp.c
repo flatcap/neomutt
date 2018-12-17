@@ -1259,9 +1259,6 @@ static int nntp_fetch_headers(struct Mailbox *m, void *hc, anum_t first, anum_t 
   int rc = 0;
   anum_t current;
   anum_t first_over = first;
-#ifdef USE_HCACHE
-  void *hdata = NULL;
-#endif
 
   /* if empty group or nothing to do */
   if (!last || first > last)
@@ -1357,7 +1354,7 @@ static int nntp_fetch_headers(struct Mailbox *m, void *hc, anum_t first, anum_t 
 
 #ifdef USE_HCACHE
     /* try to fetch header from cache */
-    hdata = mutt_hcache_fetch(fc.hc, buf, strlen(buf));
+    void *hdata = mutt_hcache_fetch(fc.hc, buf, strlen(buf));
     if (hdata)
     {
       mutt_debug(2, "mutt_hcache_fetch %s\n", buf);
@@ -1593,7 +1590,6 @@ static int check_mailbox(struct Mailbox *m)
 #ifdef USE_HCACHE
     unsigned char *messages = NULL;
     char buf[16];
-    void *hdata = NULL;
     struct Email *e = NULL;
     anum_t first = mdata->first_message;
 
@@ -1620,16 +1616,14 @@ static int check_mailbox(struct Mailbox *m)
           messages[anum - first] = 1;
 
         snprintf(buf, sizeof(buf), "%u", anum);
-        hdata = mutt_hcache_fetch(hc, buf, strlen(buf));
+        void *hdata = mutt_hcache_fetch(hc, buf, strlen(buf));
         if (hdata)
         {
-          bool deleted;
-
           mutt_debug(2, "#1 mutt_hcache_fetch %s\n", buf);
           e = mutt_hcache_restore(hdata);
           mutt_hcache_free(hc, &hdata);
           e->edata = NULL;
-          deleted = e->deleted;
+          bool deleted = e->deleted;
           flagged = e->flagged;
           mutt_email_free(&e);
 
@@ -1666,7 +1660,7 @@ static int check_mailbox(struct Mailbox *m)
         continue;
 
       snprintf(buf, sizeof(buf), "%u", anum);
-      hdata = mutt_hcache_fetch(hc, buf, strlen(buf));
+      void *hdata = mutt_hcache_fetch(hc, buf, strlen(buf));
       if (hdata)
       {
         mutt_debug(2, "#2 mutt_hcache_fetch %s\n", buf);
