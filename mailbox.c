@@ -314,17 +314,8 @@ void mutt_update_mailbox(struct Mailbox *m)
 int mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
                          unsigned long data, struct Buffer *err)
 {
-  // char canon[PATH_MAX];
-  // struct stat sb = { 0 };
-#if 0
-  char f1[PATH_MAX];
-  char *p = NULL;
-#endif
-
   while (MoreArgs(s))
   {
-    // char *desc = NULL;
-
     struct Mailbox *m = mailbox_new();
 
     if (data & MUTT_NAMED)
@@ -386,67 +377,6 @@ int mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
       mailbox_free(&m);
       continue;
     }
-
-    // SUCCESS
-
-#if 0
-#ifdef USE_NOTMUCH
-    if (nm_path_probe(buf->data, NULL) == MUTT_NOTMUCH)
-      nm_normalize_uri(buf->data, canon, sizeof(canon));
-    else
-#endif
-      mutt_str_strfcpy(canon, buf->data, sizeof(canon));
-
-    mutt_expand_path(canon, sizeof(canon));
-
-    /* Skip empty tokens. */
-    if (!*canon)
-    {
-      FREE(&desc);
-      continue;
-    }
-
-    /* avoid duplicates */
-    p = realpath(canon, f1);
-    struct MailboxNode *np = NULL;
-    STAILQ_FOREACH(np, &AllMailboxes, entries)
-    {
-      if (mutt_str_strcmp(p ? p : canon, np->m->realpath) == 0)
-      {
-        mutt_debug(3, "mailbox '%s' already registered as '%s'\n", canon, np->m->path);
-        break;
-      }
-    }
-
-    if (np)
-    {
-      FREE(&desc);
-      continue;
-    }
-
-    m = mailbox_new(canon);
-
-    m->notified = true;
-    m->desc = desc;
-#ifdef USE_NOTMUCH
-    if (nm_path_probe(m->path, NULL) == MUTT_NOTMUCH)
-    {
-      m->magic = MUTT_NOTMUCH;
-    }
-    else
-#endif
-    {
-      /* for check_mbox_size, it is important that if the folder is new (tested by
-       * reading it), the size is set to 0 so that later when we check we see
-       * that it increased. without check_mbox_size we probably don't care.
-       */
-      if (CheckMboxSize && (stat(m->path, &sb) == 0) && !mbox_test_new_folder(m->path))
-      {
-        /* some systems out there don't have an off_t type */
-        m->size = (off_t) sb.st_size;
-      }
-    }
-#endif
 
     struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
     mn->m = m;
