@@ -898,8 +898,9 @@ int nntp_select_server2(struct NntpAccountData *adata)
     return -1;
 
   /* check for new newsgroups */
-  if (nntp_check_new_groups(adata) < 0)
-    return -1;
+  nntp_check_new_groups(adata);
+  // if (nntp_check_new_groups(adata) < 0)
+  //   return -1;
 
   /* try to create cache directory and enable caching */
   adata->cacheable = false;
@@ -960,6 +961,28 @@ int nntp_select_server2(struct NntpAccountData *adata)
 
   return adata;
 #endif
+
+  if (NntpCheckSubscribed)
+  {
+    char buf[PATH_MAX];
+    struct Buffer *err = mutt_buffer_alloc(PATH_MAX);
+    struct Buffer *token = mutt_buffer_alloc(PATH_MAX);
+
+    for (size_t i = 0; i < adata->groups_num; i++)
+    {
+      struct NntpMboxData *mdata = adata->groups_list[i];
+      snprintf(buf, sizeof(buf), "mailboxes news://%s/%s", adata->conn_account.host, mdata->group);
+      if (mutt_parse_rc_line(buf, token, err))
+      {
+        mutt_debug(1, "Error adding subscribed mailbox: %s\n", err->data);
+        mutt_buffer_reset(err);
+      }
+    }
+
+    mutt_buffer_free(&err);
+    mutt_buffer_free(&token);
+  }
+
   return 0;
 }
 
