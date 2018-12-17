@@ -32,6 +32,7 @@
 #include "config.h"
 #include <ctype.h>
 #include <limits.h>
+#include <netdb.h>
 #include <stdbool.h>
 #include <string.h>
 #include <strings.h>
@@ -147,10 +148,9 @@ void nntp_hashelem_free(int type, void *obj, intptr_t data)
  * nntp_adata_new - Allocate and initialise a new NntpAccountData structure
  * @retval ptr New NntpAccountData
  */
-struct NntpAccountData *nntp_adata_new(struct Connection *conn)
+struct NntpAccountData *nntp_adata_new(void)
 {
   struct NntpAccountData *adata = mutt_mem_calloc(1, sizeof(struct NntpAccountData));
-  adata->conn = conn;
   adata->groups_hash = mutt_hash_new(1009, 0);
   mutt_hash_set_destructor(adata->groups_hash, nntp_hashelem_free, 0);
   adata->groups_max = 16;
@@ -1796,6 +1796,72 @@ static int fetch_children(char *line, void *data)
 }
 
 /**
+ * nntp_parse_path - Parse an NNTP mailbox name into ConnAccount, name
+ * @param path       Mailbox path to parse
+ * @param account    Account credentials
+ * @param mailbox    Buffer for mailbox name
+ * @param mailboxlen Length of buffer
+ * @retval  0 Success
+ * @retval -1 Failure
+ *
+ * Given an NNTP mailbox name, return host, port and a path NNTP servers will
+ * recognize.  mx.mbox is malloc'd, caller must free it
+ */
+int nntp_parse_path(const char *path, struct ConnAccount *account, char *mailbox, size_t mailboxlen)
+{
+  static unsigned short NntpPort = 0;
+  static unsigned short NntpsPort = 0;
+  struct servent *service = NULL;
+
+  if (!NntpPort)
+  {
+    service = getservbyname("nntp", "tcp");
+    if (service)
+      NntpPort = ntohs(service->s_port);
+    else
+      NntpPort = NNTP_PORT;
+    mutt_debug(3, "Using default NNTP port %d\n", NntpPort);
+  }
+  if (!NntpsPort)
+  {
+    service = getservbyname("nntps", "tcp");
+    if (service)
+      NntpsPort = ntohs(service->s_port);
+    else
+      NntpsPort = NNTP_SSL_PORT;
+    mutt_debug(3, "Using default NNTPS port %d\n", NntpsPort);
+  }
+
+  /* Defaults */
+  memset(account, 0, sizeof(struct ConnAccount));
+  account->port = NntpPort;
+  account->type = MUTT_ACCT_TYPE_NNTP;
+
+  struct Url *url = url_parse(path);
+  if (url && (url->scheme == U_NNTP || url->scheme == U_NNTPS))
+  {
+    if (mutt_account_fromurl(account, url) < 0 || !*account->host)
+    {
+      url_free(&url);
+      return -1;
+    }
+    if (url->scheme == U_NNTPS)
+      account->flags |= MUTT_ACCT_SSL;
+
+    mutt_str_strfcpy(mailbox, url->path, mailboxlen);
+
+    url_free(&url);
+  }
+  else
+    return -1;
+
+  if ((account->flags & MUTT_ACCT_SSL) && !(account->flags & MUTT_ACCT_PORT))
+    account->port = NntpsPort;
+
+  return 0;
+}
+
+/**
  * nntp_open_connection - Connect to server, authenticate and get capabilities
  * @param adata NNTP server
  * @retval  0 Success
@@ -2383,27 +2449,21 @@ int nntp_compare_order(const void *a, const void *b)
  */
 struct Account *nntp_ac_find(struct Account *a, const char *path)
 {
-#if 0
-  if (!a || (a->type != MUTT_NNTP) || !path)
+  if (!a || (a->magic != MUTT_NNTP) || !path)
     return NULL;
 
-  struct Url url;
-  char tmp[PATH_MAX];
-  mutt_str_strfcpy(tmp, path, sizeof(tmp));
-  url_parse(&url, tmp);
+  struct Url *url = url_parse(path);
 
-  struct ImapAccountData *adata = a->data;
+  struct NntpAccountData *adata = a->adata;
   struct ConnAccount *ac = &adata->conn_account;
 
-  if (mutt_str_strcasecmp(url.host, ac->host) != 0)
-    return NULL;
+  if ((mutt_str_strcasecmp(url->host, ac->host) != 0) ||
+      (mutt_str_strcasecmp(url->user, ac->user) != 0))
+  {
+    a = NULL;
+  }
 
-  if (mutt_str_strcasecmp(url.user, ac->user) != 0)
-    return NULL;
-
-  // if (mutt_str_strcmp(path, a->mailbox->realpath) == 0)
-  //   return a;
-#endif
+  url_free(&url);
   return a;
 }
 
@@ -2414,6 +2474,26 @@ int nntp_ac_add(struct Account *a, struct Mailbox *m)
 {
   if (!a || !m || m->magic != MUTT_NNTP)
     return -1;
+
+  struct NntpAccountData *adata = a->adata;
+  if (!adata)
+  {
+    struct ConnAccount conn_account;
+    char mailbox[PATH_MAX];
+
+    if (nntp_parse_path(m->path, &conn_account, mailbox, sizeof(mailbox)) < 0)
+      return -1;
+
+    adata = nntp_adata_new();
+    adata->conn_account = conn_account;
+    adata->conn = mutt_conn_new(&conn_account);
+    if (!adata->conn)
+      return -1;
+
+    a->adata = adata;
+    a->free_adata = nntp_adata_free;
+  }
+
   return 0;
 }
 

@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
+#include "conn/conn.h"
 #include "format_flags.h"
 #include "mx.h"
 
@@ -101,9 +102,10 @@ struct NntpAccountData
   time_t check_time;
   unsigned int groups_num;
   unsigned int groups_max;
-  void **groups_list;
+  struct NntpMboxData **groups_list;
   struct Hash *groups_hash;
   struct Connection *conn;
+  struct ConnAccount conn_account;
 };
 
 /**
