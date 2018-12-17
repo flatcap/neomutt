@@ -65,8 +65,6 @@
 char *NewsCacheDir; ///< Config: (nntp) Directory for cached news articles
 char *Newsrc; ///< Config: (nntp) File containing list of subscribed newsgroups
 
-struct BodyCache;
-
 /**
  * mdata_find - Find NntpMboxData for given newsgroup or add it
  * @param adata NNTP server
@@ -171,8 +169,9 @@ void nntp_group_unread_stat(struct NntpMboxData *mdata)
  */
 int nntp_newsrc_parse(struct NntpAccountData *adata)
 {
-  char *line = NULL;
-  struct stat sb;
+  if (!adata)
+    return -1;
+
 
   if (adata->newsrc_fp)
   {
@@ -202,14 +201,15 @@ int nntp_newsrc_parse(struct NntpAccountData *adata)
     return -1;
   }
 
-  if (stat(adata->newsrc_file, &sb))
+  struct stat sb;
+  if (stat(adata->newsrc_file, &sb) != 0)
   {
     mutt_perror(adata->newsrc_file);
     nntp_newsrc_close(adata);
     return -1;
   }
 
-  if (adata->size == sb.st_size && adata->mtime == sb.st_mtime)
+  if ((adata->size == sb.st_size) && (adata->mtime == sb.st_mtime))
     return 0;
 
   adata->size = sb.st_size;
@@ -230,7 +230,7 @@ int nntp_newsrc_parse(struct NntpAccountData *adata)
     FREE(&mdata->newsrc_ent);
   }
 
-  line = mutt_mem_malloc(sb.st_size + 1);
+  char *line = mutt_mem_malloc(sb.st_size + 1);
   while (sb.st_size && fgets(line, sb.st_size + 1, adata->newsrc_fp))
   {
     char *b = NULL, *h = NULL;

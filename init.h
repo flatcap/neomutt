@@ -2165,8 +2165,8 @@ struct ConfigDef MuttVars[] = {
   /*
   ** .pp
   ** The file, containing info about subscribed newsgroups - names and
-  ** indexes of read articles.  The following printf-style sequence
-  ** is understood:
+  ** indexes of read articles.  The following printf-style sequences
+  ** are understood:
   ** .dl
   ** .dt \fBExpando\fP .dd \fBDescription\fP .dd \fBExample\fP
   ** .dt %a .dd Account url       .dd \fCnews:news.gmane.org\fP
