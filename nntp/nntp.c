@@ -46,6 +46,7 @@
 #include "nntp.h"
 #include "account.h"
 #include "bcache.h"
+#include "browser.h"
 #include "context.h"
 #include "curs_lib.h"
 #include "globals.h"
@@ -2446,6 +2447,191 @@ int nntp_compare_order(const void *a, const void *b)
   int result = (na == nb) ? 0 : (na > nb) ? 1 : -1;
   result = perform_auxsort(result, a, b);
   return SORTCODE(result);
+}
+
+/**
+ * nntp_browse - NNTP hook into the folder browser
+ * @param path  Current folder
+ * @param state BrowserState to populate
+ * @retval  0 Success
+ * @retval -1 Failure
+ *
+ * Fill out browser_state, given a current folder to browse
+ */
+int nntp_browse(char *path, struct BrowserState *state)
+{
+  return -1;
+#if 0
+  struct NntpAccountData *adata = NULL;
+  struct NntpList list;
+  struct ConnAccount conn_account;
+  char buf[PATH_MAX];
+  char mbox[PATH_MAX];
+  char munged_mbox[PATH_MAX];
+  char list_cmd[5];
+  int n;
+  char ctmp;
+  bool showparents = false;
+  bool save_lsub;
+
+  if (nntp_parse_path(path, &conn_account, buf, sizeof(buf)))
+  {
+    mutt_error(_("%s is an invalid NNTP path"), path);
+    return -1;
+  }
+
+  save_lsub = NntpCheckSubscribed;
+  NntpCheckSubscribed = false;
+  mutt_str_strfcpy(list_cmd, NntpListSubscribed ? "LSUB" : "LIST", sizeof(list_cmd));
+
+  // Pick first mailbox connected to the same server
+  struct MailboxNode *np = NULL;
+  STAILQ_FOREACH(np, &AllMailboxes, entries)
+  {
+    if (np->m->magic != MUTT_NNTP)
+      continue;
+
+    adata = nntp_adata_get(np->m);
+    // Pick first mailbox connected on the same server
+    if (nntp_account_match(&adata->conn_account, &conn_account))
+      break;
+    adata = NULL;
+  }
+  if (!adata)
+    goto fail;
+
+  mutt_message(_("Getting folder list..."));
+
+  /* skip check for parents when at the root */
+  if (buf[0] != '\0')
+  {
+    nntp_fix_path(adata->delim, buf, mbox, sizeof(mbox));
+    n = mutt_str_strlen(mbox);
+  }
+  else
+  {
+    mbox[0] = '\0';
+    n = 0;
+  }
+
+  if (n)
+  {
+    int rc;
+    mutt_debug(3, "mbox: %s\n", mbox);
+
+    /* if our target exists and has inferiors, enter it if we
+     * aren't already going to */
+    nntp_munge_mbox_name(adata->unicode, munged_mbox, sizeof(munged_mbox), mbox);
+    snprintf(buf, sizeof(buf), "%s \"\" %s", list_cmd, munged_mbox);
+    nntp_cmd_start(adata, buf);
+    adata->cmdresult = &list;
+    do
+    {
+      list.name = 0;
+      rc = nntp_cmd_step(adata);
+      if (rc == NNTP_CMD_CONTINUE && list.name)
+      {
+        if (!list.noinferiors && list.name[0] &&
+            (nntp_mxcmp(list.name, mbox) == 0) && n < sizeof(mbox) - 1)
+        {
+          mbox[n++] = list.delim;
+          mbox[n] = '\0';
+        }
+      }
+    } while (rc == NNTP_CMD_CONTINUE);
+    adata->cmdresult = NULL;
+
+    /* if we're descending a folder, mark it as current in browser_state */
+    if (mbox[n - 1] == list.delim)
+    {
+      showparents = true;
+      nntp_qualify_path(buf, sizeof(buf), &conn_account, mbox);
+      state->folder = mutt_str_strdup(buf);
+      n--;
+    }
+
+    /* Find superiors to list
+     * Note: UW-NNTP servers return folder + delimiter when asked to list
+     *  folder + delimiter. Cyrus servers don't. So we ask for folder,
+     *  and tack on delimiter ourselves.
+     * Further note: UW-NNTP servers return nothing when asked for
+     *  NAMESPACES without delimiters at the end. Argh! */
+    for (n--; n >= 0 && mbox[n] != list.delim; n--)
+      ;
+    if (n > 0) /* "aaaa/bbbb/" -> "aaaa" */
+    {
+      /* forget the check, it is too delicate (see above). Have we ever
+       * had the parent not exist? */
+      ctmp = mbox[n];
+      mbox[n] = '\0';
+
+      if (showparents)
+      {
+        mutt_debug(3, "adding parent %s\n", mbox);
+        add_folder(list.delim, mbox, true, false, state, true);
+      }
+
+      /* if our target isn't a folder, we are in our superior */
+      if (!state->folder)
+      {
+        /* store folder with delimiter */
+        mbox[n++] = ctmp;
+        ctmp = mbox[n];
+        mbox[n] = '\0';
+        nntp_qualify_path(buf, sizeof(buf), &conn_account, mbox);
+        state->folder = mutt_str_strdup(buf);
+      }
+      mbox[n] = ctmp;
+    }
+    /* "/bbbb/" -> add  "/", "aaaa/" -> add "" */
+    else
+    {
+      char relpath[2];
+      /* folder may be "/" */
+      snprintf(relpath, sizeof(relpath), "%c", n < 0 ? '\0' : adata->delim);
+      if (showparents)
+        add_folder(adata->delim, relpath, true, false, state, true);
+      if (!state->folder)
+      {
+        nntp_qualify_path(buf, sizeof(buf), &conn_account, relpath);
+        state->folder = mutt_str_strdup(buf);
+      }
+    }
+  }
+
+  /* no namespace, no folder: set folder to host only */
+  if (!state->folder)
+  {
+    nntp_qualify_path(buf, sizeof(buf), &conn_account, NULL);
+    state->folder = mutt_str_strdup(buf);
+  }
+
+  mutt_debug(3, "Quoting mailbox scan: %s -> ", mbox);
+  snprintf(buf, sizeof(buf), "%s%%", mbox);
+  nntp_munge_mbox_name(adata->unicode, munged_mbox, sizeof(munged_mbox), buf);
+  mutt_debug(3, "%s\n", munged_mbox);
+  snprintf(buf, sizeof(buf), "%s \"\" %s", list_cmd, munged_mbox);
+  if (browse_add_list_result(adata, buf, state, false))
+    goto fail;
+
+  if (state->entrylen == 0)
+  {
+    mutt_error(_("No such folder"));
+    goto fail;
+  }
+
+  mutt_clear_error();
+
+  if (save_lsub)
+    NntpCheckSubscribed = true;
+
+  return 0;
+
+fail:
+  if (save_lsub)
+    NntpCheckSubscribed = true;
+  return -1;
+#endif
 }
 
 /**

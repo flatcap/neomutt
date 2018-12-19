@@ -1855,6 +1855,15 @@ void mutt_select_file(char *file, size_t filelen, int flags, char ***files, int 
           menu->data = state.entry;
         }
 #endif
+#ifdef USE_NNTP
+        else if (nntp_path_probe(LastDir, NULL) == MUTT_NNTP)
+        {
+          init_state(&state, NULL);
+          nntp_browse(LastDir, &state);
+          browser_sort(&state);
+          menu->data = state.entry;
+        }
+#endif
         else if (examine_directory(menu, &state, LastDir, prefix) == -1)
           goto bail;
         init_menu(&state, menu, title, sizeof(title), mailbox);
