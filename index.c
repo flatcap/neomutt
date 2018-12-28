@@ -569,8 +569,8 @@ static int main_change_folder(struct Menu *menu, int op, struct Mailbox *m,
   enum MailboxType magic = mx_path_probe(buf, NULL);
   if ((magic == MUTT_MAILBOX_ERROR) || (magic == MUTT_UNKNOWN))
   {
-    // Try and see if the buffer matches a description before we bail. We'll receive a
-    // non-null pointer if there is a corresponding mailbox.
+    // Try to see if the buffer matches a description before we bail.
+    // We'll receive a non-null pointer if there is a corresponding mailbox.
     m = mutt_find_mailbox_desc(buf);
     if (m)
     {
@@ -637,7 +637,13 @@ static int main_change_folder(struct Menu *menu, int op, struct Mailbox *m,
 
   const int flags =
       (ReadOnly || (op == OP_MAIN_CHANGE_FOLDER_READONLY)) ? MUTT_READONLY : 0;
-  Context = mx_mbox_open(m, buf, flags);
+  bool free_m = false;
+  if (!m)
+  {
+    m = mx_path_resolve(buf);
+    free_m = true;
+  }
+  Context = mx_mbox_open(m, NULL, flags);
   if (Context)
   {
     menu->current = ci_first_message();
@@ -646,7 +652,11 @@ static int main_change_folder(struct Menu *menu, int op, struct Mailbox *m,
 #endif
   }
   else
+  {
     menu->current = 0;
+    if (free_m)
+      mailbox_free(&m);
+  }
 
   if (((Sort & SORT_MASK) == SORT_THREADS) && CollapseAll)
     collapse_all(menu, 0);
