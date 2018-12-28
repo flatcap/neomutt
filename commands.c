@@ -1088,101 +1088,103 @@ int mutt_save_message(struct Email *e, bool delete, bool decode, bool decrypt)
   }
 #endif
 
-  savectx = mx_mbox_open(NULL, buf, MUTT_APPEND);
-  if (savectx)
+  struct Mailbox *m_save = mx_path_resolve(buf);
+  savectx = mx_mbox_open(m_save, NULL, MUTT_APPEND);
+  if (!savectx)
   {
+    mailbox_free(&m_save);
+    return -1;
+  }
+
 #ifdef USE_COMPRESSED
-    /* If we're saving to a compressed mailbox, the stats won't be updated
-     * until the next open.  Until then, improvise. */
-    struct Mailbox *cm = NULL;
-    if (savectx->mailbox->compress_info)
-    {
-      cm = mutt_find_mailbox(savectx->mailbox->realpath);
-    }
-    /* We probably haven't been opened yet */
-    if (cm && (cm->msg_count == 0))
-      cm = NULL;
+  /* If we're saving to a compressed mailbox, the stats won't be updated
+   * until the next open.  Until then, improvise. */
+  struct Mailbox *cm = NULL;
+  if (savectx->mailbox->compress_info)
+  {
+    cm = mutt_find_mailbox(savectx->mailbox->realpath);
+  }
+  /* We probably haven't been opened yet */
+  if (cm && (cm->msg_count == 0))
+    cm = NULL;
 #endif
-    if (e)
+  if (e)
+  {
+    if (mutt_save_message_ctx(e, delete, decode, decrypt, savectx->mailbox) != 0)
     {
-      if (mutt_save_message_ctx(e, delete, decode, decrypt, savectx->mailbox) != 0)
+      mx_mbox_close(&savectx);
+      return -1;
+    }
+#ifdef USE_COMPRESSED
+    if (cm)
+    {
+      cm->msg_count++;
+      if (!e->read)
       {
-        mx_mbox_close(&savectx);
-        return -1;
+        cm->msg_unread++;
+        if (!e->old)
+          cm->msg_new++;
       }
+      if (e->flagged)
+        cm->msg_flagged++;
+    }
+#endif
+  }
+  else
+  {
+    int rc = 0;
+
+#ifdef USE_NOTMUCH
+    if (Context->mailbox->magic == MUTT_NOTMUCH)
+      nm_db_longrun_init(Context->mailbox, true);
+#endif
+    for (int i = 0; i < Context->mailbox->msg_count; i++)
+    {
+      if (!message_is_tagged(Context, i))
+        continue;
+
+      mutt_message_hook(Context->mailbox, Context->mailbox->emails[i], MUTT_MESSAGE_HOOK);
+      rc = mutt_save_message_ctx(Context->mailbox->emails[i], delete, decode,
+                                 decrypt, savectx->mailbox);
+      if (rc != 0)
+        break;
 #ifdef USE_COMPRESSED
       if (cm)
       {
+        struct Email *e2 = Context->mailbox->emails[i];
         cm->msg_count++;
-        if (!e->read)
+        if (!e2->read)
         {
           cm->msg_unread++;
-          if (!e->old)
+          if (!e2->old)
             cm->msg_new++;
         }
-        if (e->flagged)
+        if (e2->flagged)
           cm->msg_flagged++;
       }
 #endif
     }
-    else
+#ifdef USE_NOTMUCH
+    if (Context->mailbox->magic == MUTT_NOTMUCH)
+      nm_db_longrun_done(Context->mailbox);
+#endif
+    if (rc != 0)
     {
-      int rc = 0;
-
-#ifdef USE_NOTMUCH
-      if (Context->mailbox->magic == MUTT_NOTMUCH)
-        nm_db_longrun_init(Context->mailbox, true);
-#endif
-      for (int i = 0; i < Context->mailbox->msg_count; i++)
-      {
-        if (!message_is_tagged(Context, i))
-          continue;
-
-        mutt_message_hook(Context->mailbox, Context->mailbox->emails[i], MUTT_MESSAGE_HOOK);
-        rc = mutt_save_message_ctx(Context->mailbox->emails[i], delete, decode,
-                                   decrypt, savectx->mailbox);
-        if (rc != 0)
-          break;
-#ifdef USE_COMPRESSED
-        if (cm)
-        {
-          struct Email *e2 = Context->mailbox->emails[i];
-          cm->msg_count++;
-          if (!e2->read)
-          {
-            cm->msg_unread++;
-            if (!e2->old)
-              cm->msg_new++;
-          }
-          if (e2->flagged)
-            cm->msg_flagged++;
-        }
-#endif
-      }
-#ifdef USE_NOTMUCH
-      if (Context->mailbox->magic == MUTT_NOTMUCH)
-        nm_db_longrun_done(Context->mailbox);
-#endif
-      if (rc != 0)
-      {
-        mx_mbox_close(&savectx);
-        return -1;
-      }
+      mx_mbox_close(&savectx);
+      return -1;
     }
-
-    const bool need_mailbox_cleanup = ((savectx->mailbox->magic == MUTT_MBOX) ||
-                                       (savectx->mailbox->magic == MUTT_MMDF));
-
-    mx_mbox_close(&savectx);
-
-    if (need_mailbox_cleanup)
-      mutt_mailbox_cleanup(buf, &st);
-
-    mutt_clear_error();
-    return 0;
   }
 
-  return -1;
+  const bool need_mailbox_cleanup = ((savectx->mailbox->magic == MUTT_MBOX) ||
+                                     (savectx->mailbox->magic == MUTT_MMDF));
+
+  mx_mbox_close(&savectx);
+
+  if (need_mailbox_cleanup)
+    mutt_mailbox_cleanup(buf, &st);
+
+  mutt_clear_error();
+  return 0;
 }
 
 /**
