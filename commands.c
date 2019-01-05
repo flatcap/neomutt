@@ -1068,8 +1068,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
 #endif
 
   struct Mailbox *m_save = mx_path_resolve(buf);
-  struct Context ctx_save = ctx_open(m_save, MUTT_APPEND);
-  if (!ctx_save)
+  if (mx_mbox_open(m_save, MUTT_APPEND) != 0)
   {
     mailbox_free(&m_save);
     return -1;
@@ -1079,9 +1078,9 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
   /* If we're saving to a compressed mailbox, the stats won't be updated
    * until the next open.  Until then, improvise. */
   struct Mailbox *m_comp = NULL;
-  if (ctx_save->mailbox->compress_info)
+  if (m_save->compress_info)
   {
-    m_comp = mutt_find_mailbox(ctx_save->mailbox->realpath);
+    m_comp = mutt_find_mailbox(m_save->realpath);
   }
   /* We probably haven't been opened yet */
   if (m_comp && (m_comp->msg_count == 0))
@@ -1089,9 +1088,9 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
 #endif
   if (single)
   {
-    if (mutt_save_message_ctx(en->email, delete, decode, decrypt, ctx_save->mailbox) != 0)
+    if (mutt_save_message_ctx(en->email, delete, decode, decrypt, m_save) != 0)
     {
-      ctx_close(&ctx_save);
+      mx_mbox_close(&m_save);
       return -1;
     }
 #ifdef USE_COMPRESSED
@@ -1120,7 +1119,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
     STAILQ_FOREACH(en, el, entries)
     {
       mutt_message_hook(m, en->email, MUTT_MESSAGE_HOOK);
-      rc = mutt_save_message_ctx(en->email, delete, decode, decrypt, ctx_save->mailbox);
+      rc = mutt_save_message_ctx(en->email, delete, decode, decrypt, m_save);
       if (rc != 0)
         break;
 #ifdef USE_COMPRESSED
@@ -1145,15 +1144,15 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
 #endif
     if (rc != 0)
     {
-      ctx_close(&ctx_save);
+      mx_mbox_close(&m_save);
       return -1;
     }
   }
 
-  const bool need_mailbox_cleanup = ((ctx_save->mailbox->magic == MUTT_MBOX) ||
-                                     (ctx_save->mailbox->magic == MUTT_MMDF));
+  const bool need_mailbox_cleanup = ((m_save->magic == MUTT_MBOX) ||
+                                     (m_save->magic == MUTT_MMDF));
 
-  ctx_close(&ctx_save);
+  mx_mbox_close(&m_save);
 
   if (need_mailbox_cleanup)
     mutt_mailbox_cleanup(buf, &st);

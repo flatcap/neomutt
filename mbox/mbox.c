@@ -1783,15 +1783,11 @@ static int mbox_mbox_check_stats(struct Mailbox *m, int flags)
 
   if (mutt_file_stat_timespec_compare(&sb, MUTT_STAT_MTIME, &m->stats_last_checked) > 0)
   {
-    struct Context *ctx = ctx_open(m, MUTT_QUIET | MUTT_NOSORT | MUTT_PEEK);
-    if (ctx)
-    {
-      m->msg_count = ctx->mailbox->msg_count;
-      m->msg_unread = ctx->mailbox->msg_unread;
-      m->msg_flagged = ctx->mailbox->msg_flagged;
-      m->stats_last_checked = ctx->mailbox->mtime;
-      ctx_close(&ctx);
-    }
+    if (m->magic == MUTT_MBOX)
+      mbox_parse_mailbox(m);
+    else if (m->magic == MUTT_MMDF)
+      mmdf_parse_mailbox(m);
+    m->stats_last_checked = m->mtime;
   }
 
   return 0;

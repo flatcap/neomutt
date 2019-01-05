@@ -87,12 +87,20 @@ struct MailboxList AllMailboxes = STAILQ_HEAD_INITIALIZER(AllMailboxes);
 
 /**
  * mailbox_new - Create a new Mailbox
+ * @param path Mailbox path
  * @retval ptr New Mailbox
  */
-struct Mailbox *mailbox_new(void)
+struct Mailbox *mailbox_new(const char *path, const char *folder)
 {
   struct Mailbox *m = mutt_mem_calloc(1, sizeof(struct Mailbox));
 
+  if (path)
+  {
+    mutt_str_strfcpy(m->path, path, sizeof(m->path));
+    mx_path_canon2(m, folder);
+  }
+
+  m->opened = 1;
   return m;
 }
 

@@ -2365,11 +2365,7 @@ int mutt_index_menu(void)
         if ((menu->menu == MENU_MAIN) &&
             (query_quadoption(C_Quit, _("Exit NeoMutt without saving?")) == MUTT_YES))
         {
-          if (Context)
-          {
-            mx_fastclose_mailbox(Context->mailbox);
-            ctx_free(&Context);
-          }
+          ctx_free(&Context);
           done = true;
         }
         break;

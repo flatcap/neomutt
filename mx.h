@@ -32,7 +32,6 @@
 #include "hcache/hcache.h"
 
 struct Email;
-struct Context;
 struct Mailbox;
 struct stat;
 
@@ -301,7 +300,7 @@ struct MxOps
 /* Wrappers for the Mailbox API, see MxOps */
 int             mx_mbox_check      (struct Mailbox *m, int *index_hint);
 int             mx_mbox_check_stats(struct Mailbox *m, int flags);
-int             mx_mbox_close      (struct Mailbox *m);
+int             mx_mbox_close      (struct Mailbox **ptr);
 int             mx_mbox_create     (struct Mailbox *m);
 int             mx_mbox_delete     (struct Mailbox *m);
 int             mx_mbox_open       (struct Mailbox *m, OpenMailboxFlags flags);

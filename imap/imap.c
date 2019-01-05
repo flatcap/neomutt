@@ -1314,7 +1314,11 @@ int imap_path_status(const char *path, bool queue)
 {
   struct Mailbox *m = mx_mbox_find2(path);
   if (m)
-    return imap_mailbox_status(m, queue);
+  {
+    int rc = imap_mailbox_status(m, queue);
+    mx_mbox_close(&m);
+    return rc;
+  }
 
   // FIXME(sileht): Is that case possible ?
   struct ImapAccountData *adata = NULL;
@@ -2007,7 +2011,10 @@ static int imap_mbox_open(struct Mailbox *m)
   struct ImapAccountData *postponed_adata = imap_adata_get(m_postponed);
   if (postponed_adata &&
       mutt_account_match(&postponed_adata->conn_account, &adata->conn_account))
+  {
     imap_mailbox_status(m_postponed, true);
+  }
+  mx_mbox_close(&m_postponed);
 
   if (C_ImapCheckSubscribed)
     imap_exec(adata, "LSUB \"\" \"*\"", IMAP_CMD_QUEUE);

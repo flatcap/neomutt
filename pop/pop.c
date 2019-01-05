@@ -648,8 +648,7 @@ void pop_fetch_mail(void)
   }
 
   struct Mailbox *m_spool = mx_path_resolve(C_Spoolfile);
-  struct Context *ctx = ctx_open(m_spool, MUTT_APPEND);
-  if (!ctx)
+  if (mx_mbox_open(m_spool, MUTT_APPEND) != 0)
   {
     mailbox_free(&m_spool);
     goto finish;
@@ -666,7 +665,7 @@ void pop_fetch_mail(void)
 
   for (int i = last + 1; i <= msgs; i++)
   {
-    struct Message *msg = mx_msg_open_new(ctx->mailbox, NULL, MUTT_ADD_FROM);
+    struct Message *msg = mx_msg_open_new(m_spool, NULL, MUTT_ADD_FROM);
     if (!msg)
       ret = -3;
     else
@@ -676,13 +675,13 @@ void pop_fetch_mail(void)
       if (ret == -3)
         rset = 1;
 
-      if ((ret == 0) && (mx_msg_commit(ctx->mailbox, msg) != 0))
+      if ((ret == 0) && (mx_msg_commit(m_spool, msg) != 0))
       {
         rset = 1;
         ret = -3;
       }
 
-      mx_msg_close(ctx->mailbox, &msg);
+      mx_msg_close(m_spool, &msg);
     }
 
     if ((ret == 0) && (delanswer == MUTT_YES))
@@ -694,7 +693,7 @@ void pop_fetch_mail(void)
 
     if (ret == -1)
     {
-      ctx_close(&ctx);
+      mx_mbox_close(&m_spool);
       goto fail;
     }
     if (ret == -2)
@@ -715,7 +714,7 @@ void pop_fetch_mail(void)
                  msgbuf, i - last, msgs - last);
   }
 
-  ctx_close(&ctx);
+  mx_mbox_close(&m_spool);
 
   if (rset)
   {

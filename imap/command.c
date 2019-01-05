@@ -817,7 +817,7 @@ static void cmd_parse_status(struct ImapAccountData *adata, char *s)
   if (!mdata)
   {
     mutt_debug(LL_DEBUG3, "Received status for an unexpected mailbox: %s\n", mailbox);
-    return;
+    goto cps_out;
   }
   olduv = mdata->uid_validity;
   oldun = mdata->uid_next;
@@ -825,7 +825,7 @@ static void cmd_parse_status(struct ImapAccountData *adata, char *s)
   if (*s++ != '(')
   {
     mutt_debug(LL_DEBUG1, "Error parsing STATUS\n");
-    return;
+    goto cps_out;
   }
   while (*s && (*s != ')'))
   {
@@ -836,7 +836,7 @@ static void cmd_parse_status(struct ImapAccountData *adata, char *s)
     if (((errno == ERANGE) && (ulcount == ULONG_MAX)) || ((unsigned int) ulcount != ulcount))
     {
       mutt_debug(LL_DEBUG1, "Error parsing STATUS number\n");
-      return;
+      goto cps_out;
     }
     const unsigned int count = (unsigned int) ulcount;
 
@@ -895,6 +895,8 @@ static void cmd_parse_status(struct ImapAccountData *adata, char *s)
   // force back to keep detecting new mail until the mailbox is opened
   if (m->has_new)
     mdata->uid_next = oldun;
+cps_out:
+  mx_mbox_close(&m);
 }
 
 /**

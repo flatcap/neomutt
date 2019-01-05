@@ -28,6 +28,7 @@
 #include <time.h>
 #include "conn/conn.h"
 
+struct ConnAccount;
 struct Mailbox;
 struct Progress;
 
