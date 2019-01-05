@@ -603,7 +603,7 @@ static int main_change_folder(struct Menu *menu, int op, struct Mailbox *m,
       new_last_folder = mutt_str_strdup(Context->mailbox->path);
     *oldcount = Context ? Context->mailbox->msg_count : 0;
 
-    int check = mx_mbox_close(&Context);
+    int check = ctx_close(&Context);
     if (check != 0)
     {
 #ifdef USE_INOTIFY
@@ -643,7 +643,7 @@ static int main_change_folder(struct Menu *menu, int op, struct Mailbox *m,
     m = mx_path_resolve(buf);
     free_m = true;
   }
-  Context = mx_mbox_open(m, flags);
+  Context = ctx_open(m, flags);
   if (Context)
   {
     menu->current = ci_first_message();
@@ -1683,7 +1683,7 @@ int mutt_index_menu(void)
 
           mutt_startup_shutdown_hook(MUTT_SHUTDOWN_HOOK);
 
-          if (!Context || (check = mx_mbox_close(&Context)) == 0)
+          if (!Context || (check = ctx_close(&Context)) == 0)
             done = true;
           else
           {
@@ -1828,7 +1828,7 @@ int mutt_index_menu(void)
       case OP_MAIN_IMAP_LOGOUT_ALL:
         if (Context && Context->mailbox->magic == MUTT_IMAP)
         {
-          int check = mx_mbox_close(&Context);
+          int check = ctx_close(&Context);
           if (check != 0)
           {
             if ((check == MUTT_NEW_MAIL) || (check == MUTT_REOPENED))

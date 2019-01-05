@@ -238,9 +238,9 @@ void ctx_update_tables(struct Context *ctx, bool committing)
       if (m->id_hash && m->emails[i]->env->message_id)
         mutt_hash_delete(m->id_hash, m->emails[i]->env->message_id, m->emails[i]);
       mutt_label_hash_remove(m, m->emails[i]);
-      /* The path mx_mbox_check() -> imap_check_mailbox() ->
+      /* The path ctx_mbox_check() -> imap_check_mailbox() ->
        *          imap_expunge_mailbox() -> ctx_update_tables()
-       * can occur before a call to mx_mbox_sync(), resulting in
+       * can occur before a call to ctx_mbox_sync(), resulting in
        * last_tag being stale if it's not reset here.
        */
       if (ctx->last_tag == m->emails[i])
@@ -391,5 +391,62 @@ int el_add_email(struct EmailList *el, struct Email *e)
   en->email = e;
   STAILQ_INSERT_TAIL(el, en, entries);
 
+  return 0;
+}
+
+/**
+ * ctx_open - Open a mailbox and parse it
+ * @param m     Mailbox to open
+ * @param flags See mx_mbox_open()
+ * @retval ptr  Mailbox context
+ * @retval NULL Error
+ */
+struct Context *ctx_open(struct Mailbox *m, int flags)
+{
+  int rc = mx_mbox_open(m, flags);
+  if (rc < 0)
+    return NULL;
+
+  struct Context *ctx = mutt_mem_calloc(1, sizeof(*ctx));
+  ctx->mailbox = m;
+  ctx->mailbox->notify = ctx_mailbox_changed;
+  ctx->mailbox->ndata = ctx;
+  ctx->msgnotreadyet = -1;
+  ctx->collapsed = false;
+
+  ctx_update(ctx);
+
+  if ((flags & MUTT_NOSORT) == 0)
+  {
+    OptSortSubthreads = false;
+    OptNeedRescore = false;
+    mutt_sort_headers(ctx, true);
+  }
+
+  return ctx;
+}
+
+/**
+ * ctx_close - Save changes and close mailbox
+ * @param ptr Mailbox
+ * @retval  0 Success
+ * @retval -1 Failure
+ *
+ * @note Context will be freed after it's closed
+ */
+int ctx_close(struct Context **ptr)
+{
+  if (!ptr || !*ptr)
+    return 0;
+
+  struct Context *ctx = *ptr;
+  if (!ctx->mailbox)
+    return -1;
+
+  int rc = mx_mbox_close(ctx->mailbox);
+  if (rc < 0)
+    return -1;
+
+  FREE(ptr);
   return 0;
 }
