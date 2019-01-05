@@ -42,8 +42,8 @@ extern bool  MailCheckStats;
 extern short MailCheckStatsInterval;
 extern bool  MaildirCheckCur;
 
-#define MB_NORMAL 0
-#define MB_HIDDEN 1
+#define MB_HIDDEN  0
+#define MB_VISIBLE 1
 
 /**
  * enum MailboxNotification - Notifications about changes to a Mailbox
@@ -133,7 +133,7 @@ struct Mailbox
   struct Account *account;
   int opened;              /**< number of times mailbox is opened */
 
-  int flags; /**< e.g. #MB_NORMAL */
+  int flags; /**< e.g. #MB_VISIBLE */
 
   void *mdata;                 /**< driver specific data */
   void (*free_mdata)(void **); /**< driver-specific data free function */
@@ -155,7 +155,7 @@ STAILQ_HEAD(MailboxList, MailboxNode);
 
 extern struct MailboxList AllMailboxes; ///< List of all Mailboxes
 
-struct Mailbox *mailbox_new(void);
+struct Mailbox *mailbox_new(const char *path, const char *folder);
 void            mailbox_free(struct Mailbox **ptr);
 
 struct Mailbox *mutt_find_mailbox(const char *path);

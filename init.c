@@ -1331,20 +1331,19 @@ bail:
 static enum CommandResult parse_mailboxes(struct Buffer *buf, struct Buffer *s,
                                           unsigned long data, struct Buffer *err)
 {
+  char *desc = NULL;
+
   while (MoreArgs(s))
   {
-    struct Mailbox *m = mailbox_new();
-
     if (data & MUTT_NAMED)
     {
       mutt_extract_token(buf, s, 0);
       if (buf->data && *buf->data)
       {
-        m->desc = mutt_str_strdup(buf->data);
+        desc = mutt_str_strdup(buf->data);
       }
       else
       {
-        mailbox_free(&m);
         continue;
       }
     }
@@ -1353,39 +1352,35 @@ static enum CommandResult parse_mailboxes(struct Buffer *buf, struct Buffer *s,
     if (mutt_buffer_is_empty(buf))
     {
       /* Skip empty tokens. */
-      mailbox_free(&m);
       continue;
     }
 
-    mutt_str_strfcpy(m->path, buf->data, sizeof(m->path));
-    /* int rc = */ mx_path_canon2(m, Folder);
+    struct Mailbox *m = mx_mbox_find2(buf->data);
+    if (m)
+    {
+      if (m->flags == MB_HIDDEN)
+      {
+        m->flags = MB_VISIBLE;
+        struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
+        mn->m = m;
+        STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
+#ifdef USE_SIDEBAR
+        mutt_sb_notify_mailbox(m, true);
+#endif
+      }
+      mx_mbox_close(&m);
+      continue;
+    }
 
-    bool new_account = false;
+    m = mailbox_new(buf->data, Folder);
+    m->desc = desc;
+
     struct Account *a = mx_ac_find(m);
     if (!a)
     {
       a = account_new();
       a->magic = m->magic;
       TAILQ_INSERT_TAIL(&AllAccounts, a, entries);
-      new_account = true;
-    }
-
-    if (!new_account)
-    {
-      struct Mailbox *old_m = mx_mbox_find(a, m->realpath);
-      if (old_m)
-      {
-        if (old_m->flags == MB_HIDDEN)
-        {
-          old_m->flags = MB_NORMAL;
-          mutt_sb_notify_mailbox(old_m, true);
-          struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
-          mn->m = old_m;
-          STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
-        }
-        mailbox_free(&m);
-        continue;
-      }
     }
 
     if (mx_ac_add(a, m) < 0)

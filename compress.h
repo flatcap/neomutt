@@ -27,8 +27,6 @@
 #include <stdbool.h>
 #include "mx.h"
 
-struct Context;
-
 /**
  * struct CompressInfo - Private data for compress
  *

@@ -29,7 +29,6 @@
 #include "conn/conn.h"
 
 struct ConnAccount;
-struct Context;
 struct Mailbox;
 struct Progress;
 

@@ -44,13 +44,15 @@
  * ctx_free - Free a Context
  * @param ctx Context to free
  */
-void ctx_free(struct Context **ctx)
+void ctx_free(struct Context **ptr)
 {
-  if (!ctx || !*ctx)
+  if (!ptr || !*ptr)
     return;
 
-  mailbox_free(&(*ctx)->mailbox);
-  FREE(ctx);
+  struct Context *ctx = *ptr;
+
+  mx_mbox_close(&ctx->mailbox);
+  FREE(ptr);
 }
 
 /**
@@ -397,6 +399,29 @@ int el_add_email(struct EmailList *el, struct Email *e)
 }
 
 /**
+ * ctx_wrap - XXX
+ * @param m Mailbox
+ * @retval ptr XXX
+ */
+struct Context *ctx_wrap(struct Mailbox *m, int flags)
+{
+  struct Context *ctx = mutt_mem_calloc(1, sizeof(*ctx));
+  ctx->mailbox = m;
+  ctx->msgnotreadyet = -1;
+
+  ctx_update(ctx);
+
+  if ((flags & MUTT_NOSORT) == 0)
+  {
+    OptSortSubthreads = false;
+    OptNeedRescore = false;
+    mutt_sort_headers(ctx, true);
+  }
+
+  return ctx;
+}
+
+/**
  * ctx_open - Open a mailbox and parse it
  * @param m     Mailbox to open
  * @param flags See mx_mbox_open()
@@ -409,22 +434,9 @@ struct Context *ctx_open(struct Mailbox *m, int flags)
   if (rc < 0)
     return NULL;
 
-  struct Context *ctx = mutt_mem_calloc(1, sizeof(*ctx));
-  ctx->mailbox = m;
+  struct Context *ctx = ctx_wrap(m, flags);
   ctx->mailbox->notify = ctx_mailbox_changed;
   ctx->mailbox->ndata = ctx;
-  ctx->msgnotreadyet = -1;
-  ctx->collapsed = false;
-
-  ctx_update(ctx);
-
-  if ((flags & MUTT_NOSORT) == 0)
-  {
-    OptSortSubthreads = false;
-    OptNeedRescore = false;
-    mutt_sort_headers(ctx, true);
-  }
-
   return ctx;
 }
 
@@ -445,7 +457,7 @@ int ctx_close(struct Context **ptr)
   if (!ctx->mailbox)
     return -1;
 
-  int rc = mx_mbox_close(ctx->mailbox);
+  int rc = mx_mbox_close(&ctx->mailbox);
   if (rc < 0)
     return -1;
 

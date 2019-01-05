@@ -255,12 +255,6 @@ int mx_mbox_open(struct Mailbox *m, int flags)
   if (!m)
     return -1;
 
-  struct Context *ctx = mutt_mem_calloc(1, sizeof(*ctx));
-  ctx->mailbox = m;
-
-  m->notify = ctx_mailbox_changed;
-  m->ndata = ctx;
-
   if ((m->magic == MUTT_UNKNOWN) && (flags & (MUTT_NEWFOLDER | MUTT_APPEND)))
   {
     m->magic = MboxType;
@@ -484,23 +478,22 @@ static int trash_append(struct Mailbox *m)
 #endif
 
   struct Mailbox *m_trash = mx_path_resolve(Trash);
-  struct Context *ctx_trash = ctx_open(m_trash, MUTT_APPEND);
-  if (ctx_trash)
+  if (mx_mbox_open(m_trash, MUTT_APPEND) == 0)
   {
     /* continue from initial scan above */
     for (i = first_del; i < m->msg_count; i++)
     {
       if (m->emails[i]->deleted && (!m->emails[i]->purge))
       {
-        if (mutt_append_message(ctx_trash->mailbox, m, m->emails[i], 0, 0) == -1)
+        if (mutt_append_message(m_trash, m, m->emails[i], 0, 0) == -1)
         {
-          ctx_close(&ctx_trash);
+          mx_mbox_close(&m_trash);
           return -1;
         }
       }
     }
 
-    ctx_close(&ctx_trash);
+    mx_mbox_close(&m_trash);
   }
   else
   {
@@ -514,15 +507,27 @@ static int trash_append(struct Mailbox *m)
 
 /**
  * mx_mbox_close - Save changes and close mailbox
- * @param m Mailbox
+ * @param ptr Mailbox
  * @retval  0 Success
  * @retval -1 Failure
  */
-int mx_mbox_close(struct Mailbox *m)
+int mx_mbox_close(struct Mailbox **ptr)
 {
+  if (!ptr || !*ptr)
+    return -1;
+
+  struct Mailbox *m = *ptr;
+  // assert(m->opened > 0);
   int i, move_messages = 0, purge = 1, read_msgs = 0;
   char mbox[PATH_MAX];
   char buf[PATH_MAX + 64];
+
+  m->opened--;
+  if (m->opened > 0)
+  {
+    *ptr = NULL;
+    return 0;
+  }
 
   if (m->readonly || m->dontwrite || m->append)
   {
@@ -668,13 +673,13 @@ int mx_mbox_close(struct Mailbox *m)
           }
           else
           {
-            mx_mbox_close(m_read);
+            mx_mbox_close(&m_read);
             return -1;
           }
         }
       }
 
-      mx_mbox_close(m_read);
+      mx_mbox_close(&m_read);
     }
   }
   else if (!m->changed && m->msg_deleted == 0)
@@ -1453,6 +1458,8 @@ struct Mailbox *mx_mbox_find(struct Account *a, const char *path)
  * mx_mbox_find2 - XXX
  *
  * find a mailbox on an account
+ *
+ * @note Caller must mx_mbox_close() the result.
  */
 struct Mailbox *mx_mbox_find2(const char *path)
 {
@@ -1468,7 +1475,10 @@ struct Mailbox *mx_mbox_find2(const char *path)
   {
     struct Mailbox *m = mx_mbox_find(np, buf);
     if (m)
+    {
+      m->opened++;
       return m;
+    }
   }
 
   return NULL;
@@ -1476,6 +1486,8 @@ struct Mailbox *mx_mbox_find2(const char *path)
 
 /**
  * mx_path_resolve - XXX
+ *
+ * @note Caller must mx_mbox_close() the result.
  */
 struct Mailbox *mx_path_resolve(const char *path)
 {
@@ -1486,11 +1498,7 @@ struct Mailbox *mx_path_resolve(const char *path)
   if (m)
     return m;
 
-  m = mailbox_new();
-  m->flags = MB_HIDDEN;
-  mutt_str_strfcpy(m->path, path, sizeof(m->path));
-  mx_path_canon2(m, Folder);
-
+  m = mailbox_new(path, Folder);
   return m;
 }
 
