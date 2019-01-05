@@ -70,7 +70,7 @@ static int ev_message(enum EvMessage action, struct Mailbox *m, struct Email *e)
   MboxType = MUTT_MBOX;
 
   struct Mailbox *m_fname = mx_path_resolve(fname);
-  struct Context *tmpctx = mx_mbox_open(m_fname, MUTT_NEWFOLDER);
+  struct Context *tmpctx = ctx_open(m_fname, MUTT_NEWFOLDER);
 
   MboxType = omagic;
 
@@ -86,7 +86,7 @@ static int ev_message(enum EvMessage action, struct Mailbox *m, struct Email *e)
   rc = mutt_append_message(tmpctx->mailbox, m, e, 0, chflags);
   int oerrno = errno;
 
-  mx_mbox_close(&tmpctx);
+  ctx_close(&tmpctx);
 
   if (rc == -1)
   {
@@ -173,7 +173,7 @@ static int ev_message(enum EvMessage action, struct Mailbox *m, struct Email *e)
     goto bail;
   }
 
-  tmpctx = mx_mbox_open(m, MUTT_APPEND);
+  tmpctx = ctx_open(m, MUTT_APPEND);
   if (!tmpctx)
   {
     rc = -1;
@@ -209,7 +209,7 @@ static int ev_message(enum EvMessage action, struct Mailbox *m, struct Email *e)
   if (!msg)
   {
     mutt_error(_("Can't append to folder: %s"), strerror(errno));
-    mx_mbox_close(&tmpctx);
+    ctx_close(&tmpctx);
     goto bail;
   }
 
@@ -223,7 +223,7 @@ static int ev_message(enum EvMessage action, struct Mailbox *m, struct Email *e)
   rc = mx_msg_commit(tmpctx->mailbox, msg);
   mx_msg_close(tmpctx->mailbox, &msg);
 
-  mx_mbox_close(&tmpctx);
+  ctx_close(&tmpctx);
 
 bail:
   mutt_file_fclose(&fp);

@@ -656,7 +656,7 @@ void pop_fetch_mail(void)
   }
 
   struct Mailbox *m_spool = mx_path_resolve(Spoolfile);
-  struct Context *ctx = mx_mbox_open(m_spool, MUTT_APPEND);
+  struct Context *ctx = ctx_open(m_spool, MUTT_APPEND);
   if (!ctx)
   {
     mailbox_free(&m_spool);
@@ -701,7 +701,7 @@ void pop_fetch_mail(void)
 
     if (ret == -1)
     {
-      mx_mbox_close(&ctx);
+      ctx_close(&ctx);
       goto fail;
     }
     if (ret == -2)
@@ -722,7 +722,7 @@ void pop_fetch_mail(void)
                  msgbuf, i - last, msgs - last);
   }
 
-  mx_mbox_close(&ctx);
+  ctx_close(&ctx);
 
   if (rset)
   {
