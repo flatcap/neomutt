@@ -1445,7 +1445,7 @@ int mutt_compose_menu(struct Email *msg, char *fcc, size_t fcclen, struct Email 
         menu->redraw = REDRAW_FULL;
 
         struct Mailbox *m = mx_path_resolve(buf);
-        struct Context *ctx = mx_mbox_open(m, MUTT_READONLY);
+        struct Context *ctx = ctx_open(m, MUTT_READONLY);
         if (!ctx)
         {
           mutt_error(_("Unable to open mailbox %s"), buf);
@@ -1455,7 +1455,7 @@ int mutt_compose_menu(struct Email *msg, char *fcc, size_t fcclen, struct Email 
 
         if (ctx->mailbox->msg_count == 0)
         {
-          mx_mbox_close(&ctx);
+          ctx_close(&ctx);
           mutt_error(_("No messages in that folder"));
           break;
         }
@@ -1500,7 +1500,7 @@ int mutt_compose_menu(struct Email *msg, char *fcc, size_t fcclen, struct Email 
         menu->redraw |= REDRAW_FULL;
 
         if (op_close == OP_QUIT)
-          mx_mbox_close(&Context);
+          ctx_close(&Context);
         else
         {
           mx_fastclose_mailbox(Context->mailbox);

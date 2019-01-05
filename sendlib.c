@@ -3145,7 +3145,7 @@ int mutt_write_fcc(const char *path, struct Email *e, const char *msgid,
   mutt_folder_hook(path, NULL);
 #endif
   struct Mailbox *m_fcc = mx_path_resolve(path);
-  struct Context *ctx_fcc = mx_mbox_open(m_fcc, MUTT_APPEND | MUTT_QUIET);
+  struct Context *ctx_fcc = ctx_open(m_fcc, MUTT_APPEND | MUTT_QUIET);
   if (!ctx_fcc)
   {
     mutt_debug(LL_DEBUG1, "unable to open mailbox %s in append-mode, aborting\n", path);
@@ -3162,7 +3162,7 @@ int mutt_write_fcc(const char *path, struct Email *e, const char *msgid,
     if (!fp_tmp)
     {
       mutt_perror(tempfile);
-      mx_mbox_close(&ctx_fcc);
+      ctx_close(&ctx_fcc);
       goto done;
     }
     /* remember new mail status before appending message */
@@ -3178,7 +3178,7 @@ int mutt_write_fcc(const char *path, struct Email *e, const char *msgid,
   if (!msg)
   {
     mutt_file_fclose(&fp_tmp);
-    mx_mbox_close(&ctx_fcc);
+    ctx_close(&ctx_fcc);
     goto done;
   }
 
@@ -3292,7 +3292,7 @@ int mutt_write_fcc(const char *path, struct Email *e, const char *msgid,
       unlink(tempfile);
       mx_msg_commit(ctx_fcc->mailbox, msg); /* XXX really? */
       mx_msg_close(ctx_fcc->mailbox, &msg);
-      mx_mbox_close(&ctx_fcc);
+      ctx_close(&ctx_fcc);
       goto done;
     }
 
@@ -3323,7 +3323,7 @@ int mutt_write_fcc(const char *path, struct Email *e, const char *msgid,
   else if (finalpath)
     *finalpath = mutt_str_strdup(msg->committed_path);
   mx_msg_close(ctx_fcc->mailbox, &msg);
-  mx_mbox_close(&ctx_fcc);
+  ctx_close(&ctx_fcc);
 
   if (!post && need_mailbox_cleanup)
     mutt_mailbox_cleanup(path, &st);
