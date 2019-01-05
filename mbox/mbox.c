@@ -1800,14 +1800,13 @@ static int mbox_mbox_check_stats(struct Mailbox *m, int flags)
 
   if (mutt_file_stat_timespec_compare(&sb, MUTT_STAT_MTIME, &m->stats_last_checked) > 0)
   {
-    struct Context *ctx = ctx_open(m, MUTT_READONLY | MUTT_QUIET | MUTT_NOSORT | MUTT_PEEK);
-    if (ctx)
+    if (mx_mbox_open(m, MUTT_READONLY | MUTT_QUIET | MUTT_NOSORT | MUTT_PEEK) == 0)
     {
-      m->msg_count = ctx->mailbox->msg_count;
-      m->msg_unread = ctx->mailbox->msg_unread;
-      m->msg_flagged = ctx->mailbox->msg_flagged;
-      m->stats_last_checked = ctx->mailbox->mtime;
-      ctx_close(&ctx);
+      m->msg_count = m->msg_count;
+      m->msg_unread = m->msg_unread;
+      m->msg_flagged = m->msg_flagged;
+      m->stats_last_checked = m->mtime;
+      mx_mbox_close(m);
     }
   }
 

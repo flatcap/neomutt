@@ -31,7 +31,6 @@
 #endif
 
 struct Connection;
-struct Context;
 struct Email;
 struct Mailbox;
 
