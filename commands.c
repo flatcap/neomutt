@@ -1089,7 +1089,7 @@ int mutt_save_message(struct Email *e, bool delete, bool decode, bool decrypt)
 #endif
 
   struct Mailbox *m_save = mx_path_resolve(buf);
-  savectx = mx_mbox_open(m_save, NULL, MUTT_APPEND);
+  savectx = mx_mbox_open(m_save, MUTT_APPEND);
   if (!savectx)
   {
     mailbox_free(&m_save);
