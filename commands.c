@@ -981,7 +981,6 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete, bool
   int app = 0;
   char buf[PATH_MAX];
   const char *prompt = NULL;
-  struct Context *savectx = NULL;
   struct stat st;
   struct EmailNode *en = STAILQ_FIRST(el);
   bool single = !STAILQ_NEXT(en, entries);
@@ -1068,8 +1067,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete, bool
 #endif
 
   struct Mailbox *m_save = mx_path_resolve(buf);
-  savectx = ctx_open(m_save, MUTT_APPEND);
-  if (!savectx)
+  if (mx_mbox_open(m_save, MUTT_APPEND) != 0)
   {
     mailbox_free(&m_save);
     return -1;
@@ -1079,9 +1077,9 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete, bool
   /* If we're saving to a compressed mailbox, the stats won't be updated
    * until the next open.  Until then, improvise. */
   struct Mailbox *cm = NULL;
-  if (savectx->mailbox->compress_info)
+  if (m_save->compress_info)
   {
-    cm = mutt_find_mailbox(savectx->mailbox->realpath);
+    cm = mutt_find_mailbox(m_save->realpath);
   }
   /* We probably haven't been opened yet */
   if (cm && (cm->msg_count == 0))
@@ -1089,9 +1087,9 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete, bool
 #endif
   if (single)
   {
-    if (mutt_save_message_ctx(en->email, delete, decode, decrypt, savectx->mailbox) != 0)
+    if (mutt_save_message_ctx(en->email, delete, decode, decrypt, m_save) != 0)
     {
-      ctx_close(&savectx);
+      mx_mbox_close(m_save);
       return -1;
     }
 #ifdef USE_COMPRESSED
@@ -1120,8 +1118,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete, bool
     STAILQ_FOREACH(en, el, entries)
     {
       mutt_message_hook(m, en->email, MUTT_MESSAGE_HOOK);
-      rc = mutt_save_message_ctx(en->email, delete, decode,
-                                 decrypt, savectx->mailbox);
+      rc = mutt_save_message_ctx(en->email, delete, decode, decrypt, m_save);
       if (rc != 0)
         break;
 #ifdef USE_COMPRESSED
@@ -1146,15 +1143,15 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete, bool
 #endif
     if (rc != 0)
     {
-      ctx_close(&savectx);
+      mx_mbox_close(m_save);
       return -1;
     }
   }
 
-  const bool need_mailbox_cleanup = ((savectx->mailbox->magic == MUTT_MBOX) ||
-                                     (savectx->mailbox->magic == MUTT_MMDF));
+  const bool need_mailbox_cleanup = ((m_save->magic == MUTT_MBOX) ||
+                                     (m_save->magic == MUTT_MMDF));
 
-  ctx_close(&savectx);
+  mx_mbox_close(m_save);
 
   if (need_mailbox_cleanup)
     mutt_mailbox_cleanup(buf, &st);
