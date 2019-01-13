@@ -355,7 +355,7 @@ int mx_mbox_open(struct Mailbox *m, int flags)
 }
 
 /**
- * mx_fastclose_mailbox - free up memory associated with the mailbox context
+ * mx_fastclose_mailbox - free up memory associated with the Mailbox
  * @param m Mailbox
  */
 void mx_fastclose_mailbox(struct Mailbox *m)
@@ -884,8 +884,7 @@ int mx_mbox_sync(struct Context *ctx, int *index_hint)
       /* IMAP does this automatically after handling EXPUNGE */
       if (m->magic != MUTT_IMAP)
       {
-        ctx_update_tables(ctx, true);
-        mutt_sort_headers(ctx, true); /* rethread from scratch */
+        mutt_mailbox_changed(ctx->mailbox, MBN_RESORT);
       }
     }
   }
