@@ -1869,7 +1869,7 @@ int mutt_index_menu(void)
               e = Context->mailbox->emails[Context->mailbox->v2r[newidx]];
           }
 
-          check = mx_mbox_sync(Context, &index_hint);
+          check = mx_mbox_sync(Context->mailbox, &index_hint);
           if (check == 0)
           {
             if (e && Context->mailbox->vcount != ovc)
