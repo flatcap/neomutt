@@ -276,6 +276,10 @@ void ctx_mailbox_changed(struct Mailbox *m, enum MailboxNotification action)
       ctx_update_tables(ctx, false);
       mutt_sort_headers(ctx, true);
       break;
+    case MBN_UNTAG:
+      if (ctx->last_tag && ctx->last_tag->deleted)
+        ctx->last_tag = NULL;
+      break;
   }
 }
 
