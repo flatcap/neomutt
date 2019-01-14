@@ -255,12 +255,6 @@ int mx_mbox_open(struct Mailbox *m, int flags)
   if (!m)
     return -1;
 
-  struct Context *ctx = mutt_mem_calloc(1, sizeof(*ctx));
-  ctx->mailbox = m;
-
-  m->notify = ctx_mailbox_changed;
-  m->ndata = ctx;
-
   if ((m->magic == MUTT_UNKNOWN) && (flags & MUTT_NEWFOLDER))
   {
     m->magic = MboxType;
@@ -762,17 +756,15 @@ int mx_mbox_close(struct Mailbox *m)
 
 /**
  * mx_mbox_sync - Save changes to mailbox
- * @param[in]  ctx        Context
+ * @param[in]  m          Mailbox
  * @param[out] index_hint Currently selected Email
  * @retval  0 Success
  * @retval -1 Error
  */
-int mx_mbox_sync(struct Context *ctx, int *index_hint)
+int mx_mbox_sync(struct Mailbox *m, int *index_hint)
 {
-  if (!ctx || !ctx->mailbox)
+  if (!m)
     return -1;
-
-  struct Mailbox *m = ctx->mailbox;
 
   int rc;
   int purge = 1;
@@ -884,7 +876,7 @@ int mx_mbox_sync(struct Context *ctx, int *index_hint)
       /* IMAP does this automatically after handling EXPUNGE */
       if (m->magic != MUTT_IMAP)
       {
-        mutt_mailbox_changed(ctx->mailbox, MBN_RESORT);
+        mutt_mailbox_changed(m, MBN_RESORT);
       }
     }
   }
