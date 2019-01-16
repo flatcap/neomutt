@@ -58,6 +58,7 @@ void ctx_update_tables(struct Context *ctx, bool committing);
 
 struct Context *ctx_open(struct Mailbox *m, int flags);
 int ctx_close(struct Context **ptr);
+struct Context *ctx_wrap(struct Mailbox *m, int flags);
 
 bool message_is_tagged(struct Context *ctx, int index);
 bool message_is_visible(struct Context *ctx, int index);
