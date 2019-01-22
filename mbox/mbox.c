@@ -1818,7 +1818,7 @@ static int mbox_mbox_check_stats(struct Mailbox *m, int flags)
       m->msg_unread = m->msg_unread;
       m->msg_flagged = m->msg_flagged;
       m->stats_last_checked = m->mtime;
-      mx_mbox_close(m);
+      mx_mbox_close(&m);
     }
   }
 
