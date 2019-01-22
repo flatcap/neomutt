@@ -87,37 +87,39 @@ struct MailboxList AllMailboxes = STAILQ_HEAD_INITIALIZER(AllMailboxes);
 
 /**
  * mailbox_new - Create a new Mailbox
+ * @param path Mailbox path
  * @retval ptr New Mailbox
  */
-struct Mailbox *mailbox_new(void)
+struct Mailbox *mailbox_new(const char *path, const char *folder)
 {
-  // char rp[PATH_MAX] = "";
-
   struct Mailbox *m = mutt_mem_calloc(1, sizeof(struct Mailbox));
-  // mutt_str_strfcpy(m->path, path, sizeof(m->path));
-  // char *r = realpath(path, rp);
-  // mutt_str_strfcpy(m->realpath, r ? rp : path, sizeof(m->realpath));
-  // m->magic = MUTT_UNKNOWN;
-  // m->desc = get_mailbox_description(m->path);
 
+  if (path)
+  {
+    mutt_str_strfcpy(m->path, path, sizeof(m->path));
+    mx_path_canon2(m, folder);
+  }
+
+  m->opened = 1;
   return m;
 }
 
 /**
  * mailbox_free - Free a Mailbox
- * @param m Mailbox to free
+ * @param ptr Mailbox to free
  */
-void mailbox_free(struct Mailbox **m)
+void mailbox_free(struct Mailbox **ptr)
 {
-  if (!m || !*m)
+  if (!ptr || !*ptr)
     return;
 
-  mutt_mailbox_changed(*m, MBN_CLOSED);
+  struct Mailbox *m = *ptr;
+  mutt_mailbox_changed(m, MBN_CLOSED);
 
-  FREE(&(*m)->desc);
-  if ((*m)->mdata && (*m)->free_mdata)
-    (*m)->free_mdata(&(*m)->mdata);
-  FREE(m);
+  FREE(&m->desc);
+  if (m->mdata && m->free_mdata)
+    m->free_mdata(&m->mdata);
+  FREE(ptr);
 }
 
 /**
@@ -333,29 +335,19 @@ void mutt_update_mailbox(struct Mailbox *m)
 enum CommandResult mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
                                         unsigned long data, struct Buffer *err)
 {
-  // char canon[PATH_MAX];
-  // struct stat sb = { 0 };
-#if 0
-  char f1[PATH_MAX];
-  char *p = NULL;
-#endif
+  char *desc = NULL;
 
   while (MoreArgs(s))
   {
-    // char *desc = NULL;
-
-    struct Mailbox *m = mailbox_new();
-
     if (data & MUTT_NAMED)
     {
       mutt_extract_token(buf, s, 0);
       if (buf->data && *buf->data)
       {
-        m->desc = mutt_str_strdup(buf->data);
+        desc = mutt_str_strdup(buf->data);
       }
       else
       {
-        mailbox_free(&m);
         continue;
       }
     }
@@ -364,39 +356,35 @@ enum CommandResult mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
     if (mutt_buffer_is_empty(buf))
     {
       /* Skip empty tokens. */
-      mailbox_free(&m);
       continue;
     }
 
-    mutt_str_strfcpy(m->path, buf->data, sizeof(m->path));
-    /* int rc = */ mx_path_canon2(m, Folder);
+    struct Mailbox *m = mx_mbox_find2(buf->data);
+    if (m)
+    {
+      if (m->flags == MB_HIDDEN)
+      {
+        m->flags = MB_VISIBLE;
+        struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
+        mn->m = m;
+        STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
+#ifdef USE_SIDEBAR
+        mutt_sb_notify_mailbox(m, true);
+#endif
+      }
+      mx_mbox_close(&m);
+      continue;
+    }
 
-    bool new_account = false;
+    m = mailbox_new(buf->data, Folder);
+    m->desc = desc;
+
     struct Account *a = mx_ac_find(m);
     if (!a)
     {
       a = account_new();
       a->magic = m->magic;
       TAILQ_INSERT_TAIL(&AllAccounts, a, entries);
-      new_account = true;
-    }
-
-    if (!new_account)
-    {
-      struct Mailbox *old_m = mx_mbox_find(a, m->realpath);
-      if (old_m)
-      {
-        if (old_m->flags == MB_HIDDEN)
-        {
-          old_m->flags = MB_NORMAL;
-          mutt_sb_notify_mailbox(old_m, true);
-          struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
-          mn->m = old_m;
-          STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
-        }
-        mailbox_free(&m);
-        continue;
-      }
     }
 
     if (mx_ac_add(a, m) < 0)
@@ -406,67 +394,6 @@ enum CommandResult mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
       continue;
     }
 
-    // SUCCESS
-
-#if 0
-#ifdef USE_NOTMUCH
-    if (nm_path_probe(buf->data, NULL) == MUTT_NOTMUCH)
-      nm_normalize_uri(buf->data, canon, sizeof(canon));
-    else
-#endif
-      mutt_str_strfcpy(canon, buf->data, sizeof(canon));
-
-    mutt_expand_path(canon, sizeof(canon));
-
-    /* Skip empty tokens. */
-    if (!*canon)
-    {
-      FREE(&desc);
-      continue;
-    }
-
-    /* avoid duplicates */
-    p = realpath(canon, f1);
-    struct MailboxNode *np = NULL;
-    STAILQ_FOREACH(np, &AllMailboxes, entries)
-    {
-      if (mutt_str_strcmp(p ? p : canon, np->m->realpath) == 0)
-      {
-        mutt_debug(3, "mailbox '%s' already registered as '%s'\n", canon, np->m->path);
-        break;
-      }
-    }
-
-    if (np)
-    {
-      FREE(&desc);
-      continue;
-    }
-
-    m = mailbox_new(canon);
-
-    m->notified = true;
-    m->desc = desc;
-#ifdef USE_NOTMUCH
-    if (nm_path_probe(m->path, NULL) == MUTT_NOTMUCH)
-    {
-      m->magic = MUTT_NOTMUCH;
-    }
-    else
-#endif
-    {
-      /* for check_mbox_size, it is important that if the folder is new (tested by
-       * reading it), the size is set to 0 so that later when we check we see
-       * that it increased. without check_mbox_size we probably don't care.
-       */
-      if (CheckMboxSize && (stat(m->path, &sb) == 0) && !mbox_test_new_folder(m->path))
-      {
-        /* some systems out there don't have an off_t type */
-        m->size = (off_t) sb.st_size;
-      }
-    }
-#endif
-
     struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
     mn->m = m;
     STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
@@ -475,7 +402,6 @@ enum CommandResult mutt_parse_mailboxes(struct Buffer *buf, struct Buffer *s,
     mutt_sb_notify_mailbox(m, true);
 #endif
 #ifdef USE_INOTIFY
-    m->magic = mx_path_probe(m->path, NULL);
     mutt_monitor_add(m);
 #endif
   }
