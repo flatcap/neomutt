@@ -44,13 +44,15 @@
  * ctx_free - Free a Context
  * @param ctx Context to free
  */
-void ctx_free(struct Context **ctx)
+void ctx_free(struct Context **ptr)
 {
-  if (!ctx || !*ctx)
+  if (!ptr || !*ptr)
     return;
 
-  mailbox_free(&(*ctx)->mailbox);
-  FREE(ctx);
+  struct Context *ctx = *ptr;
+
+  mx_mbox_close(&ctx->mailbox);
+  FREE(ptr);
 }
 
 /**

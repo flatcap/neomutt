@@ -1337,7 +1337,7 @@ int imap_path_status(const char *path, bool queue)
  * @param queue  Queue the STATUS command
  * @retval num   Total number of messages
  *
- * Note this prepares the mailbox if we are not connected
+ * @note Prepare the mailbox if we are not connected
  */
 int imap_mailbox_status(struct Mailbox *m, bool queue)
 {
@@ -2195,14 +2195,12 @@ static int imap_mbox_open_append(struct Mailbox *m, int flags)
   if (!m || !m->account)
     return -1;
 
-  int rc;
-
   /* in APPEND mode, we appear to hijack an existing IMAP connection -
    * ctx is brand new and mostly empty */
   struct ImapAccountData *adata = imap_adata_get(m);
   struct ImapMboxData *mdata = imap_mdata_get(m);
 
-  rc = imap_mailbox_status(m, false);
+  int rc = imap_mailbox_status(m, false);
   if (rc >= 0)
     return 0;
   if (rc == -1)
