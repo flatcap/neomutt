@@ -2106,6 +2106,18 @@ int nm_ac_add(struct Account *a, struct Mailbox *m)
 }
 
 /**
+ * nm_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool nm_mbox_is_open(struct Mailbox *m)
+{
+  struct NmAccountData *adata = nm_adata_get(m);
+  if (!adata)
+    return false;
+
+  return (adata->db != NULL);
+}
+
+/**
  * nm_mbox_open - Implements MxOps::mbox_open()
  */
 static int nm_mbox_open(struct Mailbox *m)
@@ -2539,6 +2551,7 @@ struct MxOps MxNotmuchOps = {
   .name             = "notmuch",
   .ac_find          = nm_ac_find,
   .ac_add           = nm_ac_add,
+  .mbox_is_open     = nm_mbox_is_open,
   .mbox_open        = nm_mbox_open,
   .mbox_open_append = NULL,
   .mbox_check       = nm_mbox_check,

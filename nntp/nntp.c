@@ -2421,6 +2421,18 @@ int nntp_ac_add(struct Account *a, struct Mailbox *m)
 }
 
 /**
+ * nntp_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool nntp_mbox_is_open(struct Mailbox *m)
+{
+  struct NntpAccountData *adata = nntp_adata_get(m);
+  if (!adata || !adata->conn)
+    return false;
+
+  return (adata->conn->fd >= 0);
+}
+
+/**
  * nntp_mbox_open - Implements MxOps::mbox_open()
  */
 static int nntp_mbox_open(struct Mailbox *m)
@@ -2884,6 +2896,7 @@ struct MxOps MxNntpOps = {
   .name             = "nntp",
   .ac_find          = nntp_ac_find,
   .ac_add           = nntp_ac_add,
+  .mbox_is_open     = nntp_mbox_is_open,
   .mbox_open        = nntp_mbox_open,
   .mbox_open_append = NULL,
   .mbox_check       = nntp_mbox_check,

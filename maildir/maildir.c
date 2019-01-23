@@ -293,6 +293,16 @@ cleanup:
 }
 
 /**
+ * maildir_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool maildir_mbox_is_open(struct Mailbox *m)
+{
+  struct MaildirMboxData *mdata = maildir_mdata_get(m);
+
+  return (mdata != NULL);
+}
+
+/**
  * maildir_mbox_open - Implements MxOps::mbox_open()
  */
 static int maildir_mbox_open(struct Mailbox *m)
@@ -704,6 +714,7 @@ struct MxOps MxMaildirOps = {
   .name             = "maildir",
   .ac_find          = maildir_ac_find,
   .ac_add           = maildir_ac_add,
+  .mbox_is_open     = maildir_mbox_is_open,
   .mbox_open        = maildir_mbox_open,
   .mbox_open_append = maildir_mbox_open_append,
   .mbox_check       = maildir_mbox_check,

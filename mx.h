@@ -119,7 +119,13 @@ struct MxOps
    */
   int             (*ac_add)   (struct Account *a, struct Mailbox *m);
   /**
-   * mbox_open - Open a mailbox
+   * mbox_is_open - Is a Mailbox already open?
+   * @param m Mailbox to check
+   * @retval true Mailbox is open
+   */
+  bool (*mbox_is_open)   (struct Mailbox *m);
+  /**
+   * mbox_open - Open a Mailbox
    * @param m Mailbox to open
    * @retval  0 Success
    * @retval -1 Error
