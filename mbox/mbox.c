@@ -901,6 +901,18 @@ int mbox_ac_add(struct Account *a, struct Mailbox *m)
 }
 
 /**
+ * mbox_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool mbox_mbox_is_open(struct Mailbox *m)
+{
+  struct MboxAccountData *adata = mbox_adata_get(m);
+  if (!adata)
+    return false;
+
+  return (adata->fp != NULL);
+}
+
+/**
  * mbox_mbox_open - Implements MxOps::mbox_open()
  */
 static int mbox_mbox_open(struct Mailbox *m)
@@ -1794,6 +1806,7 @@ struct MxOps MxMboxOps = {
   .name             = "mbox",
   .ac_find          = mbox_ac_find,
   .ac_add           = mbox_ac_add,
+  .mbox_is_open     = mbox_mbox_is_open,
   .mbox_open        = mbox_mbox_open,
   .mbox_open_append = mbox_mbox_open_append,
   .mbox_check       = mbox_mbox_check,
@@ -1822,6 +1835,7 @@ struct MxOps MxMmdfOps = {
   .name             = "mmdf",
   .ac_find          = mbox_ac_find,
   .ac_add           = mbox_ac_add,
+  .mbox_is_open     = mbox_mbox_is_open,
   .mbox_open        = mbox_mbox_open,
   .mbox_open_append = mbox_mbox_open_append,
   .mbox_check       = mbox_mbox_check,

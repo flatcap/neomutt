@@ -1953,6 +1953,18 @@ int imap_login(struct ImapAccountData *adata)
 }
 
 /**
+ * imap_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool imap_mbox_is_open(struct Mailbox *m)
+{
+  struct ImapAccountData *adata = imap_adata_get(m);
+  if (!adata || !adata->conn)
+    return false;
+
+  return (adata->conn->fd >= 0);
+}
+
+/**
  * imap_mbox_open - Implements MxOps::mbox_open()
  */
 static int imap_mbox_open(struct Mailbox *m)
@@ -2530,6 +2542,7 @@ struct MxOps MxImapOps = {
   .name             = "imap",
   .ac_find          = imap_ac_find,
   .ac_add           = imap_ac_add,
+  .mbox_is_open     = imap_mbox_is_open,
   .mbox_open        = imap_mbox_open,
   .mbox_open_append = imap_mbox_open_append,
   .mbox_check       = imap_mbox_check,
