@@ -1603,3 +1603,14 @@ int mx_save_hcache(struct Mailbox *m, struct Email *e)
 
   return m->mx_ops->msg_save_hcache(m, e);
 }
+
+/**
+ * mx_mbox_is_open - Is a Mailbox already open? - Wrapper for MxOps::mbox_is_open()
+ */
+bool mx_mbox_is_open(struct Mailbox *m)
+{
+  if (!m || !m->mx_ops || !m->mx_ops->mbox_is_open)
+    return false;
+
+  return m->mx_ops->mbox_is_open(m);
+}

@@ -120,7 +120,13 @@ struct MxOps
    */
   int             (*ac_add)   (struct Account *a, struct Mailbox *m);
   /**
-   * mbox_open - Open a mailbox
+   * mbox_is_open - Is a Mailbox already open?
+   * @param m Mailbox to check
+   * @retval true Mailbox is open
+   */
+  bool (*mbox_is_open)   (struct Mailbox *m);
+  /**
+   * mbox_open - Open a Mailbox
    * @param m Mailbox to open
    * @retval  0 Success
    * @retval -1 Error
@@ -272,6 +278,7 @@ struct MxOps
 int             mx_mbox_check      (struct Mailbox *m, int *index_hint);
 int             mx_mbox_check_stats(struct Mailbox *m, int flags);
 int             mx_mbox_close      (struct Context **ptr);
+bool            mx_mbox_is_open    (struct Mailbox *m);
 struct Context *mx_mbox_open       (struct Mailbox *m, OpenMailboxFlags flags);
 int             mx_mbox_sync       (struct Mailbox *m, int *index_hint);
 int             mx_msg_close       (struct Mailbox *m, struct Message **msg);

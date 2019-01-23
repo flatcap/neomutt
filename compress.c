@@ -455,6 +455,24 @@ int comp_ac_add(struct Account *a, struct Mailbox *m)
 }
 
 /**
+ * comp_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool comp_mbox_is_open(struct Mailbox *m)
+{
+  if (!m || !m->compress_info)
+    return false;
+
+  struct CompressInfo *ci = m->compress_info;
+
+  const struct MxOps *ops = ci->child_ops;
+  if (!ops)
+    return false;
+
+  /* Delegate */
+  return ops->mbox_is_open(m);
+}
+
+/**
  * comp_mbox_open - Implements MxOps::mbox_open()
  *
  * Set up a compressed mailbox to be read.
@@ -979,6 +997,7 @@ struct MxOps MxCompOps = {
   .name             = "compressed",
   .ac_find          = comp_ac_find,
   .ac_add           = comp_ac_add,
+  .mbox_is_open     = comp_mbox_is_open,
   .mbox_open        = comp_mbox_open,
   .mbox_open_append = comp_mbox_open_append,
   .mbox_check       = comp_mbox_check,

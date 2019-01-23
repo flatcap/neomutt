@@ -809,6 +809,18 @@ int pop_ac_add(struct Account *a, struct Mailbox *m)
 }
 
 /**
+ * pop_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool pop_mbox_is_open(struct Mailbox *m)
+{
+  struct PopAccountData *adata = pop_adata_get(m);
+  if (!adata || !adata->conn)
+    return false;
+
+  return (adata->conn->fd >= 0);
+}
+
+/**
  * pop_mbox_open - Implements MxOps::mbox_open()
  *
  * Fetch only headers
@@ -1281,6 +1293,7 @@ struct MxOps MxPopOps = {
   .name             = "pop",
   .ac_find          = pop_ac_find,
   .ac_add           = pop_ac_add,
+  .mbox_is_open     = pop_mbox_is_open,
   .mbox_open        = pop_mbox_open,
   .mbox_open_append = NULL,
   .mbox_check       = pop_mbox_check,

@@ -539,6 +539,16 @@ int mh_sync_message(struct Mailbox *m, int msgno)
 }
 
 /**
+ * mh_mbox_is_open - Implements MxOps::mbox_is_open()
+ */
+static bool mh_mbox_is_open(struct Mailbox *m)
+{
+  struct MaildirMboxData *mdata = maildir_mdata_get(m);
+
+  return (mdata != NULL);
+}
+
+/**
  * mh_mbox_open - Implements MxOps::mbox_open()
  */
 static int mh_mbox_open(struct Mailbox *m)
@@ -807,6 +817,7 @@ struct MxOps MxMhOps = {
   .name             = "mh",
   .ac_find          = maildir_ac_find,
   .ac_add           = maildir_ac_add,
+  .mbox_is_open     = mh_mbox_is_open,
   .mbox_open        = mh_mbox_open,
   .mbox_open_append = mh_mbox_open_append,
   .mbox_check       = mh_mbox_check,
