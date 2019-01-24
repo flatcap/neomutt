@@ -1812,14 +1812,11 @@ static int mbox_mbox_check_stats(struct Mailbox *m, int flags)
 
   if (mutt_file_stat_timespec_compare(&sb, MUTT_STAT_MTIME, &m->stats_last_checked) > 0)
   {
-    if (mx_mbox_open(m, MUTT_QUIET | MUTT_NOSORT | MUTT_PEEK) == 0)
-    {
-      m->msg_count = m->msg_count;
-      m->msg_unread = m->msg_unread;
-      m->msg_flagged = m->msg_flagged;
-      m->stats_last_checked = m->mtime;
-      mx_mbox_close(&m);
-    }
+    if (m->magic == MUTT_MBOX)
+      mbox_parse_mailbox(m);
+    else if (m->magic == MUTT_MMDF)
+      mmdf_parse_mailbox(m);
+    m->stats_last_checked = m->mtime;
   }
 
   return 0;
