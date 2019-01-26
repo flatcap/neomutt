@@ -1502,10 +1502,7 @@ int mutt_compose_menu(struct Email *msg, char *fcc, size_t fcclen, struct Email 
         if (op_close == OP_QUIT)
           ctx_close(&Context);
         else
-        {
-          mx_fastclose_mailbox(Context->mailbox);
           ctx_free(&Context);
-        }
 
         /* go back to the folder we started from */
         Context = this;

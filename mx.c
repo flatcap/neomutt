@@ -284,10 +284,8 @@ int mx_mbox_open(struct Mailbox *m, OpenMailboxFlags flags)
   if (flags & (MUTT_APPEND | MUTT_NEWFOLDER))
   {
     if (mx_open_mailbox_append(m, flags) != 0)
-    {
-      mx_fastclose_mailbox(m);
       return -1;
-    }
+
     return 0;
   }
 
@@ -304,7 +302,6 @@ int mx_mbox_open(struct Mailbox *m, OpenMailboxFlags flags)
     else if ((m->magic == MUTT_UNKNOWN) || !m->mx_ops)
       mutt_error(_("%s is not a mailbox"), m->path);
 
-    mx_fastclose_mailbox(m);
     return -1;
   }
 
@@ -328,11 +325,6 @@ int mx_mbox_open(struct Mailbox *m, OpenMailboxFlags flags)
       mutt_clear_error();
     if (rc == -2)
       mutt_error(_("Reading from %s interrupted..."), m->path);
-  }
-  else
-  {
-    mx_fastclose_mailbox(m);
-    return -1;
   }
 
   OptForceRefresh = false;
@@ -480,13 +472,13 @@ static int trash_append(struct Mailbox *m)
       {
         if (mutt_append_message(m_trash, m, m->emails[i], 0, 0) == -1)
         {
-          mx_mbox_close(&m_trash);
+          mailbox_free(&m_trash);
           return -1;
         }
       }
     }
 
-    mx_mbox_close(&m_trash);
+    mailbox_free(&m_trash);
   }
   else
   {
@@ -510,7 +502,6 @@ int mx_mbox_close(struct Mailbox **ptr)
     return -1;
 
   struct Mailbox *m = *ptr;
-  // assert(m->opened > 0);
   int i, read_msgs = 0;
   enum QuadOption move_messages = MUTT_NO;
   enum QuadOption purge = MUTT_YES;
@@ -668,13 +659,13 @@ int mx_mbox_close(struct Mailbox **ptr)
           }
           else
           {
-            mx_mbox_close(&m_read);
+            mailbox_free(&m_read);
             return -1;
           }
         }
       }
 
-      mx_mbox_close(&m_read);
+      mailbox_free(&m_read);
     }
   }
   else if (!m->changed && (m->msg_deleted == 0))
@@ -869,7 +860,6 @@ int mx_mbox_sync(struct Mailbox *m, int *index_hint)
         !mutt_is_spool(m->path) && !C_SaveEmpty)
     {
       unlink(m->path);
-      mx_fastclose_mailbox(m);
       return 0;
     }
 
@@ -1455,7 +1445,7 @@ struct Mailbox *mx_mbox_find(struct Account *a, const char *path)
  *
  * find a mailbox on an account
  *
- * @note Caller must mx_mbox_close() the result.
+ * @note Caller must mailbox_free() the result.
  */
 struct Mailbox *mx_mbox_find2(const char *path)
 {
@@ -1483,7 +1473,7 @@ struct Mailbox *mx_mbox_find2(const char *path)
 /**
  * mx_path_resolve - XXX
  *
- * @note Caller must mx_mbox_close() the result.
+ * @note Caller must mailbox_free() the result.
  */
 struct Mailbox *mx_path_resolve(const char *path)
 {

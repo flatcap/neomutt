@@ -1090,7 +1090,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
   {
     if (mutt_save_message_ctx(en->email, delete, decode, decrypt, m_save) != 0)
     {
-      mx_mbox_close(&m_save);
+      mailbox_free(&m_save);
       return -1;
     }
 #ifdef USE_COMPRESSED
@@ -1144,7 +1144,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
 #endif
     if (rc != 0)
     {
-      mx_mbox_close(&m_save);
+      mailbox_free(&m_save);
       return -1;
     }
   }
@@ -1152,7 +1152,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el, bool delete,
   const bool need_mailbox_cleanup = ((m_save->magic == MUTT_MBOX) ||
                                      (m_save->magic == MUTT_MMDF));
 
-  mx_mbox_close(&m_save);
+  mailbox_free(&m_save);
 
   if (need_mailbox_cleanup)
     mutt_mailbox_cleanup(buf, &st);

@@ -114,7 +114,17 @@ void mailbox_free(struct Mailbox **ptr)
     return;
 
   struct Mailbox *m = *ptr;
+
+  m->opened--;
+  if (m->opened > 0)
+  {
+    *ptr = NULL;
+    return;
+  }
+
   mutt_mailbox_changed(m, MBN_CLOSED);
+
+  mx_mbox_close(ptr);
 
   FREE(&m->desc);
   if (m->mdata && m->free_mdata)
