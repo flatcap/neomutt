@@ -457,9 +457,7 @@ int ctx_close(struct Context **ptr)
   if (!ctx->mailbox)
     return -1;
 
-  int rc = mx_mbox_close(&ctx->mailbox);
-  if (rc < 0)
-    return -1;
+  mailbox_free(&ctx->mailbox);
 
   FREE(ptr);
   return 0;
