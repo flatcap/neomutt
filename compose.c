@@ -1508,7 +1508,10 @@ int mutt_compose_menu(struct Email *msg, char *fcc, size_t fcclen, struct Email 
         if (close == OP_QUIT)
           ctx_close(&Context);
         else
+        {
+          mutt_mailbox_changed(m, MBN_UPDATE);
           ctx_free(&Context);
+        }
 
         /* go back to the folder we started from */
         Context = this;

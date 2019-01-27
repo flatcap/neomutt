@@ -293,7 +293,10 @@ int mx_mbox_open(struct Mailbox *m, int flags)
   if (flags & (MUTT_APPEND | MUTT_NEWFOLDER))
   {
     if (mx_open_mailbox_append(m, flags) != 0)
+    {
+      mutt_mailbox_changed(m, MBN_UPDATE);
       return -1;
+    }
 
     return 0;
   }
@@ -311,6 +314,7 @@ int mx_mbox_open(struct Mailbox *m, int flags)
     else if (m->magic == MUTT_UNKNOWN || !m->mx_ops)
       mutt_error(_("%s is not a mailbox"), m->path);
 
+    mutt_mailbox_changed(m, MBN_UPDATE);
     return -1;
   }
 
@@ -335,6 +339,10 @@ int mx_mbox_open(struct Mailbox *m, int flags)
       mutt_clear_error();
     if (rc == -2)
       mutt_error(_("Reading from %s interrupted..."), m->path);
+  }
+  else
+  {
+    mutt_mailbox_changed(m, MBN_UPDATE);
   }
 
   OptForceRefresh = false;
@@ -864,6 +872,7 @@ int mx_mbox_sync(struct Mailbox *m, int *index_hint)
         !mutt_is_spool(m->path) && !SaveEmpty)
     {
       unlink(m->path);
+      mutt_mailbox_changed(m, MBN_UPDATE);
       return 0;
     }
 
