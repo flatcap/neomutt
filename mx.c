@@ -232,7 +232,7 @@ static int mx_open_mailbox_append(struct Mailbox *m, OpenMailboxFlags flags)
     return -1;
 
   int rc = m->mx_ops->mbox_open_append(m, flags);
-  m->opened++;
+  m->opened++; //QWQ make conditional on success
   return rc;
 }
 
