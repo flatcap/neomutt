@@ -173,6 +173,30 @@ struct MxOps
    */
   int (*mbox_close)      (struct Mailbox *m);
   /**
+   * mbox_create - Create a Mailbox
+   * @param m Mailbox to create
+   * @retval  0 Success
+   * @retval  1 Success, Mailbox already exists
+   * @retval -1 Failure
+   */
+  int (*mbox_create)     (struct Mailbox *m);
+  /**
+   * mbox_rename - Rename a Mailbox
+   * @param m    Mailbox to rename
+   * @param name New name
+   * @retval  0 Success
+   * @retval -1 Failure
+   */
+  int (*mbox_rename)     (struct Mailbox *m, const char *name);
+  /**
+   * mbox_delete - Delete a Mailbox
+   * @param m Mailbox to delete
+   * @retval  0 Success
+   * @retval  1 Success, Mailbox didn't exist
+   * @retval -1 Failure
+   */
+  int (*mbox_delete)     (struct Mailbox *m);
+  /**
    * msg_open - Open an email message in Mailbox
    * @param m     Mailbox
    * @param msg   Message to open
@@ -278,7 +302,10 @@ struct MxOps
 int             mx_mbox_check      (struct Mailbox *m, int *index_hint);
 int             mx_mbox_check_stats(struct Mailbox *m, int flags);
 int             mx_mbox_close      (struct Context **ptr);
+int             mx_mbox_create     (struct Mailbox *m);
+int             mx_mbox_delete     (struct Mailbox *m);
 struct Context *mx_mbox_open       (struct Mailbox *m, OpenMailboxFlags flags);
+int             mx_mbox_rename     (struct Mailbox *m, const char *name);
 int             mx_mbox_sync       (struct Mailbox *m, int *index_hint);
 int             mx_msg_close       (struct Mailbox *m, struct Message **msg);
 int             mx_msg_commit      (struct Mailbox *m, struct Message *msg);

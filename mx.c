@@ -1578,3 +1578,36 @@ int mx_save_hcache(struct Mailbox *m, struct Email *e)
 
   return m->mx_ops->msg_save_hcache(m, e);
 }
+
+/**
+ * mx_mbox_create - Create a Mailbox - Wrapper for MxOps::mbox_create()
+ */
+int mx_mbox_create(struct Mailbox *m)
+{
+  if (!m || !m->mx_ops || !m->mx_ops->mbox_create)
+    return -1;
+
+  return m->mx_ops->mbox_create(m);
+}
+
+/**
+ * mx_mbox_rename - Rename a Mailbox - Wrapper for MxOps::mbox_rename()
+ */
+int mx_mbox_rename(struct Mailbox *m, const char *name)
+{
+  if (!m || !m->mx_ops || !m->mx_ops->mbox_rename || !name)
+    return -1;
+
+  return m->mx_ops->mbox_rename(m, name);
+}
+
+/**
+ * mx_mbox_delete - Delete a Mailbox - Wrapper for MxOps::mbox_delete()
+ */
+int mx_mbox_delete(struct Mailbox *m)
+{
+  if (!m || !m->mx_ops || !m->mx_ops->mbox_delete)
+    return -1;
+
+  return m->mx_ops->mbox_delete(m);
+}
