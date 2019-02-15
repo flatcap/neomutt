@@ -111,6 +111,86 @@ static const char *Function_not_permitted_in_attach_message_mode =
 static int TopLine = 0;
 static struct Email *OldHdr = NULL;
 
+// Checks to perform before running a function
+#define CHECK_MODE     (1 << 0)
+#define CHECK_READONLY (1 << 1)
+#define CHECK_ATTACH   (1 << 2)
+
+/**
+ * prereq - Check the pre-requisites for a function
+ * @param ctx    Mailbox
+ * @param menu   Current Menu
+ * @param checks Checks to perform, e.g. #CHECK_MSGCOUNT
+ * @retval bool true if the checks pass successfully
+ */
+static bool prereq(struct Context *ctx, struct Menu *menu, int checks)
+{
+  bool result = false;
+
+  if (checks & (CHECK_MSGCOUNT | CHECK_VISIBLE | CHECK_READONLY))
+    checks |= CHECK_IN_MAILBOX;
+
+  if ((checks & CHECK_IN_MAILBOX) && !Context)
+  {
+    mutt_error(_("No mailbox is open"));
+    goto pr_done;
+  }
+
+  if ((checks & CHECK_MSGCOUNT) && (Context->mailbox->msg_count == 0))
+  {
+    mutt_error(_("There are no messages"));
+    goto pr_done;
+  }
+
+  if ((checks & CHECK_VISIBLE) && (menu->current >= Context->mailbox->vcount))
+  {
+    mutt_error(_("No visible messages"));
+    goto pr_done;
+  }
+
+  if ((checks & CHECK_READONLY) && Context->mailbox->readonly)
+  {
+    mutt_error(_("Mailbox is read-only"));
+    goto pr_done;
+  }
+
+  if ((checks & CHECK_ATTACH) && OptAttachMsg)
+  {
+    mutt_error(_("Function not permitted in attach-message mode"));
+    goto pr_done;
+  }
+
+  result = true;
+
+pr_done:
+  if (!result)
+    mutt_flushinp();
+
+  return result;
+}
+
+/**
+ * check_acl - Check the ACLs for a function
+ * @param ctx Mailbox
+ * @param acl ACL, e.g. #MUTT_ACL_DELETE
+ * @param msg Error message for failure
+ * @retval bool true if the function is permitted
+ */
+static bool check_acl(struct Context *ctx, int acl, const char *msg)
+{
+  if (!ctx || !ctx->mailbox)
+    return false;
+
+  if (!(ctx->mailbox->rights & acl))
+  {
+    /* L10N: %s is one of the CHECK_ACL entries below. */
+    mutt_error(_("%s: Operation not permitted by ACL"), msg);
+    return false;
+  }
+
+  return true;
+}
+
 #define CHECK_MODE(test)                                                       \
   if (!(test))                                                                 \
   {                                                                            \
