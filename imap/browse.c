@@ -154,7 +154,7 @@ static int browse_add_list_result(struct ImapAccountData *adata, const char *cmd
     list.name = NULL;
     rc = imap_cmd_step(adata);
 
-    if ((rc == IMAP_CMD_CONTINUE) && list.name)
+    if ((rc == IMAP_RESP_CONTINUE) && list.name)
     {
       /* Let a parent folder never be selectable for navigation */
       if (isparent)
@@ -163,12 +163,12 @@ static int browse_add_list_result(struct ImapAccountData *adata, const char *cmd
       if (isparent || !mutt_str_startswith(url->path, list.name, CASE_MATCH))
         add_folder(list.delim, list.name, list.noselect, list.noinferiors, state, isparent);
     }
-  } while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_RESP_CONTINUE);
   adata->cmdresult = NULL;
 
   url_free(&url);
 
-  return (rc == IMAP_CMD_OK) ? 0 : -1;
+  return (rc == IMAP_RESP_OK) ? 0 : -1;
 }
 
 /**
@@ -249,7 +249,7 @@ int imap_browse(char *path, struct BrowserState *state)
     {
       list.name = 0;
       rc = imap_cmd_step(adata);
-      if ((rc == IMAP_CMD_CONTINUE) && list.name)
+      if ((rc == IMAP_RESP_CONTINUE) && list.name)
       {
         if (!list.noinferiors && list.name[0] &&
             (imap_mxcmp(list.name, mbox) == 0) && (n < sizeof(mbox) - 1))
@@ -258,7 +258,7 @@ int imap_browse(char *path, struct BrowserState *state)
           mbox[n] = '\0';
         }
       }
-    } while (rc == IMAP_CMD_CONTINUE);
+    } while (rc == IMAP_RESP_CONTINUE);
     adata->cmdresult = NULL;
 
     /* if we're descending a folder, mark it as current in browser_state */

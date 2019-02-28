@@ -475,7 +475,7 @@ static int msg_fetch_header(struct Mailbox *m, struct ImapHeader *ih, char *buf,
      * (eg Domino puts FLAGS here). Nothing wrong with that, either.
      * This all has to go - we should accept literals and nonliterals
      * interchangeably at any time. */
-    if (imap_cmd_step(adata) != IMAP_CMD_CONTINUE)
+    if (imap_cmd_step(adata) != IMAP_RESP_CONTINUE)
       return rc;
 
     if (msg_parse_fetch(ih, adata->buf) == -1)
@@ -724,10 +724,10 @@ static int read_headers_normal_eval_cache(struct ImapAccountData *adata,
 
   imap_cmd_start(adata, buf);
 
-  int rc = IMAP_CMD_CONTINUE;
+  int rc = IMAP_RESP_CONTINUE;
   int mfhrc = 0;
   struct ImapHeader h;
-  for (int msgno = 1; rc == IMAP_CMD_CONTINUE; msgno++)
+  for (int msgno = 1; rc == IMAP_RESP_CONTINUE; msgno++)
   {
     if (SigInt && query_abort_header_download(adata))
       return -1;
@@ -739,7 +739,7 @@ static int read_headers_normal_eval_cache(struct ImapAccountData *adata,
     do
     {
       rc = imap_cmd_step(adata);
-      if (rc != IMAP_CMD_CONTINUE)
+      if (rc != IMAP_RESP_CONTINUE)
         break;
 
       mfhrc = msg_fetch_header(m, &h, adata->buf, NULL);
@@ -821,7 +821,7 @@ static int read_headers_normal_eval_cache(struct ImapAccountData *adata,
 
     imap_edata_free((void **) &h.edata);
 
-    if ((mfhrc < -1) || ((rc != IMAP_CMD_CONTINUE) && (rc != IMAP_CMD_OK)))
+    if ((mfhrc < -1) || ((rc != IMAP_RESP_CONTINUE) && (rc != IMAP_RESP_OK)))
       return -1;
   }
 
@@ -931,8 +931,8 @@ static int read_headers_condstore_qresync_updates(struct ImapAccountData *adata,
 
   imap_cmd_start(adata, buf);
 
-  int rc = IMAP_CMD_CONTINUE;
-  for (int msgno = 1; rc == IMAP_CMD_CONTINUE; msgno++)
+  int rc = IMAP_RESP_CONTINUE;
+  for (int msgno = 1; rc == IMAP_RESP_CONTINUE; msgno++)
   {
     if (SigInt && query_abort_header_download(adata))
       return -1;
@@ -941,7 +941,7 @@ static int read_headers_condstore_qresync_updates(struct ImapAccountData *adata,
 
     /* cmd_parse_fetch will update the flags */
     rc = imap_cmd_step(adata);
-    if (rc != IMAP_CMD_CONTINUE)
+    if (rc != IMAP_RESP_CONTINUE)
       break;
 
     /* so we just need to grab the header and persist it back into
@@ -1076,8 +1076,8 @@ static int read_headers_fetch_new(struct Mailbox *m, unsigned int msn_begin,
     FREE(&cmd);
     mutt_buffer_free(&b);
 
-    rc = IMAP_CMD_CONTINUE;
-    for (int msgno = msn_begin; rc == IMAP_CMD_CONTINUE; msgno++)
+    rc = IMAP_RESP_CONTINUE;
+    for (int msgno = msn_begin; rc == IMAP_RESP_CONTINUE; msgno++)
     {
       if (initial_download && SigInt && query_abort_header_download(adata))
         goto bail;
@@ -1094,7 +1094,7 @@ static int read_headers_fetch_new(struct Mailbox *m, unsigned int msn_begin,
       do
       {
         rc = imap_cmd_step(adata);
-        if (rc != IMAP_CMD_CONTINUE)
+        if (rc != IMAP_RESP_CONTINUE)
           break;
 
         mfhrc = msg_fetch_header(m, &h, adata->buf, fp);
@@ -1174,7 +1174,7 @@ static int read_headers_fetch_new(struct Mailbox *m, unsigned int msn_begin,
 
       imap_edata_free((void **) &h.edata);
 
-      if ((mfhrc < -1) || ((rc != IMAP_CMD_CONTINUE) && (rc != IMAP_CMD_OK)))
+      if ((mfhrc < -1) || ((rc != IMAP_RESP_CONTINUE) && (rc != IMAP_RESP_OK)))
         goto bail;
     }
 
@@ -1467,9 +1467,9 @@ int imap_append_message(struct Mailbox *m, struct Message *msg)
 
   do
     rc = imap_cmd_step(adata);
-  while (rc == IMAP_CMD_CONTINUE);
+  while (rc == IMAP_RESP_CONTINUE);
 
-  if (rc != IMAP_CMD_RESPOND)
+  if (rc != IMAP_RESP_RESPOND)
   {
     mutt_debug(LL_DEBUG1, "#1 command failed: %s\n", adata->buf);
 
@@ -1504,7 +1504,7 @@ int imap_append_message(struct Mailbox *m, struct Message *msg)
 
   do
     rc = imap_cmd_step(adata);
-  while (rc == IMAP_CMD_CONTINUE);
+  while (rc == IMAP_RESP_CONTINUE);
 
   if (!imap_code(adata->buf))
   {
@@ -1880,7 +1880,7 @@ int imap_msg_open(struct Mailbox *m, struct Message *msg, int msgno)
   do
   {
     rc = imap_cmd_step(adata);
-    if (rc != IMAP_CMD_CONTINUE)
+    if (rc != IMAP_RESP_CONTINUE)
       break;
 
     pc = adata->buf;
@@ -1925,7 +1925,7 @@ int imap_msg_open(struct Mailbox *m, struct Message *msg, int msgno)
           }
           /* pick up trailing line */
           rc = imap_cmd_step(adata);
-          if (rc != IMAP_CMD_CONTINUE)
+          if (rc != IMAP_RESP_CONTINUE)
             goto bail;
           pc = adata->buf;
 
@@ -1943,7 +1943,7 @@ int imap_msg_open(struct Mailbox *m, struct Message *msg, int msgno)
         }
       }
     }
-  } while (rc == IMAP_CMD_CONTINUE);
+  } while (rc == IMAP_RESP_CONTINUE);
 
   /* see comment before command start. */
   e->active = true;
@@ -1952,7 +1952,7 @@ int imap_msg_open(struct Mailbox *m, struct Message *msg, int msgno)
   if (ferror(msg->fp))
     goto bail;
 
-  if (rc != IMAP_CMD_OK)
+  if (rc != IMAP_RESP_OK)
     goto bail;
 
   if (!fetched || !imap_code(adata->buf))

@@ -107,7 +107,7 @@ static struct ImapCommand *cmd_new(struct ImapAccountData *adata)
   if (adata->seqno > 9999)
     adata->seqno = 0;
 
-  cmd->state = IMAP_CMD_NEW;
+  cmd->state = IMAP_RESP_NEW;
 
   return cmd;
 }
@@ -117,12 +117,11 @@ static struct ImapCommand *cmd_new(struct ImapAccountData *adata)
  * @param adata Imap Account data
  * @param cmdstr Command string
  * @param flags  Server flags, see #ImapCmdFlags
- * @retval  0 Success
- * @retval <0 Failure, e.g. #IMAP_CMD_BAD
+ * @retval enum See #ImapCommandResponse
  *
  * If the queue is full, attempts to drain it.
  */
-static int cmd_queue(struct ImapAccountData *adata, const char *cmdstr, ImapCmdFlags flags)
+static enum ImapCommandResponse cmd_queue(struct ImapAccountData *adata, const char *cmdstr, ImapCmdFlags flags)
 {
   if (cmd_queue_full(adata))
   {
@@ -131,15 +130,15 @@ static int cmd_queue(struct ImapAccountData *adata, const char *cmdstr, ImapCmdF
     const int rc = imap_exec(adata, NULL, flags & IMAP_CMD_POLL);
 
     if (rc == IMAP_EXEC_ERROR)
-      return IMAP_CMD_BAD;
+      return IMAP_RESP_BAD;
   }
 
   struct ImapCommand *cmd = cmd_new(adata);
   if (!cmd)
-    return IMAP_CMD_BAD;
+    return IMAP_RESP_BAD;
 
   if (mutt_buffer_add_printf(adata->cmdbuf, "%s %s\r\n", cmd->seq, cmdstr) < 0)
-    return IMAP_CMD_BAD;
+    return IMAP_RESP_BAD;
 
   return 0;
 }
@@ -181,27 +180,26 @@ static void cmd_handle_fatal(struct ImapAccountData *adata)
  * @param adata Imap Account data
  * @param cmdstr Command string
  * @param flags  Command flags, see #ImapCmdFlags
- * @retval  0 Success
- * @retval <0 Failure, e.g. #IMAP_CMD_BAD
+ * @retval enum See #ImapCommandResponse
  */
-static int cmd_start(struct ImapAccountData *adata, const char *cmdstr, ImapCmdFlags flags)
+static enum ImapCommandResponse cmd_start(struct ImapAccountData *adata, const char *cmdstr, ImapCmdFlags flags)
 {
   int rc;
 
   if (adata->status == IMAP_FATAL)
   {
     cmd_handle_fatal(adata);
-    return -1;
+    return IMAP_RESP_BAD;
   }
 
   if (cmdstr && ((rc = cmd_queue(adata, cmdstr, flags)) < 0))
     return rc;
 
   if (flags & IMAP_CMD_QUEUE)
-    return 0;
+    return IMAP_RESP_OK;
 
   if (adata->cmdbuf->dptr == adata->cmdbuf->data)
-    return IMAP_CMD_BAD;
+    return IMAP_RESP_BAD;
 
   rc = mutt_socket_send_d(adata->conn, adata->cmdbuf->data,
                           (flags & IMAP_CMD_PASS) ? IMAP_LOG_PASS : IMAP_LOG_CMD);
@@ -211,25 +209,24 @@ static int cmd_start(struct ImapAccountData *adata, const char *cmdstr, ImapCmdF
   if (adata->state == IMAP_IDLE)
     adata->state = IMAP_SELECTED;
 
-  return (rc < 0) ? IMAP_CMD_BAD : 0;
+  return (rc < 0) ? IMAP_RESP_BAD : IMAP_RESP_OK;
 }
 
 /**
  * cmd_status - parse response line for tagged OK/NO/BAD
  * @param s Status string from server
- * @retval  0 Success
- * @retval <0 Failure, e.g. #IMAP_CMD_BAD
+ * @retval enum See #ImapCommandResponse
  */
-static int cmd_status(const char *s)
+static enum ImapCommandResponse cmd_status(const char *s)
 {
   s = imap_next_word((char *) s);
 
   if (mutt_str_startswith(s, "OK", CASE_IGNORE))
-    return IMAP_CMD_OK;
+    return IMAP_RESP_OK;
   if (mutt_str_startswith(s, "NO", CASE_IGNORE))
-    return IMAP_CMD_NO;
+    return IMAP_RESP_NO;
 
-  return IMAP_CMD_BAD;
+  return IMAP_RESP_BAD;
 }
 
 /**
@@ -600,7 +597,7 @@ static void cmd_parse_list(struct ImapAccountData *adata, char *s)
   /* Notes often responds with literals here. We need a real tokenizer. */
   if (imap_get_literal_count(s, &litlen) == 0)
   {
-    if (imap_cmd_step(adata) != IMAP_CMD_CONTINUE)
+    if (imap_cmd_step(adata) != IMAP_RESP_CONTINUE)
     {
       adata->status = IMAP_FATAL;
       return;
@@ -781,7 +778,7 @@ static void cmd_parse_status(struct ImapAccountData *adata, char *s)
   /* We need a real tokenizer. */
   if (imap_get_literal_count(mailbox, &litlen) == 0)
   {
-    if (imap_cmd_step(adata) != IMAP_CMD_CONTINUE)
+    if (imap_cmd_step(adata) != IMAP_RESP_CONTINUE)
     {
       adata->status = IMAP_FATAL;
       return;
@@ -1029,13 +1026,12 @@ static int cmd_handle_untagged(struct ImapAccountData *adata)
 /**
  * imap_cmd_start - Given an IMAP command, send it to the server
  * @param adata Imap Account data
- * @param cmdstr Command string to send
- * @retval  0 Success
- * @retval <0 Failure, e.g. #IMAP_CMD_BAD
+ * @param cmdstr Command string to send (OPTIONAL)
+ * @retval enum See #ImapCommandResponse
  *
  * If cmdstr is NULL, sends queued commands.
  */
-int imap_cmd_start(struct ImapAccountData *adata, const char *cmdstr)
+enum ImapCommandResponse imap_cmd_start(struct ImapAccountData *adata, const char *cmdstr)
 {
   return cmd_start(adata, cmdstr, 0);
 }
@@ -1043,27 +1039,26 @@ int imap_cmd_start(struct ImapAccountData *adata, const char *cmdstr)
 /**
  * imap_cmd_step - Reads server responses from an IMAP command
  * @param adata Imap Account data
- * @retval  0 Success
- * @retval <0 Failure, e.g. #IMAP_CMD_BAD
+ * @retval enum See #ImapCommandResponse
  *
- * detects tagged completion response, handles untagged messages, can read
+ * Detects tagged completion response, handles untagged messages, can read
  * arbitrarily large strings (using malloc, so don't make it _too_ large!).
  */
-int imap_cmd_step(struct ImapAccountData *adata)
+enum ImapCommandResponse imap_cmd_step(struct ImapAccountData *adata)
 {
   if (!adata)
-    return -1;
+    return IMAP_RESP_BAD;
 
   size_t len = 0;
   int c;
-  int rc;
+  enum ImapCommandResponse rc;
   int stillrunning = 0;
   struct ImapCommand *cmd = NULL;
 
   if (adata->status == IMAP_FATAL)
   {
     cmd_handle_fatal(adata);
-    return IMAP_CMD_BAD;
+    return IMAP_RESP_BAD;
   }
 
   /* read into buffer, expanding buffer as necessary until we have a full
@@ -1085,7 +1080,7 @@ int imap_cmd_step(struct ImapAccountData *adata)
     {
       mutt_debug(LL_DEBUG1, "Error reading server response.\n");
       cmd_handle_fatal(adata);
-      return IMAP_CMD_BAD;
+      return IMAP_RESP_BAD;
     }
 
     len += c;
@@ -1110,12 +1105,12 @@ int imap_cmd_step(struct ImapAccountData *adata)
        mutt_str_startswith(imap_next_word(adata->buf), "OK [", CASE_MATCH)) &&
       cmd_handle_untagged(adata))
   {
-    return IMAP_CMD_BAD;
+    return IMAP_RESP_BAD;
   }
 
   /* server demands a continuation response from us */
   if (adata->buf[0] == '+')
-    return IMAP_CMD_RESPOND;
+    return IMAP_RESP_RESPOND;
 
   /* Look for tagged command completions.
    *
@@ -1127,12 +1122,12 @@ int imap_cmd_step(struct ImapAccountData *adata)
    * Other callers don't even create an adata->cmds entry.
    *
    * For both these cases, we default to returning OK */
-  rc = IMAP_CMD_OK;
+  rc = IMAP_RESP_OK;
   c = adata->lastcmd;
   do
   {
     cmd = &adata->cmds[c];
-    if (cmd->state == IMAP_CMD_NEW)
+    if (cmd->state == IMAP_RESP_NEW)
     {
       if (mutt_str_startswith(adata->buf, cmd->seq, CASE_MATCH))
       {
@@ -1154,7 +1149,7 @@ int imap_cmd_step(struct ImapAccountData *adata)
   } while (c != adata->nextcmd);
 
   if (stillrunning)
-    rc = IMAP_CMD_CONTINUE;
+    rc = IMAP_RESP_CONTINUE;
   else
   {
     mutt_debug(LL_DEBUG3, "IMAP queue drained\n");
@@ -1167,12 +1162,12 @@ int imap_cmd_step(struct ImapAccountData *adata)
 /**
  * imap_code - Was the command successful
  * @param s IMAP command status
- * @retval 1 Command result was OK
- * @retval 0 If NO or BAD
+ * @retval true  Command result was OK
+ * @retval false If NO or BAD
  */
 bool imap_code(const char *s)
 {
-  return cmd_status(s) == IMAP_CMD_OK;
+  return cmd_status(s) == IMAP_RESP_OK;
 }
 
 /**
@@ -1245,12 +1240,12 @@ int imap_exec(struct ImapAccountData *adata, const char *cmdstr, ImapCmdFlags fl
   mutt_sig_allow_interrupt(1);
   do
     rc = imap_cmd_step(adata);
-  while (rc == IMAP_CMD_CONTINUE);
+  while (rc == IMAP_RESP_CONTINUE);
   mutt_sig_allow_interrupt(0);
 
-  if (rc == IMAP_CMD_NO)
+  if (rc == IMAP_RESP_NO)
     return IMAP_EXEC_ERROR;
-  else if (rc != IMAP_CMD_OK)
+  else if (rc != IMAP_RESP_OK)
   {
     if (adata->status != IMAP_FATAL)
       return IMAP_EXEC_ERROR;
@@ -1328,43 +1323,42 @@ void imap_cmd_finish(struct ImapAccountData *adata)
 /**
  * imap_cmd_idle - Enter the IDLE state
  * @param adata Imap Account data
- * @retval  0 Success
- * @retval <0 Failure, e.g. #IMAP_CMD_BAD
+ * @retval enum See #ImapCommandResponse
  */
-int imap_cmd_idle(struct ImapAccountData *adata)
+enum ImapCommandResponse imap_cmd_idle(struct ImapAccountData *adata)
 {
-  int rc;
+  enum ImapCommandResponse rc;
 
   if (cmd_start(adata, "IDLE", IMAP_CMD_POLL) < 0)
   {
     cmd_handle_fatal(adata);
-    return -1;
+    return IMAP_RESP_BAD;
   }
 
   if ((C_ImapPollTimeout > 0) && ((mutt_socket_poll(adata->conn, C_ImapPollTimeout)) == 0))
   {
     mutt_error(_("Connection to %s timed out"), adata->conn->account.host);
     cmd_handle_fatal(adata);
-    return -1;
+    return IMAP_RESP_BAD;
   }
 
   do
     rc = imap_cmd_step(adata);
-  while (rc == IMAP_CMD_CONTINUE);
+  while (rc == IMAP_RESP_CONTINUE);
 
-  if (rc == IMAP_CMD_RESPOND)
+  if (rc == IMAP_RESP_RESPOND)
   {
     /* successfully entered IDLE state */
     adata->state = IMAP_IDLE;
     /* queue automatic exit when next command is issued */
     mutt_buffer_addstr(adata->cmdbuf, "DONE\r\n");
-    rc = IMAP_CMD_OK;
+    rc = IMAP_RESP_OK;
   }
-  if (rc != IMAP_CMD_OK)
+  if (rc != IMAP_RESP_OK)
   {
     mutt_debug(LL_DEBUG1, "error starting IDLE\n");
-    return -1;
+    return IMAP_RESP_BAD;
   }
 
-  return 0;
+  return IMAP_RESP_OK;
 }
