@@ -395,6 +395,133 @@ bool get_user_info(struct ConfigSet *cs)
   return true;
 }
 
+void dump_addresses(struct AddressList *al)
+{
+  struct Address *addr = NULL;
+  TAILQ_FOREACH(addr, al, entries)
+  {
+    // printf("\tAddr: %d%d%d %s : %s\n", addr->group, addr->is_intl, addr->intl_checked, addr->personal, addr->mailbox);
+    printf("\tAddr: %p %s : %s\n", (void *) addr, addr->personal, addr->mailbox);
+  }
+}
+
+void dump_regexes(struct RegexList *rl)
+{
+  struct RegexListNode *np = NULL;
+  STAILQ_FOREACH(np, rl, entries)
+  {
+    printf("\tRegex: %s\n", np->regex->pattern);
+  }
+}
+
+void dump_group(struct Group *g)
+{
+  dump_addresses(&g->al);
+  dump_regexes(&g->rs);
+}
+
+void dump_groups(void)
+{
+  struct HashWalkState walk = { 0 };
+  struct HashElem *he = NULL;
+
+  while ((he = mutt_hash_walk(Groups, &walk)))
+  {
+    struct Group *g = he->data;
+    printf("Group: %s\n", g->name);
+    dump_group(g);
+  }
+}
+
+void dump_aliases(void)
+{
+  struct Alias *a = NULL, *tmp = NULL;
+  TAILQ_FOREACH_SAFE(a, &Aliases, entries, tmp)
+  {
+    printf("Alias: %s\n", a->name);
+    dump_addresses(&a->addr);
+  }
+}
+
+void dump_alternates(void)
+{
+  struct RegexListNode *np = NULL;
+  if (!STAILQ_EMPTY(&Alternates))
+  {
+    printf("Alternates\n");
+    STAILQ_FOREACH(np, &Alternates, entries)
+    {
+      printf("\t%s\n", np->regex->pattern);
+    }
+  }
+  if (!STAILQ_EMPTY(&UnAlternates))
+  {
+    printf("UnAlternates\n");
+    STAILQ_FOREACH(np, &UnAlternates, entries)
+    {
+      printf("\t%s\n", np->regex->pattern);
+    }
+  }
+}
+
+void dump_maillists(void)
+{
+  struct RegexListNode *np = NULL;
+  if (!STAILQ_EMPTY(&MailLists))
+  {
+    printf("MailLists\n");
+    STAILQ_FOREACH(np, &MailLists, entries)
+    {
+      printf("\t%s\n", np->regex->pattern);
+    }
+  }
+  if (!STAILQ_EMPTY(&UnMailLists))
+  {
+    printf("UnMailLists\n");
+    STAILQ_FOREACH(np, &UnMailLists, entries)
+    {
+      printf("\t%s\n", np->regex->pattern);
+    }
+  }
+}
+
+void dump_subscribedlists(void)
+{
+  struct RegexListNode *np = NULL;
+  if (!STAILQ_EMPTY(&SubscribedLists))
+  {
+    printf("SubscribedLists\n");
+    STAILQ_FOREACH(np, &SubscribedLists, entries)
+    {
+      printf("\t%s\n", np->regex->pattern);
+    }
+  }
+  if (!STAILQ_EMPTY(&UnSubscribedLists))
+  {
+    printf("UnSubscribedLists\n");
+    STAILQ_FOREACH(np, &UnSubscribedLists, entries)
+    {
+      printf("\t%s\n", np->regex->pattern);
+    }
+  }
+}
+
+void dump_autosubscribecache(void)
+{
+  struct HashWalkState walk = { 0 };
+  struct HashElem *he = NULL;
+
+  if (AutoSubscribeCache)
+  {
+    printf("AutoSubscribeCache\n");
+    while ((he = mutt_hash_walk(AutoSubscribeCache, &walk)))
+    {
+      const char *str = he->data;
+      printf("\t%s\n", str);
+    }
+  }
+}
+
 /**
  * main - Start NeoMutt
  * @param argc Number of command line arguments
@@ -819,6 +946,14 @@ int main(int argc, char *argv[], char *envp[])
       }
     }
   }
+
+  dump_aliases();
+  dump_groups();
+  dump_alternates();
+  dump_maillists();
+  dump_subscribedlists();
+  dump_autosubscribecache();
+  goto main_exit;
 
   if (batch_mode)
   {

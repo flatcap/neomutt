@@ -52,6 +52,8 @@ struct GroupNode
 };
 STAILQ_HEAD(GroupList, GroupNode);
 
+extern struct Hash *Groups;
+
 void mutt_grouplist_init(void);
 void mutt_grouplist_free(void);
 void mutt_grouplist_add(struct GroupList *gl, struct Group *group);

@@ -35,7 +35,7 @@
 #include "group.h"
 #include "address.h"
 
-static struct Hash *Groups = NULL;
+struct Hash *Groups = NULL;
 
 /**
  * mutt_grouplist_init - Initialize the GroupList singleton
