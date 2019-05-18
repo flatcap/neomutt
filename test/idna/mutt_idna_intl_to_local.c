@@ -31,12 +31,54 @@ void test_mutt_idna_intl_to_local(void)
   // char * mutt_idna_intl_to_local(const char *user, const char *domain, int flags);
 
 #ifdef HAVE_LIBIDN
-  {
-    TEST_CHECK(!mutt_idna_intl_to_local(NULL, "banana", 0));
-  }
+  // {
+  //   TEST_CHECK(!mutt_idna_intl_to_local(NULL, "banana", 0));
+  // }
+
+  // {
+  //   TEST_CHECK(!mutt_idna_intl_to_local("apple", NULL, 0));
+  // }
+
+  // {
+  //   C_Charset = "utf-8";
+  //   char *email = NULL;
+  //   TEST_CHECK((email = mutt_idna_intl_to_local("john", "example.com", MI_MAY_BE_IRREVERSIBLE)) != NULL);
+  //   TEST_MSG("email: %s\n", email);
+  //   FREE(&email);
+  // }
+
+  // {
+  //   C_Charset = "utf-8";
+  //   char *email = NULL;
+  //   TEST_CHECK((email = mutt_idna_intl_to_local("josé", "example.com", MI_MAY_BE_IRREVERSIBLE)) != NULL);
+  //   TEST_MSG("email: %s\n", email);
+  //   FREE(&email);
+  // }
 
   {
-    TEST_CHECK(!mutt_idna_intl_to_local("apple", NULL, 0));
+    C_Charset = "us-ascii";
+    char *email = NULL;
+    TEST_CHECK((email = mutt_idna_intl_to_local("苹果", "example.com", MI_MAY_BE_IRREVERSIBLE)) != NULL);
+    TEST_MSG("email: %s\n", email);
+    FREE(&email);
+  }
+
+  // {
+  //   C_Charset = "utf-8";
+  //   C_IdnDecode = true;
+  //   char *email = NULL;
+  //   TEST_CHECK((email = mutt_idna_intl_to_local("jim", "💩.la", MI_MAY_BE_IRREVERSIBLE)) != NULL);
+  //   TEST_MSG("email: %s\n", email);
+  //   FREE(&email);
+  // }
+
+  {
+    C_Charset = "utf-8";
+    C_IdnDecode = true;
+    char *email = NULL;
+    TEST_CHECK((email = mutt_idna_intl_to_local("Bücher", "xn--!s8h.la", MI_MAY_BE_IRREVERSIBLE)) != NULL);
+    TEST_MSG("email: %s\n", email);
+    FREE(&email);
   }
 #endif
 }
