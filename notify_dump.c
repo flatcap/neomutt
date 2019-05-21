@@ -1,12 +1,14 @@
 #include "config.h"
+#include <stdint.h>
+#include <stdio.h>
 #include "mutt/mutt.h"
 #include "config/lib.h"
 #include "email/lib.h"
 #include "core/lib.h"
-#include "hook.h"
 
 const char *MagicValues[] = {
-  NULL, "mbox", "MMDF", "MH", "Maildir", "nntp", "imap", "notmuch", "pop", "compressed",
+  NULL,   "mbox", "MMDF",    "MH",  "Maildir",
+  "nntp", "imap", "notmuch", "pop", "compressed",
 };
 
 const char *dump_config2(int subtype, intptr_t event)

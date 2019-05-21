@@ -113,6 +113,7 @@ struct Email
   void *edata;                 ///< Driver-specific data
   void (*free_edata)(void **); ///< Driver-specific data free function
   struct Notify *notify;       ///< Notifications handler
+  int refcount;
 };
 
 /**

@@ -94,8 +94,6 @@
 #include "autocrypt/autocrypt.h"
 #endif
 
-struct Notify;
-
 int notify_dump(struct NotifyCallback *nc);
 
 /* These Config Variables are only used in main.c */

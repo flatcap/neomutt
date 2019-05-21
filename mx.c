@@ -1504,7 +1504,11 @@ struct Mailbox *mx_mbox_find(struct Account *a, const char *path)
   STAILQ_FOREACH(np, &a->mailboxes, entries)
   {
     if (mutt_str_strcmp(np->mailbox->realpath, path) == 0)
-      return np->mailbox;
+    {
+      struct Mailbox *m = np->mailbox;
+      m->refcount++;
+      return m;
+    }
   }
 
   return NULL;

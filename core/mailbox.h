@@ -30,8 +30,11 @@
 #include <sys/types.h>
 #include <time.h>
 #include "mutt/mutt.h"
+#include "email/email.h"
 
 struct Email;
+struct Buffer;
+struct Notify;
 
 #define MB_NORMAL 0
 #define MB_HIDDEN 1
@@ -148,6 +151,7 @@ struct Mailbox
   void (*free_mdata)(void **);        ///< Driver-specific data free function
 
   struct Notify *notify;              ///< Notifications handler
+  int refcount;
 };
 
 /**
@@ -166,6 +170,8 @@ STAILQ_HEAD(MailboxList, MailboxNode);
 struct EventMailbox
 {
   struct Mailbox *mailbox; ///< The Mailbox this Event relates to
+  int num_emails;
+  struct Email **emails;
 };
 
 /**

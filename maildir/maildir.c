@@ -287,10 +287,37 @@ static int maildir_mbox_open(struct Mailbox *m)
 {
   /* maildir looks sort of like MH, except that there are two subdirectories
    * of the main folder path from which to read messages */
-  if ((mh_read_dir(m, "new") == -1) || (mh_read_dir(m, "cur") == -1))
-    return -1;
+  int rc = mh_read_dir(m, "new");
+  if (rc == 0)
+  {
+    int count = 0;
+    for (int i = 0; i < m->email_max; i++, count++)
+      if (!m->emails[i])
+        break;
 
-  return 0;
+    struct EventEmail ev_e = { 0, 0 };
+
+    ev_e.num_emails = count;
+    ev_e.emails = m->emails;
+    notify_send(m->notify, NT_EMAIL, NT_EMAIL_NEW, IP & ev_e);
+
+    rc = mh_read_dir(m, "cur");
+    if (rc == 0)
+    {
+      ev_e.emails = m->emails + count;
+      int i = count;
+      count = 0;
+
+      for (; i < m->email_max; i++, count++)
+        if (!m->emails[i])
+          break;
+
+      ev_e.num_emails = count;
+      notify_send(m->notify, NT_EMAIL, NT_EMAIL_ADD, IP & ev_e);
+    }
+  }
+
+  return rc;
 }
 
 /**
@@ -422,12 +449,27 @@ int maildir_mbox_check(struct Mailbox *m, int *index_hint)
     mutt_file_get_stat_timespec(&m->mtime, &st_new, MUTT_STAT_MTIME);
   }
 
+  struct EmailList el_new = STAILQ_HEAD_INITIALIZER(el_new);
+  struct EmailList el_changed = STAILQ_HEAD_INITIALIZER(el_changed);
+  struct EmailList el_deleted = STAILQ_HEAD_INITIALIZER(el_deleted);
+
   /* do a fast scan of just the filenames in
    * the subdirectories that have changed.  */
   md = NULL;
   last = &md;
   if (changed & MMC_NEW_DIR)
     maildir_parse_dir(m, &last, "new", &count, NULL);
+
+  for (struct Maildir *md2 = md; md2; md2 = md2->next)
+  {
+    if (!md2->email || !md2->email->path)
+      continue;
+
+    struct EmailNode *en = mutt_mem_calloc(1, sizeof(*en));
+    en->email = md2->email;
+    STAILQ_INSERT_TAIL(&el_new, en, entries);
+  }
+
   if (changed & MMC_CUR_DIR)
     maildir_parse_dir(m, &last, "cur", &count, NULL);
 
@@ -464,8 +506,15 @@ int maildir_mbox_check(struct Mailbox *m, int *index_hint)
       /* if the user hasn't modified the flags on this message, update
        * the flags we just detected.  */
       if (!e->changed)
+      {
         if (maildir_update_flags(m, e, p->email))
+        {
           flags_changed = true;
+          struct EmailNode *en = mutt_mem_calloc(1, sizeof(*en));
+          en->email = e;
+          STAILQ_INSERT_TAIL(&el_changed, en, entries);
+        }
+      }
 
       if (e->deleted == e->trash)
       {
@@ -473,6 +522,9 @@ int maildir_mbox_check(struct Mailbox *m, int *index_hint)
         {
           e->deleted = p->email->deleted;
           flags_changed = true;
+          struct EmailNode *en = mutt_mem_calloc(1, sizeof(*en));
+          en->email = e;
+          STAILQ_INSERT_TAIL(&el_deleted, en, entries);
         }
       }
       e->trash = p->email->trash;
@@ -517,6 +569,29 @@ int maildir_mbox_check(struct Mailbox *m, int *index_hint)
     mailbox_changed(m, MBN_INVALID);
     m->changed = true;
   }
+
+  struct EmailNode *en = NULL;
+  STAILQ_FOREACH(en, &el_changed, entries)
+  {
+    mutt_message("Email changed: %s", en->email->env->subject);
+  }
+  STAILQ_FOREACH(en, &el_deleted, entries)
+  {
+    mutt_message("Email deleted: %s", en->email->env->subject);
+  }
+  STAILQ_FOREACH(en, &el_new, entries)
+  {
+    if (!en->email->env)
+    {
+      mutt_error("email with no envelope: %s", en->email->path);
+      continue;
+    }
+
+    mutt_message("Email new: %s", en->email->env->subject);
+  }
+  emaillist_clear(&el_changed);
+  emaillist_clear(&el_deleted);
+  emaillist_clear(&el_new);
 
   mutt_buffer_pool_release(&buf);
 

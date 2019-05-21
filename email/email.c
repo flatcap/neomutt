@@ -45,6 +45,9 @@ void email_free(struct Email **ptr)
     return;
 
   struct Email *e = *ptr;
+  e->refcount--;
+  if (e->refcount > 0)
+    return;
 
   if (e->edata && e->free_edata)
     e->free_edata(&e->edata);
@@ -74,6 +77,7 @@ struct Email *email_new(void)
   STAILQ_INIT(&e->chain);
 #endif
   STAILQ_INIT(&e->tags);
+  e->refcount = 1;
   memset(e->canary, 'N', sizeof(e->canary));
   return e;
 }

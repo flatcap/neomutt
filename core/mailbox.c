@@ -41,6 +41,8 @@
 struct Mailbox *mailbox_new(void)
 {
   struct Mailbox *m = mutt_mem_calloc(1, sizeof(struct Mailbox));
+  m->notify = notify_new(m, NT_MAILBOX);
+  m->refcount = 1;
 
   m->pathbuf = mutt_buffer_new();
   m->notify = notify_new(m, NT_MAILBOX);
@@ -58,6 +60,10 @@ void mailbox_free(struct Mailbox **ptr)
     return;
 
   struct Mailbox *m = *ptr;
+  m->refcount--;
+  if (m->refcount > 0)
+    return;
+
   mailbox_changed(m, MBN_CLOSED);
 
   if (m->mdata && m->free_mdata)

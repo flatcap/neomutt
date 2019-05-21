@@ -43,6 +43,7 @@ struct Account
   void *adata;                  ///< Private data (for Mailbox backends)
   void (*free_adata)(void **);  ///< Callback function to free private data
   TAILQ_ENTRY(Account) entries; ///< Linked list of Accounts
+  int refcount;                 ///< Reference count
 };
 TAILQ_HEAD(AccountList, Account);
 
