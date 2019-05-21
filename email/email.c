@@ -42,6 +42,10 @@ void mutt_email_free(struct Email **e)
 {
   if (!e || !*e)
     return;
+  (*e)->refcount--;
+  if ((*e)->refcount > 0)
+    return;
+
   mutt_env_free(&(*e)->env);
   mutt_body_free(&(*e)->content);
   FREE(&(*e)->maildir_flags);
@@ -67,6 +71,7 @@ struct Email *mutt_email_new(void)
   STAILQ_INIT(&e->chain);
 #endif
   STAILQ_INIT(&e->tags);
+  e->refcount = 1;
   return e;
 }
 

@@ -256,6 +256,8 @@ int log_disp_file(time_t stamp, const char *file, int line,
 {
   if (!LogFileFP || (level < LL_PERROR) || (level > LogFileLevel))
     return 0;
+  if ((level >= LL_DEBUG2) && (level <= LL_DEBUG5))
+    return 0;
 
   int ret = 0;
   int err = errno;

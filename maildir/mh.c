@@ -543,7 +543,22 @@ int mh_sync_message(struct Mailbox *m, int msgno)
  */
 static int mh_mbox_open(struct Mailbox *m)
 {
-  return mh_read_dir(m, NULL);
+  int rc = mh_read_dir(m, NULL);
+  if (rc != 0)
+    return rc;
+
+  int count = 0;
+  for (int i = 0; i < m->email_max; i++, count++)
+    if (!m->emails[i])
+      break;
+
+  struct EventEmail ev_e = { 0, 0 };
+
+  ev_e.num_emails = count;
+  ev_e.emails = m->emails;
+  notify_send(m->notify, NT_EMAIL, NT_EMAIL_NEW, IP &ev_e);
+
+  return rc;
 }
 
 /**
