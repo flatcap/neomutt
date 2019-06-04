@@ -759,6 +759,8 @@ void dot_allaccounts(FILE *fp, struct AccountList *al, struct ListHead *links)
   struct Account *np = NULL;
   TAILQ_FOREACH(np, al, entries)
   {
+    if (np->magic == MUTT_MBOX)
+      continue;
     dot_account(fp, np, links);
     if (prev)
       dot_add_link(links, prev, np, "Account->next", false);
@@ -854,7 +856,7 @@ void dot_dump(const char *title)
   dot_add_link(&links, connections, TAILQ_FIRST(cl), "Connections->first", false);
 #endif
 
-#if 1
+#if 0
   if (Context)
     dot_context(fp, Context, &links);
 
@@ -876,6 +878,8 @@ void dot_dump(const char *title)
   struct Account *np = NULL;
   TAILQ_FOREACH(np, &AllAccounts, entries)
   {
+    if (np->magic == MUTT_MBOX)
+      continue;
     dot_ptr_name(name, sizeof(name), np);
     fprintf(fp, "%s ", name);
   }
