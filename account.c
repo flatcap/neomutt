@@ -45,6 +45,16 @@ struct Account *account_new(const char *name)
   struct Account *a = mutt_mem_calloc(1, sizeof(struct Account));
   STAILQ_INIT(&a->mailboxes);
 
+  if (name)
+  {
+    a->name = mutt_str_strdup(name);
+    static const char *AccountVarStr[] = {
+      "folder", "index_format", "sort", "sort_aux", NULL,
+    };
+
+    account_add_config(a, Config, a->name, AccountVarStr);
+  }
+
   return a;
 }
 

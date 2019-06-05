@@ -799,8 +799,19 @@ void index_make_entry(char *buf, size_t buflen, struct Menu *menu, int line)
     }
   }
 
-  mutt_make_string_flags(buf, buflen, NONULL(C_IndexFormat), Context,
-                         Context->mailbox, e, flags);
+  struct Account *a = Context->mailbox->account;
+  if (a->name)
+  {
+    struct Buffer *value = mutt_buffer_pool_get();
+    account_get_value(a, 1, value);
+    mutt_make_string_flags(buf, buflen, mutt_b2s(value), Context, Context->mailbox, e, flags);
+    mutt_buffer_pool_release(&value);
+  }
+  else
+  {
+    mutt_make_string_flags(buf, buflen, NONULL(C_IndexFormat), Context,
+                           Context->mailbox, e, flags);
+  }
 }
 
 /**
