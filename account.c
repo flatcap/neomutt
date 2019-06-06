@@ -298,6 +298,22 @@ struct Account *account_find(const char *name)
 }
 
 /**
+ * account_count - Count the 'account' command stack depth
+ * @param num Stack depth
+ */
+size_t account_count(void)
+{
+  size_t count = 0;
+
+  struct ListNode *np = NULL;
+  STAILQ_FOREACH(np, &ConfigAccountStack, entries)
+  {
+    count++;
+  }
+  return count;
+}
+
+/**
  * account_push_current - Set the current 'account' command in effect
  * @param name Current Account name
  */
@@ -308,6 +324,8 @@ void account_push_current(char *name)
 
   name = mutt_str_strdup(name);
   mutt_list_insert_head(&ConfigAccountStack, name);
+
+  mutt_message("pushed %s (%ld)", name, account_count());
 }
 
 /**
@@ -321,6 +339,7 @@ void account_pop_current(void)
 
   STAILQ_REMOVE_HEAD(&ConfigAccountStack, entries);
 
+  mutt_message("popped %s (%ld)", first->data, account_count());
   FREE(&first->data);
   FREE(&first);
 }

@@ -49,6 +49,7 @@
 #include "config/lib.h"
 #include "email/lib.h"
 #include "mutt.h"
+#include "account.h"
 #include "context.h"
 #include "copy.h"
 #include "globals.h"
@@ -1657,7 +1658,10 @@ struct Account *maildir_ac_find(struct Account *a, const char *path)
 {
   if (!a || !path)
     return NULL;
+  if ((a->magic != MUTT_MH) && (a->magic != MUTT_MAILDIR))
+    return NULL;
 
+  mutt_message("find: %s", path);
   return a;
 }
 

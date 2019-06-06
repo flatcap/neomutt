@@ -395,6 +395,56 @@ bool get_user_info(struct ConfigSet *cs)
   return true;
 }
 
+void dump_one(struct Buffer *tmp, struct Buffer *value, const char *name)
+{
+  mutt_buffer_reset(value);
+  mutt_buffer_reset(tmp);
+  struct HashElem *he = NULL;
+  he = cs_get_elem(Config, name);
+  int type = DTYPE(he->type);
+  cs_he_string_get(Config, he, value);
+  if ((type != DT_BOOL) && (type != DT_NUMBER) && (type != DT_LONG) && (type != DT_QUAD))
+  {
+    mutt_buffer_reset(tmp);
+    pretty_var(value->data, tmp);
+    mutt_buffer_strcpy(value, tmp->data);
+  }
+  dump_config_neo(Config, he, value, NULL, CS_DUMP_NO_FLAGS, stdout);
+}
+
+void dump_vars(const char *account)
+{
+  const char *vars[] = { "folder", "index_format", "sort", "sort_aux" };
+  struct Buffer *tmp = mutt_buffer_alloc(1024);
+  struct Buffer *value = mutt_buffer_alloc(1024);
+  char name[128];
+
+  printf("%s:\n", account ? account : "base values");
+  for (size_t i = 0; i < mutt_array_size(vars); i++)
+  {
+    printf("    ");
+    if (account)
+      snprintf(name, sizeof(name), "%s:%s", account, vars[i]);
+    else
+      snprintf(name, sizeof(name), "%s", vars[i]);
+    dump_one(tmp, value, name);
+  }
+
+  mutt_buffer_free(&tmp);
+  mutt_buffer_free(&value);
+}
+
+void dump_accounts2(void)
+{
+  printf("\n");
+  dump_vars(NULL);
+  struct Account *np = NULL;
+  TAILQ_FOREACH(np, &AllAccounts, entries)
+  {
+    dump_vars(np->name);
+  }
+}
+
 /**
  * main - Start NeoMutt
  * @param argc Number of command line arguments
@@ -823,6 +873,8 @@ int main(int argc, char *argv[], char *envp[])
 
   if (batch_mode)
   {
+    dot_dump("batch");
+    dump_accounts2();
     goto main_ok; // TEST22: neomutt -B
   }
 

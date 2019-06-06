@@ -1349,12 +1349,15 @@ static enum CommandResult parse_mailboxes(struct Buffer *buf, struct Buffer *s,
 
     mutt_buffer_strcpy(m->pathbuf, buf->data);
     char *name = account_get_current();
+    mutt_message("%s : %s", name, mutt_b2s(m->pathbuf));
 
     bool new_account = false;
     struct Account *a = NULL;
     if (name)
     {
       a = account_find(name);
+      if (a)
+        mutt_message("found account %s", a->name);
       struct Buffer *folder = mutt_buffer_alloc(256);
       account_get_value(a, 0, folder);
       mx_path_canon2(m, folder->data);
