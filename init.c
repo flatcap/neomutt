@@ -804,6 +804,10 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
     return -1;
   }
 
+  // Inherit the 'account' of the parent config file
+  char *name = account_get_current();
+  account_push_current(name);
+
   mutt_buffer_init(&token);
   while ((linebuf = mutt_file_read_line(linebuf, &buflen, fp, &line, MUTT_CONT)))
   {
@@ -879,6 +883,8 @@ static int source_rc(const char *rcfile_path, struct Buffer *err)
     FREE(&np);
   }
 
+  // The 'account' command stops at the end of the file
+  account_pop_current();
   return rc;
 }
 
@@ -1342,13 +1348,26 @@ static enum CommandResult parse_mailboxes(struct Buffer *buf, struct Buffer *s,
     }
 
     mutt_buffer_strcpy(m->pathbuf, buf->data);
-    /* int rc = */ mx_path_canon2(m, C_Folder);
+    char *name = account_get_current();
 
     bool new_account = false;
-    struct Account *a = mx_ac_find(m);
+    struct Account *a = NULL;
+    if (name)
+    {
+      a = account_find(name);
+      struct Buffer *folder = mutt_buffer_alloc(256);
+      account_get_value(a, 0, folder);
+      mx_path_canon2(m, folder->data);
+      mutt_buffer_free(&folder);
+    }
+    else
+    {
+      mx_path_canon2(m, C_Folder);
+      a = mx_ac_find(m);
+    }
     if (!a)
     {
-      a = account_new();
+      a = account_new(name);
       a->magic = m->magic;
       new_account = true;
     }
@@ -1555,7 +1574,17 @@ static enum CommandResult parse_set(struct Buffer *buf, struct Buffer *s,
     bool my = mutt_str_startswith(buf->data, "my_", CASE_MATCH);
     if (!my)
     {
-      he = cs_get_elem(Config, buf->data);
+      const char *name = account_get_current();
+      if (name)
+      {
+        char scoped[128] = { 0 };
+        snprintf(scoped, sizeof(scoped), "%s:%s", name, buf->data);
+        he = cs_get_elem(Config, scoped);
+      }
+      if (!he)
+      {
+        he = cs_get_elem(Config, buf->data);
+      }
       if (!he)
       {
         if (reset && (mutt_str_strcmp(buf->data, "all") == 0))

@@ -28,15 +28,19 @@
 
 #include "config.h"
 #include "mutt/mutt.h"
+#include "mutt.h"
 #include "account.h"
+#include "globals.h"
 
 struct AccountList AllAccounts = TAILQ_HEAD_INITIALIZER(AllAccounts);
+struct ListHead ConfigAccountStack = STAILQ_HEAD_INITIALIZER(ConfigAccountStack);
 
 /**
  * account_new - Create a new Account
+ * @param name Name for the Account
  * @retval ptr New Account
  */
-struct Account *account_new(void)
+struct Account *account_new(const char *name)
 {
   struct Account *a = mutt_mem_calloc(1, sizeof(struct Account));
   STAILQ_INIT(&a->mailboxes);
@@ -204,3 +208,110 @@ int account_get_value(const struct Account *a, size_t vid, struct Buffer *result
 
   return cs_he_string_get(a->cs, he, result);
 }
+
+/**
+ * mutt_parse_account - Parse the 'account' command - Implements ::command_t
+ */
+enum CommandResult mutt_parse_account(struct Buffer *buf, struct Buffer *s,
+                               unsigned long data, struct Buffer *err)
+{
+  /* Go back to the default account */
+  if (!MoreArgs(s))
+  {
+    account_pop_current();
+    return MUTT_CMD_SUCCESS;
+  }
+
+  mutt_extract_token(buf, s, 0);
+
+  struct Account *a = account_find(buf->data);
+  if (!a)
+  {
+    a = account_new(buf->data);
+    TAILQ_INSERT_TAIL(&AllAccounts, a, entries);
+  }
+
+  /* Set the current account, nothing more to do */
+  if (!MoreArgs(s))
+  {
+    account_pop_current();
+    account_push_current(a->name);
+    return MUTT_CMD_SUCCESS;
+  }
+
+  struct Buffer token = { 0 };
+
+  /* Temporarily alter the current account */
+  account_push_current(a->name);
+
+  /* Process the rest of the line */
+  enum CommandResult rc = mutt_parse_rc_line(s->dptr, &token, err);
+  if (rc == MUTT_CMD_ERROR)
+    mutt_error("%s", err->data);
+
+  account_pop_current();
+  mutt_buffer_reset(s);
+
+  FREE(&token.data);
+  return rc;
+}
+
+/**
+ * account_get_current - Current 'account' command in effect
+ * @retval ptr Name of the current Account
+ */
+char *account_get_current(void)
+{
+  struct ListNode *np = STAILQ_FIRST(&ConfigAccountStack);
+  if (!np)
+    return NULL;
+
+  return np->data;
+}
+
+/**
+ * account_find - Find an Account by its name
+ * @param name Name to find
+ * @retval ptr  Matching Account
+ * @retval NULL None found
+ */
+struct Account *account_find(const char *name)
+{
+  struct Account *np = NULL;
+  TAILQ_FOREACH(np, &AllAccounts, entries)
+  {
+    if (mutt_str_strcmp(name, np->name) == 0)
+      return np;
+  }
+
+  return NULL;
+}
+
+/**
+ * account_push_current - Set the current 'account' command in effect
+ * @param name Current Account name
+ */
+void account_push_current(char *name)
+{
+  if (!name)
+    return;
+
+  name = mutt_str_strdup(name);
+  mutt_list_insert_head(&ConfigAccountStack, name);
+}
+
+/**
+ * account_pop_current - End the current 'account' command in effect
+ */
+void account_pop_current(void)
+{
+  struct ListNode *first = STAILQ_FIRST(&ConfigAccountStack);
+  if (!first)
+    return;
+
+  STAILQ_REMOVE_HEAD(&ConfigAccountStack, entries);
+
+  FREE(&first->data);
+  FREE(&first);
+}
+

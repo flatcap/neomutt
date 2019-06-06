@@ -31,11 +31,12 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "mutt/mutt.h"
+#include "address/lib.h"
 #include "config/lib.h"
 #include "conn/conn.h"
 #include "mutt.h"
+#include "account.h"
 #include "addrbook.h"
-#include "address/lib.h"
 #include "bcache.h"
 #include "browser.h"
 #include "color.h"
@@ -4868,6 +4869,7 @@ static enum CommandResult parse_unsubscribe_from(struct Buffer *buf, struct Buff
 
 const struct Command Commands[] = {
 #ifdef USE_SOCKET
+  { "account",             mutt_parse_account,     0 },
   { "account-hook",        mutt_parse_hook,        MUTT_ACCOUNT_HOOK },
 #endif
   { "alias",               parse_alias,            0 },

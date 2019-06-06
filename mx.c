@@ -265,7 +265,7 @@ struct Context *mx_mbox_open(struct Mailbox *m, OpenMailboxFlags flags)
     bool new_account = false;
     if (!a)
     {
-      a = account_new();
+      a = account_new(NULL);
       a->magic = m->magic;
       new_account = true;
     }
@@ -1555,6 +1555,7 @@ int mx_ac_add(struct Account *a, struct Mailbox *m)
   if (m->mx_ops->ac_add(a, m) < 0)
     return -1;
 
+  a->magic = m->magic;
   m->account = a;
   struct MailboxNode *np = mutt_mem_calloc(1, sizeof(*np));
   np->mailbox = m;
