@@ -38,6 +38,12 @@ const char *line = "----------------------------------------"
 
 bool dont_fail = false;
 
+enum CommandResult mutt_parse_rc_line(/* const */ char *rcline,
+                                      struct Buffer *token, struct Buffer *err)
+{
+  return MUTT_CMD_SUCCESS;
+}
+
 int validator_fail(const struct ConfigSet *cs, const struct ConfigDef *cdef,
                    intptr_t value, struct Buffer *result)
 {
