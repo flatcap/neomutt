@@ -609,6 +609,9 @@ int main(int argc, char *argv[], char *envp[])
     goto main_curses;
   NeoMutt = neomutt_new(Config);
 
+  if (!init_components(Config))
+    goto main_curses;
+
   notify_set_parent(Config->notify, NeoMutt->notify);
 
   if (!get_user_info(Config))
