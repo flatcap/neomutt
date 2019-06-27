@@ -1608,6 +1608,9 @@ int mutt_index_menu(void)
         }
 
         log_queue_save(fp);
+#ifdef USE_DEVEL_GRAPHVIZ
+        dump_graphviz("index");
+#endif
         mutt_file_fclose(&fp);
 
         mutt_do_pager("messages", tempfile, MUTT_PAGER_LOGS, NULL);
