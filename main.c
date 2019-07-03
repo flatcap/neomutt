@@ -88,6 +88,10 @@
 #include "nntp/nntp.h"
 #endif
 
+struct Notify;
+
+int notify_dump(struct NotifyCallback *nc);
+
 /* These Config Variables are only used in main.c */
 bool C_ResumeEditedDraftFiles; ///< Config: Resume editing previously saved draft files
 
@@ -602,6 +606,8 @@ int main(int argc, char *argv[], char *envp[])
   if (!Config)
     goto main_curses;
   NeoMutt = neomutt_new(Config);
+  notify_observer_add(NeoMutt->notify, NT_GLOBAL, 0, notify_dump, 0);
+  notify_observer_add(NeoMutt->notify, NT_CONFIG, 0, notify_dump, 0);
 
   notify_set_parent(Config->notify, NeoMutt->notify);
 
