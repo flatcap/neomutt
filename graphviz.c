@@ -433,6 +433,8 @@ void dot_mailbox(FILE *fp, struct Mailbox *m, struct ListHead *links)
   dot_mailbox_type(fp, "type", m->magic);
   if (m->name)
     dot_type_string(fp, "name", m->name);
+  if (m->desc)
+    dot_type_string(fp, "desc", m->desc);
 
   if ((m->magic == MUTT_IMAP) || (m->magic == MUTT_POP))
   {
@@ -667,6 +669,7 @@ void dot_account(FILE *fp, struct Account *a, struct ListHead *links)
   dot_object_header(fp, a, "Account", "#80ffff");
   dot_mailbox_type(fp, "magic", a->magic);
   dot_type_string(fp, "name", a->name);
+  dot_type_string(fp, "desc", a->desc);
   // dot_ptr(fp, "adata", a->adata, "#60c0c0");
   dot_object_footer(fp);
 

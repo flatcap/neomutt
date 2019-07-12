@@ -204,8 +204,21 @@ static void post_make_entry(char *buf, size_t buflen, struct Menu *menu, int lin
 {
   struct Context *ctx = menu->data;
 
-  mutt_make_string_flags(buf, buflen, NONULL(C_IndexFormat), ctx, ctx->mailbox,
-                         ctx->mailbox->emails[line], MUTT_FORMAT_ARROWCURSOR);
+  struct Account *a = Context->mailbox->account;
+  if (a->name)
+  {
+    struct Buffer *value = mutt_buffer_pool_get();
+    struct HashElem *he = cs_subset_lookup(a->sub, "index_format");
+    cs_subset_string_get(a->sub, he, value);
+    mutt_make_string_flags(buf, buflen, mutt_b2s(value), ctx, ctx->mailbox,
+                           ctx->mailbox->emails[line], MUTT_FORMAT_ARROWCURSOR);
+    mutt_buffer_pool_release(&value);
+  }
+  else
+  {
+    mutt_make_string_flags(buf, buflen, NONULL(C_IndexFormat), ctx, ctx->mailbox,
+                           ctx->mailbox->emails[line], MUTT_FORMAT_ARROWCURSOR);
+  }
 }
 
 /**

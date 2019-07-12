@@ -43,6 +43,9 @@ struct Account
   void *adata;                  ///< Private data (for Mailbox backends)
   void (*free_adata)(void **);  ///< Callback function to free private data
   TAILQ_ENTRY(Account) entries; ///< Linked list of Accounts
+
+  char *desc;               ///< Description of Account
+  struct ConfigSubset *sub; ///< Inherited config items
 };
 TAILQ_HEAD(AccountList, Account);
 

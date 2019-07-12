@@ -4856,6 +4856,7 @@ struct ConfigDef MuttVars[] = {
 static enum CommandResult parse_alias           (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_alternates      (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_attachments     (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
+static enum CommandResult parse_desc            (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_echo            (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_finish          (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_group           (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
@@ -4864,12 +4865,13 @@ static enum CommandResult parse_ignore          (struct Buffer *buf, struct Buff
 static enum CommandResult parse_lists           (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_mailboxes       (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_my_hdr          (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
+static enum CommandResult parse_path            (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 #ifdef USE_SIDEBAR
 static enum CommandResult parse_path_list       (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_path_unlist     (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 #endif
 static enum CommandResult parse_replace_list    (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
-static enum CommandResult parse_set             (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
+enum CommandResult parse_set             (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_setenv          (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_source          (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 static enum CommandResult parse_spam_list       (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
@@ -4918,6 +4920,7 @@ const struct Command Commands[] = {
   { "color",               mutt_parse_color,       0 },
 #endif
   { "crypt-hook",          mutt_parse_hook,        MUTT_CRYPT_HOOK },
+  { "desc",                parse_desc,             0 },
   { "echo",                parse_echo,             0 },
   { "exec",                mutt_parse_exec,        0 },
   { "fcc-hook",            mutt_parse_hook,        MUTT_FCC_HOOK },
@@ -4937,6 +4940,7 @@ const struct Command Commands[] = {
   { "lua-source",          mutt_lua_source_file,   0 },
 #endif
   { "macro",               mutt_parse_macro,       0 },
+  { "mailbox",             mutt_parse_mailbox,     0 },
   { "mailboxes",           parse_mailboxes,        0 },
   { "mailto_allow",        parse_stailq,           UL &MailToAllow },
   { "mbox-hook",           mutt_parse_hook,        MUTT_MBOX_HOOK },
@@ -4949,6 +4953,7 @@ const struct Command Commands[] = {
 #ifdef USE_COMPRESSED
   { "open-hook",           mutt_parse_hook,        MUTT_OPEN_HOOK },
 #endif
+  { "path",                parse_path,             0 },
   { "pgp-hook",            mutt_parse_hook,        MUTT_CRYPT_HOOK },
   { "push",                mutt_parse_push,        0 },
   { "reply-hook",          mutt_parse_hook,        MUTT_REPLY_HOOK },
@@ -4991,6 +4996,7 @@ const struct Command Commands[] = {
   { "unignore",            parse_unignore,         0 },
   { "unlists",             parse_unlists,          0 },
   { "unmacro",             mutt_parse_unbind,      MUTT_UNMACRO },
+  { "unmailbox",           mutt_parse_unmailbox,   0 },
   { "unmailboxes",         parse_unmailboxes,      0 },
   { "unmailto_allow",      parse_unstailq,         UL &MailToAllow },
   { "unmime_lookup",       parse_unstailq,         UL &MimeLookupList },

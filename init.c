@@ -1071,6 +1071,39 @@ static enum CommandResult parse_attachments(struct Buffer *buf, struct Buffer *s
 }
 
 /**
+ * parse_desc - Parse the 'desc' command - Implements ::command_t
+ */
+static enum CommandResult parse_desc(struct Buffer *buf, struct Buffer *s,
+                                     unsigned long data, struct Buffer *err)
+{
+  if (!MoreArgs(s))
+  {
+    mutt_buffer_printf(err, _("%s: too few arguments"), "desc");
+    return MUTT_CMD_WARNING;
+  }
+
+  mutt_extract_token(buf, s, MUTT_TOKEN_NO_FLAGS);
+
+  struct Mailbox *m = ct_get_mailbox();
+  if (m)
+  {
+    mutt_str_replace(&m->desc, buf->data);
+    return MUTT_CMD_SUCCESS;
+  }
+
+  struct Account *a = ct_get_account();
+  if (a)
+  {
+    mutt_str_replace(&a->desc, buf->data);
+    return MUTT_CMD_SUCCESS;
+  }
+
+  mutt_buffer_printf(
+      err, _("'desc' command only applies in 'account' or 'mailbox' config"));
+  return MUTT_CMD_SUCCESS;
+}
+
+/**
  * parse_echo - Parse the 'echo' command - Implements ::command_t
  */
 static enum CommandResult parse_echo(struct Buffer *buf, struct Buffer *s,
@@ -1335,6 +1368,7 @@ static enum CommandResult parse_mailboxes(struct Buffer *buf, struct Buffer *s,
       if (buf->data && (*buf->data != '\0'))
       {
         m->name = mutt_str_strdup(buf->data);
+        m->desc = mutt_str_strdup(buf->data);
       }
       else
       {
@@ -1461,6 +1495,32 @@ static enum CommandResult parse_my_hdr(struct Buffer *buf, struct Buffer *s,
   return MUTT_CMD_SUCCESS;
 }
 
+/**
+ * parse_path - Parse the 'path' command - Implements ::command_t
+ */
+static enum CommandResult parse_path(struct Buffer *buf, struct Buffer *s,
+                                     unsigned long data, struct Buffer *err)
+{
+  if (!MoreArgs(s))
+  {
+    mutt_buffer_printf(err, _("%s: too few arguments"), "path");
+    return MUTT_CMD_WARNING;
+  }
+
+  mutt_extract_token(buf, s, MUTT_TOKEN_NO_FLAGS);
+
+  struct Mailbox *m = ct_get_mailbox();
+  if (m)
+  {
+    mutt_buffer_strcpy(m->pathbuf, buf->data);
+    //XXX need to canon path and copy to realpath
+    return MUTT_CMD_SUCCESS;
+  }
+
+  mutt_buffer_printf(err, _("'path' command only applies in 'mailbox' config"));
+  return MUTT_CMD_SUCCESS;
+}
+
 #ifdef USE_SIDEBAR
 /**
  * parse_path_list - Parse the 'sidebar_whitelist' command - Implements ::command_t
@@ -1514,8 +1574,8 @@ static enum CommandResult parse_path_unlist(struct Buffer *buf, struct Buffer *s
  *
  * This is used by 'reset', 'set', 'toggle' and 'unset'.
  */
-static enum CommandResult parse_set(struct Buffer *buf, struct Buffer *s,
-                                    unsigned long data, struct Buffer *err)
+enum CommandResult parse_set(struct Buffer *buf, struct Buffer *s,
+                             unsigned long data, struct Buffer *err)
 {
   /* The order must match `enum MuttSetCommand` */
   static const char *set_commands[] = { "set", "toggle", "unset", "reset" };

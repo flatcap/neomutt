@@ -3,8 +3,10 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include "mutt_commands.h"
 
 struct Buffer;
+struct ConfigSubset;
 struct Mailbox;
 struct stat;
 
@@ -23,6 +25,10 @@ bool mutt_mailbox_list        (void);
 void mutt_mailbox_next        (struct Mailbox *m_cur, char *s, size_t slen);
 void mutt_mailbox_next_buffer (struct Mailbox *m_cur, struct Buffer *s);
 bool mutt_mailbox_notify      (struct Mailbox *m_cur);
+void mutt_mailbox_set_config  (struct Mailbox *m, struct ConfigSubset *parent);
 void mutt_mailbox_set_notified(struct Mailbox *m);
+
+enum CommandResult mutt_parse_mailbox  (struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
+enum CommandResult mutt_parse_unmailbox(struct Buffer *buf, struct Buffer *s, unsigned long data, struct Buffer *err);
 
 #endif /* MUTT_MUTT_MAILBOX_H */

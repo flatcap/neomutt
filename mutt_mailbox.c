@@ -8,11 +8,14 @@
 #include "mutt_mailbox.h"
 #include "core/lib.h"
 #include "globals.h"
+#include "monitor.h"
 #include "mutt_menu.h"
 #include "mutt_window.h"
 #include "muttlib.h"
 #include "mx.h"
 #include "protos.h"
+#include "sidebar.h"
+#include "tracker.h"
 
 static time_t MailboxTime = 0; /**< last time we started checking for mail */
 static time_t MailboxStatsTime = 0; /**< last time we check performed mail_check_stats */
@@ -394,4 +397,101 @@ void mutt_mailbox_cleanup(const char *path, struct stat *st)
 #endif
     }
   }
+}
+
+/**
+ * mutt_mailbox_set_config - XXX
+ * @param name   Name for the Account
+ * @param parent Parent Config Subset
+ */
+void mutt_mailbox_set_config(struct Mailbox *m, struct ConfigSubset *parent)
+{
+  if (!m || m->sub)
+    return;
+
+  m->sub = cs_subset_new(m->name, parent);
+}
+
+/**
+ * mutt_parse_mailbox - Parse the 'mailbox' command - Implements ::command_t
+ */
+enum CommandResult mutt_parse_mailbox(struct Buffer *buf, struct Buffer *s,
+                                      unsigned long data, struct Buffer *err)
+{
+  /* Go back to the default account */
+  if (!MoreArgs(s))
+  {
+    ct_set_mailbox(NULL);
+    return MUTT_CMD_SUCCESS;
+  }
+
+  struct Account *a = ct_get_account();
+  if (!a)
+  {
+    mutt_buffer_printf(
+        err, _("'desc' command only applies in 'account' or 'mailbox' config"));
+    return MUTT_CMD_WARNING;
+  }
+
+  struct Mailbox *m = mailbox_new();
+
+  mutt_extract_token(buf, s, MUTT_TOKEN_NO_FLAGS);
+  m->name = mutt_str_strdup(buf->data);
+
+#if 0
+  // Lookup $folder for the current Account
+  struct ConfigSubset *sub = ct_get_sub();
+  struct Buffer *folder = mutt_buffer_pool_get();
+  struct HashElem *he = cs_subset_lookup(sub, "folder");
+  cs_subset_string_get(sub, he, folder);
+  // mutt_message("%s", m->pathbuf->data);
+  mx_path_canon2(m, folder->data);
+  // mutt_message("%s", m->pathbuf->data);
+  mutt_buffer_pool_release(&folder);
+
+  struct Mailbox *old_m = mx_mbox_find(a, m->realpath);
+  if (old_m)
+  {
+    if (old_m->flags == MB_HIDDEN)
+    {
+      old_m->flags = MB_NORMAL;
+      mutt_sb_notify_mailbox(old_m, true);
+      struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
+      mn->mailbox = old_m;
+      STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
+    }
+    mailbox_free(&m);
+    // continue;
+  }
+#endif
+
+  if (mx_ac_add(a, m) < 0)
+  {
+    //error
+    mailbox_free(&m);
+    // continue;
+  }
+
+  // struct MailboxNode *mn = mutt_mem_calloc(1, sizeof(*mn));
+  // mn->mailbox = m;
+  // STAILQ_INSERT_TAIL(&AllMailboxes, mn, entries);
+  ct_set_mailbox(m);
+
+#ifdef USE_SIDEBAR
+  mutt_sb_notify_mailbox(m, true);
+#endif
+#ifdef USE_INOTIFY
+  mutt_monitor_add(m);
+#endif
+
+  return MUTT_CMD_SUCCESS;
+}
+
+/**
+ * mutt_parse_unmailbox - Parse the 'unmailbox' command - Implements ::command_t
+ */
+enum CommandResult mutt_parse_unmailbox(struct Buffer *buf, struct Buffer *s,
+                                        unsigned long data, struct Buffer *err)
+{
+  return MUTT_CMD_SUCCESS;
 }

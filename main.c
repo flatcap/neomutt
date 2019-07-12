@@ -89,6 +89,9 @@
 #include "nntp/nntp.h"
 #endif
 
+enum CommandResult parse_set(struct Buffer *buf, struct Buffer *s,
+                             unsigned long data, struct Buffer *err);
+
 /* These Config Variables are only used in main.c */
 bool C_ResumeEditedDraftFiles; ///< Config: Resume editing previously saved draft files
 
@@ -587,13 +590,13 @@ int main(int argc, char *argv[], char *envp[])
   struct ListHead cc_list = STAILQ_HEAD_INITIALIZER(cc_list);
   struct ListHead bcc_list = STAILQ_HEAD_INITIALIZER(bcc_list);
   SendFlags sendflags = SEND_NO_FLAGS;
-  CliFlags flags = MUTT_CLI_NO_FLAGS;
+  CliFlags flags = MUTT_CLI_NOSYSRC;
   int version = 0;
   int i;
   bool explicit_folder = false;
   bool dump_variables = false;
   bool hide_sensitive = false;
-  bool batch_mode = false;
+  bool batch_mode = true;
   bool edit_infile = false;
   bool test_config = false;
   extern char *optarg;
@@ -1386,7 +1389,6 @@ int main(int argc, char *argv[], char *envp[])
 
     mutt_folder_hook(mutt_b2s(folder), NULL);
     mutt_startup_shutdown_hook(MUTT_STARTUP_HOOK);
-    notify_send(NeoMutt->notify, NT_GLOBAL, NT_GLOBAL_STARTUP, 0);
 
     repeat_error = true;
     struct Mailbox *m = mx_path_resolve(mutt_b2s(folder));

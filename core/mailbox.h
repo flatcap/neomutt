@@ -95,6 +95,7 @@ struct Mailbox
   struct Buffer *pathbuf;
   char *realpath;                     ///< Used for duplicate detection, context comparison, and the sidebar
   char *name;                         ///< A short name for the Mailbox
+  char *desc;                         ///< Description
   struct ConfigSubset *sub;           ///< Inherited config items
   off_t size;                         ///< Size of the Mailbox
   bool has_new;                       ///< Mailbox has new mail
