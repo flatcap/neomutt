@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include <stdbool.h>
+#include <string.h>
 #include "mutt/mutt.h"
 #include "email.h"
 #include "body.h"
@@ -57,6 +58,7 @@ void email_free(struct Email **ptr)
   mutt_list_free(&e->chain);
 #endif
   driver_tags_free(&e->tags);
+  memset(&e->canary, 'D', sizeof(e->canary));
 
   FREE(ptr);
 }
@@ -72,6 +74,7 @@ struct Email *email_new(void)
   STAILQ_INIT(&e->chain);
 #endif
   STAILQ_INIT(&e->tags);
+  memset(e->canary, 'N', sizeof(e->canary));
   return e;
 }
 

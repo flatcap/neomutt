@@ -38,6 +38,7 @@ struct Notify;
  */
 struct Email
 {
+  char canary[16];
   SecurityFlags security;      ///< bit 0-10: flags, bit 11,12: application, bit 13: traditional pgp
                                ///< See: ncrypt/ncrypt.h pgplib.h, smime.h
 
