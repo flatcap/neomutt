@@ -627,9 +627,12 @@ int mutt_view_attachment(FILE *fp, struct Body *a, enum ViewAttachMode mode,
     info.actx = actx;
     info.email = e;
 
+    notify_observer_add(Context->notify, NT_CONTEXT, 0, mutt_pager_observe_context, IP & info);
     rc = mutt_do_pager(desc, mutt_b2s(pagerfile),
                        MUTT_PAGER_ATTACHMENT | (is_message ? MUTT_PAGER_MESSAGE : MUTT_PAGER_NO_FLAGS),
                        &info);
+    if (Context)
+      notify_observer_remove(Context->notify, mutt_pager_observe_context, IP & info);
     mutt_buffer_reset(pagerfile);
   }
   else

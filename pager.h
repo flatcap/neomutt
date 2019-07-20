@@ -72,6 +72,7 @@ struct Pager
 };
 
 int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct Pager *extra);
+int mutt_pager_observe_context(struct NotifyCallback *nc);
 
 void mutt_clear_pager_position(void);
 

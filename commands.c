@@ -352,7 +352,11 @@ int mutt_display_message(struct Mailbox *m, struct Email *e)
     /* Invoke the builtin pager */
     info.email = e;
     info.ctx = Context;
+
+    notify_observer_add(Context->notify, NT_CONTEXT, 0, mutt_pager_observe_context, IP & info);
     rc = mutt_pager(NULL, tempfile, MUTT_PAGER_MESSAGE, &info);
+    if (Context)
+      notify_observer_remove(Context->notify, mutt_pager_observe_context, IP & info);
   }
   else
   {

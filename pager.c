@@ -3593,3 +3593,29 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
   return (rc != -1) ? rc : 0;
 }
+
+/**
+ * pager_observe_context - Listen for changes to the global Context - Implements ::observer_t()
+ *
+ * If the global Context changes whilst the Pager is open,
+ * update our local pointer.
+ */
+int mutt_pager_observe_context(struct NotifyCallback *nc)
+{
+  if (!nc || (nc->obj_type != NT_CONTEXT) || !nc->data)
+    return 0;
+
+  struct Pager *info = (struct Pager *) nc->data;
+
+  if (nc->event_subtype == NT_CONTEXT_CLOSE)
+  {
+    info->ctx = NULL;
+  }
+  else if (nc->event_subtype == NT_CONTEXT_OPEN)
+  {
+    struct EventContext *ev_ctx = (struct EventContext *) nc->event;
+    info->ctx = ev_ctx->context;
+  }
+
+  return 0;
+}
