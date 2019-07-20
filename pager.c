@@ -2284,7 +2284,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
   /* Initialize variables */
 
-  if (extra->ctx && IsEmail(extra) && !extra->email->read)
+  if (IsEmail(extra) && extra->ctx && !extra->email->read)
   {
     extra->ctx->msg_not_read_yet = extra->email->msgno;
     mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_READ, true);
