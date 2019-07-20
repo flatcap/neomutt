@@ -267,7 +267,7 @@ static struct Mapping PagerNewsHelpExtra[] = {
   }
 
 #define CHECK_READONLY                                                         \
-  if (!Context || Context->mailbox->readonly)                                  \
+  if (!extra->ctx || extra->ctx->mailbox->readonly)                                  \
   {                                                                            \
     mutt_flushinp();                                                           \
     mutt_error(_(Mailbox_is_read_only));                                       \
@@ -283,7 +283,7 @@ static struct Mapping PagerNewsHelpExtra[] = {
   }
 
 #define CHECK_ACL(aclbit, action)                                              \
-  if (!Context || !(Context->mailbox->rights & aclbit))                        \
+  if (!extra->ctx || !(extra->ctx->mailbox->rights & aclbit))                        \
   {                                                                            \
     mutt_flushinp();                                                           \
     /* L10N: %s is one of the CHECK_ACL entries below. */                      \
@@ -1947,8 +1947,8 @@ static void pager_custom_redraw(struct Menu *pager_menu)
     move(0, 0);
     clrtobot();
 
-    if (IsEmail(rd->extra) && Context && ((Context->mailbox->vcount + 1) < C_PagerIndexLines))
-      rd->indexlen = Context->mailbox->vcount + 1;
+    if (IsEmail(rd->extra) && rd->extra->ctx && ((rd->extra->ctx->mailbox->vcount + 1) < C_PagerIndexLines))
+      rd->indexlen = rd->extra->ctx->mailbox->vcount + 1;
     else
       rd->indexlen = C_PagerIndexLines;
 
@@ -2032,7 +2032,7 @@ static void pager_custom_redraw(struct Menu *pager_menu)
         rd->index = mutt_menu_new(MENU_MAIN);
         rd->index->menu_make_entry = index_make_entry;
         rd->index->menu_color = index_color;
-        rd->index->max = Context ? Context->mailbox->vcount : 0;
+        rd->index->max = rd->extra->ctx ? rd->extra->ctx->mailbox->vcount : 0;
         rd->index->current = rd->extra->email->vnum;
         rd->index->indexwin = rd->index_window;
         rd->index->statuswin = rd->index_status_window;
@@ -2157,8 +2157,8 @@ static void pager_custom_redraw(struct Menu *pager_menu)
     struct HdrFormatInfo hfi;
     char pager_progress_str[65]; /* Lots of space for translations */
 
-    hfi.ctx = Context;
-    hfi.mailbox = Context ? Context->mailbox : NULL;
+    hfi.ctx = rd->extra->ctx;
+    hfi.mailbox = rd->extra->ctx ? rd->extra->ctx->mailbox : NULL;
     hfi.pager_progress = pager_progress_str;
 
     if (rd->last_pos < rd->sb.st_size - 1)
@@ -2284,10 +2284,10 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
   /* Initialize variables */
 
-  if (Context && IsEmail(extra) && !extra->email->read)
+  if (extra->ctx && IsEmail(extra) && !extra->email->read)
   {
-    Context->msg_not_read_yet = extra->email->msgno;
-    mutt_set_flag(Context->mailbox, extra->email, MUTT_READ, true);
+    extra->ctx->msg_not_read_yet = extra->email->msgno;
+    mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_READ, true);
   }
 
   rd.max_line = LINES; /* number of lines on screen, from curses */
@@ -2308,7 +2308,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   {
     mutt_compile_help(buf, sizeof(buf), MENU_PAGER,
 #ifdef USE_NNTP
-                      (Context && (Context->mailbox->magic == MUTT_NNTP)) ?
+                      (extra->ctx && (extra->ctx->mailbox->magic == MUTT_NNTP)) ?
                           PagerNewsHelpExtra :
 #endif
                           PagerHelpExtra);
@@ -2373,18 +2373,18 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
     bool do_new_mail = false;
 
-    if (Context && Context->mailbox && !OptAttachMsg)
+    if (extra->ctx && extra->ctx->mailbox && !OptAttachMsg)
     {
       int index_hint = 0; /* used to restore cursor position */
-      int oldcount = Context->mailbox->msg_count;
+      int oldcount = extra->ctx->mailbox->msg_count;
       /* check for new mail */
-      int check = mx_mbox_check(Context->mailbox, &index_hint);
+      int check = mx_mbox_check(extra->ctx->mailbox, &index_hint);
       if (check < 0)
       {
-        if (!Context->mailbox || mutt_buffer_is_empty(Context->mailbox->pathbuf))
+        if (!extra->ctx->mailbox || mutt_buffer_is_empty(extra->ctx->mailbox->pathbuf))
         {
           /* fatal error occurred */
-          ctx_free(&Context);
+          ctx_free(&extra->ctx);
           pager_menu->redraw = REDRAW_FULL;
           break;
         }
@@ -2394,9 +2394,9 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         /* notify user of newly arrived mail */
         if (check == MUTT_NEW_MAIL)
         {
-          for (size_t i = oldcount; i < Context->mailbox->msg_count; i++)
+          for (size_t i = oldcount; i < extra->ctx->mailbox->msg_count; i++)
           {
-            struct Email *e = Context->mailbox->emails[i];
+            struct Email *e = extra->ctx->mailbox->emails[i];
 
             if (e && !e->read)
             {
@@ -2409,32 +2409,32 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
         if ((check == MUTT_NEW_MAIL) || (check == MUTT_REOPENED))
         {
-          if (rd.index && Context)
+          if (rd.index && extra->ctx)
           {
             /* After the mailbox has been updated,
              * rd.index->current might be invalid */
             rd.index->current =
-                MIN(rd.index->current, MAX(Context->mailbox->msg_count - 1, 0));
-            index_hint = Context->mailbox
-                             ->emails[Context->mailbox->v2r[rd.index->current]]
+                MIN(rd.index->current, MAX(extra->ctx->mailbox->msg_count - 1, 0));
+            index_hint = extra->ctx->mailbox
+                             ->emails[extra->ctx->mailbox->v2r[rd.index->current]]
                              ->index;
 
-            bool q = Context->mailbox->quiet;
-            Context->mailbox->quiet = true;
-            update_index(rd.index, Context, check, oldcount, index_hint);
-            Context->mailbox->quiet = q;
+            bool q = extra->ctx->mailbox->quiet;
+            extra->ctx->mailbox->quiet = true;
+            update_index(rd.index, extra->ctx, check, oldcount, index_hint);
+            extra->ctx->mailbox->quiet = q;
 
-            rd.index->max = Context->mailbox->vcount;
+            rd.index->max = extra->ctx->mailbox->vcount;
 
             /* If these header pointers don't match, then our email may have
              * been deleted.  Make the pointer safe, then leave the pager.
              * This have a unpleasant behaviour to close the pager even the
              * deleted message is not the opened one, but at least it's safe. */
             if (extra->email !=
-                Context->mailbox->emails[Context->mailbox->v2r[rd.index->current]])
+                extra->ctx->mailbox->emails[extra->ctx->mailbox->v2r[rd.index->current]])
             {
               extra->email =
-                  Context->mailbox->emails[Context->mailbox->v2r[rd.index->current]];
+                  extra->ctx->mailbox->emails[extra->ctx->mailbox->v2r[rd.index->current]];
               break;
             }
           }
@@ -2444,7 +2444,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         }
       }
 
-      if (mutt_mailbox_notify(Context ? Context->mailbox : NULL) || do_new_mail)
+      if (mutt_mailbox_notify(extra->ctx ? extra->ctx->mailbox : NULL) || do_new_mail)
       {
         if (C_BeepNew)
           beep();
@@ -2947,7 +2947,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
       case OP_BOUNCE_MESSAGE:
       {
-        struct Mailbox *m = Context ? Context->mailbox : NULL;
+        struct Mailbox *m = extra->ctx ? extra->ctx->mailbox : NULL;
         CHECK_MODE(IsEmail(extra) || IsMsgAttach(extra))
         CHECK_ATTACH;
         if (IsMsgAttach(extra))
@@ -3013,10 +3013,10 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         /* L10N: CHECK_ACL */
         CHECK_ACL(MUTT_ACL_DELETE, _("Can't delete message"));
 
-        mutt_set_flag(Context->mailbox, extra->email, MUTT_DELETE, true);
-        mutt_set_flag(Context->mailbox, extra->email, MUTT_PURGE, (ch == OP_PURGE_MESSAGE));
+        mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_DELETE, true);
+        mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_PURGE, (ch == OP_PURGE_MESSAGE));
         if (C_DeleteUntag)
-          mutt_set_flag(Context->mailbox, extra->email, MUTT_TAG, false);
+          mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_TAG, false);
         pager_menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
         if (C_Resolve)
         {
@@ -3034,7 +3034,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         struct EmailList el = STAILQ_HEAD_INITIALIZER(el);
         el_add_email(&el, extra->email);
 
-        if (mutt_change_flag(Context->mailbox, &el, (ch == OP_MAIN_SET_FLAG)) == 0)
+        if (mutt_change_flag(extra->ctx->mailbox, &el, (ch == OP_MAIN_SET_FLAG)) == 0)
           pager_menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
         if (extra->email->deleted && C_Resolve)
         {
@@ -3129,7 +3129,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         /* L10N: CHECK_ACL */
         CHECK_ACL(MUTT_ACL_WRITE, "Can't flag message");
 
-        mutt_set_flag(Context->mailbox, extra->email, MUTT_FLAG, !extra->email->flagged);
+        mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_FLAG, !extra->email->flagged);
         pager_menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
         if (C_Resolve)
         {
@@ -3323,7 +3323,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         CHECK_MODE(IsEmail(extra));
         struct EmailList el = STAILQ_HEAD_INITIALIZER(el);
         el_add_email(&el, extra->email);
-        if ((mutt_save_message(Context->mailbox, &el,
+        if ((mutt_save_message(extra->ctx->mailbox, &el,
                                (ch == OP_DECRYPT_SAVE) || (ch == OP_SAVE) || (ch == OP_DECODE_SAVE),
                                (ch == OP_DECODE_SAVE) || (ch == OP_DECODE_COPY),
                                (ch == OP_DECRYPT_SAVE) || (ch == OP_DECRYPT_COPY)) == 0) &&
@@ -3347,16 +3347,16 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
       case OP_TAG:
         CHECK_MODE(IsEmail(extra));
-        if (Context)
+        if (extra->ctx)
         {
-          mutt_set_flag(Context->mailbox, extra->email, MUTT_TAG, !extra->email->tagged);
+          mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_TAG, !extra->email->tagged);
 
-          Context->last_tag =
+          extra->ctx->last_tag =
               extra->email->tagged ?
                   extra->email :
-                  ((Context->last_tag == extra->email && !extra->email->tagged) ?
+                  ((extra->ctx->last_tag == extra->email && !extra->email->tagged) ?
                        NULL :
-                       Context->last_tag);
+                       extra->ctx->last_tag);
         }
 
         pager_menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
@@ -3374,11 +3374,11 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         CHECK_ACL(MUTT_ACL_SEEN, _("Can't toggle new"));
 
         if (extra->email->read || extra->email->old)
-          mutt_set_flag(Context->mailbox, extra->email, MUTT_NEW, true);
+          mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_NEW, true);
         else if (!first)
-          mutt_set_flag(Context->mailbox, extra->email, MUTT_READ, true);
+          mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_READ, true);
         first = false;
-        Context->msg_not_read_yet = -1;
+        extra->ctx->msg_not_read_yet = -1;
         pager_menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
         if (C_Resolve)
         {
@@ -3393,8 +3393,8 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         /* L10N: CHECK_ACL */
         CHECK_ACL(MUTT_ACL_DELETE, _("Can't undelete message"));
 
-        mutt_set_flag(Context->mailbox, extra->email, MUTT_DELETE, false);
-        mutt_set_flag(Context->mailbox, extra->email, MUTT_PURGE, false);
+        mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_DELETE, false);
+        mutt_set_flag(extra->ctx->mailbox, extra->email, MUTT_PURGE, false);
         pager_menu->redraw |= REDRAW_STATUS | REDRAW_INDEX;
         if (C_Resolve)
         {
@@ -3454,8 +3454,8 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         }
         CHECK_MODE(IsEmail(extra));
         mutt_view_attachments(extra->email);
-        if (Context && extra->email->attach_del)
-          Context->mailbox->changed = true;
+        if (extra->ctx && extra->email->attach_del)
+          extra->ctx->mailbox->changed = true;
         pager_menu->redraw = REDRAW_FULL;
         break;
 
@@ -3482,12 +3482,12 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
         struct EmailList el = STAILQ_HEAD_INITIALIZER(el);
         el_add_email(&el, extra->email);
-        rc = mutt_label_message(Context->mailbox, &el);
+        rc = mutt_label_message(extra->ctx->mailbox, &el);
         emaillist_clear(&el);
 
         if (rc > 0)
         {
-          Context->mailbox->changed = true;
+          extra->ctx->mailbox->changed = true;
           pager_menu->redraw = REDRAW_FULL;
           mutt_message(ngettext("%d label changed", "%d labels changed", rc), rc);
         }
@@ -3512,7 +3512,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         CHECK_MODE(IsEmail(extra));
         struct EmailList el = STAILQ_HEAD_INITIALIZER(el);
         el_add_email(&el, extra->email);
-        crypt_extract_keys_from_messages(Context->mailbox, &el);
+        crypt_extract_keys_from_messages(extra->ctx->mailbox, &el);
         emaillist_clear(&el);
         pager_menu->redraw = REDRAW_FULL;
         break;
@@ -3551,8 +3551,8 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   mutt_file_fclose(&rd.fp);
   if (IsEmail(extra))
   {
-    if (Context)
-      Context->msg_not_read_yet = -1;
+    if (extra->ctx)
+      extra->ctx->msg_not_read_yet = -1;
     switch (rc)
     {
       case -1:
