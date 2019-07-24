@@ -26,6 +26,29 @@
 #include "config.h"
 
 /**
+ * enum MuttWindowOrientation - Which way does the Window expand?
+ */
+enum MuttWindowOrientation
+{
+  MUTT_WIN_ORIENT_VERTICAL = 1, ///< Window uses all available vertical space
+  MUTT_WIN_ORIENT_HORIZONTAL,   ///< Window uses all available horizontal space
+};
+
+/**
+ * enum MuttWindowSize - Control the allocation of Window space
+ */
+enum MuttWindowSize
+{
+  MUTT_WIN_SIZE_FIXED = 1, ///< Window has a fixed size
+  MUTT_WIN_SIZE_MAXIMISE,  ///< Window wants as much space as possible
+  MUTT_WIN_SIZE_MINIMISE,  ///< Window size depends on its children
+};
+
+#define MUTT_WIN_SIZE_UNLIMITED -1 ///< Use as much space as possible
+
+TAILQ_HEAD(MuttWindowList, MuttWindow);
+
+/**
  * struct MuttWindow - A division of the screen
  *
  * Windows for different parts of the screen
@@ -36,6 +59,14 @@ struct MuttWindow
   int cols;
   int row_offset;
   int col_offset;
+
+  bool visible;
+  enum MuttWindowOrientation orient;
+  enum MuttWindowSize size;
+
+  TAILQ_ENTRY(MuttWindow) entries;
+  struct MuttWindow *parent;
+  struct MuttWindowList children;
 };
 
 extern struct MuttWindow *MuttHelpWindow;
