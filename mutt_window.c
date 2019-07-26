@@ -35,6 +35,7 @@
 #include "mutt_curses.h"
 #include "mutt_menu.h"
 #include "options.h"
+#include "pager.h"
 
 struct MuttWindow *RootWindow = NULL; ///< Parent of all Windows
 
@@ -327,6 +328,90 @@ void mutt_window_copy_size(const struct MuttWindow *win_src, struct MuttWindow *
 }
 
 /**
+ * mutt_window_reflow_prep - Prepare the Windows for reflowing
+ *
+ * This bit of business logic is temporary.
+ * Eventually, it will be split into the handlers for various Windows.
+ *
+ * The Window layout is affected by whether the Pager is visible and these
+ * config variables:
+ * - C_Help
+ * - C_PagerIndexLines
+ * - C_SidebarOnRight
+ * - C_SidebarVisible
+ * - C_SidebarWidth
+ * - C_StatusOnTop
+ */
+void mutt_window_reflow_prep(void)
+{
+  MuttHelpWindow->visible = C_Help;
+  MuttSidebarWindow->visible = C_SidebarVisible;
+  MuttSidebarWindow->cols = C_SidebarWidth;
+
+  struct MuttWindow *parent = MuttSidebarWindow->parent;
+  struct MuttWindow *first = TAILQ_FIRST(&parent->children);
+
+  if ((C_SidebarOnRight && (first == MuttSidebarWindow)) ||
+      (!C_SidebarOnRight && (first != MuttSidebarWindow)))
+  {
+    // Swap the Sidebar and the Container of the Index/Pager
+    TAILQ_REMOVE(&parent->children, first, entries);
+    TAILQ_INSERT_TAIL(&parent->children, first, entries);
+  }
+
+  parent = MuttHelpWindow->parent;
+  first = TAILQ_FIRST(&parent->children);
+
+  if ((C_StatusOnTop && (first == MuttHelpWindow)) ||
+      (!C_StatusOnTop && (first != MuttHelpWindow)))
+  {
+    // Swap the HelpLine and the Container of the Sidebar/Index/Pager
+    TAILQ_REMOVE(&parent->children, first, entries);
+    TAILQ_INSERT_TAIL(&parent->children, first, entries);
+  }
+
+  parent = MuttIndexWindow->parent;
+  first = TAILQ_FIRST(&parent->children);
+
+  if ((C_StatusOnTop && (first == MuttIndexWindow)) ||
+      (!C_StatusOnTop && (first != MuttIndexWindow)))
+  {
+    // Swap the Index and the Status Windows
+    TAILQ_REMOVE(&parent->children, first, entries);
+    TAILQ_INSERT_TAIL(&parent->children, first, entries);
+  }
+
+  parent = MuttPagerWindow->parent;
+  first = TAILQ_FIRST(&parent->children);
+
+  if ((C_StatusOnTop && (first == MuttPagerWindow)) ||
+      (!C_StatusOnTop && (first != MuttPagerWindow)))
+  {
+    // Swap the Pager and Pager Bar Windows
+    TAILQ_REMOVE(&parent->children, first, entries);
+    TAILQ_INSERT_TAIL(&parent->children, first, entries);
+  }
+
+  parent = MuttPagerWindow->parent;
+  if (parent->visible)
+  {
+    MuttIndexWindow->rows = C_PagerIndexLines;
+    MuttIndexWindow->size = MUTT_WIN_SIZE_FIXED;
+    parent = MuttIndexWindow->parent;
+    parent->size = MUTT_WIN_SIZE_MINIMISE;
+    parent->visible = (C_PagerIndexLines != 0);
+  }
+  else
+  {
+    MuttIndexWindow->rows = MUTT_WIN_SIZE_UNLIMITED;
+    MuttIndexWindow->size = MUTT_WIN_SIZE_MAXIMISE;
+    parent = MuttIndexWindow->parent;
+    parent->size = MUTT_WIN_SIZE_MAXIMISE;
+    parent->visible = true;
+  }
+}
+
+/**
  * mutt_window_reflow - Resize the Windows to fit the screen
  */
 void mutt_window_reflow(void)
@@ -335,6 +420,7 @@ void mutt_window_reflow(void)
     return;
 
   mutt_debug(LL_DEBUG2, "entering\n");
+  mutt_window_reflow_prep();
 
   MuttStatusWindow->rows = 1;
   MuttStatusWindow->cols = COLS;
