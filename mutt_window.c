@@ -238,6 +238,20 @@ void mutt_window_init(void)
                                      1, MUTT_WIN_SIZE_UNLIMITED);
 
   RootWindow = w1;
+  RootWindow->name = "r1";
+
+  w2->name = "w2";
+  w3->name = "w3";
+  w4->name = "w4";
+  w5->name = "w5";
+  w6->name = "w6";
+  MuttHelpWindow->name = "Help";
+  MuttIndexWindow->name = "Index";
+  MuttMessageWindow->name = "Message";
+  MuttPagerBarWindow->name = "PagerBar";
+  MuttPagerWindow->name = "Pager";
+  MuttSidebarWindow->name = "Sidebar";
+  MuttStatusWindow->name = "Status";
 
   mutt_window_add_child(w1, w2);
   mutt_window_add_child(w1, MuttMessageWindow);
@@ -412,6 +426,7 @@ void mutt_window_reflow(struct MuttWindow *win)
   mutt_menu_set_current_redraw_full();
   /* the pager menu needs this flag set to recalc line_info */
   mutt_menu_set_current_redraw(REDRAW_FLOW);
+  win_dump();
 }
 
 /**
@@ -591,4 +606,24 @@ void mutt_window_set_root(int rows, int cols)
   {
     mutt_window_reflow(RootWindow);
   }
+}
+
+void dump(struct MuttWindow *win, int indent)
+{
+  if (!win->state.visible)
+    return;
+
+  mutt_debug(LL_DEBUG1, "%*s[%d,%d] %s (%d,%d)\n", indent, "", win->state.col_offset,
+             win->state.row_offset, win->name, win->state.cols, win->state.rows);
+
+  struct MuttWindow *np = NULL;
+  TAILQ_FOREACH(np, &win->children, entries)
+  {
+    dump(np, indent + 4);
+  }
+}
+
+void win_dump(void)
+{
+  dump(RootWindow, 0);
 }

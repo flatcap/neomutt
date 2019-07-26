@@ -79,6 +79,7 @@ struct MuttWindow
   TAILQ_ENTRY(MuttWindow) entries;   ///< Linked list
   struct MuttWindow *parent;         ///< Parent Window
   struct MuttWindowList children;    ///< Children Windows
+  const char *name;
 };
 
 extern struct MuttWindow *MuttHelpWindow;
@@ -119,5 +120,6 @@ int  mutt_window_mvprintw (struct MuttWindow *win, int row, int col, const char 
 int  mutt_window_printf   (const char *format, ...);
 
 void mutt_winlist_free       (struct MuttWindowList *head);
+void win_dump(void);
 
 #endif /* MUTT_MUTT_WINDOW_H */
