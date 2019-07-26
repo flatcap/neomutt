@@ -159,7 +159,7 @@ int HeaderPadding[HDR_ATTACH_TITLE] = { 0 };
 int MaxHeaderWidth = 0;
 
 #define HDR_XOFFSET MaxHeaderWidth
-#define W (rd->win->cols - MaxHeaderWidth)
+#define W (rd->win->state.cols - MaxHeaderWidth)
 
 static const char *const Prompts[] = {
   /* L10N: Compose menu field.  May not want to translate. */
@@ -317,7 +317,7 @@ static void snd_make_entry(char *buf, size_t buflen, struct Menu *menu, int line
 {
   struct AttachCtx *actx = menu->data;
 
-  mutt_expando_format(buf, buflen, 0, menu->indexwin->cols, NONULL(C_AttachFormat),
+  mutt_expando_format(buf, buflen, 0, menu->indexwin->state.cols, NONULL(C_AttachFormat),
                       attach_format_str, (unsigned long) (actx->idx[actx->v2r[line]]),
                       MUTT_FORMAT_STAT_FILE | MUTT_FORMAT_ARROWCURSOR);
 }
@@ -555,7 +555,7 @@ static void redraw_mix_line(struct ListHead *chain, struct ComposeRedrawData *rd
     if (t && (t[0] == '0') && (t[1] == '\0'))
       t = "<random>";
 
-    if (c + mutt_str_strlen(t) + 2 >= rd->win->cols)
+    if (c + mutt_str_strlen(t) + 2 >= rd->win->state.cols)
       break;
 
     mutt_window_addstr(NONULL(t));
@@ -900,7 +900,7 @@ static void compose_custom_redraw(struct Menu *menu)
 
     draw_envelope(rd);
     menu->offset = HDR_ATTACH;
-    menu->pagelen = menu->indexwin->rows - HDR_ATTACH;
+    menu->pagelen = menu->indexwin->state.rows - HDR_ATTACH;
   }
 
   menu_check_recenter(menu);
@@ -908,11 +908,11 @@ static void compose_custom_redraw(struct Menu *menu)
   if (menu->redraw & REDRAW_STATUS)
   {
     char buf[1024];
-    compose_status_line(buf, sizeof(buf), 0, menu->statuswin->cols, menu,
+    compose_status_line(buf, sizeof(buf), 0, menu->statuswin->state.cols, menu,
                         NONULL(C_ComposeFormat));
     mutt_window_move(menu->statuswin, 0, 0);
     mutt_curses_set_color(MT_COLOR_STATUS);
-    mutt_paddstr(menu->statuswin->cols, buf);
+    mutt_paddstr(menu->statuswin->state.cols, buf);
     mutt_curses_set_color(MT_COLOR_NORMAL);
     menu->redraw &= ~REDRAW_STATUS;
   }
@@ -2206,7 +2206,7 @@ int mutt_compose_menu(struct Email *e, struct Buffer *fcc, struct Email *e_cur, 
 
 #ifdef MIXMASTER
       case OP_COMPOSE_MIX:
-        mix_make_chain(menu->indexwin, &e->chain, menu->indexwin->cols);
+        mix_make_chain(menu->indexwin, &e->chain, menu->indexwin->state.cols);
         mutt_message_hook(NULL, e, MUTT_SEND2_HOOK);
         break;
 #endif

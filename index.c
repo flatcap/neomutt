@@ -845,7 +845,7 @@ void index_make_entry(char *buf, size_t buflen, struct Menu *menu, int line)
     }
   }
 
-  mutt_make_string_flags(buf, buflen, menu->indexwin->cols, NONULL(C_IndexFormat),
+  mutt_make_string_flags(buf, buflen, menu->indexwin->state.cols, NONULL(C_IndexFormat),
                          Context, Context->mailbox, e, flags);
 }
 
@@ -1042,7 +1042,7 @@ static void index_custom_redraw(struct Menu *menu)
     menu_status_line(buf, sizeof(buf), menu, NONULL(C_StatusFormat));
     mutt_window_move(menu->statuswin, 0, 0);
     mutt_curses_set_color(MT_COLOR_STATUS);
-    mutt_draw_statusline(menu->statuswin->cols, buf, sizeof(buf));
+    mutt_draw_statusline(menu->statuswin->state.cols, buf, sizeof(buf));
     mutt_curses_set_color(MT_COLOR_NORMAL);
     menu->redraw &= ~REDRAW_STATUS;
     if (C_TsEnabled && TsSupported)
@@ -1260,7 +1260,7 @@ int mutt_index_menu(void)
       else
       {
         mutt_window_move(menu->indexwin, menu->current - menu->top + menu->offset,
-                         menu->indexwin->cols - 1);
+                         menu->indexwin->state.cols - 1);
       }
       mutt_refresh();
 
@@ -1665,7 +1665,7 @@ int mutt_index_menu(void)
       }
 
       case OP_HELP:
-        mutt_help(MENU_MAIN, MuttIndexWindow->cols);
+        mutt_help(MENU_MAIN, MuttIndexWindow->state.cols);
         menu->redraw = REDRAW_FULL;
         break;
 

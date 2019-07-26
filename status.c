@@ -407,6 +407,6 @@ static const char *status_format_str(char *buf, size_t buflen, size_t col, int c
  */
 void menu_status_line(char *buf, size_t buflen, struct Menu *menu, const char *p)
 {
-  mutt_expando_format(buf, buflen, 0, menu ? menu->statuswin->cols : buflen, p,
-                      status_format_str, (unsigned long) menu, MUTT_FORMAT_NO_FLAGS);
+  mutt_expando_format(buf, buflen, 0, menu ? menu->statuswin->state.cols : buflen,
+                      p, status_format_str, (unsigned long) menu, MUTT_FORMAT_NO_FLAGS);
 }

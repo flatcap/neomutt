@@ -49,18 +49,30 @@ enum MuttWindowSize
 TAILQ_HEAD(MuttWindowList, MuttWindow);
 
 /**
+ * struct WindowState - The current, or old, state of a Window
+ */
+struct WindowState
+{
+  bool visible;     ///< Window is visible
+  short rows;       ///< Number of rows, can be #MUTT_WIN_SIZE_UNLIMITED
+  short cols;       ///< Number of columns, can be #MUTT_WIN_SIZE_UNLIMITED
+  short row_offset; ///< Absolute on screen row
+  short col_offset; ///< Absolute on screen column
+};
+
+/**
  * struct MuttWindow - A division of the screen
  *
  * Windows for different parts of the screen
  */
 struct MuttWindow
 {
-  int rows;
-  int cols;
-  int row_offset;
-  int col_offset;
+  short req_rows;                    ///< Number of rows required
+  short req_cols;                    ///< Number of columns required
 
-  bool visible;
+  struct WindowState state;          ///< Current state of the Window
+  struct WindowState old;            ///< Previous state of the Window
+
   enum MuttWindowOrientation orient; ///< Which direction the Window will expand
   enum MuttWindowSize size;          ///< Type of Window, e.g. Fixed, Maximise
 

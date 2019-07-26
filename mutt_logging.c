@@ -168,7 +168,7 @@ int log_disp_curses(time_t stamp, const char *file, int line,
   if ((level > LL_ERROR) && OptMsgErr && !dupe)
     error_pause();
 
-  mutt_simple_format(ErrorBuf, sizeof(ErrorBuf), 0, MuttMessageWindow->cols,
+  mutt_simple_format(ErrorBuf, sizeof(ErrorBuf), 0, MuttMessageWindow->state.cols,
                      JUSTIFY_LEFT, 0, buf, sizeof(buf), false);
   ErrorBufMessage = true;
 
