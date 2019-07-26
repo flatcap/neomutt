@@ -50,12 +50,21 @@ struct MuttWindow *MuttStatusWindow = NULL; ///< Status Window
 
 /**
  * mutt_window_new - Create a new Window
+ * @param orient Window orientation, e.g. #MUTT_WIN_ORIENT_VERTICAL
+ * @param size   Window size, e.g. #MUTT_WIN_SIZE_MAXIMISE
+ * @param rows   Initial number of rows to allocate, can be #MUTT_WIN_SIZE_UNLIMITED
+ * @param cols   Initial number of columns to allocate, can be #MUTT_WIN_SIZE_UNLIMITED
  * @retval ptr New Window
  */
-struct MuttWindow *mutt_window_new(void)
+struct MuttWindow *mutt_window_new(enum MuttWindowOrientation orient,
+                                   enum MuttWindowSize size, int rows, int cols)
 {
   struct MuttWindow *win = mutt_mem_calloc(1, sizeof(struct MuttWindow));
 
+  win->orient = orient;
+  win->size = size;
+  win->rows = rows;
+  win->cols = cols;
   TAILQ_INIT(&win->children);
   return win;
 }
@@ -191,39 +200,59 @@ void mutt_window_init(void)
   if (RootWindow)
     return;
 
-  struct MuttWindow *v1 = mutt_window_new();
-  struct MuttWindow *v2 = mutt_window_new();
-  struct MuttWindow *h3 = mutt_window_new();
-  struct MuttWindow *v4 = mutt_window_new();
-  struct MuttWindow *v5 = mutt_window_new();
-  struct MuttWindow *v6 = mutt_window_new();
+  struct MuttWindow *w1 =
+      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  struct MuttWindow *w2 =
+      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  struct MuttWindow *w3 =
+      mutt_window_new(MUTT_WIN_ORIENT_HORIZONTAL, MUTT_WIN_SIZE_MAXIMISE,
+                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  struct MuttWindow *w4 =
+      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  struct MuttWindow *w5 =
+      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  struct MuttWindow *w6 =
+      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  w6->visible = false; // The Pager and Pager Bar are initially hidden
 
-  MuttHelpWindow = mutt_window_new();
-  MuttIndexWindow = mutt_window_new();
-  MuttMessageWindow = mutt_window_new();
-  MuttPagerBarWindow = mutt_window_new();
-  MuttPagerWindow = mutt_window_new();
-  MuttSidebarWindow = mutt_window_new();
-  MuttStatusWindow = mutt_window_new();
+  MuttHelpWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
+                                   1, MUTT_WIN_SIZE_UNLIMITED);
+  MuttIndexWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                                    MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  MuttMessageWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
+                                      1, MUTT_WIN_SIZE_UNLIMITED);
+  MuttPagerBarWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
+                                       1, MUTT_WIN_SIZE_UNLIMITED);
+  MuttPagerWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                                    MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  MuttSidebarWindow = mutt_window_new(MUTT_WIN_ORIENT_HORIZONTAL, MUTT_WIN_SIZE_FIXED,
+                                      MUTT_WIN_SIZE_UNLIMITED, 20);
+  MuttStatusWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
+                                     1, MUTT_WIN_SIZE_UNLIMITED);
 
-  RootWindow = v1;
+  RootWindow = w1;
 
-  mutt_window_add_child(v1, v2);
-  mutt_window_add_child(v1, MuttMessageWindow);
+  mutt_window_add_child(w1, w2);
+  mutt_window_add_child(w1, MuttMessageWindow);
 
-  mutt_window_add_child(v2, MuttHelpWindow);
-  mutt_window_add_child(v2, h3);
+  mutt_window_add_child(w2, MuttHelpWindow);
+  mutt_window_add_child(w2, w3);
 
-  mutt_window_add_child(h3, MuttSidebarWindow);
-  mutt_window_add_child(h3, v4);
+  mutt_window_add_child(w3, MuttSidebarWindow);
+  mutt_window_add_child(w3, w4);
 
-  mutt_window_add_child(v4, v5);
-  mutt_window_add_child(v5, MuttIndexWindow);
-  mutt_window_add_child(v5, MuttStatusWindow);
+  mutt_window_add_child(w4, w5);
+  mutt_window_add_child(w5, MuttIndexWindow);
+  mutt_window_add_child(w5, MuttStatusWindow);
 
-  mutt_window_add_child(v4, v6);
-  mutt_window_add_child(v6, MuttPagerWindow);
-  mutt_window_add_child(v6, MuttPagerBarWindow);
+  mutt_window_add_child(w4, w6);
+  mutt_window_add_child(w6, MuttPagerWindow);
+  mutt_window_add_child(w6, MuttPagerBarWindow);
 }
 
 /**
