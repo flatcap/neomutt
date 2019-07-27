@@ -36,6 +36,7 @@
 #include "mutt_menu.h"
 #include "options.h"
 #include "pager.h"
+#include "reflow.h"
 
 struct MuttWindow *RootWindow = NULL; ///< Parent of all Windows
 
@@ -345,6 +346,9 @@ void mutt_window_copy_size(const struct MuttWindow *win_src, struct MuttWindow *
  */
 void mutt_window_reflow_prep(void)
 {
+  RootWindow->state.cols = COLS; // From curses
+  RootWindow->state.rows = LINES;
+
   MuttHelpWindow->state.visible = C_Help;
   MuttSidebarWindow->state.visible = C_SidebarVisible;
   MuttSidebarWindow->req_cols = C_SidebarWidth;
@@ -422,50 +426,7 @@ void mutt_window_reflow(void)
 
   mutt_debug(LL_DEBUG2, "entering\n");
   mutt_window_reflow_prep();
-
-  MuttStatusWindow->state.rows = 1;
-  MuttStatusWindow->state.cols = COLS;
-  MuttStatusWindow->state.row_offset = C_StatusOnTop ? 0 : LINES - 2;
-  MuttStatusWindow->state.col_offset = 0;
-
-  mutt_window_copy_size(MuttStatusWindow, MuttHelpWindow);
-  if (C_Help)
-    MuttHelpWindow->state.row_offset = C_StatusOnTop ? LINES - 2 : 0;
-  else
-    MuttHelpWindow->state.rows = 0;
-
-  mutt_window_copy_size(MuttStatusWindow, MuttMessageWindow);
-  MuttMessageWindow->state.row_offset = LINES - 1;
-
-  mutt_window_copy_size(MuttStatusWindow, MuttIndexWindow);
-  MuttIndexWindow->state.rows =
-      MAX(LINES - MuttStatusWindow->state.rows - MuttHelpWindow->state.rows -
-              MuttMessageWindow->state.rows,
-          0);
-  MuttIndexWindow->state.row_offset =
-      C_StatusOnTop ? MuttStatusWindow->state.rows : MuttHelpWindow->state.rows;
-
-#ifdef USE_SIDEBAR
-  if (C_SidebarVisible)
-  {
-    mutt_window_copy_size(MuttIndexWindow, MuttSidebarWindow);
-    MuttSidebarWindow->state.cols = C_SidebarWidth;
-    MuttIndexWindow->state.cols -= C_SidebarWidth;
-
-    if (C_SidebarOnRight)
-    {
-      MuttSidebarWindow->state.col_offset = COLS - C_SidebarWidth;
-    }
-    else
-    {
-      MuttIndexWindow->state.col_offset += C_SidebarWidth;
-    }
-  }
-#endif
-
-  mutt_menu_set_current_redraw_full();
-  /* the pager menu needs this flag set to recalc line_info */
-  mutt_menu_set_current_redraw(REDRAW_FLOW);
+  window_reflow(RootWindow);
 }
 
 /**
@@ -476,23 +437,8 @@ void mutt_window_reflow(void)
  */
 void mutt_window_reflow_message_rows(int mw_rows)
 {
-  MuttMessageWindow->state.rows = mw_rows;
-  MuttMessageWindow->state.row_offset = LINES - mw_rows;
-
-  MuttStatusWindow->state.row_offset = C_StatusOnTop ? 0 : LINES - mw_rows - 1;
-
-  if (C_Help)
-    MuttHelpWindow->state.row_offset = C_StatusOnTop ? LINES - mw_rows - 1 : 0;
-
-  MuttIndexWindow->state.rows =
-      MAX(LINES - MuttStatusWindow->state.rows - MuttHelpWindow->state.rows -
-              MuttMessageWindow->state.rows,
-          0);
-
-#ifdef USE_SIDEBAR
-  if (C_SidebarVisible)
-    MuttSidebarWindow->state.rows = MuttIndexWindow->state.rows;
-#endif
+  MuttMessageWindow->req_rows = mw_rows;
+  mutt_window_reflow();
 
   /* We don't also set REDRAW_FLOW because this function only
    * changes rows and is a temporary adjustment. */
