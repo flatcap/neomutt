@@ -59,8 +59,11 @@ char *C_SidebarIndentString; ///< Config: (sidebar) Indent nested folders using 
 bool C_SidebarNewMailOnly; ///< Config: (sidebar) Only show folders with new/flagged mail
 bool C_SidebarNonEmptyMailboxOnly; ///< Config: (sidebar) Only show folders with a non-zero number of mail
 bool C_SidebarNextNewWrap; ///< Config: (sidebar) Wrap around when searching for the next mailbox with new mail
+bool C_SidebarOnRight; ///< Config: (sidebar) Display the sidebar on the right
 bool C_SidebarShortPath; ///< Config: (sidebar) Abbreviate the paths using the #C_Folder variable
 short C_SidebarSortMethod; ///< Config: (sidebar) Method to sort the sidebar
+bool C_SidebarVisible;     ///< Config: (sidebar) Show the sidebar
+short C_SidebarWidth;      ///< Config: (sidebar) Width of the sidebar
 
 /* Previous values for some sidebar config */
 static short PreviousSort = SORT_ORDER; /* sidebar_sort_method */
@@ -1160,4 +1163,54 @@ void mutt_sb_notify_mailbox(struct Mailbox *m, bool created)
   }
 
   mutt_menu_set_current_redraw(REDRAW_SIDEBAR);
+}
+
+/**
+ * mutt_sb_observer - Listen for config changes affecting the sidebar - Implements ::observer_t()
+ * @param cs Config Set
+ * @retval bool True, if successful
+ */
+int mutt_sb_observer(struct NotifyCallback *nc)
+{
+  if (!nc || !MuttSidebarWindow)
+    return -1;
+
+  struct EventConfig *ec = (struct EventConfig *) nc->event;
+
+  if (mutt_str_strncmp(ec->name, "sidebar_", 8) != 0)
+    return 0;
+
+  bool repaint = false;
+
+  if (MuttSidebarWindow->state.visible == !C_SidebarVisible)
+  {
+    MuttSidebarWindow->state.visible = C_SidebarVisible;
+    repaint = true;
+  }
+
+  if (MuttSidebarWindow->req_cols != C_SidebarWidth)
+  {
+    MuttSidebarWindow->req_cols = C_SidebarWidth;
+    repaint = true;
+  }
+
+  struct MuttWindow *parent = MuttSidebarWindow->parent;
+  struct MuttWindow *first = TAILQ_FIRST(&parent->children);
+
+  if ((C_SidebarOnRight && (first == MuttSidebarWindow)) ||
+      (!C_SidebarOnRight && (first != MuttSidebarWindow)))
+  {
+    // Swap the Sidebar and the Container of the Index/Pager
+    TAILQ_REMOVE(&parent->children, first, entries);
+    TAILQ_INSERT_TAIL(&parent->children, first, entries);
+    repaint = true;
+  }
+
+  if (repaint)
+  {
+    mutt_debug(LL_NOTIFY, "repaint sidebar\n");
+    mutt_menu_set_current_redraw_full();
+  }
+
+  return 0;
 }
