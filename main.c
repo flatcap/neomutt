@@ -697,7 +697,7 @@ int main(int argc, char *argv[], char *envp[])
 
     /* check whether terminal status is supported (must follow curses init) */
     TsSupported = mutt_ts_capability();
-    mutt_window_reflow();
+    mutt_window_reflow(NULL);
   }
 
   /* set defaults and read init files */

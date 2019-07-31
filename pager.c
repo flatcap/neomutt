@@ -2249,7 +2249,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   unlink(fname);
 
   MuttPagerWindow->parent->state.visible = true;
-  mutt_window_reflow();
+  mutt_window_reflow(NULL);
 
   /* Initialize variables */
 
@@ -3507,7 +3507,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
       case OP_SIDEBAR_TOGGLE_VISIBLE:
         bool_str_toggle(Config, "sidebar_visible", NULL);
-        mutt_window_reflow();
+        mutt_window_reflow(NULL);
         break;
 #endif
 
@@ -3556,7 +3556,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   mutt_buffer_dealloc(&helpstr);
 
   MuttPagerWindow->parent->state.visible = false;
-  mutt_window_reflow();
+  mutt_window_reflow(NULL);
 
   return (rc != -1) ? rc : 0;
 }

@@ -417,16 +417,17 @@ void mutt_window_reflow_prep(void)
 }
 
 /**
- * mutt_window_reflow - Resize the Windows to fit the screen
+ * mutt_window_reflow - Resize a Window and its children
+ * @param win Window to resize
  */
-void mutt_window_reflow(void)
+void mutt_window_reflow(struct MuttWindow *win)
 {
   if (OptNoCurses)
     return;
 
   mutt_debug(LL_DEBUG2, "entering\n");
   mutt_window_reflow_prep();
-  window_reflow(RootWindow);
+  window_reflow(win ? win : RootWindow);
 }
 
 /**
@@ -438,7 +439,7 @@ void mutt_window_reflow(void)
 void mutt_window_reflow_message_rows(int mw_rows)
 {
   MuttMessageWindow->req_rows = mw_rows;
-  mutt_window_reflow();
+  mutt_window_reflow(MuttMessageWindow->parent);
 
   /* We don't also set REDRAW_FLOW because this function only
    * changes rows and is a temporary adjustment. */
