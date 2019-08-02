@@ -204,8 +204,7 @@ void mutt_window_init(void)
     return;
 
   struct MuttWindow *w1 =
-      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED, 0, 0);
   struct MuttWindow *w2 =
       mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
                       MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
@@ -346,9 +345,6 @@ void mutt_window_copy_size(const struct MuttWindow *win_src, struct MuttWindow *
  */
 void mutt_window_reflow_prep(void)
 {
-  RootWindow->state.cols = COLS; // From curses
-  RootWindow->state.rows = LINES;
-
   MuttHelpWindow->state.visible = C_Help;
   MuttSidebarWindow->state.visible = C_SidebarVisible;
   MuttSidebarWindow->req_cols = C_SidebarWidth;
@@ -428,6 +424,10 @@ void mutt_window_reflow(struct MuttWindow *win)
   mutt_debug(LL_DEBUG2, "entering\n");
   mutt_window_reflow_prep();
   window_reflow(win ? win : RootWindow);
+
+  mutt_menu_set_current_redraw_full();
+  /* the pager menu needs this flag set to recalc line_info */
+  mutt_menu_set_current_redraw(REDRAW_FLOW);
 }
 
 /**
@@ -576,5 +576,35 @@ void mutt_winlist_free(struct MuttWindowList *head)
     TAILQ_REMOVE(head, np, entries);
     mutt_winlist_free(&np->children);
     FREE(&np);
+  }
+}
+
+/**
+ * mutt_window_set_root - XXX
+ * @param rows
+ * @param cols
+ */
+void mutt_window_set_root(int rows, int cols)
+{
+  if (!RootWindow)
+    return;
+
+  bool changed = false;
+
+  if (RootWindow->state.rows != rows)
+  {
+    RootWindow->state.rows = rows;
+    changed = true;
+  }
+
+  if (RootWindow->state.cols != cols)
+  {
+    RootWindow->state.cols = cols;
+    changed = true;
+  }
+
+  if (changed)
+  {
+    mutt_window_reflow(RootWindow);
   }
 }
