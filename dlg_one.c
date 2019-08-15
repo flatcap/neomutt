@@ -2,6 +2,7 @@
 #include <string.h>
 #include "mutt/mutt.h"
 #include "dlg_one.h"
+#include "dlg_two.h"
 #include "keymap.h"
 #include "mutt_curses.h"
 #include "mutt_window.h"
@@ -64,6 +65,14 @@ static bool dlg_one_menu_handler(struct Dialog *dlg, struct MuttWindow *win,
         return true;
       }
       break;
+    }
+
+    case 'z':
+    {
+      struct DlgTwo *dlg2 = dlg_two_new();
+      dialog_run(&dlg2->dialog);
+      dlg_two_free(&dlg2);
+      return true;
     }
   }
 

@@ -58,6 +58,7 @@
 #include "context.h"
 #include "curs_lib.h"
 #include "dlg_one.h"
+#include "dlg_two.h"
 #include "globals.h"
 #include "hook.h"
 #include "index.h"
