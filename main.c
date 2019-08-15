@@ -57,6 +57,7 @@
 #include "color.h"
 #include "context.h"
 #include "curs_lib.h"
+#include "dlg_one.h"
 #include "globals.h"
 #include "hook.h"
 #include "index.h"
@@ -853,7 +854,10 @@ int main(int argc, char *argv[], char *envp[])
     MuttMessageWindow->repaint(NULL, MuttMessageWindow, true);
     refresh();
 
-    mutt_sleep(2);
+    struct DlgOne *dlg1 = dlg_one_new();
+    dialog_run(&dlg1->dialog);
+    dlg_one_free(&dlg1);
+
     mutt_curses_set_cursor(MUTT_CURSOR_VISIBLE);
   }
   else if (sendflags & SEND_POSTPONED)
