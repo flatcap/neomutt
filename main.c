@@ -846,7 +846,17 @@ int main(int argc, char *argv[], char *envp[])
   notify_observer_add(Colors->notify, NT_COLOR, 0, mutt_menu_color_observer, 0);
   notify_observer_add(Config->notify, NT_CONFIG, 0, mutt_sb_observer, 0);
 
-  if (sendflags & SEND_POSTPONED)
+  if (true)
+  {
+    mutt_curses_set_cursor(MUTT_CURSOR_INVISIBLE);
+    MuttHelpWindow->repaint(NULL, MuttHelpWindow, true);
+    MuttMessageWindow->repaint(NULL, MuttMessageWindow, true);
+    refresh();
+
+    mutt_sleep(2);
+    mutt_curses_set_cursor(MUTT_CURSOR_VISIBLE);
+  }
+  else if (sendflags & SEND_POSTPONED)
   {
     if (!OptNoCurses)
       mutt_flushinp();
