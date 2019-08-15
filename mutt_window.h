@@ -25,6 +25,9 @@
 
 #include "config.h"
 
+struct Dialog;
+struct KeyEvent;
+
 /**
  * enum MuttWindowOrientation - Which way does the Window expand?
  */
@@ -60,6 +63,23 @@ struct WindowState
   short col_offset; ///< Absolute on screen column
 };
 
+typedef uint16_t WindowChangeFlags;
+#define WIN_CHANGE_NO_FLAGS             0
+#define WIN_CHANGE_FORCE         (1 <<  0)
+#define WIN_CHANGE_MOVED         (1 <<  1)
+#define WIN_CHANGE_MOVED_LEFT    (1 <<  2)
+#define WIN_CHANGE_MOVED_RIGHT   (1 <<  3)
+#define WIN_CHANGE_MOVED_UP      (1 <<  4)
+#define WIN_CHANGE_MOVED_DOWN    (1 <<  5)
+#define WIN_CHANGE_SIZE          (1 <<  6)
+#define WIN_CHANGE_SIZE_WIDER    (1 <<  7)
+#define WIN_CHANGE_SIZE_NARROWER (1 <<  8)
+#define WIN_CHANGE_SIZE_TALLER   (1 <<  9)
+#define WIN_CHANGE_SIZE_SHORTER  (1 << 10)
+#define WIN_CHANGE_VISIBILITY    (1 << 11)
+#define WIN_CHANGE_VIS_VISIBLE   (1 << 12)
+#define WIN_CHANGE_VIS_HIDDEN    (1 << 13)
+
 /**
  * struct MuttWindow - A division of the screen
  *
@@ -67,6 +87,8 @@ struct WindowState
  */
 struct MuttWindow
 {
+  bool need_repaint;
+
   short req_rows;                    ///< Number of rows required
   short req_cols;                    ///< Number of columns required
 
@@ -80,8 +102,12 @@ struct MuttWindow
   struct MuttWindow *parent;         ///< Parent Window
   struct MuttWindowList children;    ///< Children Windows
   const char *name;
+
+  int  (*repaint)(struct Dialog *dlg, struct MuttWindow *win, WindowChangeFlags flags);
+  bool (*handler)(struct Dialog *dlg, struct MuttWindow *win, struct KeyEvent *ke);
 };
 
+extern struct MuttWindow *MuttDialogWindow;
 extern struct MuttWindow *MuttHelpWindow;
 extern struct MuttWindow *MuttIndexWindow;
 extern struct MuttWindow *MuttMessageWindow;
@@ -121,5 +147,6 @@ int  mutt_window_printf   (const char *format, ...);
 
 void mutt_winlist_free       (struct MuttWindowList *head);
 void win_dump(void);
+WindowChangeFlags mutt_window_calc_changes(struct MuttWindow *win);
 
 #endif /* MUTT_MUTT_WINDOW_H */

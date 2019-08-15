@@ -38,7 +38,8 @@
 #include "pager.h"
 #include "reflow.h"
 
-struct MuttWindow *RootWindow = NULL; ///< Parent of all Windows
+struct MuttWindow *RootWindow = NULL;       ///< Parent of all Windows
+struct MuttWindow *MuttDialogWindow = NULL; ///< Parent of all Dialogs
 
 struct MuttWindow *MuttHelpWindow = NULL;     ///< Help Window
 struct MuttWindow *MuttIndexWindow = NULL;    ///< Index Window
@@ -193,6 +194,26 @@ void mutt_window_get_coords(struct MuttWindow *win, int *row, int *col)
     *row = y - win->state.row_offset;
 }
 
+static int help_repaint(struct Dialog *dlg, struct MuttWindow *win, WindowChangeFlags flags)
+{
+  mutt_curses_set_color(MT_COLOR_STATUS);
+  mutt_window_mvaddstr(win, 0, 0, "HelpLine");
+  mutt_window_clrtoeol(win);
+  mutt_window_mvaddstr(win, 0, win->state.cols - 1, "X");
+  mutt_curses_set_color(MT_COLOR_NORMAL);
+  return 0;
+}
+
+static int message_repaint(struct Dialog *dlg, struct MuttWindow *win, WindowChangeFlags flags)
+{
+  // mutt_curses_set_color(MT_COLOR_STATUS);
+  mutt_window_mvaddstr(win, 0, 0, "Message");
+  mutt_window_clrtoeol(win);
+  mutt_window_mvaddstr(win, 0, win->state.cols - 1, "X");
+  // mutt_curses_set_color(MT_COLOR_NORMAL);
+  return 0;
+}
+
 /**
  * mutt_window_init - Create the default Windows
  *
@@ -203,72 +224,24 @@ void mutt_window_init(void)
   if (RootWindow)
     return;
 
-  struct MuttWindow *w1 =
-      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED, 0, 0);
-  struct MuttWindow *w2 =
-      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
-  struct MuttWindow *w3 =
-      mutt_window_new(MUTT_WIN_ORIENT_HORIZONTAL, MUTT_WIN_SIZE_MAXIMISE,
-                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
-  struct MuttWindow *w4 =
-      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
-  struct MuttWindow *w5 =
-      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
-  struct MuttWindow *w6 =
-      mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                      MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
-  w6->state.visible = false; // The Pager and Pager Bar are initially hidden
-
+  RootWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED, 0, 0);
   MuttHelpWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
                                    1, MUTT_WIN_SIZE_UNLIMITED);
-  MuttIndexWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                                    MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
+  MuttDialogWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
+                                     MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
   MuttMessageWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
                                       1, MUTT_WIN_SIZE_UNLIMITED);
-  MuttPagerBarWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
-                                       1, MUTT_WIN_SIZE_UNLIMITED);
-  MuttPagerWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_MAXIMISE,
-                                    MUTT_WIN_SIZE_UNLIMITED, MUTT_WIN_SIZE_UNLIMITED);
-  MuttSidebarWindow = mutt_window_new(MUTT_WIN_ORIENT_HORIZONTAL, MUTT_WIN_SIZE_FIXED,
-                                      MUTT_WIN_SIZE_UNLIMITED, 20);
-  MuttStatusWindow = mutt_window_new(MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
-                                     1, MUTT_WIN_SIZE_UNLIMITED);
 
-  RootWindow = w1;
   RootWindow->name = "r1";
-
-  w2->name = "w2";
-  w3->name = "w3";
-  w4->name = "w4";
-  w5->name = "w5";
-  w6->name = "w6";
   MuttHelpWindow->name = "Help";
-  MuttIndexWindow->name = "Index";
+  MuttHelpWindow->repaint = help_repaint;
+  MuttDialogWindow->name = "d1";
   MuttMessageWindow->name = "Message";
-  MuttPagerBarWindow->name = "PagerBar";
-  MuttPagerWindow->name = "Pager";
-  MuttSidebarWindow->name = "Sidebar";
-  MuttStatusWindow->name = "Status";
+  MuttMessageWindow->repaint = message_repaint;
 
-  mutt_window_add_child(w1, w2);
-  mutt_window_add_child(w1, MuttMessageWindow);
-
-  mutt_window_add_child(w2, MuttHelpWindow);
-  mutt_window_add_child(w2, w3);
-
-  mutt_window_add_child(w3, MuttSidebarWindow);
-  mutt_window_add_child(w3, w4);
-
-  mutt_window_add_child(w4, w5);
-  mutt_window_add_child(w5, MuttIndexWindow);
-  mutt_window_add_child(w5, MuttStatusWindow);
-
-  mutt_window_add_child(w4, w6);
-  mutt_window_add_child(w6, MuttPagerWindow);
-  mutt_window_add_child(w6, MuttPagerBarWindow);
+  mutt_window_add_child(RootWindow, MuttHelpWindow);
+  mutt_window_add_child(RootWindow, MuttDialogWindow);
+  mutt_window_add_child(RootWindow, MuttMessageWindow);
 }
 
 /**
@@ -420,7 +393,7 @@ void mutt_window_reflow(struct MuttWindow *win)
     return;
 
   mutt_debug(LL_DEBUG2, "entering\n");
-  mutt_window_reflow_prep();
+  // mutt_window_reflow_prep();
   window_reflow(win ? win : RootWindow);
 
   mutt_menu_set_current_redraw_full();
@@ -626,4 +599,25 @@ void dump(struct MuttWindow *win, int indent)
 void win_dump(void)
 {
   dump(RootWindow, 0);
+}
+
+WindowChangeFlags mutt_window_calc_changes(struct MuttWindow *win)
+{
+  WindowChangeFlags flags = WIN_CHANGE_NO_FLAGS;
+  if (!win)
+    return flags;
+
+  struct WindowState *os = &win->old;
+  struct WindowState *ns = &win->state;
+
+  if (os->visible != ns->visible)
+    flags |= WIN_CHANGE_VISIBILITY;
+
+  if ((os->rows != ns->rows) || (os->cols != ns->cols))
+    flags |= WIN_CHANGE_SIZE;
+
+  if ((os->row_offset != ns->row_offset) || (os->col_offset != ns->col_offset))
+    flags |= WIN_CHANGE_MOVED;
+
+  return flags;
 }
