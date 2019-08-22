@@ -190,10 +190,6 @@ struct PagerRedrawData
   struct QClass *quote_list;
   LOFF_T last_pos;
   LOFF_T last_offset;
-  struct MuttWindow *index_status_window;
-  struct MuttWindow *index_window;
-  struct MuttWindow *pager_status_window;
-  struct MuttWindow *pager_window;
   struct Menu *menu; /**< the Pager Index (PI) */
   regex_t search_re;
   bool search_compiled;
@@ -2000,12 +1996,12 @@ static void pager_custom_redraw(struct Menu *pager_menu)
         rd->menu->menu_color = index_color;
         rd->menu->max = Context ? Context->mailbox->vcount : 0;
         rd->menu->current = rd->extra->email->vnum;
-        rd->menu->indexwin = rd->index_window;
-        rd->menu->statuswin = rd->index_status_window;
+        rd->menu->indexwin = rd->extra->index_window;
+        rd->menu->statuswin = rd->extra->index_status_window;
       }
 
       mutt_curses_set_color(MT_COLOR_NORMAL);
-      rd->menu->pagelen = rd->index_window->state.rows;
+      rd->menu->pagelen = rd->extra->index_window->state.rows;
 
       /* some fudge to work out whereabouts the indicator should go */
       if (rd->menu->current - rd->indicator < 0)
@@ -2055,7 +2051,7 @@ static void pager_custom_redraw(struct Menu *pager_menu)
     while (display_line(rd->fp, &rd->last_pos, &rd->line_info, ++i, &rd->last_line,
                         &rd->max_line, rd->has_types | rd->search_flag | (rd->flags & MUTT_PAGER_NOWRAP),
                         &rd->quote_list, &rd->q_level, &rd->force_redraw,
-                        &rd->search_re, rd->pager_window) == 0)
+                        &rd->search_re, rd->extra->pager_window) == 0)
     {
       if (!rd->line_info[i].continuation && (++j == rd->lines))
       {
@@ -2077,13 +2073,13 @@ static void pager_custom_redraw(struct Menu *pager_menu)
   {
     do
     {
-      mutt_window_move(rd->pager_window, 0, 0);
+      mutt_window_move(rd->extra->pager_window, 0, 0);
       rd->curline = rd->topline;
       rd->oldtopline = rd->topline;
       rd->lines = 0;
       rd->force_redraw = false;
 
-      while ((rd->lines < rd->pager_window->state.rows) &&
+      while ((rd->lines < rd->extra->pager_window->state.rows) &&
              (rd->line_info[rd->curline].offset <= rd->sb.st_size - 1))
       {
         if (display_line(rd->fp, &rd->last_pos, &rd->line_info, rd->curline,
@@ -2091,24 +2087,24 @@ static void pager_custom_redraw(struct Menu *pager_menu)
                          (rd->flags & MUTT_DISPLAYFLAGS) | rd->hide_quoted |
                              rd->search_flag | (rd->flags & MUTT_PAGER_NOWRAP),
                          &rd->quote_list, &rd->q_level, &rd->force_redraw,
-                         &rd->search_re, rd->pager_window) > 0)
+                         &rd->search_re, rd->extra->pager_window) > 0)
         {
           rd->lines++;
         }
         rd->curline++;
-        mutt_window_move(rd->pager_window, rd->lines, 0);
+        mutt_window_move(rd->extra->pager_window, rd->lines, 0);
       }
       rd->last_offset = rd->line_info[rd->curline].offset;
     } while (rd->force_redraw);
 
     mutt_curses_set_color(MT_COLOR_TILDE);
-    while (rd->lines < rd->pager_window->state.rows)
+    while (rd->lines < rd->extra->pager_window->state.rows)
     {
-      mutt_window_clrtoeol(rd->pager_window);
+      mutt_window_clrtoeol(rd->extra->pager_window);
       if (C_Tilde)
         mutt_window_addch('~');
       rd->lines++;
-      mutt_window_move(rd->pager_window, rd->lines, 0);
+      mutt_window_move(rd->extra->pager_window, rd->lines, 0);
     }
     mutt_curses_set_color(MT_COLOR_NORMAL);
 
@@ -2143,24 +2139,24 @@ static void pager_custom_redraw(struct Menu *pager_menu)
     }
 
     /* print out the pager status bar */
-    mutt_window_move(rd->pager_status_window, 0, 0);
+    mutt_window_move(rd->extra->pager_status_window, 0, 0);
     mutt_curses_set_color(MT_COLOR_STATUS);
 
     if (IsEmail(rd->extra) || IsMsgAttach(rd->extra))
     {
-      size_t l1 = rd->pager_status_window->state.cols * MB_LEN_MAX;
+      size_t l1 = rd->extra->pager_status_window->state.cols * MB_LEN_MAX;
       size_t l2 = sizeof(buf);
       hfi.email = (IsEmail(rd->extra)) ? rd->extra->email : rd->extra->body->email;
       mutt_make_string_info(buf, (l1 < l2) ? l1 : l2,
-                            rd->pager_status_window->state.cols,
+                            rd->extra->pager_status_window->state.cols,
                             NONULL(C_PagerFormat), &hfi, MUTT_FORMAT_NO_FLAGS);
-      mutt_draw_statusline(rd->pager_status_window->state.cols, buf, l2);
+      mutt_draw_statusline(rd->extra->pager_status_window->state.cols, buf, l2);
     }
     else
     {
       char bn[256];
       snprintf(bn, sizeof(bn), "%s (%s)", rd->banner, pager_progress_str);
-      mutt_draw_statusline(rd->pager_status_window->state.cols, bn, sizeof(bn));
+      mutt_draw_statusline(rd->extra->pager_status_window->state.cols, bn, sizeof(bn));
     }
     mutt_curses_set_color(MT_COLOR_NORMAL);
     if (C_TsEnabled && TsSupported && rd->menu)
@@ -2176,15 +2172,15 @@ static void pager_custom_redraw(struct Menu *pager_menu)
   {
     /* redraw the pager_index indicator, because the
      * flags for this message might have changed. */
-    if (rd->index_window->state.rows > 0)
+    if (rd->extra->index_window->state.rows > 0)
       menu_redraw_current(rd->menu);
 
     /* print out the index status bar */
     menu_status_line(buf, sizeof(buf), rd->menu, NONULL(C_StatusFormat));
 
-    mutt_window_move(rd->index_status_window, 0, 0);
+    mutt_window_move(rd->extra->index_status_window, 0, 0);
     mutt_curses_set_color(MT_COLOR_STATUS);
-    mutt_draw_statusline(rd->index_status_window->state.cols, buf, sizeof(buf));
+    mutt_draw_statusline(rd->extra->index_status_window->state.cols, buf, sizeof(buf));
     mutt_curses_set_color(MT_COLOR_NORMAL);
   }
 
@@ -2248,7 +2244,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   }
   unlink(fname);
 
-  MuttPagerWindow->parent->state.visible = true;
+  rd.extra->pager_window->parent->state.visible = true;
   mutt_window_reflow(NULL);
 
   /* Initialize variables */
@@ -2292,11 +2288,6 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
   }
   rd.helpstr = mutt_b2s(&helpstr);
 
-  rd.index_status_window = MuttStatusWindow;
-  rd.index_window = MuttIndexWindow;
-  rd.pager_status_window = MuttPagerBarWindow;
-  rd.pager_window = MuttPagerWindow;
-
   pager_menu = mutt_menu_new(MENU_PAGER);
   pager_menu->menu_custom_redraw = pager_custom_redraw;
   pager_menu->redraw_data = &rd;
@@ -2317,7 +2308,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
       }
     }
     else
-      mutt_window_move(rd.pager_status_window, 0, rd.pager_status_window->state.cols - 1);
+      mutt_window_move(rd.extra->pager_status_window, 0, rd.extra->pager_status_window->state.cols - 1);
 
     mutt_refresh();
 
@@ -2509,7 +2500,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         }
         else
         {
-          rd.topline = up_n_lines(rd.pager_window->state.rows - C_PagerContext,
+          rd.topline = up_n_lines(rd.extra->pager_window->state.rows - C_PagerContext,
                                   rd.line_info, rd.topline, rd.hide_quoted);
         }
         break;
@@ -2548,8 +2539,8 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
       case OP_HALF_UP:
         if (rd.topline)
         {
-          rd.topline = up_n_lines(rd.pager_window->state.rows / 2 +
-                                      (rd.pager_window->state.rows % 2),
+          rd.topline = up_n_lines(rd.extra->pager_window->state.rows / 2 +
+                                      (rd.extra->pager_window->state.rows % 2),
                                   rd.line_info, rd.topline, rd.hide_quoted);
         }
         else
@@ -2559,7 +2550,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
       case OP_HALF_DOWN:
         if (rd.line_info[rd.curline].offset < (rd.sb.st_size - 1))
         {
-          rd.topline = up_n_lines(rd.pager_window->state.rows / 2, rd.line_info,
+          rd.topline = up_n_lines(rd.extra->pager_window->state.rows / 2, rd.line_info,
                                   rd.curline, rd.hide_quoted);
         }
         else if (C_PagerStop)
@@ -2581,7 +2572,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
         {
           wrapped = false;
 
-          if (C_SearchContext < rd.pager_window->state.rows)
+          if (C_SearchContext < rd.extra->pager_window->state.rows)
             searchctx = C_SearchContext;
           else
             searchctx = 0;
@@ -2722,7 +2713,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
                               &rd.last_line, &rd.max_line,
                               MUTT_SEARCH | (flags & MUTT_PAGER_NSKIP) | (flags & MUTT_PAGER_NOWRAP),
                               &rd.quote_list, &rd.q_level, &rd.force_redraw,
-                              &rd.search_re, rd.pager_window) == 0)
+                              &rd.search_re, rd.extra->pager_window) == 0)
           {
             line_num++;
           }
@@ -2769,7 +2760,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
           {
             rd.search_flag = MUTT_SEARCH;
             /* give some context for search results */
-            if (C_SearchContext < rd.pager_window->state.rows)
+            if (C_SearchContext < rd.extra->pager_window->state.rows)
               searchctx = C_SearchContext;
             else
               searchctx = 0;
@@ -2838,7 +2829,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
                                rd.fp, &rd.last_pos, &rd.line_info, new_topline, &rd.last_line,
                                &rd.max_line, MUTT_TYPES | (flags & MUTT_PAGER_NOWRAP),
                                &rd.quote_list, &rd.q_level, &rd.force_redraw,
-                               &rd.search_re, rd.pager_window)))) &&
+                               &rd.search_re, rd.extra->pager_window)))) &&
                    IS_HEADER(rd.line_info[new_topline].type))
             {
               new_topline++;
@@ -2852,7 +2843,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
                              rd.fp, &rd.last_pos, &rd.line_info, new_topline, &rd.last_line,
                              &rd.max_line, MUTT_TYPES | (flags & MUTT_PAGER_NOWRAP),
                              &rd.quote_list, &rd.q_level, &rd.force_redraw,
-                             &rd.search_re, rd.pager_window)))) &&
+                             &rd.search_re, rd.extra->pager_window)))) &&
                  (rd.line_info[new_topline + C_SkipQuotedOffset].type != MT_COLOR_QUOTED))
           {
             new_topline++;
@@ -2869,7 +2860,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
                              rd.fp, &rd.last_pos, &rd.line_info, new_topline, &rd.last_line,
                              &rd.max_line, MUTT_TYPES | (flags & MUTT_PAGER_NOWRAP),
                              &rd.quote_list, &rd.q_level, &rd.force_redraw,
-                             &rd.search_re, rd.pager_window)))) &&
+                             &rd.search_re, rd.extra->pager_window)))) &&
                  (rd.line_info[new_topline + C_SkipQuotedOffset].type == MT_COLOR_QUOTED))
           {
             new_topline++;
@@ -2892,11 +2883,11 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
           while (display_line(rd.fp, &rd.last_pos, &rd.line_info, line_num, &rd.last_line,
                               &rd.max_line, rd.has_types | (flags & MUTT_PAGER_NOWRAP),
                               &rd.quote_list, &rd.q_level, &rd.force_redraw,
-                              &rd.search_re, rd.pager_window) == 0)
+                              &rd.search_re, rd.extra->pager_window) == 0)
           {
             line_num++;
           }
-          rd.topline = up_n_lines(rd.pager_window->state.rows, rd.line_info,
+          rd.topline = up_n_lines(rd.extra->pager_window->state.rows, rd.line_info,
                                   rd.last_line, rd.hide_quoted);
         }
         else
@@ -3555,7 +3546,7 @@ int mutt_pager(const char *banner, const char *fname, PagerFlags flags, struct P
 
   mutt_buffer_dealloc(&helpstr);
 
-  MuttPagerWindow->parent->state.visible = false;
+  rd.extra->pager_window->parent->state.visible = false;
   mutt_window_reflow(NULL);
 
   return (rc != -1) ? rc : 0;
