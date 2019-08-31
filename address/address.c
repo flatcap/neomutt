@@ -1384,14 +1384,13 @@ void mutt_addrlist_clear(struct AddressList *al)
   if (!al)
     return;
 
-  struct Address *a = TAILQ_FIRST(al), *next = NULL;
-  while (a)
+  struct Address *np = NULL;
+  struct Address *tmp = NULL;
+  TAILQ_FOREACH_SAFE(np, al, entries, tmp)
   {
-    next = TAILQ_NEXT(a, entries);
-    mutt_addr_free(&a);
-    a = next;
+    TAILQ_REMOVE(al, np, entries);
+    mutt_addr_free(&np);
   }
-  TAILQ_INIT(al);
 }
 
 /**

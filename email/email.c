@@ -118,20 +118,20 @@ size_t email_size(const struct Email *e)
  * emaillist_clear - Drop a private list of Emails
  * @param el EmailList to empty
  *
- * The Emails are not freed.
+ * @note The Emails are not freed
  */
 void emaillist_clear(struct EmailList *el)
 {
   if (!el)
     return;
 
-  struct EmailNode *en = NULL, *tmp = NULL;
+  struct EmailNode *en = NULL;
+  struct EmailNode *tmp = NULL;
   STAILQ_FOREACH_SAFE(en, el, entries, tmp)
   {
     STAILQ_REMOVE(el, en, EmailNode, entries);
     FREE(&en);
   }
-  STAILQ_INIT(el);
 }
 
 /**

@@ -80,7 +80,8 @@ struct CryptModuleSpecs *crypto_module_lookup(int identifier)
  */
 void crypto_module_free(void)
 {
-  struct CryptModule *np = NULL, *tmp = NULL;
+  struct CryptModule *np = NULL;
+  struct CryptModule *tmp = NULL;
   STAILQ_FOREACH_SAFE(np, &CryptModules, entries, tmp)
   {
     STAILQ_REMOVE(&CryptModules, np, CryptModule, entries);

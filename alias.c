@@ -761,11 +761,11 @@ void mutt_alias_free(struct Alias **ptr)
  */
 void mutt_aliaslist_free(struct AliasList *a_list)
 {
-  struct Alias *a = NULL, *tmp = NULL;
+  struct Alias *a = NULL;
+  struct Alias *tmp = NULL;
   TAILQ_FOREACH_SAFE(a, a_list, entries, tmp)
   {
     TAILQ_REMOVE(a_list, a, entries);
     mutt_alias_free(&a);
   }
-  TAILQ_INIT(a_list);
 }

@@ -106,16 +106,14 @@ void mutt_grouplist_clear(struct GroupList *gl)
   if (!gl)
     return;
 
-  struct GroupNode *np = STAILQ_FIRST(gl);
-  struct GroupNode *next = NULL;
-  while (np)
+  struct GroupNode *g = NULL;
+  struct GroupNode *tmp = NULL;
+  STAILQ_FOREACH_SAFE(g, gl, entries, tmp)
   {
-    group_remove(np->group);
-    next = STAILQ_NEXT(np, entries);
-    FREE(&np);
-    np = next;
+    STAILQ_REMOVE(gl, g, GroupNode, entries);
+    group_remove(g->group);
+    FREE(&g);
   }
-  STAILQ_INIT(gl);
 }
 
 /**

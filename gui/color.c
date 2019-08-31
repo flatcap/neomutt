@@ -318,7 +318,8 @@ static void color_line_free(struct Colors *c, struct ColorLine **ptr, bool free_
  */
 static void color_line_list_clear(struct Colors *c, struct ColorLineList *list)
 {
-  struct ColorLine *np = NULL, *tmp = NULL;
+  struct ColorLine *np = NULL;
+  struct ColorLine *tmp = NULL;
   STAILQ_FOREACH_SAFE(np, list, entries, tmp)
   {
     STAILQ_REMOVE(list, np, ColorLine, entries);
