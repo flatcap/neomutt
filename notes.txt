@@ -1,0 +1,15 @@
+email events
+
+user 1 Email action
+user n Emails tagged action
+backend few add/del/changed
+backend open, LOTS added -- nec?
+when opening Index sees Mailbox fully populated
+backend works with array or list? }- both need to be array
+index   works with array or list? }  too many for list with nodes
+backend array sorted for fast find/insertion
+index array sorted for user
+does sidebar need an array for A, M for sorted list?
+=> all core all arrays
+all notifications are Lists
+
