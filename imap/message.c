@@ -1639,6 +1639,7 @@ int imap_copy_messages(struct Mailbox *m, struct EmailList *el, const char *dest
        * remainder. */
       STAILQ_FOREACH(en, el, entries)
       {
+        // QWQ Progress?
         if (en->email->attach_del)
         {
           mutt_debug(LL_DEBUG3,

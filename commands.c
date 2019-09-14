@@ -1174,6 +1174,7 @@ int mutt_save_message(struct Mailbox *m, struct EmailList *el,
 #endif
     STAILQ_FOREACH(en, el, entries)
     {
+      // QWQ Progress?
       mutt_message_hook(m, en->email, MUTT_MESSAGE_HOOK);
       rc = mutt_save_message_ctx(en->email, delete_original, decode, decrypt,
                                  ctx_save->mailbox);
