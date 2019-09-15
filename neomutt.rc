@@ -1,0 +1,35 @@
+set folder = "/home/mutt/issue/1629/neomutt"
+
+# set spoolfile = +empty
+set spoolfile = +apple
+
+mailboxes $spoolfile
+mailboxes +apple
+# mailboxes +banana
+# mailboxes +cherry
+# mailboxes +damson
+
+set check_mbox_size = no
+set help            = no
+set mark_old        = yes
+set mbox_type       = mbox
+set status_on_top   = yes
+
+set sidebar_visible = no
+set sidebar_width   = 25
+# set sidebar_format  = "%B%* %F/%n/%N/%S"
+set sidebar_format  = "%B%* %5FF %n %5NN"
+
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CO sidebar-open
+
+set mail_check_stats          = no
+set mail_check_stats_interval = 10
+set timeout                   = 10
+
+set status_format = " %b Mailboxes | %f | %F Flagged | %n New | %o Old"
+
+color status black yellow
+
+# vim: syn=neomuttrc
