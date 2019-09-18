@@ -1634,6 +1634,16 @@ int imap_copy_messages(struct Mailbox *m, struct EmailList *el, const char *dest
 
     if (!single) /* copy tagged messages */
     {
+      int count = 0;
+      STAILQ_FOREACH(en, el, entries)
+      {
+        count++;
+      }
+
+      struct Progress progress;
+      mutt_progress_init(&progress, delete_original ? _("Moving messages...") : _("Copying messages..."), MUTT_PROGRESS_WRITE, count);
+      count = 0;
+
       /* if any messages have attachments to delete, fall through to FETCH
        * and APPEND. TODO: Copy what we can with COPY, fall through for the
        * remainder. */
@@ -1656,6 +1666,7 @@ int imap_copy_messages(struct Mailbox *m, struct EmailList *el, const char *dest
             goto out;
           }
         }
+        mutt_progress_update(&progress, ++count, -1);
       }
 
       rc = imap_exec_msgset(m, "UID COPY", mmbox, MUTT_TAG, false, false);
