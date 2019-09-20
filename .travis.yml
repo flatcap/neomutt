@@ -1,0 +1,30 @@
+notifications:
+  email: false
+
+dist: bionic
+
+language: c
+compiler: gcc
+
+addons:
+  apt:
+  coverity_scan:
+    project:
+      name: "flatcap/neomutt"
+      description: "test code"
+    notification_email: rich@flatcap.org
+    build_command: "gcc -o jim main.c"
+    branch_pattern: coverity
+
+git:
+  depth: 3
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "nMKm8pB/yVWr6s3jZRPGh/LocBcHvkiypDZAxF/P8Wfwf6mv6Tn0FTxWmJETv/K7ODOiIK1YY0nCDWw81B0Tnqy5YTZyd/gTOSPZdVD7/XjP+HBPaJLfFL7sM9CDje0WTJMYDPjWSqRuXp8l65Tq+qt574xWplkO8TDeFgyrYgFyYuzcRci11TnJGihRZ7qdFWom6Lcl1/Njnbruk1+RuydhAaa9mKYLzdg9JrN0BG/2oNthO/b8MkB/saqots0sNJ0SZuMeh2y4Cw0jo3b/XLpOa6Pri2mEoL0RzspCtZ+/VoPdzWhDYgvIOzQHoZYXHUO0imQKVxHbOLGo0V30dDRjUQy2iLgmpvALwY0HEysJtZ70FSdbxVqVtN1Aie3gtwz/yPao/RhvnLZBiWIsDZzK9q6IrT/gCPSrtPuq9GMOzpNcsaLil115WVHtscCVTDfUOlO9V4/rtj080HGvRieM+AnY40yvObsinCwWRBAZK2VpIIBFSaTFXfF2eWcDr/vwj04uiojw3U0Fs3UywQhjiOB1buPJrBL+XWb3St39cgMTkHkmwVo08YYq7g5Wj7L1GfrjzFKv6yanRwYM7cPpqZrXdJECWdrDherfhn0+9YB+YBEax8s1csx+k5BvYnJz/wT4uoTkYo1Z1nt+QYwcC6bPcZdzi72Lcsa/IY4="
+
+script:
+  - true
+
