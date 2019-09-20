@@ -13,7 +13,7 @@ addons:
       name: "flatcap/neomutt"
       description: "test code"
     notification_email: rich@flatcap.org
-    build_command: "gcc -o jim main.c"
+    build_command: "make"
     branch_pattern: coverity
 
 git:
