@@ -7,7 +7,6 @@ language: c
 compiler: gcc
 
 addons:
-  apt:
   coverity_scan:
     project:
       name: "flatcap/neomutt"
@@ -22,12 +21,9 @@ git:
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   - secure: "nMKm8pB/yVWr6s3jZRPGh/LocBcHvkiypDZAxF/P8Wfwf6mv6Tn0FTxWmJETv/K7ODOiIK1YY0nCDWw81B0Tnqy5YTZyd/gTOSPZdVD7/XjP+HBPaJLfFL7sM9CDje0WTJMYDPjWSqRuXp8l65Tq+qt574xWplkO8TDeFgyrYgFyYuzcRci11TnJGihRZ7qdFWom6Lcl1/Njnbruk1+RuydhAaa9mKYLzdg9JrN0BG/2oNthO/b8MkB/saqots0sNJ0SZuMeh2y4Cw0jo3b/XLpOa6Pri2mEoL0RzspCtZ+/VoPdzWhDYgvIOzQHoZYXHUO0imQKVxHbOLGo0V30dDRjUQy2iLgmpvALwY0HEysJtZ70FSdbxVqVtN1Aie3gtwz/yPao/RhvnLZBiWIsDZzK9q6IrT/gCPSrtPuq9GMOzpNcsaLil115WVHtscCVTDfUOlO9V4/rtj080HGvRieM+AnY40yvObsinCwWRBAZK2VpIIBFSaTFXfF2eWcDr/vwj04uiojw3U0Fs3UywQhjiOB1buPJrBL+XWb3St39cgMTkHkmwVo08YYq7g5Wj7L1GfrjzFKv6yanRwYM7cPpqZrXdJECWdrDherfhn0+9YB+YBEax8s1csx+k5BvYnJz/wT4uoTkYo1Z1nt+QYwcC6bPcZdzi72Lcsa/IY4="
-
-before_install:
-  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+   #   via the "travis encrypt COVERITY_SCAN_TOKEN=XYZ" command using the project repo's public key
+   - secure: "bOuRgszbB/kbDN8geXfzx9TTGlZ/Qx9NVeojvmi5Zj8M8rhlSAJrXCq+hkh7PnfTkEbpy4U28BQ85w+T1B7MiwzEMQheN2RcMojC0MZYsBYXVR/yTalob8abh/Y7I16IaMaorRR757YswvUbmQA6z2Fb5fmpxhuyYHSlViAD92/4i6yCg4tKHLfBJyph8I1dRh11WAJiRRnQ+ZBHRLML4ne/LMq/v3Hamf0PY/pOR0qivmK4taRSLIbnGC4N9TFEJtN0r1rYI4eBsjGuikVFdzbYj+mcnBfnfsE6lxeZSLaDmKNpzoenfujQBnjpWq086LCGXl1kSRYzvZUCH5Q/8BcIBUEAifwHWy8shUfsf85YNQbzMLBEBbEbsOUO6IJjX0EH+otPte/LIWzNsQSoWVtxsVPWxYLDttBwuJJt39RxjzlTT0JT+ETYghIN1KM44vpI7B1mUYv2i/o4CHzm2FzHfiK9s6W9T5iJp70S+pQyqAbw3AYLqsseKsJqFV+mw41AMXBhxW0QFQdBJCS6OqhavLAn03Odd73PXniYxNW3j6i7n5hqj1WdrXd9K00HRhenEqBfkMpI3vt6QjGFu5H+8T4NtxcVAp0V/lwXYv26qbbl6CWr9HMrTrq2AIImHfPqhf+gBSAzabjS1QHdrRwnvz1qNYI7pnXqLIijdqc="
 
 script:
-  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make ; fi
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then make ; fi
 
