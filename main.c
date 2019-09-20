@@ -49,6 +49,7 @@ int main()
   TAILQ_INSERT_TAIL(&al, a, entries);
   a = address_new();
   TAILQ_INSERT_TAIL(&al, a, entries);
+  a = address_new();
 
   TAILQ_FOREACH(a, &al, entries)
   {
