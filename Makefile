@@ -5,7 +5,7 @@ OUT	= jim
 
 CFLAGS	+= -Wall
 CFLAGS	+= -g
-CFLAGS	+= -O0
+# CFLAGS	+= -O0
 
 # CFLAGS	+= -fsanitize=undefined -fno-sanitize-recover=undefined
 # LDFLAGS	+= -fsanitize=undefined -fno-sanitize-recover=undefined
