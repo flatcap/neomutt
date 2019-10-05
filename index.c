@@ -999,7 +999,7 @@ void mutt_draw_statusline(int cols, const char *buf, size_t buflen)
   {
     /* Text before the first highlight */
     mutt_window_addnstr(buf, MIN(len, syntax[0].first));
-    attrset(Colors->defs[MT_COLOR_STATUS]);
+    mutt_curses_set_color(MT_COLOR_STATUS);
     if (len <= syntax[0].first)
       goto dsl_finish; /* no more room */
 
@@ -1024,7 +1024,7 @@ void mutt_draw_statusline(int cols, const char *buf, size_t buflen)
       next = MIN(len, syntax[i + 1].first);
     }
 
-    attrset(Colors->defs[MT_COLOR_STATUS]);
+    mutt_curses_set_color(MT_COLOR_STATUS);
     offset = syntax[i].last;
     mutt_window_addnstr(buf + offset, next - offset);
 
@@ -1033,7 +1033,7 @@ void mutt_draw_statusline(int cols, const char *buf, size_t buflen)
       goto dsl_finish; /* no more room */
   }
 
-  attrset(Colors->defs[MT_COLOR_STATUS]);
+  mutt_curses_set_color(MT_COLOR_STATUS);
   if (offset < len)
   {
     /* Text after the last highlight */

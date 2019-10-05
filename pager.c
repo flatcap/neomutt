@@ -362,7 +362,7 @@ static void resolve_color(struct Line *line_info, int n, int cnt,
   struct TextSyntax *matching_chunk = NULL;
 
   if (cnt == 0)
-    last_color = -1; /* force attrset() */
+    last_color = -1; // force setting of colour
 
   if (line_info[n].continuation)
   {

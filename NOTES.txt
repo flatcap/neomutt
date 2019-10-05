@@ -1,0 +1,49 @@
+Still using curses functions:
+	attron()
+	attrset()
+	endwin()
+	isendwin()
+	refresh()
+
+functions to move:
+	mutt_endwin()
+	mutt_refresh()
+	mutt_addwch()
+
+menu.c:294:13:            attron(attr);
+menu.c:298:13:            attron(get_color(index, s));
+
+index.c:934:5:            attrset(syntax[i].color);
+menu.c:288:11:            attrset(attr);
+
+commands.c:538:5:         endwin();
+compose.c:2113:9:         endwin();
+compress.c:341:3:         endwin();
+curs_lib.c:549:67:        /* at least in some situations (screen + xterm under SuSE11/12) endwin()
+curs_lib.c:552:3:         endwin();
+imap/message.c:1899:52:   /* This function is called in a few places after endwin()
+mailcap.h:47:32:          bool needsterminal : 1; /**< endwin() and system */
+main.c:332:3:             endwin();
+mutt_signal.c:59:9:       endwin();
+mutt_signal.c:90:3:       endwin(); /* just to be safe */
+mutt_signal.c:102:3:      endwin(); /* just to be safe */
+
+imap/message.c:1901:22:   output_progress = !isendwin();
+mutt_signal.c:56:18:      IsEndwin = isendwin();
+ncrypt/crypt.c:225:12:    if (!isendwin())
+ncrypt/crypt.c:250:8:     if (!isendwin())
+ncrypt/crypt.c:928:7:     if (isendwin())
+ncrypt/pgpinvoke.c:456:8: if (!isendwin())
+ncrypt/pgpinvoke.c:462:8: if (!isendwin())
+ncrypt/smime.c:1458:13:   if (isendwin())
+
+curs_lib.c:116:3:         refresh();
+main.c:213:3:             refresh();
+main.c:331:24:            * The first call to refresh() will swap us back to curses screen mode. */
+main.c:1272:3:            refresh();
+mutt_signal.c:65:9:       refresh();
+
+mutt_signal.c:41:12:      static int IsEndwin = 0;
+mutt_signal.c:56:7:       IsEndwin = isendwin();
+mutt_signal.c:58:12:      if (!IsEndwin)
+mutt_signal.c:64:12:      if (!IsEndwin)
