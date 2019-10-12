@@ -119,6 +119,27 @@ struct Email
   struct Notify *notify;       ///< Notifications handler
 };
 
+struct Email2
+{
+  SecurityFlags security;      ///< bit 0-10: flags, bit 11,12: application, bit 13: traditional pgp
+                               ///< See: ncrypt/ncrypt.h pgplib.h, smime.h
+  bool active           : 1;   ///< Message is not to be removed
+  bool expired          : 1;   ///< Already expired?
+  bool flagged          : 1;   ///< Marked important?
+  bool mime             : 1;   ///< Has a MIME-Version header?
+  bool old              : 1;   ///< Email is seen, but unread
+  bool read             : 1;   ///< Email is read
+  bool replied          : 1;   ///< Email has been replied to
+  bool superseded       : 1;   ///< Got superseded?
+  bool trash            : 1;   ///< Message is marked as trashed on disk (used by the maildir_trash option)
+  unsigned int zhours   : 5;   ///< Sender TZ: Hours away from UTC
+  unsigned int zminutes : 6;   ///< Sender TZ: Minutes away from UTC
+  bool zoccident        : 1;   ///< Sender TZ: True, if west of UTC, False if east
+  time_t date_sent;            ///< Time when the message was sent (UTC)
+  time_t received;             ///< Time when the message was placed in the mailbox
+  int lines;                   ///< How many lines in the body of this message?
+};
+
 /**
  * struct EmailNode - List of Emails
  */

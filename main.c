@@ -344,6 +344,14 @@ static bool get_user_info(struct ConfigSet *cs)
  */
 int main(int argc, char *argv[], char *envp[])
 {
+#if 0
+  printf("Body     %ld\n", sizeof(struct Body));
+  printf("Body2    %ld\n", sizeof(struct Body2));
+  printf("Email    %ld\n", sizeof(struct Email));
+  printf("Email2 %ld\n", sizeof(struct Email2));
+  printf("Envelope %ld\n", sizeof(struct Envelope));
+  return 0;
+#endif
   char *subject = NULL;
   char *include_file = NULL;
   char *draft_file = NULL;
