@@ -17,6 +17,7 @@ test/neomutt-test
 *.gc??
 *.Po
 *.Tpo
+dlg*.a
 html
 lcov
 lcov.info

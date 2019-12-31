@@ -50,7 +50,7 @@
 #include "pattern.h"
 #include "protos.h"
 #ifdef USE_SIDEBAR
-#include "sidebar.h"
+#include "dlg_index/lib.h"
 #endif
 
 /* These Config Variables are only used in menu.c */

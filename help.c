@@ -35,12 +35,12 @@
 #include <wchar.h>
 #include "mutt/lib.h"
 #include "gui/lib.h"
+#include "dlg_index/lib.h"
 #include "functions.h"
 #include "globals.h"
 #include "keymap.h"
 #include "muttlib.h"
 #include "opcodes.h"
-#include "pager.h"
 #include "protos.h" // IWYU pragma: keep
 
 static const char *HelpStrings[] = {

@@ -52,6 +52,7 @@
 #include "core/lib.h"
 #include "conn/lib.h"
 #include "gui/lib.h"
+#include "dlg_index/lib.h"
 #include "mutt.h"
 #include "debug/lib.h"
 #include "alias.h"
@@ -59,7 +60,6 @@
 #include "context.h"
 #include "globals.h"
 #include "hook.h"
-#include "index.h"
 #include "keymap.h"
 #include "mutt_attach.h"
 #include "mutt_commands.h"
@@ -80,7 +80,7 @@
 #include <libintl.h>
 #endif
 #ifdef USE_SIDEBAR
-#include "sidebar.h"
+#include "dlg_index/lib.h"
 #endif
 #ifdef USE_IMAP
 #include "imap/lib.h"

@@ -64,13 +64,13 @@ NEOMUTT=	neomutt$(EXEEXT)
 NEOMUTTOBJS=	addrbook.o alias.o bcache.o browser.o commands.o \
 		complete.o compose.o conststrings.o context.o copy.o \
 		edit.o editmsg.o enriched.o enter.o flags.o functions.o \
-		git_ver.o handler.o hdrline.o help.o hook.o icommands.o index.o init.o \
+		git_ver.o handler.o hdrline.o help.o hook.o icommands.o init.o \
 		keymap.o mailcap.o main.o menu.o mutt_account.o mutt_attach.o \
 		mutt_body.o mutt_header.o mutt_history.o mutt_logging.o mutt_mailbox.o \
 		mutt_parse.o mutt_signal.o mutt_socket.o mutt_thread.o \
-		muttlib.o mx.o myvar.o pager.o pattern.o postpone.o progress.o query.o \
+		muttlib.o mx.o myvar.o pattern.o postpone.o progress.o query.o \
 		recvattach.o recvcmd.o resize.o rfc3676.o score.o send.o sendlib.o \
-		sidebar.o smtp.o sort.o state.o status.o system.o version.o \
+		smtp.o sort.o state.o status.o system.o version.o \
 		mutt_commands.o mutt_config.o command_parse.o
 
 @if !HAVE_WCSCASECMP
@@ -91,6 +91,14 @@ NEOMUTTOBJS+=	mutt_zstrm.o
 
 CLEANFILES+=	$(NEOMUTT) $(NEOMUTTOBJS)
 ALLOBJS+=	$(NEOMUTTOBJS)
+
+###############################################################################
+# dlgindex
+DLGINDEX=	dlgindex.a
+DLGINDEXOBJS=	dlg_index/index.o dlg_index/pager.o dlg_index/sidebar.o
+CLEANFILES+=	$(DLGINDEX) $(DLGINDEXOBJS)
+MUTTLIBS+=	$(DLGINDEX)
+ALLOBJS+=	$(DLGINDEXOBJS)
 
 ###############################################################################
 # libautocrypt
@@ -351,6 +359,13 @@ $(LIBADDRESS): $(PWD)/address $(LIBADDRESSOBJS)
 	$(RANLIB) $@
 $(PWD)/address:
 	$(MKDIR_P) $(PWD)/address
+
+# dlgindex
+$(DLGINDEX): $(PWD)/dlg_index $(DLGINDEXOBJS)
+	$(AR) cr $@ $(DLGINDEXOBJS)
+	$(RANLIB) $@
+$(PWD)/dlg_index:
+	$(MKDIR_P) $(PWD)/dlg_index
 
 # libautocrypt
 $(LIBAUTOCRYPT): $(PWD)/autocrypt $(LIBAUTOCRYPTOBJS)

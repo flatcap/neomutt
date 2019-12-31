@@ -30,6 +30,7 @@
 #include "config/lib.h"
 #include "core/lib.h"
 #include "gui/lib.h"
+#include "dlg_index/lib.h"
 #include "mutt.h"
 #include "icommands.h"
 #include "functions.h"
@@ -37,7 +38,6 @@
 #include "keymap.h"
 #include "muttlib.h"
 #include "opcodes.h"
-#include "pager.h"
 #include "version.h"
 
 /**

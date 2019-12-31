@@ -37,6 +37,8 @@ IncludeCategories:
     Priority:   -30
   - Regex:      '"gui/.*\.h"'
     Priority:   -20
+  - Regex:      '"dlg.*/.*\.h"'
+    Priority:   -18
 
   # NeoMutt general purpose headers
   - Regex:      '"mutt\.h"'

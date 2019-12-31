@@ -48,6 +48,7 @@
 #include "core/lib.h"
 #include "conn/lib.h"
 #include "gui/lib.h"
+#include "dlg_index/lib.h"
 #include "mutt.h"
 #include "init.h"
 #include "alias.h"
@@ -66,7 +67,6 @@
 #include "myvar.h"
 #include "options.h"
 #include "protos.h"
-#include "sidebar.h"
 #include "sort.h"
 #include "version.h"
 #ifdef USE_HCACHE

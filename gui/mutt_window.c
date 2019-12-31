@@ -32,13 +32,13 @@
 #include "mutt/lib.h"
 #include "config/lib.h"
 #include "core/lib.h"
+#include "dlg_index/lib.h"
 #include "mutt_window.h"
 #include "context.h"
 #include "globals.h"
 #include "mutt_curses.h"
 #include "mutt_menu.h"
 #include "options.h"
-#include "pager.h"
 #include "reflow.h"
 
 struct MuttWindow *RootWindow = NULL;        ///< Parent of all Windows

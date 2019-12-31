@@ -35,6 +35,7 @@
 #include "email/lib.h"
 #include "core/lib.h"
 #include "gui/lib.h"
+#include "dlg_index/lib.h"
 #include "mutt.h"
 #include "alias.h"
 #include "context.h"
@@ -49,7 +50,6 @@
 #include "mx.h"
 #include "myvar.h"
 #include "options.h"
-#include "sidebar.h"
 #include "version.h"
 #include "imap/lib.h"
 

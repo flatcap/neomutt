@@ -30,7 +30,7 @@
 #include "mutt.h"
 #include "browser.h"
 #include "keymap.h"
-#include "pager.h"
+#include "dlg_index/lib.h"
 
 struct Buffer;
 

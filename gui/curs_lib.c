@@ -45,6 +45,7 @@
 #include "mutt/lib.h"
 #include "config/lib.h"
 #include "core/lib.h"
+#include "dlg_index/lib.h"
 #include "mutt.h"
 #include "curs_lib.h"
 #include "browser.h"
@@ -57,7 +58,6 @@
 #include "mutt_window.h"
 #include "opcodes.h"
 #include "options.h"
-#include "pager.h"
 #include "protos.h"
 #ifdef HAVE_ISWBLANK
 #include <wctype.h>
