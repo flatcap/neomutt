@@ -139,6 +139,7 @@ struct ConfigDef
   intptr_t      initial;   ///< Initial value
   intptr_t      data;      ///< Extra variable data
   cs_validator  validator; ///< Validator callback function
+  const char   *docs;      ///< Documentation (Markdown format)
 };
 
 /**
