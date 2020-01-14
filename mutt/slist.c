@@ -194,6 +194,8 @@ struct Slist *slist_parse(const char *str, int flags)
     sep = ',';
   else if ((flags & SLIST_SEP_MASK) == SLIST_SEP_COLON)
     sep = ':';
+  else if ((flags & SLIST_SEP_MASK) == SLIST_SEP_RETURN)
+    sep = '\n';
 
   struct Slist *list = mutt_mem_calloc(1, sizeof(struct Slist));
   list->flags = flags;

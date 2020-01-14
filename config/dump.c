@@ -92,6 +92,31 @@ size_t pretty_var(const char *str, struct Buffer *buf)
 }
 
 /**
+ * dump_docs - Dump the docs for a config item
+ * @param fp   FILE to write to
+ * @param cdef Config Item
+ */
+void dump_docs(FILE *fp, const struct ConfigDef *cdef)
+{
+  if (!fp || !cdef)
+    return;
+
+  struct Slist *sl = slist_parse(cdef->docs, SLIST_SEP_RETURN | SLIST_ALLOW_DUPES | SLIST_ALLOW_EMPTY);
+
+  printf("#\n");
+  struct ListNode *np = NULL;
+  STAILQ_FOREACH(np, &sl->head, entries)
+  {
+    if (!STAILQ_NEXT(np, entries))
+      break;
+    printf("# %s\n", NONULL(np->data));
+  }
+  printf("\n");
+
+  slist_free(&sl);
+}
+
+/**
  * dump_config_neo - Dump the config in the style of NeoMutt
  * @param cs      Config items
  * @param he      HashElem representing config item
@@ -140,6 +165,8 @@ void dump_config_neo(struct ConfigSet *cs, struct HashElem *he, struct Buffer *v
     if (cst)
       fprintf(fp, "# %s %s %s\n", cst->name, name, value->data);
   }
+  if (flags & CS_DUMP_SHOW_DOCS)
+    dump_docs(fp, he->data);
 }
 
 /**

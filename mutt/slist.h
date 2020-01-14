@@ -27,11 +27,12 @@
 #include <stdbool.h>
 #include "list.h"
 
-#define SLIST_SEP_SPACE (1 << 13)
-#define SLIST_SEP_COMMA (1 << 14)
-#define SLIST_SEP_COLON (1 << 15)
+#define SLIST_SEP_SPACE  (1 << 13)
+#define SLIST_SEP_COMMA  (1 << 14)
+#define SLIST_SEP_COLON  (1 << 15)
+#define SLIST_SEP_RETURN (1 << 16)
 
-#define SLIST_SEP_MASK  0xE000
+#define SLIST_SEP_MASK  0x1E000
 
 #define SLIST_ALLOW_DUPES    (1 << 17)
 #define SLIST_ALLOW_EMPTY    (1 << 18)

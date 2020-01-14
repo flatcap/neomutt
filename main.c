@@ -365,7 +365,7 @@ int main(int argc, char *argv[], char *envp[])
   int version = 0;
   int i;
   bool explicit_folder = false;
-  bool dump_variables = false;
+  int dump_variables = 0;
   bool hide_sensitive = false;
   bool batch_mode = false;
   bool edit_infile = false;
@@ -440,7 +440,7 @@ int main(int argc, char *argv[], char *envp[])
           mutt_list_insert_tail(&cc_list, mutt_str_strdup(optarg));
           break;
         case 'D':
-          dump_variables = true;
+          dump_variables++;
           break;
         case 'd':
           dlevel = optarg;
@@ -604,7 +604,7 @@ int main(int argc, char *argv[], char *envp[])
 
   /* Check for a batch send. */
   if (!isatty(0) || !STAILQ_EMPTY(&queries) || !STAILQ_EMPTY(&alias_queries) ||
-      dump_variables || batch_mode)
+      (dump_variables > 0) || batch_mode)
   {
     OptNoCurses = true;
     sendflags = SEND_BATCH;
@@ -688,9 +688,14 @@ int main(int argc, char *argv[], char *envp[])
     goto main_curses;
   }
 
-  if (dump_variables)
+  if (dump_variables > 0)
   {
-    dump_config(cs, hide_sensitive ? CS_DUMP_HIDE_SENSITIVE : CS_DUMP_NO_FLAGS, stdout);
+    ConfigDumpFlags cdf = CS_DUMP_NO_FLAGS;
+    if (dump_variables > 1)
+      cdf = CS_DUMP_HIDE_NAME | CS_DUMP_HIDE_VALUE | CS_DUMP_SHOW_DEFAULTS | CS_DUMP_SHOW_DOCS;
+    else if (hide_sensitive)
+      cdf = CS_DUMP_HIDE_SENSITIVE;
+    dump_config(cs, cdf, stdout);
     goto main_ok; // TEST18: neomutt -D
   }
 
