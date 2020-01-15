@@ -1,0 +1,10 @@
+init.h, config def
+	convert comment to markdown *string*
+	support: bold, italic, paragraphs, lists, tables
+config dump option to display in various formats
+	markdown (unprocessed)
+	text
+	highlighted-text
+	nroff
+	docbook
+fix doc build
