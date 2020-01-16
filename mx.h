@@ -173,6 +173,14 @@ struct MxOps
    */
   int (*mbox_close)      (struct Mailbox *m);
   /**
+   * mbox_is_empty - Does the Mailbox contains no mail?
+   * @param m Mailbox to check
+   * @retval  1 Success, Mailbox is empty
+   * @retval  0 Success, Mailbox has mail
+   * @retval -1 Failure, e.g. Mailbox doesn't exist
+   */
+  int (*mbox_is_empty)   (struct Mailbox *m);
+  /**
    * msg_open - Open an email message in a Mailbox
    * @param m     Mailbox
    * @param msg   Message to open

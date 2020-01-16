@@ -2892,6 +2892,7 @@ struct MxOps MxNntpOps = {
   .mbox_check_stats = NULL,
   .mbox_sync        = nntp_mbox_sync,
   .mbox_close       = nntp_mbox_close,
+  .mbox_is_empty    = NULL,
   .msg_open         = nntp_msg_open,
   .msg_open_new     = NULL,
   .msg_commit       = NULL,
