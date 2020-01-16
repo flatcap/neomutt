@@ -2325,6 +2325,22 @@ static int imap_mbox_close(struct Mailbox *m)
 }
 
 /**
+ * imap_mbox_is_empty - Does the Mailbox contains no mail? - Implements MxOps::mbox_is_empty()
+ */
+static int imap_mbox_is_empty(struct Mailbox *m)
+{
+  if (!m)
+    return -1;
+
+  int rc = imap_path_status(mailbox_path(m), false);
+  if (rc < 0)
+    return -1;
+  if (rc == 0)
+    return 1;
+  return 0;
+}
+
+/**
  * imap_msg_open_new - Open a new message in a Mailbox - Implements MxOps::msg_open_new()
  */
 static int imap_msg_open_new(struct Mailbox *m, struct Message *msg, struct Email *e)
@@ -2600,7 +2616,7 @@ struct MxOps MxImapOps = {
   .mbox_check_stats = imap_mbox_check_stats,
   .mbox_sync        = NULL, /* imap syncing is handled by imap_sync_mailbox */
   .mbox_close       = imap_mbox_close,
-  .mbox_is_empty    = NULL,
+  .mbox_is_empty    = imap_mbox_is_empty,
   .msg_open         = imap_msg_open,
   .msg_open_new     = imap_msg_open_new,
   .msg_commit       = imap_msg_commit,

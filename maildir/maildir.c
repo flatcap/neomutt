@@ -568,6 +568,17 @@ static int maildir_mbox_check_stats(struct Mailbox *m, int flags)
 }
 
 /**
+ * maildir_mbox_is_empty - Does the Mailbox contains no mail? - Implements MxOps::mbox_is_empty()
+ */
+int maildir_mbox_is_empty(struct Mailbox *m)
+{
+  if (!m)
+    return -1;
+
+  return maildir_check_empty(mailbox_path(m));
+}
+
+/**
  * maildir_msg_open - Open an email message in a Mailbox - Implements MxOps::msg_open()
  */
 static int maildir_msg_open(struct Mailbox *m, struct Message *msg, int msgno)
@@ -716,7 +727,7 @@ struct MxOps MxMaildirOps = {
   .mbox_check_stats = maildir_mbox_check_stats,
   .mbox_sync        = mh_mbox_sync,
   .mbox_close       = mh_mbox_close,
-  .mbox_is_empty    = NULL,
+  .mbox_is_empty    = maildir_mbox_is_empty,
   .msg_open         = maildir_msg_open,
   .msg_open_new     = maildir_msg_open_new,
   .msg_commit       = maildir_msg_commit,

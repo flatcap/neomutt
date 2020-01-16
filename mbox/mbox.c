@@ -1570,6 +1570,17 @@ static int mbox_mbox_close(struct Mailbox *m)
 }
 
 /**
+ * mbox_mbox_is_empty - Does the Mailbox contains no mail? - Implements MxOps::mbox_is_empty()
+ */
+static int mbox_mbox_is_empty(struct Mailbox *m)
+{
+  if (!m)
+    return -1;
+
+  return mutt_file_check_empty(mailbox_path(m));
+}
+
+/**
  * mbox_msg_open - Open an email message in a Mailbox - Implements MxOps::msg_open()
  */
 static int mbox_msg_open(struct Mailbox *m, struct Message *msg, int msgno)
@@ -1857,7 +1868,7 @@ struct MxOps MxMboxOps = {
   .mbox_check_stats = mbox_mbox_check_stats,
   .mbox_sync        = mbox_mbox_sync,
   .mbox_close       = mbox_mbox_close,
-  .mbox_is_empty    = NULL,
+  .mbox_is_empty    = mbox_mbox_is_empty,
   .msg_open         = mbox_msg_open,
   .msg_open_new     = mbox_msg_open_new,
   .msg_commit       = mbox_msg_commit,
@@ -1887,7 +1898,7 @@ struct MxOps MxMmdfOps = {
   .mbox_check_stats = mbox_mbox_check_stats,
   .mbox_sync        = mbox_mbox_sync,
   .mbox_close       = mbox_mbox_close,
-  .mbox_is_empty    = NULL,
+  .mbox_is_empty    = mbox_mbox_is_empty,
   .msg_open         = mbox_msg_open,
   .msg_open_new     = mbox_msg_open_new,
   .msg_commit       = mmdf_msg_commit,

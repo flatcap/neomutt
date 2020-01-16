@@ -1813,3 +1813,14 @@ int mh_msg_save_hcache(struct Mailbox *m, struct Email *e)
 #endif
   return rc;
 }
+
+/**
+ * mh_mbox_is_empty - Does the Mailbox contains no mail? - Implements MxOps::mbox_is_empty()
+ */
+int mh_mbox_is_empty(struct Mailbox *m)
+{
+  if (!m)
+    return -1;
+
+  return mh_check_empty(mailbox_path(m));
+}
