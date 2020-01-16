@@ -1223,31 +1223,22 @@ void mx_alloc_memory(struct Mailbox *m)
  */
 int mx_check_empty(const char *path)
 {
-  switch (mx_path_probe(path))
-  {
-    case MUTT_MBOX:
-    case MUTT_MMDF:
-      return mutt_file_check_empty(path);
-    case MUTT_MH:
-      return mh_check_empty(path);
-    case MUTT_MAILDIR:
-      return maildir_check_empty(path);
-#ifdef USE_IMAP
-    case MUTT_IMAP:
-    {
-      int rc = imap_path_status(path, false);
-      if (rc < 0)
-        return -1;
-      if (rc == 0)
-        return 1;
-      return 0;
-    }
-#endif
-    default:
-      errno = EINVAL;
-      return -1;
-  }
-  /* not reached */
+  enum MailboxType type = mx_path_probe(path, NULL);
+  if (type == MUTT_UNKNOWN)
+    return -1;
+
+  const struct MxOps *ops = mx_get_ops(type);
+  if (!ops || !ops->mbox_is_empty)
+    return -1;
+
+  // resolve +path      -> /full/path
+  // probe   /full/path -> magic
+  // canon   /sym/path  -> /real/path
+  // find    /real/path -> Mailbox
+  //     compare (M,M)?
+  // test    Mailbox    -> result
+
+  return ops->mbox_is_empty(NULL);
 }
 
 /**
