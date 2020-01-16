@@ -1,0 +1,69 @@
+int mbox_is_empty(struct Mailbox *m)
+	int mx_check_empty(const char *path)
+	resolve path
+	canonicalise it
+		e.g. follow symlink
+	missing => empty
+	retvals
+		success empty
+		success non-empty
+		error
+			missing mailbox
+	resolve +path      -> /full/path
+	probe   /full/path -> magic
+	canon   /sym/path  -> /real/path
+	find    /real/path -> Mailbox
+		compare (M,M)?
+	test    Mailbox    -> result
+
+int ac_mbox_create(struct Account *a, struct Mailbox *m)
+	resolve path
+	try to find Mailbox
+	create Mailbox
+	retvals
+		Success
+		Permission denied
+		Invalid name
+
+int mbox_delete(struct Account *a, struct Mailbox *m)
+	resolve path (if nec)
+	find Mailbox
+	NO?
+		probe path
+		create Mailbox
+	NOTIMPL: notmuch, pop, nntp
+	delete Mailbox
+		imap DELETE MAILBOX
+		mbox DELETE FILE
+			check it's an mbox file?
+		maildir DELETE {cur,new,tmp} & root
+			check all three subdirs exist?
+		notify
+	retvals
+		Success
+		Error, Permission denied
+		Error, Mailbox not found
+	limit delete to Mailboxes that we know about? YES
+
+int mbox_rename(struct Account *a, struct Mailbox *m, const char *name)
+	resolve path
+	try to find Mailbox
+	rename Mailbox
+	retvals
+		Success
+		Permission denied
+		Mailbox not found
+
+int mbox_compare(struct Mailbox *m1, struct Mailbox *m2)
+	backend can canonicalised them first
+	must exist?
+	retvals
+		identical
+		same (non-canonical)
+			symlinks
+			differ in user@host vs host
+			differ in / vs INBOX vs inbox
+		different
+		error
+			missing mailbox
+
