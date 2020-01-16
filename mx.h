@@ -125,6 +125,34 @@ struct MxOps
    */
   int             (*ac_add)   (struct Account *a, struct Mailbox *m);
   /**
+   * ac_mbox_create - Create a Mailbox
+   * @param a Account
+   * @param m Mailbox to create
+   * @retval  0 Success
+   * @retval -1 Error, permission denied
+   * @retval -2 Invalid name
+   */
+  int (*ac_mbox_create)(struct Account *a, struct Mailbox *m);
+  /**
+   * ac_mbox_delete - Delete a Mailbox
+   * @param a Account
+   * @param m Mailbox to delete
+   * @retval  0 Success
+   * @retval -1 Error, permission denied
+   * @retval -2 Mailbox not found
+   */
+  int (*ac_mbox_delete)(struct Account *a, struct Mailbox *m);
+  /**
+   * ac_mbox_rename - Rename a Mailbox
+   * @param a    Account
+   * @param m    Mailbox to rename
+   * @param name New name
+   * @retval  0 Success
+   * @retval -1 Error, permission denied
+   * @retval -2 Mailbox not found
+   */
+  int (*ac_mbox_rename)(struct Account *a, struct Mailbox *m, const char *name);
+  /**
    * mbox_open - Open a Mailbox
    * @param m Mailbox to open
    * @retval  0 Success
