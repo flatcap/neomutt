@@ -134,25 +134,6 @@ struct MxOps
    */
   int (*ac_mbox_create)(struct Account *a, struct Mailbox *m);
   /**
-   * ac_mbox_delete - Delete a Mailbox
-   * @param a Account
-   * @param m Mailbox to delete
-   * @retval  0 Success
-   * @retval -1 Error, permission denied
-   * @retval -2 Mailbox not found
-   */
-  int (*ac_mbox_delete)(struct Account *a, struct Mailbox *m);
-  /**
-   * ac_mbox_rename - Rename a Mailbox
-   * @param a    Account
-   * @param m    Mailbox to rename
-   * @param name New name
-   * @retval  0 Success
-   * @retval -1 Error, permission denied
-   * @retval -2 Mailbox not found
-   */
-  int (*ac_mbox_rename)(struct Account *a, struct Mailbox *m, const char *name);
-  /**
    * mbox_open - Open a Mailbox
    * @param m Mailbox to open
    * @retval  0 Success
@@ -200,6 +181,25 @@ struct MxOps
    * @retval -1 Failure
    */
   int (*mbox_close)      (struct Mailbox *m);
+  /**
+   * mbox_delete - Delete a Mailbox
+   * @param a Account
+   * @param m Mailbox to delete
+   * @retval  0 Success
+   * @retval -1 Error, permission denied
+   * @retval -2 Mailbox not found
+   */
+  int (*mbox_delete)(struct Mailbox *m);
+  /**
+   * mbox_rename - Rename a Mailbox
+   * @param a    Account
+   * @param m    Mailbox to rename
+   * @param name New name
+   * @retval  0 Success
+   * @retval -1 Error, permission denied
+   * @retval -2 Mailbox not found
+   */
+  int (*mbox_rename)(struct Mailbox *m, const char *name);
   /**
    * msg_open - Open an email message in a Mailbox
    * @param m     Mailbox
@@ -306,7 +306,10 @@ struct MxOps
 int             mx_mbox_check      (struct Mailbox *m, int *index_hint);
 int             mx_mbox_check_stats(struct Mailbox *m, int flags);
 int             mx_mbox_close      (struct Context **ptr);
+int             mx_mbox_create     (const char *path);
+int             mx_mbox_delete     (const char *path);
 struct Context *mx_mbox_open       (struct Mailbox *m, OpenMailboxFlags flags);
+int             mx_mbox_rename     (const char *path);
 int             mx_mbox_sync       (struct Mailbox *m, int *index_hint);
 int             mx_msg_close       (struct Mailbox *m, struct Message **msg);
 int             mx_msg_commit      (struct Mailbox *m, struct Message *msg);

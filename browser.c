@@ -1649,6 +1649,8 @@ void mutt_buffer_select_file(struct Buffer *file, SelectFileFlags flags,
         break;
 
       case OP_CREATE_MAILBOX:
+        mx_mbox_create(state.entry[menu->current].name);
+        break;
         if (!state.imap_browse)
         {
           mutt_error(_("Create is only supported for IMAP mailboxes"));
@@ -1672,6 +1674,8 @@ void mutt_buffer_select_file(struct Buffer *file, SelectFileFlags flags,
         break;
 
       case OP_RENAME_MAILBOX:
+        mx_mbox_rename(state.entry[menu->current].name);
+        break;
         if (!state.entry[menu->current].imap)
           mutt_error(_("Rename is only supported for IMAP mailboxes"));
         else
@@ -1693,6 +1697,8 @@ void mutt_buffer_select_file(struct Buffer *file, SelectFileFlags flags,
         break;
 
       case OP_DELETE_MAILBOX:
+        mx_mbox_delete(state.entry[menu->current].name);
+        break;
         if (!state.entry[menu->current].imap)
           mutt_error(_("Delete is only supported for IMAP mailboxes"));
         else

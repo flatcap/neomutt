@@ -1722,3 +1722,36 @@ int mx_save_hcache(struct Mailbox *m, struct Email *e)
 
   return m->mx_ops->msg_save_hcache(m, e);
 }
+
+/**
+ * mx_mbox_create - XXX
+ * @param path - XXX
+ * @retval num XXX
+ */
+int mx_mbox_create(const char *path)
+{
+  mutt_message(path);
+  return -1;
+}
+
+/**
+ * mx_mbox_delete - XXX
+ * @param path - XXX
+ * @retval num XXX
+ */
+int mx_mbox_delete(const char *path)
+{
+  mutt_message(path);
+  return -1;
+}
+
+/**
+ * mx_mbox_rename - XXX
+ * @param path - XXX
+ * @retval num XXX
+ */
+int mx_mbox_rename(const char *path)
+{
+  mutt_message(path);
+  return -1;
+}
