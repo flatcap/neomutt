@@ -945,6 +945,7 @@ struct MxOps MxCompOps = {
   .mbox_check_stats = NULL,
   .mbox_sync        = comp_mbox_sync,
   .mbox_close       = comp_mbox_close,
+  .mbox_compare     = NULL,
   .msg_open         = comp_msg_open,
   .msg_open_new     = comp_msg_open_new,
   .msg_commit       = comp_msg_commit,

@@ -173,6 +173,16 @@ struct MxOps
    */
   int (*mbox_close)      (struct Mailbox *m);
   /**
+   * mbox_compare - Compare two Mailboxes
+   * @param m1 First Mailbox
+   * @param m2 Second Mailbox
+   * @retval  1 Success, identical
+   * @retval  0 Success, same (non-canonical)
+   * @retval -1 Failure, different
+   * @retval -2 Error
+   */
+  int (*mbox_compare)    (struct Mailbox *m1, struct Mailbox *m2);
+  /**
    * msg_open - Open an email message in a Mailbox
    * @param m     Mailbox
    * @param msg   Message to open

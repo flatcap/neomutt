@@ -2599,6 +2599,7 @@ struct MxOps MxNotmuchOps = {
   .mbox_check_stats = nm_mbox_check_stats,
   .mbox_sync        = nm_mbox_sync,
   .mbox_close       = nm_mbox_close,
+  .mbox_compare     = NULL,
   .msg_open         = nm_msg_open,
   .msg_open_new     = maildir_msg_open_new,
   .msg_commit       = nm_msg_commit,
