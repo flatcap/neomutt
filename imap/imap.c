@@ -2612,5 +2612,6 @@ struct MxOps MxImapOps = {
   .path_canon       = imap_path_canon,
   .path_pretty      = imap_path_pretty,
   .path_parent      = imap_path_parent,
+  .path_exists      = NULL,
 };
 // clang-format on

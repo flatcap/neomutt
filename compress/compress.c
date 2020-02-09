@@ -957,5 +957,6 @@ struct MxOps MxCompOps = {
   .path_canon       = comp_path_canon,
   .path_pretty      = comp_path_pretty,
   .path_parent      = comp_path_parent,
+  .path_exists      = NULL,
 };
 // clang-format on

@@ -1869,6 +1869,7 @@ struct MxOps MxMboxOps = {
   .path_canon       = mbox_path_canon,
   .path_pretty      = mbox_path_pretty,
   .path_parent      = mbox_path_parent,
+  .path_exists      = NULL,
 };
 
 /**
@@ -1898,5 +1899,6 @@ struct MxOps MxMmdfOps = {
   .path_canon       = mbox_path_canon,
   .path_pretty      = mbox_path_pretty,
   .path_parent      = mbox_path_parent,
+  .path_exists      = NULL,
 };
 // clang-format on

@@ -272,6 +272,14 @@ struct MxOps
    * @retval -1 Failure
    */
   int (*path_parent)     (char *buf, size_t buflen);
+  /**
+   * path_exists -  Does the Mailbox path exist?
+   * @param path Path to check
+   * @retval  1 Success, path exists
+   * @retval  0 Success, path does not exist
+   * @retval -1 Error
+   */
+  int (*path_exists)     (char *path);
 };
 
 /* Wrappers for the Mailbox API, see MxOps */

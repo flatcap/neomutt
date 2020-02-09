@@ -728,5 +728,6 @@ struct MxOps MxMaildirOps = {
   .path_canon       = maildir_path_canon,
   .path_pretty      = maildir_path_pretty,
   .path_parent      = maildir_path_parent,
+  .path_exists      = NULL,
 };
 // clang-format on
