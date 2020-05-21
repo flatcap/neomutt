@@ -1849,7 +1849,6 @@ int pgp_class_send_menu(struct Email *e)
   const char *prompt = NULL;
   const char *letters = NULL;
   const char *choices = NULL;
-  char promptbuf[1024];
   int choice;
 
   if (!(WithCrypto & APPLICATION_PGP))
@@ -1864,19 +1863,6 @@ int pgp_class_send_menu(struct Email *e)
 
   e->security |= APPLICATION_PGP;
 
-  char *mime_inline = NULL;
-  if (e->security & SEC_INLINE)
-  {
-    /* L10N: The next string MUST have the same highlighted letter
-       One of them will appear in each of the three strings marked "(inline"), below. */
-    mime_inline = _("PGP/(m)IME");
-  }
-  else
-  {
-    /* L10N: The previous string MUST have the same highlighted letter
-       One of them will appear in each of the three strings marked "(inline"), below. */
-    mime_inline = _("(i)nline");
-  }
   /* Opportunistic encrypt is controlling encryption.  Allow to toggle
    * between inline and mime, but not turn encryption on or off.
    * NOTE: "Signing" and "Clearing" only adjust the sign bit, so we have different
@@ -1885,15 +1871,20 @@ int pgp_class_send_menu(struct Email *e)
   {
     if (e->security & (SEC_ENCRYPT | SEC_SIGN))
     {
-      snprintf(promptbuf, sizeof(promptbuf),
-               /* L10N: PGP options (inline) (opportunistic encryption is on) */
-               _("PGP (s)ign, sign (a)s, %s format, (c)lear, or (o)ppenc mode "
-                 "off?"),
-               mime_inline);
-      prompt = promptbuf;
-      /* L10N: PGP options (inline) (opportunistic encryption is on)
-         The 'i' is from the "PGP/M(i)ME" or "(i)nline", above. */
-      letters = _("saico");
+      if (e->security & SEC_INLINE)
+      {
+        /* L10N: PGP options (inline) (opportunistic encryption is on) */
+        prompt = _("PGP (s)ign, sign (a)s, PGP/(m)IME format, (c)lear, or (o)ppenc mode off?");
+        /* L10N: PGP options (inline) (opportunistic encryption is on) */
+        letters = _("samco");
+      }
+      else
+      {
+        /* L10N: PGP options (mime) (opportunistic encryption is on) */
+        prompt = _("PGP (s)ign, sign (a)s, (i)nline format, (c)lear, or (o)ppenc mode off?");
+        /* L10N: PGP options (mime) (opportunistic encryption is on) */
+        letters = _("saico");
+      }
       choices = "SaiCo";
     }
     else
@@ -1913,22 +1904,26 @@ int pgp_class_send_menu(struct Email *e)
      * between PGP/MIME and Traditional doesn't make sense.  */
     if (e->security & (SEC_ENCRYPT | SEC_SIGN))
     {
-      snprintf(promptbuf, sizeof(promptbuf),
-               /* L10N: PGP options (inline) (opportunistic encryption is off) */
-               _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, "
-                 "(c)lear, or (o)ppenc mode?"),
-               mime_inline);
-      prompt = promptbuf;
-      /* L10N: PGP options (inline) (opportunistic encryption is off)
-         The 'i' is from the "PGP/M(i)ME" or "(i)nline", above. */
-      letters = _("esabico");
+      if (e->security & SEC_INLINE)
+      {
+        /* L10N: PGP options (inline) (opportunistic encryption is off) */
+        prompt = _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, PGP/(m)IME format, (c)lear, or (o)ppenc mode?");
+        /* L10N: PGP options (inline) (opportunistic encryption is off) */
+        letters = _("esabmco");
+      }
+      else
+      {
+        /* L10N: PGP options (mime) (opportunistic encryption is off) */
+        prompt = _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, (i)nline format, (c)lear, or (o)ppenc mode?");
+        /* L10N: PGP options (mime) (opportunistic encryption is off) */
+        letters = _("esabico");
+      }
       choices = "esabicO";
     }
     else
     {
       /* L10N: PGP options (opportunistic encryption is off) */
-      prompt = _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, (c)lear, or "
-                 "(o)ppenc mode?");
+      prompt = _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, (c)lear, or (o)ppenc mode?");
       /* L10N: PGP options (opportunistic encryption is off) */
       letters = _("esabco");
       choices = "esabcO";
@@ -1939,15 +1934,20 @@ int pgp_class_send_menu(struct Email *e)
   {
     if (e->security & (SEC_ENCRYPT | SEC_SIGN))
     {
-      snprintf(promptbuf, sizeof(promptbuf),
-               /* L10N: PGP options (inline) */
-               _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, or "
-                 "(c)lear?"),
-               mime_inline);
-      prompt = promptbuf;
-      /* L10N: PGP options (inline)
-         The 'i' is from the "PGP/M(i)ME" or "(i)nline", above. */
-      letters = _("esabic");
+      if (e->security & SEC_INLINE)
+      {
+        /* L10N: PGP options (inline) */
+        prompt = _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, PGP/(m)IME format, or (c)lear?");
+        /* L10N: PGP options (inline) */
+        letters = _("esabmc");
+      }
+      else
+      {
+        /* L10N: PGP options (mime) */
+        prompt = _("PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, (i)nline format, or (c)lear?");
+        /* L10N: PGP options (mime) */
+        letters = _("esabic");
+      }
       choices = "esabic";
     }
     else
