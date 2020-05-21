@@ -4568,7 +4568,7 @@ msgstr "Ei voitu kutsua PGP:tä"
 #. L10N: The next string MUST have the same highlighted letter
 #. One of them will appear in each of the three strings marked "(inline"), below.
 #: ncrypt/pgp.c:1872
-msgid "PGP/M(i)ME"
+msgid "PGP/(m)IME"
 msgstr "PGP/M(I)ME"
 
 #. L10N: The previous string MUST have the same highlighted letter
@@ -4584,7 +4584,7 @@ msgid "PGP (s)ign, sign (a)s, %s format, (c)lear, or (o)ppenc mode off?"
 msgstr "PGP-(a)llekirjoita, (n)imellä, %s-formaatti, (t)yhjennä, (o)ppenc pois?"
 
 #. L10N: PGP options (inline) (opportunistic encryption is on)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1896
 msgid "saico"
 msgstr "anito"
@@ -4606,7 +4606,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, (c)lear, or (o)ppenc
 msgstr "PGP-(s)alaa, -(a)llekirjoita, (n)imellä, (m)olemmat, %s-formaatti, (t)yhjennä, tai (o)ppenc?"
 
 #. L10N: PGP options (inline) (opportunistic encryption is off)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1924
 msgid "esabico"
 msgstr "sanmito"
@@ -4628,7 +4628,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, or (c)lear?"
 msgstr "PGP-(s)alaa, -(a)llekirjoita, (n)imellä, (m)olemmat, %s-formaatti, tai (t)yhjennä?"
 
 #. L10N: PGP options (inline)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1950
 msgid "esabic"
 msgstr "sanmit"

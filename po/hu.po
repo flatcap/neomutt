@@ -4693,7 +4693,7 @@ msgstr "PGP-t nem tudom meghívni"
 #. L10N: The next string MUST have the same highlighted letter
 #. One of them will appear in each of the three strings marked "(inline"), below.
 #: ncrypt/pgp.c:1872
-msgid "PGP/M(i)ME"
+msgid "PGP/(m)IME"
 msgstr ""
 
 #. L10N: The previous string MUST have the same highlighted letter
@@ -4709,7 +4709,7 @@ msgid "PGP (s)ign, sign (a)s, %s format, (c)lear, or (o)ppenc mode off?"
 msgstr "PGP (t)itkosít, (a)láír, aláír (m)int, titkosít é(s) aláír, (b)eágyazott, mé(g)se?"
 
 #. L10N: PGP options (inline) (opportunistic encryption is on)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1896
 #, fuzzy
 msgid "saico"
@@ -4734,7 +4734,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, (c)lear, or (o)ppenc
 msgstr "PGP (t)itkosít, (a)láír, aláír (m)int, titkosít é(s) aláír, (b)eágyazott, mé(g)se?"
 
 #. L10N: PGP options (inline) (opportunistic encryption is off)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1924
 #, fuzzy
 msgid "esabico"
@@ -4759,7 +4759,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, or (c)lear?"
 msgstr "PGP (t)itkosít, (a)láír, aláír (m)int, titkosít é(s) aláír, (b)eágyazott, mé(g)se?"
 
 #. L10N: PGP options (inline)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1950
 #, fuzzy
 msgid "esabic"

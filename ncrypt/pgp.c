@@ -1869,7 +1869,7 @@ int pgp_class_send_menu(struct Email *e)
   {
     /* L10N: The next string MUST have the same highlighted letter
        One of them will appear in each of the three strings marked "(inline"), below. */
-    mime_inline = _("PGP/M(i)ME");
+    mime_inline = _("PGP/(m)IME");
   }
   else
   {

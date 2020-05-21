@@ -4532,8 +4532,8 @@ msgstr "不能调用 PGP"
 #. L10N: The next string MUST have the same highlighted letter
 #. One of them will appear in each of the three strings marked "(inline"), below.
 #: ncrypt/pgp.c:1872
-msgid "PGP/M(i)ME"
-msgstr "PGP/M(i)ME"
+msgid "PGP/(m)IME"
+msgstr "PGP/(m)IME"
 
 #. L10N: The previous string MUST have the same highlighted letter
 #. One of them will appear in each of the three strings marked "(inline"), below.
@@ -4548,7 +4548,7 @@ msgid "PGP (s)ign, sign (a)s, %s format, (c)lear, or (o)ppenc mode off?"
 msgstr "PGP 签署(s)，选择身份签署(a)，%s 格式，清除(c)，或关闭机遇加密模式(o)？"
 
 #. L10N: PGP options (inline) (opportunistic encryption is on)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1896
 msgid "saico"
 msgstr "saico"
@@ -4570,7 +4570,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, (c)lear, or (o)ppenc
 msgstr "PGP 加密(e)，签署(s)，选择身份签署(a)，同时(b)，%s 格式，清除(c)，或使用机遇加密模式(o)？"
 
 #. L10N: PGP options (inline) (opportunistic encryption is off)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1924
 msgid "esabico"
 msgstr "esabico"
@@ -4592,7 +4592,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, or (c)lear?"
 msgstr "PGP 加密(e)，签署(s)，选择身份签署(a)，同时(b)，%s 格式，或清除(c)？"
 
 #. L10N: PGP options (inline)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1950
 msgid "esabic"
 msgstr "esabic"

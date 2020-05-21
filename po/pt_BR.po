@@ -4542,8 +4542,8 @@ msgstr "Não foi possível executar o PGP"
 #. L10N: The next string MUST have the same highlighted letter
 #. One of them will appear in each of the three strings marked "(inline"), below.
 #: ncrypt/pgp.c:1872
-msgid "PGP/M(i)ME"
-msgstr "PGP/M(i)ME"
+msgid "PGP/(m)IME"
+msgstr "PGP/(m)IME"
 
 #. L10N: The previous string MUST have the same highlighted letter
 #. One of them will appear in each of the three strings marked "(inline"), below.
@@ -4558,7 +4558,7 @@ msgid "PGP (s)ign, sign (a)s, %s format, (c)lear, or (o)ppenc mode off?"
 msgstr "(s)assinar com PGP, (a) assinar como, %s format, (c)limpar, ou (o)desligar modo oppenc?"
 
 #. L10N: PGP options (inline) (opportunistic encryption is on)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1896
 msgid "saico"
 msgstr "saico"
@@ -4580,7 +4580,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, (c)lear, or (o)ppenc
 msgstr "(e)encriptar, (s)assinar, (a)assinar como, (b)ambos, %s format, (c)limpar, ou (o)modo oppenc?"
 
 #. L10N: PGP options (inline) (opportunistic encryption is off)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1924
 msgid "esabico"
 msgstr "esabico"
@@ -4602,7 +4602,7 @@ msgid "PGP (e)ncrypt, (s)ign, sign (a)s, (b)oth, %s format, or (c)lear?"
 msgstr "(e)encriptar com PGP, (s)assinar, (a)assinar como, (b)ambos, %s format, ou (c)limpar?"
 
 #. L10N: PGP options (inline)
-#. The 'i' is from the "PGP/M(i)ME" or "(i)nline", above.
+#. The 'i' is from the "PGP/(m)IME" or "(i)nline", above.
 #: ncrypt/pgp.c:1950
 msgid "esabic"
 msgstr "esabic"
