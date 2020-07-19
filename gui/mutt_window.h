@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mutt/lib.h"
+#include "mouse.h"
 
 struct ConfigSubset;
 
@@ -179,6 +180,17 @@ struct MuttWindow
    * @retval -1 Error
    */
   int (*repaint)(struct MuttWindow *win);
+
+  /**
+   * @defgroup window_mouse mouse()
+   * @ingroup window_api
+   *
+   * mouse - Mouse Event occurred
+   * @param win Window
+   * @param em  Mouse Event details
+   * @retval true If handled
+   */
+  bool (*mouse)(struct MuttWindow *win, struct EventMouse *em);
 };
 
 typedef uint8_t WindowNotifyFlags; ///< Flags for Changes to a MuttWindow, e.g. #WN_TALLER

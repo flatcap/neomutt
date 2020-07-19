@@ -30,6 +30,7 @@
  * | gui/curs_lib.c      | @subpage gui_curs_lib      |
  * | gui/dialog.c        | @subpage gui_dialog        |
  * | gui/global.c        | @subpage gui_global        |
+ * | gui/mouse.c         | @subpage gui_mouse         |
  * | gui/msgcont.c       | @subpage gui_msgcont       |
  * | gui/msgwin.c        | @subpage gui_msgwin        |
  * | gui/mutt_curses.c   | @subpage gui_curses        |
@@ -57,6 +58,9 @@
 #include "sbar.h"
 #include "simple.h"
 #include "terminal.h"
+#ifdef USE_DEVEL_MOUSE
+#include "mouse.h"
+#endif
 // IWYU pragma: end_exports
 
 #endif /* MUTT_GUI_LIB_H */
