@@ -208,6 +208,28 @@ void sb_init(void)
 }
 
 /**
+ * sidebar_mouse - Mouse Event occurred - Implements MuttWindow::mouse() - @ingroup window_mouse
+ */
+bool sidebar_mouse(struct MuttWindow *win, struct EventMouse *em)
+{
+  struct SidebarWindowData *wdata = sb_wdata_get(win);
+
+  int index = em->row + wdata->top_index;
+
+  if (index >= ARRAY_SIZE(&wdata->entries))
+    return true;
+
+  struct MuttWindow *dlg = dialog_find(win);
+  struct MuttWindow *win_index = window_find_child(dlg, WT_INDEX);
+  if (!win_index)
+    return true;
+
+  struct Mailbox *m = (*ARRAY_GET(&wdata->entries, index))->mailbox;
+  dlg_change_folder(dlg, m);
+  return true;
+}
+
+/**
  * sb_shutdown - Clean up the Sidebar
  */
 void sb_shutdown(void)
