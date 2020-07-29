@@ -176,6 +176,7 @@ const struct MenuFuncOp OpBrowser[] = { /* map: browser */
  */
 const struct MenuFuncOp OpCompose[] = { /* map: compose */
   { "attach-file",                   OP_ATTACHMENT_ATTACH_FILE },
+  { "attach-file-external",          OP_ATTACHMENT_ATTACH_FILE_EXTERNAL },
   { "attach-key",                    OP_ATTACHMENT_ATTACH_KEY },
   { "attach-message",                OP_ATTACHMENT_ATTACH_MESSAGE },
 #ifdef USE_NNTP

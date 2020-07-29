@@ -649,6 +649,97 @@ static int op_attachment_attach_file(struct ComposeSharedData *shared, int op)
 }
 
 /**
+ * op_attachment_attach_file_external - Attach files to this message - Implements ::compose_function_t - @ingroup compose_function_api
+ */
+static int op_attachment_attach_file_external(struct ComposeSharedData *shared, int op)
+{
+  // char *prompt = _("Attach file externally");
+  mutt_endwin();
+  int numfiles = 0;
+  char **files = NULL;
+
+  // mutt_buffer_reset(&fname);
+
+  // BEGIN ENTER_FNAME_FULL EXTERNAL
+  // mutt_buffer_enter_fname_full(prompt, &fname, false, true, &files, &numfiles, MUTT_SEL_MULTI)
+  int enter_fname_full = 0;
+
+  // char *cmd = "cat";
+  // char *cmd = "vifm --on-choose 'echo %f | xargs -n1'";
+  char *cmd = "vifm --choose-files -";
+  // char *cmd = "find pop -type f -name '*.c'";
+  char *buf = NULL;
+  size_t buflen;
+  FILE *fp = NULL;
+  // pid_t pid = filter_create(mutt_b2s(cmd), NULL, &fp, NULL);
+  pid_t pid = filter_create(cmd, NULL, &fp, NULL);
+  if (pid < 0)
+  {
+    mutt_debug(LL_DEBUG3, "fork failed\n");
+    exit(1);
+  }
+
+  files = mutt_mem_calloc(16, sizeof(char *));
+
+  while ((buf = mutt_file_read_line(buf, &buflen, fp, NULL, 0)))
+  {
+    files[numfiles] = mutt_str_dup(buf);
+    numfiles++;
+    mutt_debug(LL_DEBUG3, "Chosen attachment: %s\n", files[numfiles - 1]);
+  }
+  mutt_debug(LL_DEBUG3, "Chosen attachments num: %d\n", numfiles);
+
+  mutt_refresh();
+  // files = tfiles;
+  // if(true) break;
+  // END   ENTER_FNAME_FULL EXTERNAL
+
+  if ((enter_fname_full == -1))
+  {
+    for (int i = 0; i < numfiles; i++)
+      FREE(&files[i]);
+
+    FREE(&files);
+    return FR_SUCCESS;
+  }
+
+  bool error = false;
+  if (numfiles > 1)
+  {
+    mutt_message(ngettext("Attaching selected file...",
+                          "Attaching selected files...", numfiles));
+  }
+  for (int i = 0; i < numfiles; i++)
+  {
+    char *att = files[i];
+    struct AttachPtr *ap = mutt_mem_calloc(1, sizeof(struct AttachPtr));
+    ap->unowned = true;
+    ap->body = mutt_make_file_attach(att, NeoMutt->sub);
+    if (ap->body)
+    {
+      update_idx(shared->adata->menu, shared->adata->actx, ap);
+      mutt_debug(LL_DEBUG3, "Attached a file.\n");
+    }
+    else
+    {
+      error = true;
+      mutt_error(_("Unable to attach %s"), att);
+      FREE(&ap);
+    }
+    FREE(&files[i]);
+  }
+
+  FREE(&files);
+  if (!error)
+    mutt_clear_error();
+
+  menu_queue_redraw(shared->adata->menu, MENU_REDRAW_FULL);
+  mutt_message_hook(NULL, shared->email, MUTT_SEND2_HOOK);
+  mutt_debug(LL_DEBUG3, "End of attaching externally\n");
+  return FR_SUCCESS;
+}
+
+/**
  * op_attachment_attach_key - Attach a PGP public key - Implements ::compose_function_t - @ingroup compose_function_api
  */
 static int op_attachment_attach_key(struct ComposeSharedData *shared, int op)
@@ -1915,6 +2006,7 @@ static int op_forget_passphrase(struct ComposeSharedData *shared, int op)
 static const struct ComposeFunction ComposeFunctions[] = {
   // clang-format off
   { OP_ATTACHMENT_ATTACH_FILE,            op_attachment_attach_file },
+  { OP_ATTACHMENT_ATTACH_FILE_EXTERNAL,   op_attachment_attach_file_external },
   { OP_ATTACHMENT_ATTACH_KEY,             op_attachment_attach_key },
   { OP_ATTACHMENT_ATTACH_MESSAGE,         op_attachment_attach_message },
   { OP_ATTACHMENT_ATTACH_NEWS_MESSAGE,    op_attachment_attach_message },
