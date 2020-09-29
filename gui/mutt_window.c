@@ -228,6 +228,9 @@ void mutt_window_free(struct MuttWindow **ptr)
  */
 void mutt_window_clearline(struct MuttWindow *win, int row)
 {
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "curses clrtoeol() [%d] for %s\n", row, win_name(win));
+#endif
   mutt_window_move(win, 0, row);
   mutt_window_clrtoeol(win);
 }
@@ -245,10 +248,16 @@ void mutt_window_clrtoeol(struct MuttWindow *win)
 
   if ((win->state.col_offset + win->state.cols) == COLS)
   {
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "curses clrtoeol() for %s\n", win_name(win));
+#endif
     clrtoeol();
   }
   else
   {
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "manual clrtoeol() for %s\n", win_name(win));
+#endif
     int row = 0;
     int col = 0;
     getyx(stdscr, row, col);
@@ -346,9 +355,17 @@ void mutt_window_reflow(struct MuttWindow *win)
   if (!win)
     win = RootWindow;
 
-  mutt_debug(LL_DEBUG2, "entering\n");
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "Begin reflow for %s\n", win_name(win));
+#endif
   window_reflow(win);
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "Notify reflow for %s\n", win_name(win));
+#endif
   window_notify_all(win);
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "End reflow for %s\n", win_name(win));
+#endif
 
 #ifdef USE_DEBUG_WINDOW
   debug_win_dump();
@@ -566,7 +583,15 @@ static void window_recalc(struct MuttWindow *win)
     return;
 
   if (win->recalc && (win->actions & WA_RECALC))
+  {
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "Begin recalc for %s\n", win_name(win));
+#endif
     win->recalc(win);
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "End recalc for %s\n", win_name(win));
+#endif
+  }
   win->actions &= ~WA_RECALC;
 
   struct MuttWindow *np = NULL;
@@ -586,7 +611,15 @@ static void window_repaint(struct MuttWindow *win)
     return;
 
   if (win->repaint && (win->actions & WA_REPAINT))
+  {
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "Begin repaint for %s\n", win_name(win));
+#endif
     win->repaint(win);
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "End repaint for %s\n", win_name(win));
+#endif
+  }
   win->actions &= ~WA_REPAINT;
 
   struct MuttWindow *np = NULL;
@@ -614,11 +647,19 @@ void window_redraw(struct MuttWindow *win)
     mutt_resize_screen();
   }
 
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "------------------------------------------------------------\n");
+  mutt_debug(LL_DEBUG2, "Begin redraw for %s\n", win_name(win));
+#endif
   window_reflow(win);
   window_notify_all(win);
 
   window_recalc(win);
   window_repaint(win);
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "End redraw for %s\n", win_name(win));
+  mutt_debug(LL_DEBUG2, "------------------------------------------------------------\n");
+#endif
   mutt_refresh();
 }
 
@@ -698,6 +739,9 @@ void mutt_window_clear(struct MuttWindow *win)
   if (!mutt_window_is_visible(win))
     return;
 
+#ifdef USE_DEBUG_WINDOW
+  mutt_debug(LL_DEBUG2, "Clear Window %s\n", win_name(win));
+#endif
   for (int i = 0; i < win->state.rows; i++)
     mutt_window_clearline(win, i);
 }

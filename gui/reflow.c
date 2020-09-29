@@ -29,6 +29,7 @@
 #include "config.h"
 #include <stddef.h>
 #include "mutt/lib.h"
+#include "debug/lib.h"
 #include "reflow.h"
 #include "mutt_window.h"
 
@@ -221,6 +222,9 @@ void window_reflow(struct MuttWindow *win)
 {
   if (!win)
     return;
+#ifdef USE_DEBUG_WINDOW
+    mutt_debug(LL_DEBUG2, "%s\n", win_name(win));
+#endif
   if (win->orient == MUTT_WIN_ORIENT_VERTICAL)
     window_reflow_vert(win);
   else
