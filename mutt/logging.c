@@ -32,6 +32,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
 #include "date.h"
@@ -76,7 +77,7 @@ static int LogQueueMax = 0;   ///< Maximum number of entries in the log queue
  */
 static const char *timestamp(time_t stamp)
 {
-  static char buf[23] = { 0 };
+  static char buf[64] = { 0 };
   static time_t last = 0;
 
   if (stamp == 0)
@@ -87,6 +88,10 @@ static const char *timestamp(time_t stamp)
     mutt_date_localtime_format(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", stamp);
     last = stamp;
   }
+
+  struct timeval tv = { 0 };
+  gettimeofday(&tv, NULL);
+  snprintf(buf + 19, 6, ".%06ld", tv.tv_usec);
 
   return buf;
 }
