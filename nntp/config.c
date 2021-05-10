@@ -32,6 +32,33 @@
 #include <stdbool.h>
 
 /**
+ * nntp_auth_validator - Validate the "nntp_authenticators" config variable - Implements ConfigDef::validator()
+ */
+static int nntp_auth_validator(const struct ConfigSet *cs, const struct ConfigDef *cdef,
+                               intptr_t value, struct Buffer *err)
+{
+  const struct Slist *nntp_auth_methods = (const struct Slist *) value;
+  if (!nntp_auth_methods || (nntp_auth_methods->count == 0))
+    return CSR_SUCCESS;
+
+  struct ListNode *np = NULL;
+  STAILQ_FOREACH(np, &nntp_auth_methods->head, entries)
+  {
+    if (nntp_auth_is_valid(np->data))
+      continue;
+#ifdef USE_SASL
+    if (sasl_auth_validator(np->data))
+      continue;
+#endif
+    mutt_buffer_printf(err, _("Option %s: %s is not a valid authenticator"),
+                       cdef->name, np->data);
+    return CSR_ERR_INVALID;
+  }
+
+  return CSR_SUCCESS;
+}
+
+/**
  * NntpVars - Config definitions for the NNTP library
  */
 static struct ConfigDef NntpVars[] = {
@@ -54,7 +81,7 @@ static struct ConfigDef NntpVars[] = {
   { "news_server", DT_STRING, 0, 0, NULL,
     "(nntp) Url of the news server"
   },
-  { "nntp_authenticators", DT_STRING, 0, 0, NULL,
+  { "nntp_authenticators", DT_SLIST|SLIST_SEP_COLON, 0, 0, nntp_auth_validator,
     "(nntp) Allowed authentication methods"
   },
   { "nntp_context", DT_LONG|DT_NOT_NEGATIVE, 1000, 0, NULL,

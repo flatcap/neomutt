@@ -113,6 +113,53 @@ struct ChildCtx
 };
 
 /**
+ * struct NntpAuth - NNTP authentication multiplexor
+ */
+struct NntpAuth
+{
+  /**
+   * authenticate - Authenticate an NNTP connection
+   * @param adata  NNTP Account data
+   * @param method Name of this authentication method
+   * @retval num Result
+   */
+  int (*authenticate)(struct NntpAccountData *adata, const char *method);
+
+  const char *method; ///< Name of authentication method supported, NULL means variable.
+      ///< If this is not null, authenticate may ignore the second parameter.
+};
+
+/**
+ * nntp_authenticators - Accepted authentication methods
+ */
+static const struct NntpAuth nntp_authenticators[] = {
+  { NULL, "user" },
+  { NULL, NULL },
+  // { nntp_auth_user, "user" },
+  // { nntp_auth_sasl, NULL },
+};
+
+/**
+ * nntp_auth_is_valid - Check if string is a valid nntp authentication method
+ * @param authenticator Authenticator string to check
+ * @retval bool True if argument is a valid auth method
+ *
+ * Validate whether an input string is an accepted nntp authentication method as
+ * defined by #nntp_authenticators.
+ */
+bool nntp_auth_is_valid(const char *authenticator)
+{
+  for (size_t i = 0; i < mutt_array_size(nntp_authenticators); i++)
+  {
+    const struct NntpAuth *auth = &nntp_authenticators[i];
+    if (auth->method && mutt_istr_equal(auth->method, authenticator))
+      return true;
+  }
+
+  return false;
+}
+
+/**
  * nntp_hashelem_free - Free our hash table data - Implements ::hash_hdata_free_t - @ingroup hash_hdata_free_api
  */
 void nntp_hashelem_free(int type, void *obj, intptr_t data)
@@ -422,12 +469,12 @@ static void nntp_log_binbuf(const char *buf, size_t len, const char *pfx, int db
 #endif
 
 /**
- * nntp_auth - Get login, password and authenticate
+ * nntp_authenticate - Get login, password and authenticate
  * @param adata NNTP server
  * @retval  0 Success
  * @retval -1 Failure
  */
-static int nntp_auth(struct NntpAccountData *adata)
+static int nntp_authenticate(struct NntpAccountData *adata)
 {
   struct Connection *conn = adata->conn;
   char buf[1024] = { 0 };
@@ -435,7 +482,7 @@ static int nntp_auth(struct NntpAccountData *adata)
   char *method = NULL, *a = NULL, *p = NULL;
   unsigned char flags = conn->account.flags;
 
-  const char *const c_nntp_authenticators = cs_subset_string(NeoMutt->sub, "nntp_authenticators");
+  const struct Slist *c_nntp_authenticators = cs_subset_slist(NeoMutt->sub, "nntp_authenticators");
   while (true)
   {
     /* get login and password */
@@ -446,9 +493,12 @@ static int nntp_auth(struct NntpAccountData *adata)
     }
 
     /* get list of authenticators */
-    if (c_nntp_authenticators)
+    if (c_nntp_authenticators && (c_nntp_authenticators->count > 0))
     {
-      mutt_str_copy(authenticators, c_nntp_authenticators, sizeof(authenticators));
+      struct Buffer auth = mutt_buffer_make(128);
+      slist_to_buffer(c_nntp_authenticators, &auth);
+      mutt_str_copy(authenticators, mutt_b2s(&auth), sizeof(authenticators));
+      mutt_buffer_dealloc(&auth);
     }
     else if (adata->hasCAPABILITIES)
     {
@@ -1865,7 +1915,7 @@ int nntp_open_connection(struct NntpAccountData *adata)
   }
 
   /* authenticate */
-  if (auth && (nntp_auth(adata) < 0))
+  if (auth && (nntp_authenticate(adata) < 0))
     return -1;
 
   /* get final capabilities after authentication */

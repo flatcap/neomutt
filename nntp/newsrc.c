@@ -1204,13 +1204,8 @@ struct NntpAccountData *nntp_select_server(struct Mailbox *m, const char *server
 
   if (rc < 0)
   {
-    mutt_hash_free(&adata->groups_hash);
-    FREE(&adata->groups_list);
-    FREE(&adata->newsrc_file);
-    FREE(&adata->authenticators);
-    FREE(&adata);
     mutt_socket_close(conn);
-    FREE(&conn);
+    nntp_adata_free((void **) &adata);
     return NULL;
   }
 
