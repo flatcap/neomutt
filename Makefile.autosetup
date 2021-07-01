@@ -831,9 +831,39 @@ ALLOBJS+=	$(PGPEWRAPOBJS)
 $(PGPEWRAP): $(PGPEWRAPOBJS)
 	$(CC) $(LDFLAGS) -o $@ $(PGPEWRAPOBJS)
 
+###############################################################################
+# cfg
+CFG=		cfg$(EXEEXT)
+CFGOBJS=	cfg.o mutt_config.o
+CLEANFILES+=	$(CFG) $(CFGOBJS)
+ALLOBJS+=	$(CFGOBJS)
+
+$(CFG): $(CFGOBJS)
+	$(CC_FOR_BUILD) -I. $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $(CFGOBJS) \
+		alias/config.o \
+		autocrypt/config.o \
+		compose/config.o \
+		conn/config.o \
+		hcache/config.o \
+		helpbar/config.o \
+		history/config.o \
+		imap/config.o \
+		index/config.o \
+		maildir/config.o \
+		mbox/config.o \
+		ncrypt/config.o \
+		nntp/config.o \
+		notmuch/config.o \
+		pager/config.o \
+		pattern/config.o \
+		pop/config.o \
+		send/config.o \
+		sidebar/config.o \
+		libcore.a libemail.a libconfig.a libaddress.a libmutt.a -lpcre2-8 -lidn2
+
 ##############################################################################
 # targets
-all: $(BINFILES) $(LIBBINFILES) $(ALL_TARGETS)
+all: $(BINFILES) $(LIBBINFILES) $(ALL_TARGETS) cfg
 
 # compile + dependencies
 .c.o:
@@ -861,7 +891,7 @@ $(NEOMUTT): $(GENERATED) $(NEOMUTTOBJS) $(MUTTLIBS)
 
 # clean
 clean: $(CLEAN_TARGETS)
-	$(RM) $(CLEANFILES)
+	$(RM) $(CLEANFILES) cfg
 
 # install
 install: all $(INSTALL_TARGETS)
