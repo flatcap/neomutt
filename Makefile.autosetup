@@ -554,7 +554,7 @@ $(PWD)/notmuch:
 LIBPAGER=	libpager.a
 LIBPAGEROBJS=	pager/config.o pager/display.o pager/dlg_pager.o pager/do_pager.o \
 		pager/functions.o pager/message.o pager/pager.o pager/pbar.o pager/ppanel.o \
-		pager/private_data.o
+		pager/private_data.o pager/simple.o
 CLEANFILES+=	$(LIBPAGER) $(LIBPAGEROBJS)
 ALLOBJS+=	$(LIBPAGEROBJS)
 
@@ -710,10 +710,10 @@ $(ALLOBJS):
 
 # The order of these libraries depends on their dependencies.
 # The libraries with the most dependencies will come first.
-MUTTLIBS+=	$(LIBINDEX) $(LIBPAGER) $(LIBAUTOCRYPT) $(LIBPOP) $(LIBNNTP) \
+MUTTLIBS+=	$(LIBINDEX) $(LIBAUTOCRYPT) $(LIBPOP) $(LIBNNTP) \
 		$(LIBCOMPMBOX) $(LIBSTORE) $(LIBPATTERN) $(LIBPROGRESS) \
 		$(LIBQUESTION) $(LIBCOLOR) $(LIBGUI) $(LIBHELPBAR) $(LIBMENU) \
-		$(LIBMBOX) $(LIBNOTMUCH) $(LIBATTACH) $(LIBMAILDIR) \
+		$(LIBMBOX) $(LIBNOTMUCH) $(LIBATTACH) $(LIBPAGER) $(LIBMAILDIR) \
 		$(LIBNCRYPT) $(LIBIMAP) $(LIBCONN) $(LIBHCACHE) $(LIBCOMPRESS) \
 		$(LIBSIDEBAR) $(LIBBCACHE) $(LIBHISTORY) $(LIBALIAS) \
 		$(LIBSEND) $(LIBCOMPOSE) $(LIBCORE) $(LIBCONFIG) $(LIBEMAIL) \

@@ -223,9 +223,12 @@ static int pager_window_observer(struct NotifyCallback *nc)
 
   notify_observer_remove(NeoMutt->notify, pager_color_observer, win_pager);
   notify_observer_remove(NeoMutt->notify, pager_config_observer, win_pager);
-  notify_observer_remove(shared->notify, pager_index_observer, win_pager);
-  notify_observer_remove(shared->notify, pager_pager_observer, win_pager);
   notify_observer_remove(win_pager->notify, pager_window_observer, win_pager);
+  if (shared)
+  {
+    notify_observer_remove(shared->notify, pager_index_observer, win_pager);
+    notify_observer_remove(shared->notify, pager_pager_observer, win_pager);
+  }
 
   mutt_debug(LL_DEBUG5, "window delete done\n");
 
@@ -248,9 +251,12 @@ struct MuttWindow *pager_window_new(struct IndexSharedData *shared,
 
   notify_observer_add(NeoMutt->notify, NT_COLOR, pager_color_observer, win);
   notify_observer_add(NeoMutt->notify, NT_CONFIG, pager_config_observer, win);
-  notify_observer_add(shared->notify, NT_INDEX, pager_index_observer, win);
-  notify_observer_add(shared->notify, NT_PAGER, pager_pager_observer, win);
   notify_observer_add(win->notify, NT_WINDOW, pager_window_observer, win);
+  if (shared)
+  {
+    notify_observer_add(shared->notify, NT_INDEX, pager_index_observer, win);
+    notify_observer_add(shared->notify, NT_PAGER, pager_pager_observer, win);
+  }
 
   return win;
 }

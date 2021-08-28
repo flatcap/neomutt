@@ -181,6 +181,7 @@ struct MuttWindow *ppanel_new(bool status_on_top, struct IndexSharedData *shared
 struct MuttWindow *pager_window_new(struct IndexSharedData *shared, struct PagerPrivateData *priv);
 int mutt_display_message(struct MuttWindow *win_index, struct MuttWindow *win_pager, struct MuttWindow *win_pbar, struct Mailbox *m, struct Email *e);
 int external_pager(struct Mailbox *m, struct Email *e, const char *command);
+int pager_do_simple(struct PagerView *pview);
 void pager_queue_redraw(struct PagerPrivateData *priv, MenuRedrawFlags redraw);
 
 void mutt_clear_pager_position(void);

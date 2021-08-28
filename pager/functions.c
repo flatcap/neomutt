@@ -1895,7 +1895,7 @@ int pager_function_dispatcher(struct MuttWindow *win_pager, int op)
     return IR_ERROR;
 
   struct MuttWindow *dlg = dialog_find(win_pager);
-  if (!dlg || !dlg->wdata)
+  if (!dlg)
     return IR_ERROR;
 
   int rc = IR_UNKNOWN;
