@@ -20,9 +20,9 @@ fuzz/date-fuzz
 *.gc??
 *.Po
 *.Tpo
-coverage
-coverage.info
 html
+lcov
+lcov.info
 lib*.a
 po/*.mo
 po/neomutt.pot
@@ -47,12 +47,6 @@ hcache/hcversion.h
 *~
 tags
 
-# Clangd
-.cache/clangd
-compile_commands.*
-
-# Intellij IDEs
-.idea
-
-# gcc -fdump-rtl-expand
-*.expand
+# Release testing
+html
+/*.txt

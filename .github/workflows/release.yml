@@ -1,0 +1,89 @@
+name: Release Tests
+
+on:
+  push:
+    branches:
+      - 'flatcap/**'
+
+jobs:
+
+  files:
+    name: Check source files
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+
+    - name: Install build software
+      run: |
+        sudo apt-get update
+        sudo apt install -y php
+
+    # - name: Checkout Code
+    #   uses: actions/checkout@v2
+
+    # - name: Setup PHP
+    #   uses: shivammathur/setup-php@v2
+    #   with:
+    #     php-version: '8.0'
+    #     tools: cs2pr
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      # with:
+        # repository: neomutt/neomutt
+        # path: neomutt
+        # fetch-depth: 3
+
+    - name: Test
+      run: |
+        composer require staabm/annotate-pull-request-from-checkstyle
+        # find / -name cs2pr
+        # which cs2pr
+        cat jim.xml | vendor/bin/cs2pr
+
+    # - name: Checkout Tools
+    #   uses: actions/checkout@v2
+    #     repository: neomutt/release-tests
+    #     path: tests
+
+    # - name: Set PATH
+    #   run: |
+    #     export PATH="$(pwd)/tests:$PATH"
+    #     echo "PATH=$PATH" >> $GITHUB_ENV
+
+    # - name: Whitespace
+    #   run: whitespace.sh neomutt | tee -a output.log
+
+    # - name: Config.h
+    #   run: config_h.sh neomutt | tee -a output.log
+    #     # *.c (*.h if #ifdef)
+
+    # - name: Include Guard
+    #   run: include.sh neomutt | tee -a output.log
+    #     # *.h
+
+    # - name: Shellcheck
+    #   run: shellcheck.sh neomutt | tee -a output.log
+    #     # *.sh
+
+    # - name: Doxygen 1
+    #   run: doxy_file.sh neomutt | tee -a output.log
+    #     # *.[ch]
+
+    # - name: Doxygen 2
+    #   run: doxy_page.sh neomutt | tee -a output.log
+    #     # *.c
+
+    # - name: Doxygen 3
+    #   run: calc.sh neomutt | tee -a output.log
+    #     # *.[ch] undoc'd
+
+    # - name: Summary
+    #   run: summary.sh
+
+    # - name: Upload output file
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: output-log-file
+    #     path: output.log
+

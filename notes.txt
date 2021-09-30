@@ -1,0 +1,126 @@
+checkout source
+
+need list of all source files
+for_all_source() {}
+
+check files
+	check for @file header, etc
+	*.c need config.h (needs to be first)
+	*.h need include guard (needs to be first and last)
+	check for empty line at eof
+	*.c @page
+	"calc" undoc'd functions
+	shellcheck
+	test_whitespace
+
+# Build
+test_build     . default    "$BUILD_DEFAULT"
+test_build     . everything "$BUILD_EVERYTHING"
+test_build     . slang      "$BUILD_SLANG"
+test_build     . curses     "$BUILD_CURSES"
+test_install   . normal
+test_uninstall   normal
+
+Translations
+	test_potfiles
+	test_stats
+	test_update_po
+
+Code (dependent on build)
+	test_docs
+	test_config
+	test_acutest
+	# test_lua
+	clean_dir
+	test_doxygen
+
+Out-of-tree build (dependent on build)
+	clean_dir
+	mkdir p
+	pushd p
+	test_build     .. out_of_tree "$BUILD_CURSES"
+	test_install   .. out_of_tree
+	test_uninstall    out_of_tree
+	popd
+
+--------------------------------------------------------------------------------
+
+Always exclude
+	.git/
+	*.png
+	3rd party
+		mtt/queue.h
+		test/acutest.h
+		autosetup/jimsh0.c
+		autosetup/* (not mutt-*)
+
+Main Source
+	*.[ch]
+	*/*.[ch]
+	excluding test/**
+
+Test source
+	test/*.[ch]
+	test/*/*.[ch]
+
+Makefiles
+	auto.def
+	configure
+	Makefile.autosetup
+	*/Makefile.autosetup
+
+Translations
+	po/*.po
+	po/POTFILES.in
+
+Docs
+	*.md
+	*/*.md
+	*/*/*.md
+	docs/*.[15]
+	docs/* (misc)
+
+Scripts (bash)
+	*/*.sh
+	*/*/*.sh
+
+Yaml
+	*.yml
+	*/*.yml
+	*/*/*.yml
+
+Tcl
+	autosetup/mutt-gettext.tcl
+	autosetup/mutt-iconv.tcl
+
+Contrib
+	contrib/** (misc)
+	scripts, config
+
+Doxygen
+	doxygen/* (misc)
+
+Config
+	.??*
+	.github/CODEOWNERS
+
+https://github.com/staabm/annotate-pull-request-from-checkstyle
+Turns checkstyle based XML-Reports into GitHub Pull Request Annotations via the Checks API.
+
+# ...
+jobs:
+    phpstan-analysis:
+      name: phpstan static code analysis
+      runs-on: ubuntu-latest
+      steps:
+          - uses: actions/checkout@v2
+          - name: Setup PHP
+            uses: shivammathur/setup-php@v1
+            with:
+                php-version: 7.3
+                coverage: none # disable xdebug, pcov
+                tools: cs2pr
+          - run: |
+                composer install # install your apps dependencies
+                vendor/bin/phpstan analyse --error-format=checkstyle | cs2pr
+

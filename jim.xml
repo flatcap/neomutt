@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle>
+<file name="jim.php">
+  <error line="5" column="1" severity="error" message="Parameter $date of method HelloWorld::sayHello() has invalid type DateTimeImutable." />
+</file>
+</checkstyle>
