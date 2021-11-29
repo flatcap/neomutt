@@ -149,7 +149,7 @@ static struct ConfigDef NcryptVars[] = {
   // clang-format on
 };
 
-#if defined(CRYPT_BACKEND_GPGME)
+#if defined(CRYPT_BACKEND_GPGME) || defined(USE_DEVEL_CONFIG)
 /**
  * NcryptVarsGpgme - GPGME Config definitions for the encryption library
  */
@@ -166,7 +166,7 @@ static struct ConfigDef NcryptVarsGpgme[] = {
 };
 #endif
 
-#if defined(CRYPT_BACKEND_CLASSIC_PGP)
+#if defined(CRYPT_BACKEND_CLASSIC_PGP) || defined(USE_DEVEL_CONFIG)
 /**
  * NcryptVarsPgp - PGP Config definitions for the encryption library
  */
@@ -236,7 +236,7 @@ static struct ConfigDef NcryptVarsPgp[] = {
 };
 #endif
 
-#if defined(CRYPT_BACKEND_CLASSIC_SMIME)
+#if defined(CRYPT_BACKEND_CLASSIC_SMIME) || defined(USE_DEVEL_CONFIG)
 /**
  * NcryptVarsSmime - SMIME Config definitions for the encryption library
  */
@@ -307,14 +307,20 @@ bool config_init_ncrypt(struct ConfigSet *cs)
 
 #if defined(CRYPT_BACKEND_GPGME)
   rc |= cs_register_variables(cs, NcryptVarsGpgme, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, NcryptVarsGpgme, DT_DISABLED);
 #endif
 
 #if defined(CRYPT_BACKEND_CLASSIC_PGP)
   rc |= cs_register_variables(cs, NcryptVarsPgp, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, NcryptVarsPgp, DT_DISABLED);
 #endif
 
 #if defined(CRYPT_BACKEND_CLASSIC_SMIME)
   rc |= cs_register_variables(cs, NcryptVarsSmime, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, NcryptVarsSmime, DT_DISABLED);
 #endif
 
   return rc;

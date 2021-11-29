@@ -137,7 +137,7 @@ static struct ConfigDef ImapVars[] = {
   // clang-format on
 };
 
-#if defined(USE_ZLIB)
+#if defined(USE_ZLIB) || defined(USE_DEVEL_CONFIG)
 /**
  * ImapVarsZlib - Config definitions for IMAP compression
  */
@@ -160,6 +160,8 @@ bool config_init_imap(struct ConfigSet *cs)
 
 #if defined(USE_ZLIB)
   rc |= cs_register_variables(cs, ImapVarsZlib, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, ImapVarsZlib, DT_DISABLED);
 #endif
 
   return rc;

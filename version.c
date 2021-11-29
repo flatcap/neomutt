@@ -306,6 +306,9 @@ static const struct CompileOptions DebugOpts[] = {
 #ifdef USE_DEBUG_COLOR
   { "color", 2 },
 #endif
+#ifdef USE_DEVEL_CONFIG
+  { "config", 2 },
+#endif
 #ifdef HAVE_LIBUNWIND
   { "backtrace", 2 },
 #endif

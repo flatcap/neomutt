@@ -344,7 +344,7 @@ static struct ConfigDef SendVars[] = {
   // clang-format on
 };
 
-#if defined(USE_NNTP)
+#if defined(USE_NNTP) || defined(USE_DEVEL_CONFIG)
 /**
  * SendVarsNntp - NNTP Config definitions for the send library
  */
@@ -367,7 +367,7 @@ static struct ConfigDef SendVarsNntp[] = {
 };
 #endif
 
-#if defined(USE_SMTP)
+#if defined(USE_SMTP) || defined(USE_DEVEL_CONFIG)
 /**
  * SendVarsSmtp - SMTP Config definitions for the send library
  */
@@ -402,10 +402,14 @@ bool config_init_send(struct ConfigSet *cs)
 
 #if defined(USE_NNTP)
   rc |= cs_register_variables(cs, SendVarsNntp, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, SendVarsNntp, DT_DISABLED);
 #endif
 
 #if defined(USE_SMTP)
   rc |= cs_register_variables(cs, SendVarsSmtp, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, SendVarsSmtp, DT_DISABLED);
 #endif
 
   return rc;

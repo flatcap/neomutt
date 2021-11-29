@@ -829,6 +829,7 @@ main
       cdflags |= CS_DUMP_HIDE_SENSITIVE;
     if (one_liner)
       cdflags |= CS_DUMP_SHOW_DOCS;
+    cdflags |= CS_DUMP_SHOW_DISABLED;
     dump_config(cs, cdflags, stdout);
     goto main_ok; // TEST18: neomutt -D
   }

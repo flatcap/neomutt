@@ -173,6 +173,8 @@ bool config_init_notmuch(struct ConfigSet *cs)
 
 #if defined(USE_NOTMUCH)
   rc |= cs_register_variables(cs, NotmuchVars, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, NotmuchVars, DT_DISABLED);
 #endif
 
   return rc;

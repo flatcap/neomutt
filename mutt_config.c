@@ -610,7 +610,7 @@ static struct ConfigDef MainVars[] = {
   // clang-format on
 };
 
-#if defined(MIXMASTER)
+#if defined(MIXMASTER) || defined(USE_DEVEL_CONFIG)
 #ifdef MIXMASTER
 #define MIXMASTER_DEFAULT MIXMASTER
 #else
@@ -632,7 +632,7 @@ static struct ConfigDef MainVarsMixmaster[] = {
 };
 #endif
 
-#if defined(HAVE_LIBIDN)
+#if defined(HAVE_LIBIDN) || defined(USE_DEVEL_CONFIG)
 /**
  * MainVarsIdn - IDN Config definitions for the Mixmaster library
  */
@@ -658,10 +658,14 @@ static bool config_init_main(struct ConfigSet *cs)
 
 #if defined(MIXMASTER)
   rc |= cs_register_variables(cs, MainVarsMixmaster, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, MainVarsMixmaster, DT_DISABLED);
 #endif
 
 #if defined(HAVE_LIBIDN)
   rc |= cs_register_variables(cs, MainVarsIdn, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, MainVarsIdn, DT_DISABLED);
 #endif
 
   return rc;
@@ -699,18 +703,18 @@ static void init_variables(struct ConfigSet *cs)
   // Define the config variables
   config_init_main(cs);
   CONFIG_INIT_VARS(cs, alias);
-#if defined(USE_AUTOCRYPT)
+#if defined(USE_AUTOCRYPT) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, autocrypt);
 #endif
   CONFIG_INIT_VARS(cs, browser);
   CONFIG_INIT_VARS(cs, compose);
   CONFIG_INIT_VARS(cs, conn);
-#if defined(USE_HCACHE)
+#if defined(USE_HCACHE) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, hcache);
 #endif
   CONFIG_INIT_VARS(cs, helpbar);
   CONFIG_INIT_VARS(cs, history);
-#if defined(USE_IMAP)
+#if defined(USE_IMAP) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, imap);
 #endif
   CONFIG_INIT_VARS(cs, index);
@@ -718,19 +722,19 @@ static void init_variables(struct ConfigSet *cs)
   CONFIG_INIT_VARS(cs, mbox);
   CONFIG_INIT_VARS(cs, menu);
   CONFIG_INIT_VARS(cs, ncrypt);
-#if defined(USE_NNTP)
+#if defined(USE_NNTP) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, nntp);
 #endif
-#if defined(USE_NOTMUCH)
+#if defined(USE_NOTMUCH) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, notmuch);
 #endif
   CONFIG_INIT_VARS(cs, pager);
   CONFIG_INIT_VARS(cs, pattern);
-#if defined(USE_POP)
+#if defined(USE_POP) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, pop);
 #endif
   CONFIG_INIT_VARS(cs, send);
-#if defined(USE_SIDEBAR)
+#if defined(USE_SIDEBAR) || defined(USE_DEVEL_CONFIG)
   CONFIG_INIT_VARS(cs, sidebar);
 #endif
 }

@@ -66,6 +66,8 @@ bool config_init_autocrypt(struct ConfigSet *cs)
 
 #if defined(USE_AUTOCRYPT)
   rc |= cs_register_variables(cs, AutocryptVars, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, AutocryptVars, DT_DISABLED);
 #endif
 
   return rc;

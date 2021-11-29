@@ -134,11 +134,17 @@ $(PWD)/attach:
 
 ###############################################################################
 # libautocrypt
-@if USE_AUTOCRYPT
 LIBAUTOCRYPT=	libautocrypt.a
-LIBAUTOCRYPTOBJS=autocrypt/autocrypt.o autocrypt/dlg_autocrypt.o \
+
+@if USE_AUTOCRYPT
+LIBAUTOCRYPTOBJS+= autocrypt/autocrypt.o autocrypt/dlg_autocrypt.o \
 		 autocrypt/config.o autocrypt/db.o autocrypt/functions.o \
 		 autocrypt/gpgme.o autocrypt/schema.o
+@endif
+@if USE_AUTOCRYPT || USE_DEVEL_CONFIG
+LIBAUTOCRYPTOBJS+= autocrypt/config.o
+@endif
+
 CLEANFILES+=	$(LIBAUTOCRYPT) $(LIBAUTOCRYPTOBJS)
 ALLOBJS+=	$(LIBAUTOCRYPTOBJS)
 
@@ -147,7 +153,6 @@ $(LIBAUTOCRYPT): $(PWD)/autocrypt $(LIBAUTOCRYPTOBJS)
 	$(RANLIB) $@
 $(PWD)/autocrypt:
 	$(MKDIR_P) $(PWD)/autocrypt
-@endif
 
 ###############################################################################
 # libbcache
@@ -429,9 +434,15 @@ $(PWD)/gui:
 
 ###############################################################################
 # libhcache
-@if USE_HCACHE
 LIBHCACHE=	libhcache.a
-LIBHCACHEOBJS=	hcache/config.o hcache/hcache.o hcache/serialize.o
+
+@if USE_HCACHE
+LIBHCACHEOBJS+=	hcache/config.o hcache/hcache.o hcache/serialize.o
+@endif
+@if USE_HCACHE || USE_DEVEL_CONFIG
+LIBHCACHEOBJS+= hcache/config.o
+@endif
+
 CLEANFILES+=	$(LIBHCACHE) $(LIBHCACHEOBJS)
 ALLOBJS+=	$(LIBHCACHEOBJS)
 
@@ -441,7 +452,6 @@ $(LIBHCACHE): $(PWD)/hcache $(LIBHCACHEOBJS)
 	$(RANLIB) $@
 $(PWD)/hcache:
 	$(MKDIR_P) $(PWD)/hcache
-@endif
 
 ###############################################################################
 # libhelpbar
@@ -639,11 +649,17 @@ $(PWD)/nntp:
 
 ###############################################################################
 # libnotmuch
-@if USE_NOTMUCH
 LIBNOTMUCH=	libnotmuch.a
-LIBNOTMUCHOBJS=	notmuch/config.o notmuch/db.o notmuch/notmuch.o \
+
+@if USE_NOTMUCH
+LIBNOTMUCHOBJS+= notmuch/config.o notmuch/db.o notmuch/notmuch.o \
 		notmuch/adata.o notmuch/edata.o notmuch/mdata.o \
 		notmuch/query.o notmuch/tag.o
+@endif
+@if USE_NOTMUCH || USE_DEVEL_CONFIG
+LIBNOTMUCHOBJS+= notmuch/config.o 
+@endif
+
 CLEANFILES+=	$(LIBNOTMUCH) $(LIBNOTMUCHOBJS)
 ALLOBJS+=	$(LIBNOTMUCHOBJS)
 
@@ -652,7 +668,6 @@ $(LIBNOTMUCH): $(PWD)/notmuch $(LIBNOTMUCHOBJS)
 	$(RANLIB) $@
 $(PWD)/notmuch:
 	$(MKDIR_P) $(PWD)/notmuch
-@endif
 
 ###############################################################################
 # libpager
@@ -767,7 +782,6 @@ $(PWD)/send:
 
 ###############################################################################
 # libsidebar
-@if USE_SIDEBAR
 LIBSIDEBAR=	libsidebar.a
 LIBSIDEBAROBJS=	sidebar/config.o sidebar/sidebar.o sidebar/commands.o \
 		sidebar/functions.o sidebar/observer.o sidebar/sort.o \
@@ -780,7 +794,6 @@ $(LIBSIDEBAR): $(PWD)/sidebar $(LIBSIDEBAROBJS)
 	$(RANLIB) $@
 $(PWD)/sidebar:
 	$(MKDIR_P) $(PWD)/sidebar
-@endif
 
 ###############################################################################
 # libstore

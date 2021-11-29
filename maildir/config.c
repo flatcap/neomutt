@@ -61,7 +61,7 @@ static struct ConfigDef MaildirVars[] = {
   // clang-format on
 };
 
-#if defined(USE_HCACHE)
+#if defined(USE_HCACHE) || defined(USE_DEVEL_CONFIG)
 /**
  * MaildirVarsHcache - Config definitions for the Maildir header cache
  */
@@ -84,6 +84,8 @@ bool config_init_maildir(struct ConfigSet *cs)
 
 #if defined(USE_HCACHE)
   rc |= cs_register_variables(cs, MaildirVarsHcache, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, MaildirVarsHcache, DT_DISABLED);
 #endif
 
   return rc;

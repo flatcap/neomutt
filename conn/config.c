@@ -57,7 +57,7 @@ static struct ConfigDef ConnVars[] = {
   // clang-format on
 };
 
-#if defined(USE_SSL)
+#if defined(USE_SSL) || defined(USE_DEVEL_CONFIG)
 /**
  * ConnVarsSsl - General SSL Config definitions for the conn library
  */
@@ -104,7 +104,7 @@ static struct ConfigDef ConnVarsSsl[] = {
 };
 #endif
 
-#if defined(USE_SSL_GNUTLS)
+#if defined(USE_SSL_GNUTLS) || defined(USE_DEVEL_CONFIG)
 /**
  * ConnVarsGnutls - GnuTLS Config definitions for the connection library
  */
@@ -121,7 +121,7 @@ static struct ConfigDef ConnVarsGnutls[] = {
 };
 #endif
 
-#if defined(USE_SSL_OPENSSL)
+#if defined(USE_SSL_OPENSSL) || defined(USE_DEVEL_CONFIG)
 /**
  * ConnVarsOpenssl - OpenSSL Config definitions for the connection library
  */
@@ -142,7 +142,7 @@ static struct ConfigDef ConnVarsOpenssl[] = {
 };
 #endif
 
-#if defined(HAVE_SSL_PARTIAL_CHAIN)
+#if defined(HAVE_SSL_PARTIAL_CHAIN) || defined(USE_DEVEL_CONFIG)
 /**
  * ConnVarsPartial - SSL partial chains Config definitions for the connection library
  */
@@ -156,7 +156,7 @@ static struct ConfigDef ConnVarsPartial[] = {
 };
 #endif
 
-#if defined(HAVE_GETADDRINFO)
+#if defined(HAVE_GETADDRINFO) || defined(USE_DEVEL_CONFIG)
 /**
  * ConnVarsGetaddr - GetAddrInfo Config definitions for the connection library
  */
@@ -179,22 +179,32 @@ bool config_init_conn(struct ConfigSet *cs)
 
 #if defined(USE_SSL)
   rc |= cs_register_variables(cs, ConnVarsSsl, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, ConnVarsSsl, DT_DISABLED);
 #endif
 
 #if defined(USE_SSL_GNUTLS)
   rc |= cs_register_variables(cs, ConnVarsGnutls, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, ConnVarsGnutls, DT_DISABLED);
 #endif
 
 #if defined(USE_SSL_OPENSSL)
   rc |= cs_register_variables(cs, ConnVarsOpenssl, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, ConnVarsOpenssl, DT_DISABLED);
 #endif
 
 #if defined(HAVE_SSL_PARTIAL_CHAIN)
   rc |= cs_register_variables(cs, ConnVarsPartial, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, ConnVarsPartial, DT_DISABLED);
 #endif
 
 #if defined(HAVE_GETADDRINFO)
   rc |= cs_register_variables(cs, ConnVarsGetaddr, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, ConnVarsGetaddr, DT_DISABLED);
 #endif
 
   return rc;

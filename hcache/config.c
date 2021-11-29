@@ -58,7 +58,7 @@ static int hcache_validator(const struct ConfigSet *cs, const struct ConfigDef *
 #endif
 }
 
-#if defined(USE_HCACHE_COMPRESSION)
+#if defined(USE_HCACHE_COMPRESSION) || defined(USE_DEVEL_CONFIG)
 /**
  * compress_method_validator - Validate the "header_cache_compress_method" config variable - Implements ConfigDef::validator() - @ingroup cfg_def_validator
  */
@@ -133,7 +133,7 @@ static struct ConfigDef HcacheVars[] = {
   // clang-format on
 };
 
-#if defined(USE_HCACHE_COMPRESSION)
+#if defined(USE_HCACHE_COMPRESSION) || defined(USE_DEVEL_CONFIG)
 /**
  * HcacheVarsComp - Config definitions for the Header Cache Compression
  */
@@ -151,7 +151,7 @@ static struct ConfigDef HcacheVarsComp[] = {
 };
 #endif
 
-#if defined(HAVE_QDBM) || defined(HAVE_TC) || defined(HAVE_KC)
+#if defined(HAVE_QDBM) || defined(HAVE_TC) || defined(HAVE_KC) || defined(USE_DEVEL_CONFIG)
 /**
  * HcacheVarsComp2 - Deprecated Config definitions for the Header Cache Compression
  */
@@ -163,7 +163,7 @@ static struct ConfigDef HcacheVarsComp2[] = {
 };
 #endif
 
-#if defined(HAVE_GDBM) || defined(HAVE_BDB)
+#if defined(HAVE_GDBM) || defined(HAVE_BDB) || defined(USE_DEVEL_CONFIG)
 /**
  * HcacheVarsPage - Deprecated Config definitions for the Header Cache
  */
@@ -184,18 +184,26 @@ bool config_init_hcache(struct ConfigSet *cs)
 
 #if defined(USE_HCACHE)
   rc |= cs_register_variables(cs, HcacheVars, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, HcacheVars, DT_DISABLED);
 #endif
 
 #if defined(USE_HCACHE_COMPRESSION)
   rc |= cs_register_variables(cs, HcacheVarsComp, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, HcacheVarsComp, DT_DISABLED);
 #endif
 
 #if defined(HAVE_QDBM) || defined(HAVE_TC) || defined(HAVE_KC)
   rc |= cs_register_variables(cs, HcacheVarsComp2, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, HcacheVarsComp2, DT_DISABLED);
 #endif
 
 #if defined(HAVE_GDBM) || defined(HAVE_BDB)
   rc |= cs_register_variables(cs, HcacheVarsPage, DT_NO_FLAGS);
+#elif defined(USE_DEVEL_CONFIG)
+  rc |= cs_register_variables(cs, HcacheVarsPage, DT_DISABLED);
 #endif
 
   return rc;
