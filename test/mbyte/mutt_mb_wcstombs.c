@@ -27,18 +27,19 @@
 
 void test_mutt_mb_wcstombs(void)
 {
-  // void mutt_mb_wcstombs(char *dest, size_t dlen, const wchar_t *src, size_t slen);
+  // void mutt_mb_wcstombs(struct Buffer *dest, const wchar_t *src, size_t slen);
 
   {
     wchar_t src[32] = L"apple";
-    mutt_mb_wcstombs(NULL, 10, src, 5);
-    TEST_CHECK_(1, "mutt_mb_wcstombs(NULL, 10, src, 5)");
+    mutt_mb_wcstombs(NULL, src, 5);
+    TEST_CHECK_(1, "mutt_mb_wcstombs(NULL, src, 5)");
   }
 
   {
-    char buf[32] = { 0 };
-    mutt_mb_wcstombs(buf, sizeof(buf), NULL, 3);
-    TEST_CHECK_(1, "mutt_mb_wcstombs(buf, sizeof(buf), NULL, 3)");
+    struct Buffer buf = mutt_buffer_make(256);
+    mutt_mb_wcstombs(&buf, NULL, 3);
+    TEST_CHECK_(1, "mutt_mb_wcstombs(&buf, NULL, 3)");
+    mutt_buffer_dealloc(&buf);
   }
 
   {
@@ -49,6 +50,7 @@ void test_mutt_mb_wcstombs(void)
       char *expected;
     };
 
+    struct Buffer buf = mutt_buffer_make(256);
     struct WideTest test[] = {
       // clang-format off
       { "Greek",     L"Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ᾿Αθηναῖοι",         "Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ᾿Αθηναῖοι" },
@@ -61,15 +63,17 @@ void test_mutt_mb_wcstombs(void)
       // clang-format on
     };
 
-    char buf[256];
     for (size_t i = 0; test[i].src; i++)
     {
-      memset(buf, 0, sizeof(buf));
       TEST_CASE(test[i].name);
       size_t len = wcslen(test[i].src);
-      mutt_mb_wcstombs(buf, sizeof(buf), test[i].src, len);
+      mutt_buffer_reset(&buf);
+      mutt_mb_wcstombs(&buf, test[i].src, len);
 
-      TEST_CHECK(mutt_str_equal(buf, test[i].expected));
+      TEST_CHECK(mutt_str_equal(buf.data, test[i].expected));
     }
+
+    mutt_buffer_dealloc(&buf);
   }
+
 }
