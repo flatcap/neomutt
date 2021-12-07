@@ -240,7 +240,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           state->curpos = state->lastchar;
           if (mutt_hist_at_scratch(hclass))
           {
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
             mutt_hist_save_scratch(hclass, mutt_buffer_string(buf));
           }
           replace_part(state, 0, mutt_hist_prev(hclass));
@@ -251,7 +251,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           state->curpos = state->lastchar;
           if (mutt_hist_at_scratch(hclass))
           {
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
             mutt_hist_save_scratch(hclass, mutt_buffer_string(buf));
           }
           replace_part(state, 0, mutt_hist_next(hclass));
@@ -260,7 +260,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
 
         case OP_EDITOR_HISTORY_SEARCH:
           state->curpos = state->lastchar;
-          mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+          mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
           mutt_hist_complete(buf, hclass);
           replace_part(state, 0, mutt_buffer_string(buf));
           rc = 1;
@@ -469,7 +469,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           if (flags & MUTT_COMP_FILE_MBOX)
           {
             first = true; /* clear input if user types a real key later */
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
             mutt_mailbox_next(m, buf);
             state->curpos = state->lastchar = mutt_mb_mbstowcs(&state->wbuf,
                                                                &state->wbuflen, 0,
@@ -492,7 +492,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
                  (i > 0) && !mutt_mb_is_shell_char(state->wbuf[i - 1]); i--)
             {
             }
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+            mutt_mb_wcstombs(buf, state->wbuf + i, state->curpos - i);
             if (tempbuf && (templen == (state->lastchar - i)) &&
                 (memcmp(tempbuf, state->wbuf + i, (state->lastchar - i) * sizeof(wchar_t)) == 0))
             {
@@ -524,7 +524,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
             for (; (i < state->lastchar) && (state->wbuf[i] == ' '); i++)
               ; // do nothing
 
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+            mutt_mb_wcstombs(buf, state->wbuf + i, state->curpos - i);
             int rc2 = alias_complete(buf, NeoMutt->sub);
             replace_part(state, i, mutt_buffer_string(buf));
             if (rc2 != 1)
@@ -544,7 +544,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
             for (; (i < state->lastchar) && (state->wbuf[i] == ' '); i++)
               ; // do nothing
 
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+            mutt_mb_wcstombs(buf, state->wbuf + i, state->curpos - i);
             int rc2 = mutt_label_complete(buf, state->tabs);
             replace_part(state, i, mutt_buffer_string(buf));
             if (rc2 != 1)
@@ -571,7 +571,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
                 (state->wbuf[i] == 'y'))
             {
               i++;
-              mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+              mutt_mb_wcstombs(buf, state->wbuf + i, state->curpos - i);
               int rc2 = mutt_label_complete(buf, state->tabs);
               replace_part(state, i, mutt_buffer_string(buf));
               if (rc2 != 1)
@@ -596,7 +596,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
                 ; // do nothing
             }
 
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+            mutt_mb_wcstombs(buf, state->wbuf + i, state->curpos - i);
             query_complete(buf, NeoMutt->sub);
             replace_part(state, i, mutt_buffer_string(buf));
 
@@ -605,7 +605,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           }
           else if (flags & MUTT_COMP_COMMAND)
           {
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
             size_t i = mutt_buffer_len(buf);
             if ((i != 0) && (buf->data[i - 1] == '=') &&
                 (mutt_var_value_complete(buf, i) != 0))
@@ -618,7 +618,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           }
           else if (flags & (MUTT_COMP_FILE | MUTT_COMP_FILE_MBOX))
           {
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
 
             /* see if the path has changed from the last time */
             if ((!tempbuf && !state->lastchar) ||
@@ -656,7 +656,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
 #ifdef USE_NOTMUCH
           else if (flags & MUTT_COMP_NM_QUERY)
           {
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
             size_t len = mutt_buffer_len(buf);
             if (!mutt_nm_query_complete(buf, len, state->tabs))
               mutt_beep(false);
@@ -665,7 +665,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           }
           else if (flags & MUTT_COMP_NM_TAG)
           {
-            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf, state->wbuf, state->curpos);
             if (!mutt_nm_tag_complete(buf, state->tabs))
               mutt_beep(false);
 
@@ -749,7 +749,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
       if ((wc == '\r') || (wc == '\n'))
       {
         /* Convert from wide characters */
-        mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->lastchar);
+        mutt_mb_wcstombs(buf, state->wbuf, state->lastchar);
         if (!pass)
           mutt_hist_add(hclass, mutt_buffer_string(buf), true);
 

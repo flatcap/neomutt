@@ -228,57 +228,29 @@ size_t mutt_mb_width_ceiling(const wchar_t *s, size_t n, int w1)
 /**
  * mutt_mb_wcstombs - Convert a string from wide to multibyte characters
  * @param dest Buffer for the result
- * @param dlen Length of the result buffer
  * @param src Source string to convert
  * @param slen Length of the source string
  */
-void mutt_mb_wcstombs(char *dest, size_t dlen, const wchar_t *src, size_t slen)
+void mutt_mb_wcstombs(struct Buffer *dest, const wchar_t *src, size_t slen)
 {
   if (!dest || !src)
     return;
 
   mbstate_t mbstate = { 0 };
-  size_t k;
+  size_t k = 0;
+  char one_char[MB_LEN_MAX + 1];
 
   /* First convert directly into the destination buffer */
-  for (; slen && dlen >= MB_LEN_MAX; dest += k, dlen -= k, src++, slen--)
+  for (; slen > 0; src++, slen--)
   {
-    k = wcrtomb(dest, *src, &mbstate);
+    k = wcrtomb(one_char, *src, &mbstate);
     if (k == (size_t) (-1))
       break;
+    mutt_buffer_addstr_n(dest, one_char, k);
   }
 
-  /* If this works, we can stop now */
-  if (dlen >= MB_LEN_MAX)
-  {
-    dest += wcrtomb(dest, 0, &mbstate);
-    return;
-  }
-
-  /* Otherwise convert any remaining data into a local buffer */
-  {
-    char buf[3 * MB_LEN_MAX];
-    char *p = buf;
-
-    for (; slen && p - buf < dlen; p += k, src++, slen--)
-    {
-      k = wcrtomb(p, *src, &mbstate);
-      if (k == (size_t) (-1))
-        break;
-    }
-    p += wcrtomb(p, 0, &mbstate);
-
-    /* If it fits into the destination buffer, we can stop now */
-    if (p - buf <= dlen)
-    {
-      memcpy(dest, buf, p - buf);
-      return;
-    }
-
-    /* Otherwise we truncate the string in an ugly fashion */
-    memcpy(dest, buf, dlen);
-    dest[dlen - 1] = '\0'; /* assume original dlen > 0 */
-  }
+  k = wcrtomb(one_char, 0, &mbstate);
+  mutt_buffer_addstr_n(dest, one_char, k);
 }
 
 /**
