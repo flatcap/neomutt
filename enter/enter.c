@@ -54,7 +54,7 @@
 #include "state.h" // IWYU pragma: keep
 
 /**
- * enum EnterRedrawFlags - Redraw flags for mutt_enter_string_full()
+ * enum EnterRedrawFlags - Redraw flags for mutt_buffer_enter_string()
  */
 enum EnterRedrawFlags
 {
@@ -124,9 +124,8 @@ static void replace_part(struct EnterState *state, size_t from, const char *buf)
 }
 
 /**
- * mutt_enter_string_full - Ask the user for a string
+ * mutt_buffer_enter_string - Ask the user for a string
  * @param[in]  buf      Buffer to store the string
- * @param[in]  buflen   Buffer length
  * @param[in]  col      Initial cursor position
  * @param[in]  flags    Flags, see #CompletionFlags
  * @param[in]  multiple Allow multiple matches
@@ -138,9 +137,9 @@ static void replace_part(struct EnterState *state, size_t from, const char *buf)
  * @retval 0  Selection made
  * @retval -1 Aborted
  */
-int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags flags,
-                           bool multiple, struct Mailbox *m, char ***files,
-                           int *numfiles, struct EnterState *state)
+int mutt_buffer_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
+                             bool multiple, struct Mailbox *m, char ***files,
+                             int *numfiles, struct EnterState *state)
 {
   struct MuttWindow *win = msgwin_get_window();
   if (!win)
@@ -166,7 +165,7 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
   {
     /* Initialise wbuf from buf */
     state->wbuflen = 0;
-    state->lastchar = mutt_mb_mbstowcs(&state->wbuf, &state->wbuflen, 0, buf);
+    state->lastchar = mutt_mb_mbstowcs(&state->wbuf, &state->wbuflen, 0, buf->data);
     redraw = ENTER_REDRAW_INIT;
   }
 
@@ -240,8 +239,8 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
           state->curpos = state->lastchar;
           if (mutt_hist_at_scratch(hclass))
           {
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-            mutt_hist_save_scratch(hclass, buf);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_hist_save_scratch(hclass, mutt_buffer_string(buf));
           }
           replace_part(state, 0, mutt_hist_prev(hclass));
           redraw = ENTER_REDRAW_INIT;
@@ -251,8 +250,8 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
           state->curpos = state->lastchar;
           if (mutt_hist_at_scratch(hclass))
           {
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-            mutt_hist_save_scratch(hclass, buf);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_hist_save_scratch(hclass, mutt_buffer_string(buf));
           }
           replace_part(state, 0, mutt_hist_next(hclass));
           redraw = ENTER_REDRAW_INIT;
@@ -260,9 +259,9 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
 
         case OP_EDITOR_HISTORY_SEARCH:
           state->curpos = state->lastchar;
-          mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-          mutt_hist_complete(buf, buflen, hclass);
-          replace_part(state, 0, buf);
+          mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+          mutt_hist_complete(buf->data, buf->dsize, hclass);
+          replace_part(state, 0, mutt_buffer_string(buf));
           rc = 1;
           goto bye;
           break;
@@ -469,16 +468,11 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
           if (flags & MUTT_COMP_FILE_MBOX)
           {
             first = true; /* clear input if user types a real key later */
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-
-            struct Buffer *pool = mutt_buffer_pool_get();
-            mutt_buffer_addstr(pool, buf);
-            mutt_mailbox_next(m, pool);
-            mutt_str_copy(buf, mutt_buffer_string(pool), buflen);
-            mutt_buffer_pool_release(&pool);
-
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            mutt_mailbox_next(m, buf);
             state->curpos = state->lastchar = mutt_mb_mbstowcs(&state->wbuf,
-                                                               &state->wbuflen, 0, buf);
+                                                               &state->wbuflen, 0,
+                                                               mutt_buffer_string(buf));
             break;
           }
           else if (!(flags & MUTT_COMP_FILE))
@@ -497,17 +491,18 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
                  (i > 0) && !mutt_mb_is_shell_char(state->wbuf[i - 1]); i--)
             {
             }
-            mutt_mb_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
             if (tempbuf && (templen == (state->lastchar - i)) &&
                 (memcmp(tempbuf, state->wbuf + i, (state->lastchar - i) * sizeof(wchar_t)) == 0))
             {
-              mutt_select_file(buf, buflen, MUTT_SEL_NO_FLAGS, m, NULL, NULL);
-              if (buf[0] != '\0')
-                replace_part(state, i, buf);
+              mutt_buffer_select_file(buf, (flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS,
+                                      m, NULL, NULL);
+              if (!mutt_buffer_is_empty(buf))
+                replace_part(state, i, mutt_buffer_string(buf));
               rc = 1;
               goto bye;
             }
-            if (mutt_complete(buf, buflen) == 0)
+            if (mutt_complete(buf->data, buf->dsize) == 0)
             {
               templen = state->lastchar - i;
               mutt_mem_realloc(&tempbuf, templen * sizeof(wchar_t));
@@ -516,7 +511,7 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
             else
               mutt_beep(false);
 
-            replace_part(state, i, buf);
+            replace_part(state, i, mutt_buffer_string(buf));
           }
           else if ((flags & MUTT_COMP_ALIAS) && (event.op == OP_EDITOR_COMPLETE))
           {
@@ -529,9 +524,9 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
             for (; (i < state->lastchar) && (state->wbuf[i] == ' '); i++)
               ; // do nothing
 
-            mutt_mb_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
-            int rc2 = alias_complete(buf, buflen, NeoMutt->sub);
-            replace_part(state, i, buf);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+            int rc2 = alias_complete(buf->data, buf->dsize, NeoMutt->sub);
+            replace_part(state, i, mutt_buffer_string(buf));
             if (rc2 != 1)
             {
               rc = 1;
@@ -549,9 +544,9 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
             for (; (i < state->lastchar) && (state->wbuf[i] == ' '); i++)
               ; // do nothing
 
-            mutt_mb_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
-            int rc2 = mutt_label_complete(buf, buflen, state->tabs);
-            replace_part(state, i, buf);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+            int rc2 = mutt_label_complete(buf->data, buf->dsize, state->tabs);
+            replace_part(state, i, mutt_buffer_string(buf));
             if (rc2 != 1)
             {
               rc = 1;
@@ -564,8 +559,8 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
             size_t i = state->curpos;
             if (i && (state->wbuf[i - 1] == '~'))
             {
-              if (dlg_select_pattern(buf, buflen))
-                replace_part(state, i - 1, buf);
+              if (dlg_select_pattern(buf->data, buf->dsize))
+                replace_part(state, i - 1, mutt_buffer_string(buf));
               rc = 1;
               goto bye;
             }
@@ -576,9 +571,9 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
                 (state->wbuf[i] == 'y'))
             {
               i++;
-              mutt_mb_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
-              int rc2 = mutt_label_complete(buf, buflen, state->tabs);
-              replace_part(state, i, buf);
+              mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
+              int rc2 = mutt_label_complete(buf->data, buf->dsize, state->tabs);
+              replace_part(state, i, mutt_buffer_string(buf));
               if (rc2 != 1)
               {
                 rc = 1;
@@ -601,48 +596,48 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
                 ; // do nothing
             }
 
-            mutt_mb_wcstombs(buf, buflen, state->wbuf + i, state->curpos - i);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
             struct Buffer *tmp = mutt_buffer_pool_get();
-            mutt_buffer_strcpy(tmp, buf);
+            mutt_buffer_copy(tmp, buf);
             query_complete(tmp, NeoMutt->sub);
-            mutt_str_copy(buf, mutt_buffer_string(tmp), buflen);
+            mutt_buffer_copy(buf, tmp);
             mutt_buffer_pool_release(&tmp);
-            replace_part(state, i, buf);
+            replace_part(state, i, mutt_buffer_string(buf));
 
             rc = 1;
             goto bye;
           }
           else if (flags & MUTT_COMP_COMMAND)
           {
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-            size_t i = strlen(buf);
-            if ((i != 0) && (buf[i - 1] == '=') &&
-                (mutt_var_value_complete(buf, buflen, i) != 0))
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            size_t i = mutt_buffer_len(buf);
+            if ((i != 0) && (buf->data[i - 1] == '=') &&
+                (mutt_var_value_complete(buf->data, buf->dsize, i) != 0))
             {
               state->tabs = 0;
             }
-            else if (mutt_command_complete(buf, buflen, i, state->tabs) == 0)
+            else if (mutt_command_complete(buf->data, buf->dsize, i, state->tabs) == 0)
               mutt_beep(false);
-            replace_part(state, 0, buf);
+            replace_part(state, 0, mutt_buffer_string(buf));
           }
           else if (flags & (MUTT_COMP_FILE | MUTT_COMP_FILE_MBOX))
           {
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
 
             /* see if the path has changed from the last time */
             if ((!tempbuf && !state->lastchar) ||
                 (tempbuf && (templen == state->lastchar) &&
                  (memcmp(tempbuf, state->wbuf, state->lastchar * sizeof(wchar_t)) == 0)))
             {
-              mutt_select_file(buf, buflen,
+              mutt_select_file(buf->data, buf->dsize,
                                ((flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS) |
                                    (multiple ? MUTT_SEL_MULTI : MUTT_SEL_NO_FLAGS),
                                m, files, numfiles);
-              if (buf[0] != '\0')
+              if (buf->data[0] != '\0')
               {
-                mutt_pretty_mailbox(buf, buflen);
+                mutt_pretty_mailbox(buf->data, buf->dsize);
                 if (!pass)
-                  mutt_hist_add(hclass, buf, true);
+                  mutt_hist_add(hclass, mutt_buffer_string(buf), true);
                 rc = 0;
                 goto bye;
               }
@@ -652,7 +647,7 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
               goto bye;
             }
 
-            if (mutt_complete(buf, buflen) == 0)
+            if (mutt_complete(buf->data, buf->dsize) == 0)
             {
               templen = state->lastchar;
               mutt_mem_realloc(&tempbuf, templen * sizeof(wchar_t));
@@ -660,25 +655,25 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
             }
             else
               mutt_beep(false); /* let the user know that nothing matched */
-            replace_part(state, 0, buf);
+            replace_part(state, 0, mutt_buffer_string(buf));
           }
 #ifdef USE_NOTMUCH
           else if (flags & MUTT_COMP_NM_QUERY)
           {
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-            size_t len = strlen(buf);
-            if (!mutt_nm_query_complete(buf, buflen, len, state->tabs))
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            size_t len = mutt_buffer_len(buf);
+            if (!mutt_nm_query_complete(buf->data, buf->dsize, len, state->tabs))
               mutt_beep(false);
 
-            replace_part(state, 0, buf);
+            replace_part(state, 0, mutt_buffer_string(buf));
           }
           else if (flags & MUTT_COMP_NM_TAG)
           {
-            mutt_mb_wcstombs(buf, buflen, state->wbuf, state->curpos);
-            if (!mutt_nm_tag_complete(buf, buflen, state->tabs))
+            mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
+            if (!mutt_nm_tag_complete(buf->data, buf->dsize, state->tabs))
               mutt_beep(false);
 
-            replace_part(state, 0, buf);
+            replace_part(state, 0, mutt_buffer_string(buf));
           }
 #endif
           else
@@ -758,17 +753,17 @@ int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags fl
       if ((wc == '\r') || (wc == '\n'))
       {
         /* Convert from wide characters */
-        mutt_mb_wcstombs(buf, buflen, state->wbuf, state->lastchar);
+        mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->lastchar);
         if (!pass)
-          mutt_hist_add(hclass, buf, true);
+          mutt_hist_add(hclass, mutt_buffer_string(buf), true);
 
         if (multiple)
         {
           char **tfiles = NULL;
           *numfiles = 1;
           tfiles = mutt_mem_calloc(*numfiles, sizeof(char *));
-          mutt_expand_path(buf, buflen);
-          tfiles[0] = mutt_str_dup(buf);
+          mutt_expand_path(buf->data, buf->dsize);
+          tfiles[0] = mutt_buffer_strdup(buf);
           *files = tfiles;
         }
         rc = 0;
