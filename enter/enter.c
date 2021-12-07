@@ -629,10 +629,10 @@ int mutt_buffer_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
                 (tempbuf && (templen == state->lastchar) &&
                  (memcmp(tempbuf, state->wbuf, state->lastchar * sizeof(wchar_t)) == 0)))
             {
-              mutt_select_file(buf->data, buf->dsize,
-                               ((flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS) |
-                                   (multiple ? MUTT_SEL_MULTI : MUTT_SEL_NO_FLAGS),
-                               m, files, numfiles);
+              mutt_buffer_select_file(buf,
+                                      ((flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS) |
+                                          (multiple ? MUTT_SEL_MULTI : MUTT_SEL_NO_FLAGS),
+                                      m, files, numfiles);
               if (buf->data[0] != '\0')
               {
                 mutt_pretty_mailbox(buf->data, buf->dsize);
