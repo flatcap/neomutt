@@ -50,7 +50,7 @@ struct stat;
 extern struct Buffer LastDir;
 extern struct Buffer LastDirBackup;
 
-typedef uint8_t SelectFileFlags;  ///< Flags for mutt_select_file(), e.g. #MUTT_SEL_MAILBOX
+typedef uint8_t SelectFileFlags;  ///< Flags for mutt_buffer_select_file(), e.g. #MUTT_SEL_MAILBOX
 #define MUTT_SEL_NO_FLAGS      0  ///< No flags are set
 #define MUTT_SEL_MAILBOX (1 << 0) ///< Select a mailbox
 #define MUTT_SEL_MULTI   (1 << 1) ///< Multi-selection is enabled
@@ -116,7 +116,6 @@ struct BrowserState
   bool is_mailbox_list; ///< Viewing mailboxes
 };
 
-void mutt_select_file(char *file, size_t filelen, SelectFileFlags flags, struct Mailbox *m, char ***files, int *numfiles);
 void mutt_buffer_select_file(struct Buffer *file, SelectFileFlags flags, struct Mailbox *m, char ***files, int *numfiles);
 void mutt_browser_select_dir(const char *f);
 void mutt_browser_cleanup(void);
