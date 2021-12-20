@@ -38,20 +38,19 @@
 /**
  * nntp_complete - Auto-complete NNTP newsgroups
  * @param buf    Buffer containing pathname
- * @param buflen Length of buffer
  * @retval  0 Match found
  * @retval -1 No matches
  *
  * XXX rules
  */
-int nntp_complete(char *buf, size_t buflen)
+int nntp_complete(struct Buffer *buf)
 {
   struct NntpAccountData *adata = CurrentNewsSrv;
   size_t n = 0;
   char filepart[PATH_MAX];
   bool init = false;
 
-  mutt_str_copy(filepart, buf, sizeof(filepart));
+  mutt_str_copy(filepart, mutt_buffer_string(buf), sizeof(filepart));
 
   /* special case to handle when there is no filepart yet
    * find the first subscribed newsgroup */
@@ -96,6 +95,6 @@ int nntp_complete(char *buf, size_t buflen)
     }
   }
 
-  mutt_str_copy(buf, filepart, buflen);
+  mutt_buffer_strcpy(buf, filepart);
   return init ? 0 : -1;
 }

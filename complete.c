@@ -73,7 +73,7 @@ int mutt_complete(struct Buffer *buf)
 
 #ifdef USE_NNTP
   if (OptNews)
-    return nntp_complete(buf->data, buf->dsize);
+    return nntp_complete(buf);
 #endif
 
   const char *const c_spool_file = cs_subset_string(NeoMutt->sub, "spool_file");
