@@ -658,7 +658,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           {
             mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
             size_t len = mutt_buffer_len(buf);
-            if (!mutt_nm_query_complete(buf->data, buf->dsize, len, state->tabs))
+            if (!mutt_nm_query_complete(buf, len, state->tabs))
               mutt_beep(false);
 
             replace_part(state, 0, mutt_buffer_string(buf));
