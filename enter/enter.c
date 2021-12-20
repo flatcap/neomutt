@@ -612,7 +612,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
             {
               state->tabs = 0;
             }
-            else if (mutt_command_complete(buf->data, buf->dsize, i, state->tabs) == 0)
+            else if (mutt_command_complete(buf, i, state->tabs) == 0)
               mutt_beep(false);
             replace_part(state, 0, mutt_buffer_string(buf));
           }
