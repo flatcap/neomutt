@@ -43,7 +43,7 @@
 
 struct Mailbox;
 
-int mutt_enter_string_full(char *buf, size_t buflen, int col, CompletionFlags flags,
+int mutt_enter_string_full(struct Buffer *buf, int col, CompletionFlags flags,
                            bool multiple, struct Mailbox *m, char ***files,
                            int *numfiles, struct EnterState *state);
 

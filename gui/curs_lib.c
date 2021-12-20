@@ -370,8 +370,7 @@ int mutt_buffer_get_field(const char *field, struct Buffer *buf, CompletionFlags
     mutt_curses_set_color_by_id(MT_COLOR_NORMAL);
     mutt_refresh();
     mutt_window_get_coords(win, &col, NULL);
-    rc = mutt_enter_string_full(buf->data, buf->dsize, col, complete, multiple,
-                                m, files, numfiles, es);
+    rc = mutt_enter_string_full(buf, col, complete, multiple, m, files, numfiles, es);
   } while (rc == 1);
   mutt_curses_set_cursor(cursor);
 
