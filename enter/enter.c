@@ -525,7 +525,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
               ; // do nothing
 
             mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
-            int rc2 = alias_complete(buf->data, buf->dsize, NeoMutt->sub);
+            int rc2 = alias_complete(buf, NeoMutt->sub);
             replace_part(state, i, mutt_buffer_string(buf));
             if (rc2 != 1)
             {
