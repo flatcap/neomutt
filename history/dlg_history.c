@@ -122,17 +122,16 @@ static void history_make_entry(struct Menu *menu, char *buf, size_t buflen, int 
 /**
  * dlg_select_history - Select an item from a history list
  * @param[in]  buf         Buffer in which to save string
- * @param[in]  buflen      Buffer length
  * @param[out] matches     Items to choose from
  * @param[in]  match_count Number of items
  */
-void dlg_select_history(char *buf, size_t buflen, char **matches, int match_count)
+void dlg_select_history(struct Buffer *buf, char **matches, int match_count)
 {
   struct MuttWindow *dlg = simple_dialog_new(MENU_GENERIC, WT_DLG_HISTORY, HistoryHelp);
 
   struct MuttWindow *sbar = window_find_child(dlg, WT_STATUS_BAR);
   char title[256];
-  snprintf(title, sizeof(title), _("History '%s'"), buf);
+  snprintf(title, sizeof(title), _("History '%s'"), mutt_buffer_string(buf));
   sbar_set_title(sbar, title);
 
   struct Menu *menu = dlg->wdata;

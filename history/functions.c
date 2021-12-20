@@ -50,7 +50,7 @@ static int op_exit(struct HistoryData *hd, int op)
 static int op_generic_select_entry(struct HistoryData *hd, int op)
 {
   const int index = menu_get_index(hd->menu);
-  mutt_str_copy(hd->buf, hd->matches[index], hd->buflen);
+  mutt_buffer_strcpy(hd->buf, matches[index]);
 
   hd->done = true;
   hd->selection = true;

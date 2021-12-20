@@ -49,7 +49,7 @@ void mutt_hist_complete(struct Buffer *buf, enum HistoryClass hclass)
     if (match_count == 1)
       mutt_buffer_strcpy(buf, matches[0]);
     else
-      dlg_select_history(buf->data, buf->dsize, matches, match_count);
+      dlg_select_history(buf, matches, match_count);
   }
   FREE(&matches);
 }
