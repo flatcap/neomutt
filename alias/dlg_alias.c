@@ -377,7 +377,7 @@ static bool dlg_select_alias(struct Buffer *buf, struct AliasMenuData *mdata)
 int alias_complete(char *buf, size_t buflen, struct ConfigSubset *sub)
 {
   struct Alias *np = NULL;
-  char bestname[8192] = { 0 };
+  struct Buffer *bestname = mutt_buffer_pool_get();
   int rc = 0;
 
   struct AliasMenuData mdata = { ARRAY_HEAD_INITIALIZER, NULL, sub };
@@ -389,23 +389,23 @@ int alias_complete(char *buf, size_t buflen, struct ConfigSubset *sub)
     {
       if (np->name && mutt_strn_equal(np->name, buf, strlen(buf)))
       {
-        if (bestname[0] == '\0') /* init */
+        if (mutt_buffer_is_empty(bestname)) /* init */
         {
-          mutt_str_copy(bestname, np->name,
-                        MIN(mutt_str_len(np->name) + 1, sizeof(bestname)));
+          mutt_buffer_strcpy(bestname, np->name);
         }
         else
         {
           int i;
-          for (i = 0; np->name[i] && (np->name[i] == bestname[i]); i++)
+          for (i = 0; np->name[i] && (np->name[i] == bestname->data[i]); i++)
             ; // do nothing
 
-          bestname[i] = '\0';
+          bestname->data[i] = '\0';
+          mutt_buffer_fix_dptr(bestname);
         }
       }
     }
 
-    if (bestname[0] == '\0')
+    if (mutt_buffer_is_empty(bestname))
     {
       // Create a View Array of all the Aliases
       FREE(&mdata.limit);
@@ -422,10 +422,10 @@ int alias_complete(char *buf, size_t buflen, struct ConfigSubset *sub)
       FREE(&mdata.limit);
       mdata.limit = mtitle;
 
-      if (!mutt_str_equal(bestname, buf))
+      if (!mutt_str_equal(mutt_buffer_string(bestname), buf))
       {
         /* we are adding something to the completion */
-        mutt_str_copy(buf, bestname, mutt_str_len(bestname) + 1);
+        mutt_str_copy(buf, mutt_buffer_string(bestname), buflen);
         FREE(&mdata.limit);
         rc = 1;
         goto done;
@@ -486,6 +486,7 @@ done:
   FREE(&mdata.limit);
   FREE(&mdata.title);
 
+  mutt_buffer_pool_release(&bestname);
   return rc;
 }
 
