@@ -54,7 +54,7 @@
 #include "state.h" // IWYU pragma: keep
 
 /**
- * enum EnterRedrawFlags - Redraw flags for mutt_enter_string_full()
+ * enum EnterRedrawFlags - Redraw flags for mutt_enter_string()
  */
 enum EnterRedrawFlags
 {
@@ -124,7 +124,7 @@ static void replace_part(struct EnterState *state, size_t from, const char *buf)
 }
 
 /**
- * mutt_enter_string_full - Ask the user for a string
+ * mutt_enter_string - Ask the user for a string
  * @param[in]  buf      Buffer to store the string
  * @param[in]  col      Initial cursor position
  * @param[in]  flags    Flags, see #CompletionFlags
@@ -137,9 +137,9 @@ static void replace_part(struct EnterState *state, size_t from, const char *buf)
  * @retval 0  Selection made
  * @retval -1 Aborted
  */
-int mutt_enter_string_full(struct Buffer *buf, int col, CompletionFlags flags,
-                           bool multiple, struct Mailbox *m, char ***files,
-                           int *numfiles, struct EnterState *state)
+int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
+                      bool multiple, struct Mailbox *m, char ***files,
+                      int *numfiles, struct EnterState *state)
 {
   struct MuttWindow *win = msgwin_get_window();
   if (!win)
@@ -496,7 +496,7 @@ int mutt_enter_string_full(struct Buffer *buf, int col, CompletionFlags flags,
             if (tempbuf && (templen == (state->lastchar - i)) &&
                 (memcmp(tempbuf, state->wbuf + i, (state->lastchar - i) * sizeof(wchar_t)) == 0))
             {
-              mutt_buffer_select_file(buf, MUTT_SEL_NO_FLAGS, m, NULL, NULL);
+              mutt_select_file(buf, MUTT_SEL_NO_FLAGS, m, NULL, NULL);
               if (!mutt_buffer_is_empty(buf))
                 replace_part(state, i, mutt_buffer_string(buf));
               rc = 1;
@@ -625,10 +625,10 @@ int mutt_enter_string_full(struct Buffer *buf, int col, CompletionFlags flags,
                 (tempbuf && (templen == state->lastchar) &&
                  (memcmp(tempbuf, state->wbuf, state->lastchar * sizeof(wchar_t)) == 0)))
             {
-              mutt_buffer_select_file(buf,
-                                      ((flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS) |
-                                          (multiple ? MUTT_SEL_MULTI : MUTT_SEL_NO_FLAGS),
-                                      m, files, numfiles);
+              mutt_select_file(buf,
+                               ((flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS) |
+                                   (multiple ? MUTT_SEL_MULTI : MUTT_SEL_NO_FLAGS),
+                               m, files, numfiles);
               if (!mutt_buffer_is_empty(buf))
               {
                 mutt_pretty_mailbox(buf->data, buf->dsize);

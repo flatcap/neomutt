@@ -201,7 +201,7 @@ struct PgpKeyInfo *pgp_ask_for_key(char *tag, char *whatfor, KeyFlags abilities,
   while (true)
   {
     mutt_buffer_reset(resp);
-    if (mutt_buffer_get_field(tag, resp, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0)
+    if (mutt_get_field(tag, resp, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0)
     {
       goto done;
     }

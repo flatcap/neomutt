@@ -202,9 +202,8 @@ void menu_current_redraw(void)
 {
 }
 
-int mutt_enter_string_full(char *buf, size_t buflen, int col,
-                           CompletionFlags flags, bool multiple, char ***files,
-                           int *numfiles, struct EnterState *state)
+int mutt_enter_string(char *buf, size_t buflen, int col, CompletionFlags flags, bool multiple,
+                      char ***files, int *numfiles, struct EnterState *state)
 {
   return 0;
 }
@@ -256,8 +255,7 @@ int mutt_system(const char *cmd)
   return 0;
 }
 
-void mutt_buffer_select_file(struct Buffer *file, SelectFileFlags flags,
-                             char ***files, int *numfiles)
+void mutt_select_file(struct Buffer *file, SelectFileFlags flags, char ***files, int *numfiles)
 {
 }
 

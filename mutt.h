@@ -48,7 +48,7 @@
 #define fgetc fgetc_unlocked
 #endif
 
-typedef uint16_t CompletionFlags;       ///< Flags for mutt_enter_string_full(), e.g. #MUTT_COMP_ALIAS
+typedef uint16_t CompletionFlags;       ///< Flags for mutt_enter_string(), e.g. #MUTT_COMP_ALIAS
 #define MUTT_COMP_NO_FLAGS          0   ///< No flags are set
 #define MUTT_COMP_ALIAS       (1 << 0)  ///< Alias completion (in alias dialog)
 #define MUTT_COMP_COMMAND     (1 << 1)  ///< Complete a NeoMutt command

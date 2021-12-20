@@ -322,7 +322,7 @@ struct KeyEvent mutt_getch(void)
 }
 
 /**
- * mutt_buffer_get_field - Ask the user for a string
+ * mutt_get_field - Ask the user for a string
  * @param[in]  field    Prompt
  * @param[in]  buf      Buffer for the result
  * @param[in]  complete Flags, see #CompletionFlags
@@ -334,8 +334,8 @@ struct KeyEvent mutt_getch(void)
  * @retval 0  Selection made
  * @retval -1 Aborted
  */
-int mutt_buffer_get_field(const char *field, struct Buffer *buf, CompletionFlags complete,
-                          bool multiple, struct Mailbox *m, char ***files, int *numfiles)
+int mutt_get_field(const char *field, struct Buffer *buf, CompletionFlags complete,
+                   bool multiple, struct Mailbox *m, char ***files, int *numfiles)
 {
   struct MuttWindow *win = msgwin_get_window();
   if (!win)
@@ -370,7 +370,7 @@ int mutt_buffer_get_field(const char *field, struct Buffer *buf, CompletionFlags
     mutt_curses_set_color_by_id(MT_COLOR_NORMAL);
     mutt_refresh();
     mutt_window_get_coords(win, &col, NULL);
-    rc = mutt_enter_string_full(buf, col, complete, multiple, m, files, numfiles, es);
+    rc = mutt_enter_string(buf, col, complete, multiple, m, files, numfiles, es);
   } while (rc == 1);
   mutt_curses_set_cursor(cursor);
 
@@ -407,7 +407,7 @@ int mutt_get_field_unbuffered(const char *msg, struct Buffer *buf, CompletionFla
     OptIgnoreMacroEvents = true;
     reset_ignoremacro = true;
   }
-  int rc = mutt_buffer_get_field(msg, buf, flags, false, NULL, NULL, NULL);
+  int rc = mutt_get_field(msg, buf, flags, false, NULL, NULL, NULL);
   if (reset_ignoremacro)
     OptIgnoreMacroEvents = false;
 
@@ -540,7 +540,7 @@ int mutt_any_key_to_continue(const char *s)
 }
 
 /**
- * mutt_buffer_enter_fname - Ask the user to select a file
+ * mutt_enter_fname - Ask the user to select a file
  * @param[in]  prompt   Prompt
  * @param[in]  fname    Buffer for the result
  * @param[in]  mailbox  If true, select mailboxes
@@ -552,9 +552,9 @@ int mutt_any_key_to_continue(const char *s)
  * @retval  0 Success
  * @retval -1 Error
  */
-int mutt_buffer_enter_fname(const char *prompt, struct Buffer *fname,
-                            bool mailbox, struct Mailbox *m, bool multiple,
-                            char ***files, int *numfiles, SelectFileFlags flags)
+int mutt_enter_fname(const char *prompt, struct Buffer *fname, bool mailbox,
+                     struct Mailbox *m, bool multiple, char ***files,
+                     int *numfiles, SelectFileFlags flags)
 {
   struct MuttWindow *win = msgwin_get_window();
   if (!win)
@@ -598,7 +598,7 @@ int mutt_buffer_enter_fname(const char *prompt, struct Buffer *fname,
       flags |= MUTT_SEL_MULTI;
     if (mailbox)
       flags |= MUTT_SEL_MAILBOX;
-    mutt_buffer_select_file(fname, flags, m, files, numfiles);
+    mutt_select_file(fname, flags, m, files, numfiles);
   }
   else
   {
@@ -611,8 +611,8 @@ int mutt_buffer_enter_fname(const char *prompt, struct Buffer *fname,
       mutt_unget_op(ch.op);
 
     mutt_buffer_alloc(fname, 1024);
-    if (mutt_buffer_get_field(pc, fname, (mailbox ? MUTT_COMP_FILE_MBOX : MUTT_COMP_FILE) | MUTT_COMP_CLEAR,
-                              multiple, m, files, numfiles) != 0)
+    if (mutt_get_field(pc, fname, (mailbox ? MUTT_COMP_FILE_MBOX : MUTT_COMP_FILE) | MUTT_COMP_CLEAR,
+                       multiple, m, files, numfiles) != 0)
     {
       mutt_buffer_reset(fname);
     }

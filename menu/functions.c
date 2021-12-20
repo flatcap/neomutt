@@ -66,10 +66,8 @@ static int search(struct Menu *menu, int op)
   if (!(search_buf && *search_buf) || ((op != OP_SEARCH_NEXT) && (op != OP_SEARCH_OPPOSITE)))
   {
     mutt_buffer_strcpy(buf, search_buf && (search_buf[0] != '\0') ? search_buf : "");
-    if ((mutt_buffer_get_field(((op == OP_SEARCH) || (op == OP_SEARCH_NEXT)) ?
-                                   _("Search for: ") :
-                                   _("Reverse search for: "),
-                               buf, MUTT_COMP_CLEAR, false, NULL, NULL, NULL) != 0) ||
+    if ((mutt_get_field(((op == OP_SEARCH) || (op == OP_SEARCH_NEXT)) ? _("Search for: ") : _("Reverse search for: "),
+                        buf, MUTT_COMP_CLEAR, false, NULL, NULL, NULL) != 0) ||
         mutt_buffer_is_empty(buf))
     {
       goto done;
@@ -252,8 +250,7 @@ static int op_jump(struct Menu *menu, int op)
   }
 
   struct Buffer *buf = mutt_buffer_pool_get();
-  if ((mutt_buffer_get_field(_("Jump to: "), buf, MUTT_COMP_NO_FLAGS, false,
-                             NULL, NULL, NULL) == 0) &&
+  if ((mutt_get_field(_("Jump to: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) == 0) &&
       !mutt_buffer_is_empty(buf))
   {
     int n = 0;

@@ -935,8 +935,8 @@ void mutt_autocrypt_scan_mailboxes(void)
   {
     struct Mailbox *m_cur = get_current_mailbox();
     // L10N: The prompt for a mailbox to scan for Autocrypt: headers
-    if ((!mutt_buffer_enter_fname(_("Scan mailbox"), folderbuf, true, m_cur,
-                                  false, NULL, NULL, MUTT_SEL_NO_FLAGS)) &&
+    if ((!mutt_enter_fname(_("Scan mailbox"), folderbuf, true, m_cur, false,
+                           NULL, NULL, MUTT_SEL_NO_FLAGS)) &&
         (!mutt_buffer_is_empty(folderbuf)))
     {
       mutt_buffer_expand_path_regex(folderbuf, false);

@@ -95,8 +95,8 @@ static int op_browser_new_file(struct BrowserPrivateData *priv, int op)
   struct Buffer *buf = mutt_buffer_pool_get();
   mutt_buffer_printf(buf, "%s/", mutt_buffer_string(&LastDir));
 
-  const int rc = mutt_buffer_get_field(_("New file name: "), buf,
-                                       MUTT_COMP_FILE, false, NULL, NULL, NULL);
+  const int rc = mutt_get_field(_("New file name: "), buf, MUTT_COMP_FILE,
+                                false, NULL, NULL, NULL);
   if (rc != 0)
   {
     mutt_buffer_pool_release(&buf);
@@ -303,8 +303,7 @@ static int op_change_directory(struct BrowserPrivateData *priv, int op)
 
   if (op == OP_CHANGE_DIRECTORY)
   {
-    int rc = mutt_buffer_get_field(_("Chdir to: "), buf, MUTT_COMP_FILE, false,
-                                   NULL, NULL, NULL);
+    int rc = mutt_get_field(_("Chdir to: "), buf, MUTT_COMP_FILE, false, NULL, NULL, NULL);
     if ((rc != 0) && mutt_buffer_is_empty(buf))
     {
       mutt_buffer_pool_release(&buf);
@@ -485,8 +484,7 @@ static int op_enter_mask(struct BrowserPrivateData *priv, int op)
   const struct Regex *c_mask = cs_subset_regex(NeoMutt->sub, "mask");
   struct Buffer *buf = mutt_buffer_pool_get();
   mutt_buffer_strcpy(buf, c_mask ? c_mask->pattern : NULL);
-  if (mutt_buffer_get_field(_("File Mask: "), buf, MUTT_COMP_NO_FLAGS, false,
-                            NULL, NULL, NULL) != 0)
+  if (mutt_get_field(_("File Mask: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0)
   {
     mutt_buffer_pool_release(&buf);
     return FR_NO_ACTION;
@@ -938,7 +936,7 @@ static int op_subscribe_pattern(struct BrowserPrivateData *priv, int op)
   else
     snprintf(tmp2, sizeof(tmp2), _("Unsubscribe pattern: "));
   /* buf comes from the buffer pool, so defaults to size 1024 */
-  if ((mutt_buffer_get_field(tmp2, buf, MUTT_COMP_PATTERN, false, NULL, NULL, NULL) != 0) ||
+  if ((mutt_get_field(tmp2, buf, MUTT_COMP_PATTERN, false, NULL, NULL, NULL) != 0) ||
       mutt_buffer_is_empty(buf))
   {
     mutt_buffer_pool_release(&buf);

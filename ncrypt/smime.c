@@ -727,7 +727,7 @@ static struct SmimeKey *smime_ask_for_key(char *prompt, KeyFlags abilities, bool
   while (true)
   {
     mutt_buffer_reset(resp);
-    if (mutt_buffer_get_field(prompt, resp, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0)
+    if (mutt_get_field(prompt, resp, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0)
     {
       goto done;
     }
@@ -1175,8 +1175,8 @@ void smime_class_invoke_import(const char *infile, const char *mailbox)
   const bool c_smime_ask_cert_label = cs_subset_bool(NeoMutt->sub, "smime_ask_cert_label");
   if (c_smime_ask_cert_label)
   {
-    if ((mutt_buffer_get_field(_("Label for certificate: "), buf,
-                               MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
+    if ((mutt_get_field(_("Label for certificate: "), buf, MUTT_COMP_NO_FLAGS,
+                        false, NULL, NULL, NULL) != 0) ||
         mutt_buffer_is_empty(buf))
     {
       goto done;

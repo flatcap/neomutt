@@ -187,7 +187,7 @@ int mutt_edit_address(struct AddressList *al, const char *field, bool expand_ali
     mutt_addrlist_to_local(al);
     mutt_buffer_reset(buf);
     mutt_addrlist_write(al, buf->data, buf->dsize, false);
-    if (mutt_buffer_get_field(field, buf, MUTT_COMP_ALIAS, false, NULL, NULL, NULL) != 0)
+    if (mutt_get_field(field, buf, MUTT_COMP_ALIAS, false, NULL, NULL, NULL) != 0)
     {
       rc = -1;
       goto done;
@@ -231,8 +231,7 @@ static int edit_envelope(struct Envelope *en, SendFlags flags, struct ConfigSubs
     else
       mutt_buffer_reset(buf);
 
-    if (mutt_buffer_get_field("Newsgroups: ", buf, MUTT_COMP_NO_FLAGS, false,
-                              NULL, NULL, NULL) != 0)
+    if (mutt_get_field("Newsgroups: ", buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0)
     {
       goto done;
     }
@@ -244,8 +243,8 @@ static int edit_envelope(struct Envelope *en, SendFlags flags, struct ConfigSubs
       mutt_buffer_reset(buf);
 
     const bool c_ask_follow_up = cs_subset_bool(sub, "ask_follow_up");
-    if (c_ask_follow_up && (mutt_buffer_get_field("Followup-To: ", buf, MUTT_COMP_NO_FLAGS,
-                                                  false, NULL, NULL, NULL) != 0))
+    if (c_ask_follow_up && (mutt_get_field("Followup-To: ", buf, MUTT_COMP_NO_FLAGS,
+                                           false, NULL, NULL, NULL) != 0))
     {
       goto done;
     }
@@ -259,8 +258,7 @@ static int edit_envelope(struct Envelope *en, SendFlags flags, struct ConfigSubs
     const bool c_x_comment_to = cs_subset_bool(sub, "x_comment_to");
     const bool c_ask_x_comment_to = cs_subset_bool(sub, "ask_x_comment_to");
     if (c_x_comment_to && c_ask_x_comment_to &&
-        (mutt_buffer_get_field("X-Comment-To: ", buf, MUTT_COMP_NO_FLAGS, false,
-                               NULL, NULL, NULL) != 0))
+        (mutt_get_field("X-Comment-To: ", buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0))
     {
       goto done;
     }
@@ -332,8 +330,7 @@ static int edit_envelope(struct Envelope *en, SendFlags flags, struct ConfigSubs
   }
 
   const enum QuadOption c_abort_nosubject = cs_subset_quad(sub, "abort_nosubject");
-  if ((mutt_buffer_get_field(_("Subject: "), buf, MUTT_COMP_NO_FLAGS, false,
-                             NULL, NULL, NULL) != 0) ||
+  if ((mutt_get_field(_("Subject: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
       (mutt_buffer_is_empty(buf) &&
        (query_quadoption(c_abort_nosubject, _("No subject, abort?")) != MUTT_NO)))
   {
@@ -1885,8 +1882,8 @@ full_fcc:
         case 2: /* alternate (m)ailbox */
           /* L10N: This is the prompt to enter an "alternate (m)ailbox" when the
              initial Fcc fails.  */
-          rc = mutt_buffer_enter_fname(_("Fcc mailbox"), fcc, true, m, false,
-                                       NULL, NULL, MUTT_SEL_NO_FLAGS);
+          rc = mutt_enter_fname(_("Fcc mailbox"), fcc, true, m, false, NULL,
+                                NULL, MUTT_SEL_NO_FLAGS);
           if ((rc == -1) || mutt_buffer_is_empty(fcc))
           {
             rc = 0;

@@ -395,8 +395,7 @@ void alias_create(struct AddressList *al, const struct ConfigSubset *sub)
 
 retry_name:
   /* L10N: prompt to add a new alias */
-  if ((mutt_buffer_get_field(_("Alias as: "), buf, MUTT_COMP_NO_FLAGS, false,
-                             NULL, NULL, NULL) != 0) ||
+  if ((mutt_get_field(_("Alias as: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
       mutt_buffer_is_empty(buf))
   {
     goto done;
@@ -436,8 +435,7 @@ retry_name:
 
   do
   {
-    if ((mutt_buffer_get_field(_("Address: "), buf, MUTT_COMP_NO_FLAGS, false,
-                               NULL, NULL, NULL) != 0) ||
+    if ((mutt_get_field(_("Address: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
         mutt_buffer_is_empty(buf))
     {
       alias_free(&alias);
@@ -460,8 +458,8 @@ retry_name:
   else
     mutt_buffer_reset(buf);
 
-  if (mutt_buffer_get_field(_("Personal name: "), buf, MUTT_COMP_NO_FLAGS,
-                            false, NULL, NULL, NULL) != 0)
+  if (mutt_get_field(_("Personal name: "), buf, MUTT_COMP_NO_FLAGS, false, NULL,
+                     NULL, NULL) != 0)
   {
     alias_free(&alias);
     goto done;
@@ -469,8 +467,7 @@ retry_name:
   mutt_str_replace(&TAILQ_FIRST(&alias->addr)->personal, mutt_buffer_string(buf));
 
   mutt_buffer_reset(buf);
-  if (mutt_buffer_get_field(_("Comment: "), buf, MUTT_COMP_NO_FLAGS, false,
-                            NULL, NULL, NULL) == 0)
+  if (mutt_get_field(_("Comment: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) == 0)
   {
     mutt_str_replace(&alias->comment, mutt_buffer_string(buf));
   }
@@ -500,8 +497,8 @@ retry_name:
   const char *const alias_file = cs_subset_path(sub, "alias_file");
   mutt_buffer_strcpy(buf, alias_file);
 
-  if (mutt_buffer_get_field(_("Save to file: "), buf, MUTT_COMP_FILE | MUTT_COMP_CLEAR,
-                            false, NULL, NULL, NULL) != 0)
+  if (mutt_get_field(_("Save to file: "), buf, MUTT_COMP_FILE | MUTT_COMP_CLEAR,
+                     false, NULL, NULL, NULL) != 0)
   {
     goto done;
   }

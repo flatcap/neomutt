@@ -1295,7 +1295,7 @@ main
       }
       mutt_buffer_reset(&folder);
       struct Mailbox *m_cur = get_current_mailbox();
-      mutt_buffer_select_file(&folder, MUTT_SEL_FOLDER | MUTT_SEL_MAILBOX, m_cur, NULL, NULL);
+      mutt_select_file(&folder, MUTT_SEL_FOLDER | MUTT_SEL_MAILBOX, m_cur, NULL, NULL);
       if (mutt_buffer_is_empty(&folder))
       {
         goto main_ok; // TEST40: neomutt -y (quit selection)

@@ -136,8 +136,8 @@ int mutt_label_message(struct Mailbox *m, struct EmailList *el)
       mutt_buffer_strcpy(buf, en->email->env->x_label);
   }
 
-  if (mutt_buffer_get_field("Label: ", buf, MUTT_COMP_LABEL /* | MUTT_COMP_CLEAR */,
-                            false, NULL, NULL, NULL) != 0)
+  if (mutt_get_field("Label: ", buf, MUTT_COMP_LABEL /* | MUTT_COMP_CLEAR */,
+                     false, NULL, NULL, NULL) != 0)
   {
     goto done;
   }

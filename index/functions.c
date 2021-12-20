@@ -665,8 +665,8 @@ static int op_jump(struct IndexSharedData *shared, struct IndexPrivateData *priv
   }
 
   int msg_num = 0;
-  if ((mutt_buffer_get_field(_("Jump to message: "), buf, MUTT_COMP_NO_FLAGS,
-                             false, NULL, NULL, NULL) != 0) ||
+  if ((mutt_get_field(_("Jump to message: "), buf, MUTT_COMP_NO_FLAGS, false,
+                      NULL, NULL, NULL) != 0) ||
       mutt_buffer_is_empty(buf))
   {
     mutt_message(_("Nothing to do"));
@@ -851,8 +851,8 @@ static int op_main_change_folder(struct IndexSharedData *shared,
   /* By default, fill buf with the next mailbox that contains unread mail */
   mutt_mailbox_next(shared->mailboxview ? shared->mailbox : NULL, folderbuf);
 
-  if (mutt_buffer_enter_fname(cp, folderbuf, true, shared->mailbox, false, NULL,
-                              NULL, MUTT_SEL_NO_FLAGS) == -1)
+  if (mutt_enter_fname(cp, folderbuf, true, shared->mailbox, false, NULL, NULL,
+                       MUTT_SEL_NO_FLAGS) == -1)
   {
     goto changefoldercleanup;
   }
@@ -1700,8 +1700,8 @@ static int op_mark_msg(struct IndexSharedData *shared, struct IndexPrivateData *
     /* L10N: This is the prompt for <mark-message>.  Whatever they
        enter will be prefixed by $mark_macro_prefix and will become
        a macro hotkey to jump to the currently selected message. */
-    if ((mutt_buffer_get_field(_("Enter macro stroke: "), buf, MUTT_COMP_NO_FLAGS,
-                               false, NULL, NULL, NULL) == 0) &&
+    if ((mutt_get_field(_("Enter macro stroke: "), buf, MUTT_COMP_NO_FLAGS,
+                        false, NULL, NULL, NULL) == 0) &&
         !mutt_buffer_is_empty(buf))
     {
       const char *const c_mark_macro_prefix = cs_subset_string(shared->sub, "mark_macro_prefix");
@@ -2399,8 +2399,8 @@ static int op_get_message(struct IndexSharedData *shared,
 
   if (op == OP_GET_MESSAGE)
   {
-    if ((mutt_buffer_get_field(_("Enter Message-Id: "), buf, MUTT_COMP_NO_FLAGS,
-                               false, NULL, NULL, NULL) != 0) ||
+    if ((mutt_get_field(_("Enter Message-Id: "), buf, MUTT_COMP_NO_FLAGS, false,
+                        NULL, NULL, NULL) != 0) ||
         mutt_buffer_is_empty(buf))
     {
       goto done;
@@ -2504,8 +2504,8 @@ static int op_main_change_group(struct IndexSharedData *shared,
 
   nntp_mailbox(shared->mailbox, folderbuf->data, folderbuf->dsize);
 
-  if (mutt_buffer_enter_fname(cp, folderbuf, true, shared->mailbox, false, NULL,
-                              NULL, MUTT_SEL_NO_FLAGS) == -1)
+  if (mutt_enter_fname(cp, folderbuf, true, shared->mailbox, false, NULL, NULL,
+                       MUTT_SEL_NO_FLAGS) == -1)
   {
     goto changefoldercleanup2;
   }
@@ -2658,7 +2658,7 @@ static int op_main_vfolder_from_query(struct IndexSharedData *shared,
   int rc = FR_SUCCESS;
   struct Buffer *buf = mutt_buffer_pool_get();
 
-  if ((mutt_buffer_get_field("Query: ", buf, MUTT_COMP_NM_QUERY, false, NULL, NULL, NULL) != 0) ||
+  if ((mutt_get_field("Query: ", buf, MUTT_COMP_NM_QUERY, false, NULL, NULL, NULL) != 0) ||
       mutt_buffer_is_empty(buf))
   {
     mutt_message(_("No query, aborting"));

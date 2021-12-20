@@ -33,7 +33,7 @@
  *
  * | Name           | Type           | See Also                  |
  * | :------------- | :------------- | :------------------------ |
- * | Browser Dialog | WT_DLG_BROWSER | mutt_buffer_select_file() |
+ * | Browser Dialog | WT_DLG_BROWSER | mutt_select_file() |
  *
  * **Parent**
  * - @ref gui_dialog
@@ -1066,15 +1066,15 @@ void mutt_browser_select_dir(const char *f)
 }
 
 /**
- * mutt_buffer_select_file - Let the user select a file
+ * mutt_select_file - Let the user select a file
  * @param[in]  file     Buffer for the result
  * @param[in]  flags    Flags, see #SelectFileFlags
  * @param[in]  m        Mailbox
  * @param[out] files    Array of selected files
  * @param[out] numfiles Number of selected files
  */
-void mutt_buffer_select_file(struct Buffer *file, SelectFileFlags flags,
-                             struct Mailbox *m, char ***files, int *numfiles)
+void mutt_select_file(struct Buffer *file, SelectFileFlags flags,
+                      struct Mailbox *m, char ***files, int *numfiles)
 {
   struct BrowserPrivateData *priv = browser_private_data_new();
   priv->file = file;

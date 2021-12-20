@@ -541,8 +541,7 @@ void query_index(struct Mailbox *m, struct ConfigSubset *sub)
   mdata.al = &al;
 
   struct Buffer *buf = mutt_buffer_pool_get();
-  if ((mutt_buffer_get_field(_("Query: "), buf, MUTT_COMP_NO_FLAGS, false, NULL,
-                             NULL, NULL) != 0) ||
+  if ((mutt_get_field(_("Query: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
       mutt_buffer_is_empty(buf))
   {
     goto done;

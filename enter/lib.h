@@ -43,8 +43,8 @@
 
 struct Mailbox;
 
-int mutt_enter_string_full(struct Buffer *buf, int col, CompletionFlags flags,
-                           bool multiple, struct Mailbox *m, char ***files,
-                           int *numfiles, struct EnterState *state);
+int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
+                      bool multiple, struct Mailbox *m, char ***files,
+                      int *numfiles, struct EnterState *state);
 
 #endif /* MUTT_ENTER_LIB_H */
