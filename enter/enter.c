@@ -545,7 +545,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
               ; // do nothing
 
             mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
-            int rc2 = mutt_label_complete(buf->data, buf->dsize, state->tabs);
+            int rc2 = mutt_label_complete(buf, state->tabs);
             replace_part(state, i, mutt_buffer_string(buf));
             if (rc2 != 1)
             {
@@ -572,7 +572,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
             {
               i++;
               mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf + i, state->curpos - i);
-              int rc2 = mutt_label_complete(buf->data, buf->dsize, state->tabs);
+              int rc2 = mutt_label_complete(buf, state->tabs);
               replace_part(state, i, mutt_buffer_string(buf));
               if (rc2 != 1)
               {
