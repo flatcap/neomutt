@@ -559,7 +559,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
             size_t i = state->curpos;
             if (i && (state->wbuf[i - 1] == '~'))
             {
-              if (dlg_select_pattern(buf->data, buf->dsize))
+              if (dlg_select_pattern(buf))
                 replace_part(state, i - 1, mutt_buffer_string(buf));
               rc = 1;
               goto bye;

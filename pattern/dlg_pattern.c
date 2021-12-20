@@ -326,10 +326,9 @@ static int pattern_window_observer(struct NotifyCallback *nc)
 /**
  * dlg_select_pattern - Show menu to select a Pattern
  * @param buf    Buffer for the selected Pattern
- * @param buflen Length of buffer
  * @retval true A selection was made
  */
-bool dlg_select_pattern(char *buf, size_t buflen)
+bool dlg_select_pattern(struct Buffer *buf)
 {
   struct MuttWindow *dlg = simple_dialog_new(MENU_GENERIC, WT_DLG_PATTERN, PatternHelp);
   struct Menu *menu = create_pattern_menu(dlg);

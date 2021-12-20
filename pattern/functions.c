@@ -52,7 +52,7 @@ static int op_generic_select_entry(struct PatternData *pd, int op)
 {
   const int index = menu_get_index(pd->menu);
   struct PatternEntry *entry = ((struct PatternEntry *) pd->menu->mdata) + index;
-  mutt_str_copy(pd->buf, entry->tag, pd->buflen);
+  mutt_buffer_strcpy(pd->buf, entry->tag);
 
   pd->done = true;
   pd->selection = true;
