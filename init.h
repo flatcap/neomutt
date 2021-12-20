@@ -46,6 +46,6 @@ void                  mutt_opts_free         (void);
 enum CommandResult    mutt_parse_rc_buffer   (struct Buffer *line, struct Buffer *token, struct Buffer *err);
 enum CommandResult    mutt_parse_rc_line     (const char *line, struct Buffer *err);
 int                   mutt_query_variables   (struct ListHead *queries, bool show_docs);
-int                   mutt_var_value_complete(char *buf, size_t buflen, int pos);
+int                   mutt_var_value_complete(struct Buffer *buf, int pos);
 
 #endif /* MUTT_INIT_H */

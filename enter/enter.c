@@ -608,7 +608,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
             mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
             size_t i = mutt_buffer_len(buf);
             if ((i != 0) && (buf->data[i - 1] == '=') &&
-                (mutt_var_value_complete(buf->data, buf->dsize, i) != 0))
+                (mutt_var_value_complete(buf, i) != 0))
             {
               state->tabs = 0;
             }

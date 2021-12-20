@@ -1472,29 +1472,25 @@ bool mutt_nm_tag_complete(struct Buffer *buf, int numtabs)
 /**
  * mutt_var_value_complete - Complete a variable/value
  * @param buf    Buffer for the result
- * @param buflen Length of the buffer
  * @param pos    Cursor position in the buffer
  * @retval 1 Success
  * @retval 0 Failure
  */
-int mutt_var_value_complete(char *buf, size_t buflen, int pos)
+int mutt_var_value_complete(struct Buffer *buf, int pos)
 {
-  char *pt = buf;
-
-  if (buf[0] == '\0')
+  if (mutt_buffer_is_empty(buf))
     return 0;
 
-  SKIPWS(buf);
-  const int spaces = buf - pt;
+  char *pt = buf->data;
 
-  pt = buf + pos - spaces;
-  while ((pt > buf) && !isspace((unsigned char) *pt))
+  SKIPWS(pt);
+  while ((*pt != '\0') && !isspace((unsigned char) *pt))
     pt--;
   pt++;           /* move past the space */
   if (*pt == '=') /* abort if no var before the '=' */
     return 0;
 
-  if (mutt_str_startswith(buf, "set"))
+  if (mutt_str_startswith(mutt_buffer_string(buf), "set"))
   {
     const char *myvarval = NULL;
     char var[256];
@@ -1514,7 +1510,7 @@ int mutt_var_value_complete(char *buf, size_t buflen, int pos)
       {
         struct Buffer pretty = mutt_buffer_make(256);
         pretty_var(myvarval, &pretty);
-        snprintf(pt, buflen - (pt - buf), "%s=%s", var, pretty.data);
+        mutt_buffer_printf(buf, "%s=%s", var, pretty.data);
         mutt_buffer_dealloc(&pretty);
         return 1;
       }
@@ -1528,7 +1524,7 @@ int mutt_var_value_complete(char *buf, size_t buflen, int pos)
       if (CSR_RESULT(rc) == CSR_SUCCESS)
       {
         pretty_var(value.data, &pretty);
-        snprintf(pt, buflen - (pt - buf), "%s=%s", var, pretty.data);
+        mutt_buffer_printf(buf, "%s=%s", var, pretty.data);
         mutt_buffer_dealloc(&value);
         mutt_buffer_dealloc(&pretty);
         return 0;
