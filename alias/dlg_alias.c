@@ -378,6 +378,7 @@ int alias_complete(char *buf, size_t buflen, struct ConfigSubset *sub)
 {
   struct Alias *np = NULL;
   char bestname[8192] = { 0 };
+  int rc = 0;
 
   struct AliasMenuData mdata = { ARRAY_HEAD_INITIALIZER, NULL, sub };
   mdata.limit = mutt_str_dup(buf);
@@ -426,7 +427,8 @@ int alias_complete(char *buf, size_t buflen, struct ConfigSubset *sub)
         /* we are adding something to the completion */
         mutt_str_copy(buf, bestname, mutt_str_len(bestname) + 1);
         FREE(&mdata.limit);
-        return 1;
+        rc = 1;
+        goto done;
       }
 
       /* build alias list and show it */
@@ -484,7 +486,7 @@ done:
   FREE(&mdata.limit);
   FREE(&mdata.title);
 
-  return 0;
+  return rc;
 }
 
 /**
