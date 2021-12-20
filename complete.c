@@ -47,14 +47,13 @@
 /**
  * mutt_complete - Attempt to complete a partial pathname
  * @param buf    Buffer containing pathname
- * @param buflen Length of buffer
  * @retval  0 Ok
  * @retval -1 No matches
  *
  * Given a partial pathname, fill in as much of the rest of the path as is
  * unique.
  */
-int mutt_complete(char *buf, size_t buflen)
+int mutt_complete(struct Buffer *buf)
 {
   const char *p = NULL;
   DIR *dirp = NULL;
@@ -70,11 +69,11 @@ int mutt_complete(char *buf, size_t buflen)
   int rc;
 #endif
 
-  mutt_debug(LL_DEBUG2, "completing %s\n", buf);
+  mutt_debug(LL_DEBUG2, "completing %s\n", mutt_buffer_string(buf));
 
 #ifdef USE_NNTP
   if (OptNews)
-    return nntp_complete(buf, buflen);
+    return nntp_complete(buf->data, buf->dsize);
 #endif
 
   const char *const c_spool_file = cs_subset_string(NeoMutt->sub, "spool_file");
@@ -82,21 +81,23 @@ int mutt_complete(char *buf, size_t buflen)
 #ifdef USE_IMAP
   imap_path = mutt_buffer_pool_get();
   /* we can use '/' as a delimiter, imap_complete rewrites it */
-  if ((*buf == '=') || (*buf == '+') || (*buf == '!'))
+  if ((*buf->data == '=') || (*buf->data == '+') || (*buf->data == '!'))
   {
-    if (*buf == '!')
+    if (*buf->data == '!')
       p = NONULL(c_spool_file);
     else
       p = NONULL(c_folder);
 
-    mutt_buffer_concat_path(imap_path, p, buf + 1);
+    mutt_buffer_concat_path(imap_path, p, buf->data + 1);
   }
   else
-    mutt_buffer_strcpy(imap_path, buf);
+  {
+    mutt_buffer_copy(imap_path, buf);
+  }
 
   if (imap_path_probe(mutt_buffer_string(imap_path), NULL) == MUTT_IMAP)
   {
-    rc = imap_complete(buf, buflen, mutt_buffer_string(imap_path));
+    rc = imap_complete(buf->data, buf->dsize, mutt_buffer_string(imap_path));
     mutt_buffer_pool_release(&imap_path);
     return rc;
   }
@@ -109,42 +110,44 @@ int mutt_complete(char *buf, size_t buflen)
   filepart = mutt_buffer_pool_get();
   tmp = mutt_buffer_pool_get();
 
-  if ((*buf == '=') || (*buf == '+') || (*buf == '!'))
+  if ((*buf->data == '=') || (*buf->data == '+') || (*buf->data == '!'))
   {
-    mutt_buffer_addch(dirpart, *buf);
-    if (*buf == '!')
+    mutt_buffer_addch(dirpart, *buf->data);
+    if (*buf->data == '!')
       mutt_buffer_strcpy(exp_dirpart, NONULL(c_spool_file));
     else
       mutt_buffer_strcpy(exp_dirpart, NONULL(c_folder));
-    p = strrchr(buf, '/');
+    p = strrchr(mutt_buffer_string(buf), '/');
     if (p)
     {
       mutt_buffer_concatn_path(tmp, mutt_buffer_string(exp_dirpart),
-                               mutt_buffer_len(exp_dirpart), buf + 1,
-                               (size_t) (p - buf - 1));
+                               mutt_buffer_len(exp_dirpart), buf->data + 1,
+                               (size_t) (p - buf->data - 1));
       mutt_buffer_copy(exp_dirpart, tmp);
-      mutt_buffer_substrcpy(dirpart, buf, p + 1);
+      mutt_buffer_substrcpy(dirpart, buf->data, p + 1);
       mutt_buffer_strcpy(filepart, p + 1);
     }
     else
-      mutt_buffer_strcpy(filepart, buf + 1);
+    {
+      mutt_buffer_strcpy(filepart, buf->data + 1);
+    }
     dirp = opendir(mutt_buffer_string(exp_dirpart));
   }
   else
   {
-    p = strrchr(buf, '/');
+    p = strrchr(buf->data, '/');
     if (p)
     {
-      if (p == buf) /* absolute path */
+      if (p == buf->data) /* absolute path */
       {
-        p = buf + 1;
+        p = buf->data + 1;
         mutt_buffer_strcpy(dirpart, "/");
         mutt_buffer_strcpy(filepart, p);
         dirp = opendir(mutt_buffer_string(dirpart));
       }
       else
       {
-        mutt_buffer_substrcpy(dirpart, buf, p);
+        mutt_buffer_substrcpy(dirpart, mutt_buffer_string(buf), p);
         mutt_buffer_strcpy(filepart, p + 1);
         mutt_buffer_copy(exp_dirpart, dirpart);
         mutt_buffer_expand_path(exp_dirpart);
@@ -154,7 +157,7 @@ int mutt_complete(char *buf, size_t buflen)
     else
     {
       /* no directory name, so assume current directory. */
-      mutt_buffer_strcpy(filepart, buf);
+      mutt_buffer_copy(filepart, buf);
       dirp = opendir(".");
     }
   }
@@ -225,16 +228,18 @@ int mutt_complete(char *buf, size_t buflen)
 
   if (!mutt_buffer_is_empty(dirpart))
   {
-    mutt_str_copy(buf, mutt_buffer_string(dirpart), buflen);
+    mutt_buffer_copy(buf, dirpart);
     if (!mutt_str_equal("/", mutt_buffer_string(dirpart)) &&
         (mutt_buffer_string(dirpart)[0] != '=') && (mutt_buffer_string(dirpart)[0] != '+'))
     {
-      mutt_str_copy(buf + strlen(buf), "/", buflen - strlen(buf));
+      mutt_buffer_addch(buf, '/');
     }
-    mutt_str_copy(buf + strlen(buf), mutt_buffer_string(filepart), buflen - strlen(buf));
+    mutt_buffer_addstr(buf, mutt_buffer_string(filepart));
   }
   else
-    mutt_str_copy(buf, mutt_buffer_string(filepart), buflen);
+  {
+    mutt_buffer_copy(buf, filepart);
+  }
 
 cleanup:
   mutt_buffer_pool_release(&dirpart);

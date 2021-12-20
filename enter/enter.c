@@ -502,7 +502,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
               rc = 1;
               goto bye;
             }
-            if (mutt_complete(buf->data, buf->dsize) == 0)
+            if (mutt_complete(buf) == 0)
             {
               templen = state->lastchar - i;
               mutt_mem_realloc(&tempbuf, templen * sizeof(wchar_t));
@@ -643,7 +643,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
               goto bye;
             }
 
-            if (mutt_complete(buf->data, buf->dsize) == 0)
+            if (mutt_complete(buf) == 0)
             {
               templen = state->lastchar;
               mutt_mem_realloc(&tempbuf, templen * sizeof(wchar_t));

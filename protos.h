@@ -66,7 +66,7 @@ void mutt_signal_init(void);
 void mutt_emails_set_flag(struct Mailbox *m, struct EmailList *el, enum MessageType flag, bool bf);
 int mutt_change_flag(struct Mailbox *m, struct EmailList *el, bool bf);
 
-int mutt_complete(char *buf, size_t buflen);
+int mutt_complete(struct Buffer *buf);
 int mutt_thread_set_flag(struct Mailbox *m, struct Email *e, enum MessageType flag, bool bf, bool subthread);
 extern short PostCount;
 
