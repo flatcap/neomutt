@@ -666,7 +666,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
           else if (flags & MUTT_COMP_NM_TAG)
           {
             mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
-            if (!mutt_nm_tag_complete(buf->data, buf->dsize, state->tabs))
+            if (!mutt_nm_tag_complete(buf, state->tabs))
               mutt_beep(false);
 
             replace_part(state, 0, mutt_buffer_string(buf));

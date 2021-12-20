@@ -1416,22 +1416,21 @@ bool mutt_nm_query_complete(struct Buffer *buf, int pos, int numtabs)
 /**
  * mutt_nm_tag_complete - Complete to the nearest notmuch tag
  * @param buf     Buffer for the result
- * @param buflen  Length of the buffer
  * @param numtabs Number of times the user has hit 'tab'
  * @retval true  Success, a match
  * @retval false Error, no match
  *
  * Complete the nearest "+" or "-" -prefixed string previous to pos.
  */
-bool mutt_nm_tag_complete(char *buf, size_t buflen, int numtabs)
+bool mutt_nm_tag_complete(struct Buffer *buf, int numtabs)
 {
   if (!buf)
     return false;
 
-  char *pt = buf;
+  char *pt = buf->data;
 
   /* Only examine the last token */
-  char *last_space = strrchr(buf, ' ');
+  char *last_space = strrchr(pt, ' ');
   if (last_space)
     pt = (last_space + 1);
 
@@ -1464,7 +1463,7 @@ bool mutt_nm_tag_complete(char *buf, size_t buflen, int numtabs)
   }
 
   /* return the completed query */
-  strncpy(pt, Completed, buf + buflen - pt);
+  mutt_buffer_strcpy(buf, Completed);
 
   return true;
 }
