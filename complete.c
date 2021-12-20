@@ -97,7 +97,7 @@ int mutt_complete(struct Buffer *buf)
 
   if (imap_path_probe(mutt_buffer_string(imap_path), NULL) == MUTT_IMAP)
   {
-    rc = imap_complete(buf->data, buf->dsize, mutt_buffer_string(imap_path));
+    rc = imap_complete(buf, mutt_buffer_string(imap_path));
     mutt_buffer_pool_release(&imap_path);
     return rc;
   }

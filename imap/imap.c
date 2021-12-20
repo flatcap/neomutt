@@ -1334,7 +1334,6 @@ int imap_subscribe(char *path, bool subscribe)
 /**
  * imap_complete - Try to complete an IMAP folder path
  * @param buf Buffer for result
- * @param buflen Length of buffer
  * @param path Partial mailbox name to complete
  * @retval  0 Success
  * @retval -1 Failure
@@ -1342,7 +1341,7 @@ int imap_subscribe(char *path, bool subscribe)
  * Given a partial IMAP folder path, return a string which adds as much to the
  * path as is unique
  */
-int imap_complete(char *buf, size_t buflen, const char *path)
+int imap_complete(struct Buffer *buf, const char *path)
 {
   struct ImapAccountData *adata = NULL;
   struct ImapMboxData *mdata = NULL;
@@ -1356,8 +1355,8 @@ int imap_complete(char *buf, size_t buflen, const char *path)
 
   if (imap_adata_find(path, &adata, &mdata) < 0)
   {
-    mutt_str_copy(buf, path, buflen);
-    return complete_hosts(buf, buflen);
+    mutt_buffer_strcpy(buf, path);
+    return complete_hosts(buf->data, buf->dsize);
   }
 
   /* fire off command */
@@ -1405,8 +1404,8 @@ int imap_complete(char *buf, size_t buflen, const char *path)
   if (completions)
   {
     /* reformat output */
-    imap_qualify_path(buf, buflen, &adata->conn->account, completion);
-    mutt_pretty_mailbox(buf, buflen);
+    imap_qualify_path(buf->data, buf->dsize, &adata->conn->account, completion);
+    mutt_pretty_mailbox(buf->data, buf->dsize);
     return 0;
   }
 
