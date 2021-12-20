@@ -261,7 +261,7 @@ int mutt_enter_string(struct Buffer *buf, int col, CompletionFlags flags,
         case OP_EDITOR_HISTORY_SEARCH:
           state->curpos = state->lastchar;
           mutt_mb_wcstombs(buf->data, buf->dsize, state->wbuf, state->curpos);
-          mutt_hist_complete(buf->data, buf->dsize, hclass);
+          mutt_hist_complete(buf, hclass);
           replace_part(state, 0, mutt_buffer_string(buf));
           rc = 1;
           goto bye;

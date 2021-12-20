@@ -37,20 +37,19 @@
 /**
  * mutt_hist_complete - Complete a string from a history list
  * @param buf    Buffer in which to save string
- * @param buflen Buffer length
  * @param hclass History list to use
  */
-void mutt_hist_complete(char *buf, size_t buflen, enum HistoryClass hclass)
+void mutt_hist_complete(struct Buffer *buf, enum HistoryClass hclass)
 {
   const short c_history = cs_subset_number(NeoMutt->sub, "history");
   char **matches = mutt_mem_calloc(c_history, sizeof(char *));
-  int match_count = mutt_hist_search(buf, hclass, matches);
+  int match_count = mutt_hist_search(mutt_buffer_string(buf), hclass, matches);
   if (match_count)
   {
     if (match_count == 1)
-      mutt_str_copy(buf, matches[0], buflen);
+      mutt_buffer_strcpy(buf, matches[0]);
     else
-      dlg_select_history(buf, buflen, matches, match_count);
+      dlg_select_history(buf->data, buf->dsize, matches, match_count);
   }
   FREE(&matches);
 }
