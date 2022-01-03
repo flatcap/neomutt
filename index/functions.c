@@ -84,6 +84,7 @@
 #ifdef ENABLE_NLS
 #include <libintl.h>
 #endif
+#include "debug/lib.h"
 
 /// Error message for unavailable functions
 static const char *Not_available_in_this_menu = N_("Not available in this menu");
@@ -1841,6 +1842,10 @@ static int op_prev_entry(struct IndexSharedData *shared, struct IndexPrivateData
  */
 static int op_print(struct IndexSharedData *shared, struct IndexPrivateData *priv, int op)
 {
+#ifdef USE_DEBUG_GRAPHVIZ
+  dump_graphviz_email(shared->email);
+  return IR_SUCCESS;
+#endif
   struct EmailArray ea = ARRAY_HEAD_INITIALIZER;
   ea_add_tagged(&ea, shared->mailbox_view, shared->email, priv->tag_prefix);
   mutt_print_message(shared->mailbox, &ea);

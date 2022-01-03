@@ -90,6 +90,7 @@
 #include "opcodes.h"
 #include "private_data.h"
 #include "recvattach.h"
+#include "debug/lib.h"
 
 /// Help Bar for the Attachment selection dialog
 static const struct Mapping AttachHelp[] = {

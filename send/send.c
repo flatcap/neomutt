@@ -43,6 +43,7 @@
 #include "alias/lib.h"
 #include "gui/lib.h"
 #include "mutt.h"
+#include "debug/lib.h"
 #include "send.h"
 #include "lib.h"
 #include "attach/lib.h"
@@ -2733,9 +2734,13 @@ int mutt_send_message(SendFlags flags, struct Email *e_templ, const char *tempfi
   main_loop:
 
     buf_pretty_mailbox(&fcc);
+    // dump_graphviz_email(e_templ);
     i = mutt_compose_menu(e_templ, &fcc,
                           ((flags & SEND_NO_FREE_HEADER) ? MUTT_COMPOSE_NOFREEHEADER : 0),
                           sub);
+#ifdef USE_DEBUG_GRAPHVIZ
+    dump_graphviz_email(e_templ);
+#endif
     if (i == -1)
     {
 /* abort */
@@ -2815,6 +2820,11 @@ int mutt_send_message(SendFlags flags, struct Email *e_templ, const char *tempfi
   if (e_templ->body->next)
     e_templ->body = mutt_make_multipart(e_templ->body);
 
+#ifdef USE_DEBUG_GRAPHVIZ
+  sleep(1);
+  dump_graphviz_email(e_templ);
+#endif
+
   /* Ok, we need to do it this way instead of handling all fcc stuff in
    * one place in order to avoid going to main_loop with encoded "env"
    * in case of error.  Ugh.  */
@@ -2865,6 +2875,11 @@ int mutt_send_message(SendFlags flags, struct Email *e_templ, const char *tempfi
 
   if (!OptNoCurses)
     mutt_message(_("Sending message..."));
+
+#ifdef USE_DEBUG_GRAPHVIZ
+  sleep(1);
+  dump_graphviz_email(e_templ);
+#endif
 
   mutt_prepare_envelope(e_templ->env, true, sub);
 

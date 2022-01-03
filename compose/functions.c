@@ -81,6 +81,9 @@
 #ifdef USE_IMAP
 #include "imap/lib.h"
 #endif
+#ifdef USE_DEBUG_GRAPHVIZ
+#include "debug/lib.h"
+#endif
 
 /**
  * check_count - Check if there are any attachments
@@ -1856,6 +1859,12 @@ static int op_compose_write_message(struct ComposeSharedData *shared, int op)
  */
 static int op_display_headers(struct ComposeSharedData *shared, int op)
 {
+#ifdef USE_DEBUG_GRAPHVIZ
+  dump_body_one_line(shared->email->body);
+  dump_graphviz_email(shared->email);
+  // dump_graphviz_attach_ctx(shared->adata->actx);
+  return IR_SUCCESS;
+#endif
   if (!check_count(shared->adata->actx))
     return FR_NO_ACTION;
   mutt_attach_display_loop(shared->sub, shared->adata->menu, op, shared->email,

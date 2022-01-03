@@ -1168,6 +1168,7 @@ main
       mutt_list_free(&attach);
     }
 
+    // dump_graphviz_email(e);
     rv = mutt_send_message(sendflags, e, bodyfile, NULL, NULL, NeoMutt->sub);
     /* We WANT the "Mail sent." and any possible, later error */
     log_queue_empty();
