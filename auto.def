@@ -120,6 +120,7 @@ set valid_options {
   debug-backtrace=0         => "DEBUG: Enable backtrace support with libunwind"
   with-backtrace:path       => "Location of libunwind"
   debug-color=0             => "DEBUG: Enable Color dump"
+  debug-compose=0           => "DEBUG: Enable Compose testing"
   debug-email=0             => "DEBUG: Enable Email dump"
   debug-graphviz=0          => "DEBUG: Enable Graphviz dump"
   debug-notify=0            => "DEBUG: Enable Notifications dump"
@@ -167,7 +168,7 @@ if {[llength $notices]} {
 if {1} {
   # Keep sorted, please.
   foreach opt {
-    asan autocrypt bdb compile-commands coverage debug-backtrace debug-color debug-email
+    asan autocrypt bdb compile-commands coverage debug-backtrace debug-color debug-compose debug-email
     debug-graphviz debug-notify debug-queue debug-window doc
     everything fmemopen full-doc fuzzing gdbm gnutls gpgme gsasl gss homespool
     idn2 include-path-in-cflags inotify kyotocabinet lmdb locales-fix lua lz4
@@ -1030,6 +1031,11 @@ if {[get-define want-debug-backtrace]} {
 if {[get-define want-debug-color]} {
   define USE_DEBUG_COLOR 1
   define debug_build 1
+}
+
+# Compose testing
+if {[get-define want-debug-compose]} {
+  define USE_DEBUG_COMPOSE 1
 }
 
 # Email dump

@@ -184,6 +184,9 @@ const struct MenuFuncOp OpCompose[] = { /* map: compose */
 #ifdef USE_AUTOCRYPT
   { "autocrypt-menu",                OP_COMPOSE_AUTOCRYPT_MENU },
 #endif
+#ifdef USE_DEBUG_COMPOSE
+  { "automate",                      OP_COMPOSE_AUTOMATE },
+#endif
   { "copy-file",                     OP_ATTACHMENT_SAVE },
   { "detach-file",                   OP_ATTACHMENT_DETACH },
   { "display-toggle-weed",           OP_DISPLAY_HEADERS },
@@ -874,6 +877,9 @@ const struct MenuOpSeq ComposeDefaultBindings[] = { /* map: compose */
   { OP_ATTACHMENT_VIEW,                    "\r" },             // <Return>
 #ifdef USE_AUTOCRYPT
   { OP_COMPOSE_AUTOCRYPT_MENU,             "o" },
+#endif
+#ifdef USE_DEBUG_COMPOSE
+  { OP_COMPOSE_AUTOMATE,                   "g" },
 #endif
   { OP_COMPOSE_EDIT_FILE,                  "\033e" },          // <Alt-e>
   { OP_COMPOSE_EDIT_MESSAGE,               "e" },

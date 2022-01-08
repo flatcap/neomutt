@@ -29,6 +29,7 @@
  * | :------------------ | :------------------------- |
  * | debug/backtrace.c   | @subpage debug_backtrace   |
  * | debug/common.c      | @subpage debug_common      |
+ * | debug/compose.c     | @subpage debug_compose     |
  * | debug/email.c       | @subpage debug_email       |
  * | debug/graphviz.c    | @subpage debug_graphviz    |
  * | debug/notify.c      | @subpage debug_notify      |
@@ -57,6 +58,9 @@ void        add_flag               (struct Buffer *buf, bool is_set, const char 
 
 // Backtrace
 void show_backtrace(void);
+
+// Compose
+void compose_automate(struct AttachCtx *actx, int *action_num);
 
 // Email
 char        body_name              (const struct Body *b);

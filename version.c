@@ -309,6 +309,9 @@ static const struct CompileOptions DebugOpts[] = {
 #ifdef HAVE_LIBUNWIND
   { "backtrace", 2 },
 #endif
+#ifdef USE_DEBUG_COMPOSE
+  { "compose", 2 },
+#endif
 #ifdef USE_DEBUG_EMAIL
   { "email", 2 },
 #endif
