@@ -597,6 +597,11 @@ void mutt_flushinp(void)
   flushinp();
 }
 
+bool keyboard_buffer_is_empty(void)
+{
+  return (UngetCount == 0) && (MacroBufferCount == 0);
+}
+
 /**
  * mutt_addwch - Addwch would be provided by an up-to-date curses library
  * @param win Window

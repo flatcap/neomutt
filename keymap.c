@@ -689,7 +689,7 @@ struct KeyEvent km_dokey_event(enum MenuType mtype)
     }
 #endif
 
-    tmp = mutt_getch_timeout(i * 1000);
+    tmp = mutt_getch_timeout(i * 10);
 
 #ifdef USE_IMAP
   gotkey:
