@@ -87,6 +87,7 @@ unsigned long cum_attachs_size(struct ConfigSubset *sub, struct ComposeAttachDat
   if (!adata || !adata->actx)
     return 0;
 
+  //QWQ use Body, recursively
   size_t s = 0;
   struct Content *info = NULL;
   struct Body *b = NULL;

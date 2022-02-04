@@ -1,0 +1,16 @@
+mutt_buffer_get_field
+mutt_check_overwrite
+mutt_decode_attachment
+mutt_default_save
+mutt_file_copy_stream
+mutt_file_unlink
+mutt_rfc3676_is_format_flowed
+mutt_rfc3676_space_unstuff_attachment
+mutt_save_attachment
+mutt_save_attachment_list
+mutt_save_confirm
+op_attachment_save
+query_save_attachment
+save_attachment_flowed_helper
+save_attachment_open
+save_without_prompting

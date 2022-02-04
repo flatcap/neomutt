@@ -1,0 +1,86 @@
+save one
+	non-existent file
+	exiting file
+		overwrite
+		append
+	directory
+
+save multiple - foreach
+	non-existent file
+	exiting file
+		overwrite
+		append
+	directory
+
+wants to refresh screen after every save
+	as it prompts and untags, moves selection
+
+special types:
+	ignore multipart
+	mutt_default_save() for message types
+		can save to mailbox!
+	format-flowed
+
+--------------------------------------------------
+
+op_attachment_save()
+	current attachment
+	current body
+	is_tagged
+	menu
+
+mutt_save_attachment_list()
+	$attach_split
+	$attach_sep
+	$attach_save_without_prompting
+
+	opt = no flags
+	foreach tagged
+		body, fp
+
+		SPLIT (attach_split)
+			if attach_save_without_prompting
+				save_without_prompting(fp, top, e)
+			else
+				query_save_attachment(fp, top, e, directory)
+
+		NOT SPLIT
+			buf empty?
+				Q: Save to file:
+					get tfile
+				mutt_check_overwrite()
+					adjusts opt, tfile
+			else
+				opt = append
+			save_attachment_flowed_helper()
+
+		if attach_sep
+			append it (fopen, fprintf, fclose)
+
+save_without_prompting()
+	mutt_default_save()
+	mutt_check_overwrite()
+	save_attachment_flowed_helper()
+
+query_save_attachment
+	mutt_default_save()
+	Q: Save to file:
+	message
+		mutt_save_confirm()
+	else
+		mutt_check_overwrite()
+	save_attachment_flowed_helper()
+
+mutt_check_overwrite()
+	Q: dir: save under?
+	Q: exists: overwrite, append
+
+save_attachment_flowed_helper()
+	if mutt_rfc3676_is_format_flowed()
+		mutt_save_attachment()
+		mutt_rfc3676_space_unstuff_attachment()
+		mutt_save_attachment()
+		mutt_file_unlink()
+	else
+		mutt_save_attachment()
+
