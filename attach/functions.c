@@ -310,6 +310,13 @@ static int op_attachment_print(struct AttachPrivateData *priv, int op)
  */
 static int op_attachment_save(struct AttachPrivateData *priv, int op)
 {
+  // struct AttachCtx *actx = priv->actx;
+  // struct Menu *menu = priv->menu;
+  // struct BodyArray ba = ARRAY_HEAD_INITIALIZER;
+  // ba_add_tagged(&ba, actx, menu);
+  // if (ARRAY_EMPTY(&ba))
+  //   goto done;
+
   struct AttachPtr *cur_att = current_attachment(priv->actx, priv->menu);
   mutt_save_attachment_list(priv->actx, cur_att->fp, priv->menu->tag_prefix,
                             cur_att->body, priv->actx->email, priv->menu);
@@ -318,6 +325,9 @@ static int op_attachment_save(struct AttachPrivateData *priv, int op)
   const int index = menu_get_index(priv->menu) + 1;
   if (!priv->menu->tag_prefix && c_resolve && (index < priv->menu->max))
     menu_set_index(priv->menu, index);
+
+// done:
+//   ARRAY_FREE(&ba);
   return FR_SUCCESS;
 }
 
