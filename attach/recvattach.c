@@ -1238,10 +1238,10 @@ int ba_add_tagged(struct BodyArray *ba, struct AttachCtx *actx, struct Menu *men
   {
     for (int i = 0; i < actx->idxlen; i++)
     {
-      struct Body *b = actx->idx[i]->body;
-      if (b->tagged)
+      struct AttachPtr *aptr = actx->idx[i];
+      if (aptr->body->tagged)
       {
-        ARRAY_ADD(ba, b);
+        ARRAY_ADD(ba, aptr->body);
       }
     }
   }

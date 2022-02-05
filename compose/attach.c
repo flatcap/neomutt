@@ -204,11 +204,11 @@ static int compose_attach_tag(struct Menu *menu, int sel, int act)
 {
   struct ComposeAttachData *adata = menu->mdata;
   struct AttachCtx *actx = adata->actx;
-  struct Body *cur = actx->idx[actx->v2r[sel]]->body;
-  bool ot = cur->tagged;
+  struct AttachPtr *aptr = actx->idx[actx->v2r[sel]];
+  bool ot = aptr->body->tagged;
 
-  cur->tagged = ((act >= 0) ? act : !cur->tagged);
-  return cur->tagged - ot;
+  aptr->body->tagged = ((act >= 0) ? act : !aptr->body->tagged);
+  return aptr->body->tagged - ot;
 }
 
 /**

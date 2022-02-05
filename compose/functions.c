@@ -441,8 +441,9 @@ static int group_attachments(struct ComposeSharedData *shared, char *subtype)
 
   for (int i = 0; i < actx->idxlen; i++)
   {
-    bptr = actx->idx[i]->body;
-    if (bptr->tagged)
+    struct AttachPtr *aptr = actx->idx[i];
+    bptr = aptr->body;
+    if (aptr->body->tagged)
     {
       // set group properties based on first tagged attachment
       if (!bptr_first)
@@ -466,7 +467,7 @@ static int group_attachments(struct ComposeSharedData *shared, char *subtype)
       }
 
       shared->adata->menu->num_tagged--;
-      bptr->tagged = false;
+      aptr->body->tagged = false;
       bptr->aptr->level++;
       bptr->aptr->parent_type = TYPE_MULTIPART;
 
@@ -1160,10 +1161,14 @@ static int op_attachment_group_lingual(struct ComposeSharedData *shared, int op)
   }
 
   /* traverse to see whether all the parts have Content-Language: set */
+  struct AttachCtx *actx = shared->adata->actx;
   int tagged_with_lang_num = 0;
-  for (struct Body *b = shared->email->body; b; b = b->next)
-    if (b->tagged && b->language && *b->language)
+  for (int i = 0; i < actx->idxlen; i++)
+  {
+    struct AttachPtr *aptr = actx->idx[i];
+    if (aptr->body->tagged && aptr->body->language && *aptr->body->language)
       tagged_with_lang_num++;
+  }
 
   if (shared->adata->menu->num_tagged != tagged_with_lang_num)
   {
@@ -1189,19 +1194,21 @@ static int op_attachment_group_related(struct ComposeSharedData *shared, int op)
   }
 
   // ensure Content-ID is set for tagged attachments
-  for (struct Body *b = shared->email->body; b; b = b->next)
+  struct AttachCtx *actx = shared->adata->actx;
+  for (int i = 0; i < actx->idxlen; i++)
   {
-    if (!b->tagged || (b->type == TYPE_MULTIPART))
+    struct AttachPtr *aptr = actx->idx[i];
+    if (!aptr->body->tagged || (aptr->body->type == TYPE_MULTIPART))
       continue;
 
-    char *id = mutt_param_get(&b->parameter, "content-id");
+    char *id = mutt_param_get(&aptr->body->parameter, "content-id");
     if (id)
       continue;
 
     id = gen_cid();
     if (id)
     {
-      mutt_param_set(&b->parameter, "content-id", id);
+      mutt_param_set(&aptr->body->parameter, "content-id", id);
       FREE(&id);
     }
   }
