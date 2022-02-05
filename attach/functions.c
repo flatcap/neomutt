@@ -46,6 +46,7 @@
 #include "private_data.h"
 #include "recvattach.h"
 #include "recvcmd.h"
+#include "debug/lib.h"
 
 /// Error message for unavailable functions
 static const char *Not_available_in_this_menu = N_("Not available in this menu");
@@ -296,9 +297,11 @@ static int op_attachment_pipe(struct AttachPrivateData *priv, int op)
  */
 static int op_attachment_print(struct AttachPrivateData *priv, int op)
 {
-  struct AttachPtr *cur_att = current_attachment(priv->actx, priv->menu);
-  mutt_print_attachment_list(priv->actx, cur_att->fp, priv->menu->tag_prefix,
-                             cur_att->body);
+  dump_graphviz_attach_ctx(priv->actx);
+  dump_graphviz_body(priv->actx->email->body);
+  // struct AttachPtr *cur_att = current_attachment(priv->actx, priv->menu);
+  // mutt_print_attachment_list(priv->actx, cur_att->fp, priv->menu->tag_prefix,
+  //                            cur_att->body);
   return FR_SUCCESS;
 }
 

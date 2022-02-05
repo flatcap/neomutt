@@ -71,7 +71,7 @@
 // #define GV_HIDE_CONFIG
 // #define GV_HIDE_ADATA
 // #define GV_HIDE_MDATA
-// #define GV_HIDE_BODY_CONTENT
+#define GV_HIDE_BODY_CONTENT
 // #define GV_HIDE_ENVELOPE
 
 void dot_email(FILE *fp, struct Email *e, struct ListHead *links);
