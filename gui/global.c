@@ -182,3 +182,72 @@ int global_function_dispatcher(struct MuttWindow *win, int op)
 
   return FR_SUCCESS; // Whatever the outcome, we handled it
 }
+
+/**
+ * traverse_tree - Traverse a tree of Windows to find function to handle an operation
+ * @param win    Window to start at
+ * @param ignore Child Window to ignore
+ * @param op     Operation to perform, e.g. OP_VERSION
+ * @retval num #IndexRetval, e.g. #FR_SUCCESS
+ *
+ * Descend through a tree of Windows.  If a Window has a function dispatcher, run it.
+ * If it can handle the operation, then finish.
+ *
+ * Non-visible windows will be ignored.
+ */
+static int traverse_tree(struct MuttWindow *win, struct MuttWindow *ignore, int op)
+{
+  if (!win || !win->state.visible)
+    return FR_UNKNOWN;
+
+  int rc;
+  if (win->function)
+  {
+    rc = win->function(win, op);
+    if (rc != FR_UNKNOWN)
+      return rc;
+  }
+
+  struct MuttWindow *np = NULL;
+  TAILQ_FOREACH(np, &win->children, entries)
+  {
+    if (np == ignore)
+      continue;
+
+    rc = traverse_tree(np, NULL, op);
+    if (rc != FR_UNKNOWN)
+      return rc;
+  }
+
+  return FR_UNKNOWN;
+}
+
+/**
+ * window_dispatch_function - Search for a handler for an operation
+ * @param win Window to start at
+ * @param op  Operation to perform, e.g. OP_VERSION
+ * @retval num #IndexRetval, e.g. #FR_SUCCESS
+ *
+ * Search through a tree of Windows looking for one with a function dispatcher
+ * that can handle op.
+ *
+ * Start at the given Window, then search it's children.
+ * If that fails climb the tree looking wider for matches.
+ */
+int window_dispatch_function(struct MuttWindow *win, int op)
+{
+  if (!mutt_window_is_visible(win))
+    return FR_UNKNOWN;
+
+  struct MuttWindow *ignore = NULL;
+
+  int rc;
+  for (; win; ignore = win, win = win->parent)
+  {
+    rc = traverse_tree(win, ignore, op);
+    if (rc != FR_UNKNOWN)
+      return rc;
+  }
+
+  return FR_UNKNOWN;
+}

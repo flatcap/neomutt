@@ -179,6 +179,17 @@ struct MuttWindow
    * @retval -1 Error
    */
   int (*repaint)(struct MuttWindow *win);
+
+  /**
+   * @defgroup window_functions function()
+   * @ingroup window_api
+   *
+   * function - Function Dispatcher
+   * @param win Window
+   * @param op  Operation to perform, e.g. OP_VERSION
+   * @retval enum #IndexRetval
+   */
+  int (*function)(struct MuttWindow *win, int op);
 };
 
 typedef uint8_t WindowNotifyFlags; ///< Flags for Changes to a MuttWindow, e.g. #WN_TALLER
