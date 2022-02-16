@@ -109,6 +109,23 @@ struct Address *alias_reverse_lookup(const struct Address *addr)
   return NULL;
 }
 
+const char *mutt_make_version(void)
+{
+  return "";
+}
+
+void mutt_what_key(void)
+{
+}
+
+const struct Mapping RetvalNames[] = {
+  { NULL, 0 },
+};
+
+const char *OpStrings[][2] = {
+  { NULL, NULL },
+};
+
 bool crypt_valid_passphrase(SecurityFlags flags)
 {
   return 0;

@@ -97,6 +97,7 @@
 #include "core/lib.h"
 #include "helpbar/lib.h"
 #include "dialog.h"
+#include "global.h"
 #include "msgcont.h"
 #include "msgwin.h"
 #include "mutt_window.h"
@@ -190,6 +191,7 @@ void rootwin_new(void)
   struct MuttWindow *win_root = mutt_window_new(WT_ROOT, MUTT_WIN_ORIENT_VERTICAL,
                                                 MUTT_WIN_SIZE_FIXED, 0, 0);
   notify_set_parent(win_root->notify, NeoMutt->notify);
+  win_root->function = global_function_dispatcher;
   RootWindow = win_root;
 
   struct MuttWindow *win_helpbar = helpbar_new();

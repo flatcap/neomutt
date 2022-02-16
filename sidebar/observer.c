@@ -112,6 +112,7 @@ static struct MuttWindow *sb_win_init(struct MuttWindow *dlg)
   struct MuttWindow *win_sidebar = mutt_window_new(WT_SIDEBAR, MUTT_WIN_ORIENT_HORIZONTAL,
                                                    MUTT_WIN_SIZE_FIXED, c_sidebar_width,
                                                    MUTT_WIN_SIZE_UNLIMITED);
+  win_sidebar->function = sb_function_dispatcher;
   const bool c_sidebar_visible = cs_subset_bool(NeoMutt->sub, "sidebar_visible");
   win_sidebar->state.visible = c_sidebar_visible && (c_sidebar_width > 0);
 
