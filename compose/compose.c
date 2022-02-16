@@ -336,8 +336,6 @@ int mutt_compose_menu(struct Email *e, struct Buffer *fcc, uint8_t flags,
   update_menu(shared->adata->actx, menu, true);
   notify_send(shared->email->notify, NT_EMAIL, NT_EMAIL_CHANGE, NULL);
 
-  struct MuttWindow *win_env = window_find_child(dlg, WT_CUSTOM);
-
   // ---------------------------------------------------------------------------
   // Event Loop
   int rc = 0;
@@ -362,6 +360,8 @@ int mutt_compose_menu(struct Email *e, struct Buffer *fcc, uint8_t flags,
     mutt_clear_error();
 
     rc = compose_function_dispatcher(dlg, op);
+    if (rc == FR_UNKNOWN)
+      rc = window_dispatch_function(dlg, op);
     if (rc == FR_UNKNOWN)
       rc = env_function_dispatcher(win_env, op);
     if (rc == FR_UNKNOWN)

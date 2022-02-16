@@ -234,6 +234,7 @@ const struct MenuFuncOp OpCompose[] = { /* map: compose */
   { "rename-attachment",             OP_ATTACHMENT_RENAME_ATTACHMENT },
   { "rename-file",                   OP_COMPOSE_RENAME_FILE },
   { "send-message",                  OP_COMPOSE_SEND_MESSAGE },
+  { "show-version",                  OP_VERSION },
   { "smime-menu",                    OP_COMPOSE_SMIME_MENU },
   { "toggle-disposition",            OP_ATTACHMENT_TOGGLE_DISPOSITION },
   { "toggle-recode",                 OP_ATTACHMENT_TOGGLE_RECODE },
@@ -244,6 +245,7 @@ const struct MenuFuncOp OpCompose[] = { /* map: compose */
   { "view-mailcap",                  OP_ATTACHMENT_VIEW_MAILCAP },
   { "view-pager",                    OP_ATTACHMENT_VIEW_PAGER },
   { "view-text",                     OP_ATTACHMENT_VIEW_TEXT },
+  { "what-key",                      OP_WHAT_KEY },
   { "write-fcc",                     OP_COMPOSE_WRITE_MESSAGE },
   { NULL, 0 },
 };

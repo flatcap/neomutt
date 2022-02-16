@@ -558,10 +558,8 @@ int mutt_pager(struct PagerView *pview)
     {
       if ((rc == FR_UNKNOWN) && priv->pview->win_index)
         rc = index_function_dispatcher(priv->pview->win_index, op);
-#ifdef USE_SIDEBAR
       if (rc == FR_UNKNOWN)
-        rc = sb_function_dispatcher(win_sidebar, op);
-#endif
+        rc = window_dispatch_function(priv->pview->win_pager, op);
     }
     if (rc == FR_UNKNOWN)
       rc = global_function_dispatcher(NULL, op);
