@@ -74,6 +74,54 @@ static struct MuttWindow *window_by_posn(struct MuttWindow *win, int col, int ro
   return win;
 }
 
+static void dump_event(MEVENT *event)
+{
+  mutt_debug(LL_DEBUG1, "x = %d, y = %d, z = %d\n", event->x, event->y, event->z);
+
+  unsigned long s = event->bstate;
+
+  // clang-format off
+  if (s & BUTTON_CTRL)            { mutt_debug(LL_DEBUG1, "CTRL\n");         s &= ~BUTTON_CTRL;            }
+  if (s & BUTTON_SHIFT)           { mutt_debug(LL_DEBUG1, "SHIFT\n");        s &= ~BUTTON_SHIFT;           }
+  if (s & BUTTON_ALT)             { mutt_debug(LL_DEBUG1, "ALT\n");          s &= ~BUTTON_ALT;             }
+
+  if (s & BUTTON1_RELEASED)       { mutt_debug(LL_DEBUG1, "BUT1-release\n"); s &= ~BUTTON1_RELEASED;       }
+  if (s & BUTTON1_PRESSED)        { mutt_debug(LL_DEBUG1, "BUT1-pressed\n"); s &= ~BUTTON1_PRESSED;        }
+  if (s & BUTTON1_CLICKED)        { mutt_debug(LL_DEBUG1, "BUT1-clicked\n"); s &= ~BUTTON1_CLICKED;        }
+  if (s & BUTTON1_DOUBLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT1-double\n");  s &= ~BUTTON1_DOUBLE_CLICKED; }
+  if (s & BUTTON1_TRIPLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT1-triple\n");  s &= ~BUTTON1_TRIPLE_CLICKED; }
+
+  if (s & BUTTON2_RELEASED)       { mutt_debug(LL_DEBUG1, "BUT2-release\n"); s &= ~BUTTON2_RELEASED;       }
+  if (s & BUTTON2_PRESSED)        { mutt_debug(LL_DEBUG1, "BUT2-pressed\n"); s &= ~BUTTON2_PRESSED;        }
+  if (s & BUTTON2_CLICKED)        { mutt_debug(LL_DEBUG1, "BUT2-clicked\n"); s &= ~BUTTON2_CLICKED;        }
+  if (s & BUTTON2_DOUBLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT2-double\n");  s &= ~BUTTON2_DOUBLE_CLICKED; }
+  if (s & BUTTON2_TRIPLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT2-triple\n");  s &= ~BUTTON2_TRIPLE_CLICKED; }
+
+  if (s & BUTTON3_RELEASED)       { mutt_debug(LL_DEBUG1, "BUT3-release\n"); s &= ~BUTTON3_RELEASED;       }
+  if (s & BUTTON3_PRESSED)        { mutt_debug(LL_DEBUG1, "BUT3-pressed\n"); s &= ~BUTTON3_PRESSED;        }
+  if (s & BUTTON3_CLICKED)        { mutt_debug(LL_DEBUG1, "BUT3-clicked\n"); s &= ~BUTTON3_CLICKED;        }
+  if (s & BUTTON3_DOUBLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT3-double\n");  s &= ~BUTTON3_DOUBLE_CLICKED; }
+  if (s & BUTTON3_TRIPLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT3-triple\n");  s &= ~BUTTON3_TRIPLE_CLICKED; }
+
+  if (s & BUTTON4_RELEASED)       { mutt_debug(LL_DEBUG1, "BUT4-release\n"); s &= ~BUTTON4_RELEASED;       }
+  if (s & BUTTON4_PRESSED)        { mutt_debug(LL_DEBUG1, "BUT4-pressed\n"); s &= ~BUTTON4_PRESSED;        }
+  if (s & BUTTON4_CLICKED)        { mutt_debug(LL_DEBUG1, "BUT4-clicked\n"); s &= ~BUTTON4_CLICKED;        }
+  if (s & BUTTON4_DOUBLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT4-double\n");  s &= ~BUTTON4_DOUBLE_CLICKED; }
+  if (s & BUTTON4_TRIPLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT4-triple\n");  s &= ~BUTTON4_TRIPLE_CLICKED; }
+
+  if (s & BUTTON5_RELEASED)       { mutt_debug(LL_DEBUG1, "BUT5-release\n"); s &= ~BUTTON5_RELEASED;       }
+  if (s & BUTTON5_PRESSED)        { mutt_debug(LL_DEBUG1, "BUT5-pressed\n"); s &= ~BUTTON5_PRESSED;        }
+  if (s & BUTTON5_CLICKED)        { mutt_debug(LL_DEBUG1, "BUT5-clicked\n"); s &= ~BUTTON5_CLICKED;        }
+  if (s & BUTTON5_DOUBLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT5-double\n");  s &= ~BUTTON5_DOUBLE_CLICKED; }
+  if (s & BUTTON5_TRIPLE_CLICKED) { mutt_debug(LL_DEBUG1, "BUT5-triple\n");  s &= ~BUTTON5_TRIPLE_CLICKED; }
+
+  if (s & 268435456)              { mutt_debug(LL_DEBUG1, "268435456\n"); s &= ~268435456;               }
+  // clang-format on
+
+  if (s != 0)
+    mutt_debug(LL_DEBUG1, "s = %lu\n", s);
+}
+
 /**
  * mouse_handle_event - Process mouse events
  * @param ch Character, from getch()
@@ -87,9 +135,11 @@ bool mouse_handle_event(int ch)
   if (!RootWindow)
     return true;
 
-  MEVENT event;
+  MEVENT event = { 0 };
   if (getmouse(&event) != OK)
     return true;
+
+  dump_event(&event);
 
   struct MuttWindow *win = window_by_posn(RootWindow, event.x, event.y);
 
