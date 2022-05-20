@@ -29,6 +29,7 @@
  * | :------------------ | :------------------------- |
  * | gui/curs_lib.c      | @subpage gui_curs_lib      |
  * | gui/dialog.c        | @subpage gui_dialog        |
+ * | gui/filler.c        | @subpage gui_filler        |
  * | gui/global.c        | @subpage gui_global        |
  * | gui/msgcont.c       | @subpage gui_msgcont       |
  * | gui/msgwin.c        | @subpage gui_msgwin        |
@@ -58,5 +59,7 @@
 #include "simple.h"
 #include "terminal.h"
 // IWYU pragma: end_exports
+
+struct MuttWindow *filler_window_new(int color);
 
 #endif /* MUTT_GUI_LIB_H */
