@@ -676,6 +676,72 @@ static int op_group_reply(struct IndexSharedData *shared,
  */
 static int op_jump(struct IndexSharedData *shared, struct IndexPrivateData *priv, int op)
 {
+  switch (op)
+  {
+    case OP_JUMP_1:
+    {
+      const int size = 10000;
+      struct Progress *progress = progress_new("Read big file", MUTT_PROGRESS_READ, size);
+
+      for (int i = 0; i < 1000; i++)
+      {
+        progress_update(progress, i * 10, -1);
+        window_redraw(NULL);
+        usleep(3000);
+      }
+
+      progress_free(&progress);
+      break;
+    }
+    case OP_JUMP_2:
+    {
+      const int size = 10000;
+      struct Progress *progress = progress_new("Write big file", MUTT_PROGRESS_WRITE, size);
+
+      for (int i = 0; i < 1000; i++)
+      {
+        progress_update(progress, i * 10, -1);
+        window_redraw(NULL);
+        usleep(3000);
+      }
+
+      progress_free(&progress);
+      break;
+    }
+    case OP_JUMP_3:
+    {
+      const int size = 10000000;
+      struct Progress *progress = progress_new("Big network traffic",
+                                               MUTT_PROGRESS_NET, size);
+
+      for (int i = 0; i < 1000; i++)
+      {
+        progress_update(progress, i * 10000, -1);
+        window_redraw(NULL);
+        usleep(3000);
+      }
+
+      progress_free(&progress);
+      break;
+    }
+    case OP_JUMP_4:
+    {
+      struct Progress *progress = progress_new("Big continuous file", MUTT_PROGRESS_READ, 0);
+
+      for (int i = 0; i < 1000; i++)
+      {
+        progress_update(progress, i, i / 10);
+        window_redraw(NULL);
+        usleep(3000);
+      }
+
+      progress_free(&progress);
+      break;
+    }
+  }
+
+  return FR_SUCCESS;
+#if 0
   int rc = FR_ERROR;
   struct Buffer *buf = buf_pool_get();
 
@@ -720,6 +786,7 @@ static int op_jump(struct IndexSharedData *shared, struct IndexPrivateData *priv
 
   buf_pool_release(&buf);
   return rc;
+#endif
 }
 
 /**
