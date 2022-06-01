@@ -453,6 +453,17 @@ bool editor_buffer_is_empty(struct EnterState *es)
 }
 
 /**
+ * editor_buffer_get_buffer - XXX
+ */
+const wchar_t *editor_buffer_get_buffer(struct EnterState *es)
+{
+  if (!es)
+    return NULL;
+
+  return es->wbuf;
+}
+
+/**
  * editor_buffer_get_lastchar - Get the position of the last character
  * @param es State of the Enter buffer
  * @retval num Position of last character
@@ -501,6 +512,17 @@ size_t editor_buffer_set_cursor(struct EnterState *es, size_t pos)
 }
 
 /**
+ * editor_buffer_get_buflen - XXX
+ */
+int editor_buffer_get_buflen(struct EnterState *es)
+{
+  if (!es)
+    return 0;
+
+  return es->wbuflen;
+}
+
+/**
  * editor_buffer_set - Set the string in the buffer
  * @param es  State of the Enter buffer
  * @param str String to set
@@ -512,6 +534,7 @@ int editor_buffer_set(struct EnterState *es, const char *str)
   if (!es)
     return 0;
 
+  //QWQ range check buffer?
   es->wbuflen = 0;
   es->lastchar = mutt_mb_mbstowcs(&es->wbuf, &es->wbuflen, 0, str);
   es->curpos = es->lastchar;

@@ -37,6 +37,7 @@ typedef uint8_t NotifyEnter;          ///< Flags, e.g. #NT_ENTER_CURSOR
  */
 struct EnterState
 {
+  //QWQ rename * to a_b
   wchar_t *wbuf;         ///< Buffer for the string being entered
   size_t wbuflen;        ///< Length of buffer
   size_t lastchar;       ///< Position of the last character
