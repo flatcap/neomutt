@@ -76,6 +76,8 @@ static int my_addwch(struct MuttWindow *win, wchar_t wc)
   int n = wcwidth(wc);
   if (IsWPrint(wc) && (n > 0))
     return mutt_addwch(win, wc);
+  if (IsWPrint(wc) && (wcwidth(wc) == 0))
+    return mutt_addwch(win, wc);
   if (!(wc & ~0x7f))
     return mutt_window_printf(win, "^%c", ((int) wc + 0x40) & 0x7f);
   if (!(wc & ~0xffff))
