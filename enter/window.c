@@ -115,9 +115,9 @@ bool self_insert(struct EnterWindowData *wdata, int ch)
     }
   }
 
-  if (wdata->first && (wdata->flags & MUTT_COMP_CLEAR))
+  if (wdata->flags & MUTT_COMP_CLEAR)
   {
-    wdata->first = false;
+    wdata->flags &= ~MUTT_COMP_CLEAR;
     if (IsWPrint(wc)) /* why? */
     {
       wdata->state->curpos = 0;
@@ -329,7 +329,6 @@ int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complet
                    event.op);
       }
 
-      wdata.first = false;
       if ((event.op != OP_EDITOR_COMPLETE) && (event.op != OP_EDITOR_COMPLETE_QUERY))
         wdata.tabs = 0;
       wdata.redraw = ENTER_REDRAW_LINE;

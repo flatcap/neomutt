@@ -469,7 +469,6 @@ static int op_editor_mailbox_cycle(struct EnterWindowData *wdata, int op)
 {
   if (wdata->flags & MUTT_COMP_FILE_MBOX)
   {
-    wdata->first = true; /* clear input if user types a real key later */
     mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
 
     struct Buffer *pool = buf_pool_get();

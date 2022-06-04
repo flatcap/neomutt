@@ -58,7 +58,6 @@ struct EnterWindowData
   // Local variables
   enum EnterRedrawFlags redraw;   ///< What needs redrawing? See #EnterRedrawFlags
   bool pass;                      ///< Password mode, conceal characters
-  bool first;                     ///< First time through, no input yet
   enum HistoryClass hclass;       ///< History to use, e.g. #HC_COMMAND
   wchar_t *tempbuf;               ///< Buffer used by completion
   size_t templen;                 ///< Length of complete buffer
