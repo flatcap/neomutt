@@ -61,7 +61,6 @@ struct EnterWindowData
   enum HistoryClass hclass;       ///< History to use, e.g. #HC_COMMAND
   wchar_t *tempbuf;               ///< Buffer used by completion
   size_t templen;                 ///< Length of complete buffer
-  mbstate_t *mbstate;             ///< Multi-byte state
   int tabs;                       ///< Number of times the user has hit tab
 
   bool done;                      ///< Is text-entry done?
