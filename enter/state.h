@@ -30,11 +30,12 @@
  */
 struct EnterState
 {
-  wchar_t *wbuf;   ///< Buffer for the string being entered
-  size_t wbuflen;  ///< Length of buffer
-  size_t lastchar; ///< Position of the last character
-  size_t curpos;   ///< Position of the cursor
-  size_t begin;    ///< Position of the start
+  wchar_t *wbuf;         ///< Buffer for the string being entered
+  size_t wbuflen;        ///< Length of buffer
+  size_t lastchar;       ///< Position of the last character
+  size_t curpos;         ///< Position of the cursor
+  size_t begin;          ///< Position of the start
+  mbstate_t mbstate;     ///< Multi-byte state
 };
 
 void               enter_state_free(struct EnterState **ptr);

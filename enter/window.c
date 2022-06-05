@@ -103,14 +103,14 @@ bool self_insert(struct EnterWindowData *wdata, int ch)
   /* gather the bytes into a wide character */
   {
     char c = ch;
-    size_t k = mbrtowc(&wc, &c, 1, wdata->mbstate);
+    size_t k = mbrtowc(&wc, &c, 1, &wdata->state->mbstate);
     if (k == ICONV_BUF_TOO_SMALL)
     {
       return false;
     }
     else if ((k != 0) && (k != 1))
     {
-      memset(wdata->mbstate, 0, sizeof(*wdata->mbstate));
+      memset(&wdata->state->mbstate, 0, sizeof(wdata->state->mbstate));
       return false;
     }
   }
@@ -221,12 +221,11 @@ int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complet
     mutt_window_get_coords(win, &col, NULL);
 
     int width = win->state.cols - col - 1;
-    mbstate_t mbstate = { 0 };
 
     // clang-format off
     struct EnterWindowData wdata = { buf->data, buf->dsize, col, complete,
       multiple, m, files, numfiles, es, ENTER_REDRAW_NONE,
-      (complete & MUTT_COMP_PASS), true, 0, NULL, 0, &mbstate, 0, false, NULL };
+      (complete & MUTT_COMP_PASS), true, 0, NULL, 0, 0, false, NULL };
     // clang-format on
     win->wdata = &wdata;
 
