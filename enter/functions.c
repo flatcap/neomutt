@@ -59,7 +59,7 @@ static void replace_part(struct EnterState *es, size_t from, const char *buf)
 {
   {
     char str[256] = { 0 };
-    mutt_mb_wcstombs(str, sizeof(str), state->wbuf, state->lastchar);
+    editor_buffer_get_buffer(state, BR_ENTIRE_BUFFER, str, sizeof(str));
     mutt_debug(LL_DEBUG1, "BEFORE: >>%s<< (%ld)\n", str, from);
   }
   /* Save the suffix */
@@ -88,7 +88,7 @@ static void replace_part(struct EnterState *es, size_t from, const char *buf)
   es->lastchar = es->curpos + savelen;
   {
     char str[256] = { 0 };
-    mutt_mb_wcstombs(str, sizeof(str), es->wbuf, es->lastchar);
+    editor_buffer_get_buffer(es, BR_ENTIRE_BUFFER, str, sizeof(str));
     mutt_debug(LL_DEBUG1, "AFTER:  >>%s<<\n", str);
   }
 }
@@ -349,13 +349,11 @@ static int complete_file_mbox(struct EnterWindowData *wdata)
  */
 static int complete_nm_query(struct EnterWindowData *wdata)
 {
-  const wchar_t *wbuf = editor_buffer_get_buffer(wdata->state);
-  const int curpos = editor_buffer_get_cursor(wdata->state);
-
   int rc = FR_SUCCESS;
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wbuf, curpos);
-  size_t len = strlen(wdata->buf);
-  if (!mutt_nm_query_complete(wdata->cd, wdata->buf, wdata->buflen, len, wdata->tabs))
+
+  editor_buffer_get_buffer(wdata->state, BR_START_TO_CURSOR, wdata->buf, wdata->buflen);
+  const size_t len = strlen(wdata->buf);
+  if (!mutt_nm_query_complete(wdata->buf, wdata->buflen, len, wdata->tabs))
     rc = FR_ERROR;
 
   replace_part(wdata->state, 0, wdata->buf);

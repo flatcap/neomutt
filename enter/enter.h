@@ -54,7 +54,16 @@ int editor_kill_whole_line(struct EnterState *es);
 int editor_kill_word      (struct EnterState *es);
 int editor_transpose_chars(struct EnterState *es);
 
-const wchar_t *editor_buffer_get_buffer  (struct EnterState *es);
+/**
+ * enum BufferRegion - Which part of the buffer to get
+ */
+enum BufferRegion
+{
+  BR_START_TO_CURSOR,    ///< Get the text before the cursor
+  BR_ENTIRE_BUFFER,      ///< Get all the text
+};
+
+void           editor_buffer_get_buffer  (struct EnterState *es, enum BufferRegion br, char *buf, size_t buflen);
 size_t         editor_buffer_get_cursor  (struct EnterState *es);
 size_t         editor_buffer_get_lastchar(struct EnterState *es);
 bool           editor_buffer_is_empty    (struct EnterState *es);

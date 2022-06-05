@@ -453,14 +453,20 @@ bool editor_buffer_is_empty(struct EnterState *es)
 }
 
 /**
- * editor_buffer_get_buffer - XXX
+ * editor_buffer_get_buffer - Extract the text from the buffer
+ * @param es     State of the Enter buffer
+ * @param br     Which part to get, e.g. #BR_ENTIRE_BUFFER
+ * @param buf    Buffer for the result
+ * @param buflen Length of the buffer
  */
-const wchar_t *editor_buffer_get_buffer(struct EnterState *es)
+void editor_buffer_get_buffer(struct EnterState *es, enum BufferRegion br, char *buf, size_t buflen)
 {
-  if (!es)
-    return NULL;
+  if (!es || !buf || (buflen == 0))
+    return;
 
-  return es->wbuf;
+  const size_t end = (br == BR_START_TO_CURSOR) ? es->curpos : es->lastchar;
+
+  mutt_mb_wcstombs(buf, buflen, es->wbuf, end);
 }
 
 /**
