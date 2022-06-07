@@ -58,6 +58,7 @@ int editor_backspace(struct EnterState *es)
           (es->lastchar - es->curpos) * sizeof(wchar_t));
   es->lastchar -= es->curpos - i;
   es->curpos = i;
+  es->wbuf[es->lastchar] = L'\0';
 
   return FR_SUCCESS;
 }
@@ -166,6 +167,7 @@ int editor_delete_char(struct EnterState *es)
     i++;
   memmove(es->wbuf + es->curpos, es->wbuf + i, (es->lastchar - i) * sizeof(wchar_t));
   es->lastchar -= i - es->curpos;
+  es->wbuf[es->lastchar] = L'\0';
 
   return FR_SUCCESS;
 }
@@ -240,6 +242,7 @@ int editor_kill_eol(struct EnterState *es)
     return FR_ERROR;
 
   es->lastchar = es->curpos;
+  es->wbuf[es->lastchar] = L'\0';
   return FR_SUCCESS;
 }
 
@@ -279,6 +282,7 @@ int editor_kill_eow(struct EnterState *es)
 
   memmove(es->wbuf + es->curpos, es->wbuf + i, (es->lastchar - i) * sizeof(wchar_t));
   es->lastchar += es->curpos - i;
+  es->wbuf[es->lastchar] = L'\0';
   return FR_SUCCESS;
 }
 
@@ -299,6 +303,7 @@ int editor_kill_line(struct EnterState *es)
 
   es->lastchar = len;
   es->curpos = 0;
+  es->wbuf[es->lastchar] = L'\0';
 
   return FR_SUCCESS;
 }
@@ -316,6 +321,7 @@ int editor_kill_whole_line(struct EnterState *es)
 
   es->lastchar = 0;
   es->curpos = 0;
+  es->wbuf[es->lastchar] = L'\0';
 
   return FR_SUCCESS;
 }
@@ -350,6 +356,7 @@ int editor_kill_word(struct EnterState *es)
           (es->lastchar - es->curpos) * sizeof(wchar_t));
   es->lastchar += i - es->curpos;
   es->curpos = i;
+  es->wbuf[es->lastchar] = L'\0';
 
   return FR_SUCCESS;
 }
