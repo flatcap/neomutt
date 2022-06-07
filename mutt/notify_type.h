@@ -42,6 +42,7 @@ enum NotifyType
   NT_COMMAND,   ///< A Command has been executed,   #Command
   NT_CONFIG,    ///< Config has changed,            #NotifyConfig,    #EventConfig
   NT_EMAIL,     ///< Email has changed,             #NotifyEmail,     #EventEmail
+  NT_ENTER,     ///< EnterState has changed,        #NotifyEnter
   NT_ENVELOPE,  ///< Envelope has changed,          #NotifyEnvelope
   NT_GLOBAL,    ///< Not object-related,            #NotifyGlobal
   NT_HEADER,    ///< A header has changed,          #NotifyHeader     #EventHeader

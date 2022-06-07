@@ -43,6 +43,8 @@ void enter_state_free(struct EnterState **ptr)
   struct EnterState *es = *ptr;
 
   FREE(&es->wbuf);
+  notify_free(&es->notify);
+
   FREE(ptr);
 }
 
@@ -76,6 +78,19 @@ struct EnterState *enter_state_new(void)
   struct EnterState *es = mutt_mem_calloc(1, sizeof(struct EnterState));
 
   enter_state_resize(es, 1);
+  es->notify = notify_new();
 
   return es;
+}
+
+/**
+ * enter_state_get_notify - Get state's notification object
+ * @retval ptr Notification object
+ */
+struct Notify *enter_state_get_notify(struct EnterState *es)
+{
+  if (!es)
+    return NULL;
+
+  return es->notify;
 }
