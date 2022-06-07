@@ -34,6 +34,9 @@
 #include "core/lib.h"
 #include "enter.h"
 #include "state.h" // IWYU pragma: keep
+#ifdef USE_DEBUG_ENTER
+#include "debug.h"
+#endif
 
 /// combining mark / non-spacing character
 #define COMB_CHAR(wc) (IsWPrint(wc) && (wcwidth(wc) == 0))
@@ -49,6 +52,7 @@ int editor_backspace(struct EnterState *es)
   if (!es || (es->curpos == 0))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   size_t i = es->curpos;
   while ((i > 0) && COMB_CHAR(es->wbuf[i - 1]))
     i--;
@@ -59,6 +63,7 @@ int editor_backspace(struct EnterState *es)
   es->lastchar -= es->curpos - i;
   es->curpos = i;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -74,10 +79,12 @@ int editor_backward_char(struct EnterState *es)
   if (!es || (es->curpos == 0))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   while (es->curpos && COMB_CHAR(es->wbuf[es->curpos - 1]))
     es->curpos--;
   if (es->curpos)
     es->curpos--;
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -93,10 +100,12 @@ int editor_backward_word(struct EnterState *es)
   if (!es || (es->curpos == 0))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   while (es->curpos && iswspace(es->wbuf[es->curpos - 1]))
     es->curpos--;
   while (es->curpos && !iswspace(es->wbuf[es->curpos - 1]))
     es->curpos--;
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -112,7 +121,10 @@ int editor_bol(struct EnterState *es)
   if (!es)
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   es->curpos = 0;
+  enter_dump_buffer(es);
+
   return FR_SUCCESS;
 }
 
@@ -128,6 +140,7 @@ int editor_case_word(struct EnterState *es, enum EnterCase ec)
   if (!es || (es->curpos == es->lastchar))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   while ((es->curpos < es->lastchar) && iswspace(es->wbuf[es->curpos]))
   {
     es->curpos++;
@@ -146,6 +159,8 @@ int editor_case_word(struct EnterState *es, enum EnterCase ec)
     }
     es->curpos++;
   }
+  enter_dump_buffer(es);
+
   return FR_SUCCESS;
 }
 
@@ -160,6 +175,7 @@ int editor_delete_char(struct EnterState *es)
   if (!es || (es->curpos == es->lastchar))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   size_t i = es->curpos;
   if (i < es->lastchar)
     i++;
@@ -168,6 +184,7 @@ int editor_delete_char(struct EnterState *es)
   memmove(es->wbuf + es->curpos, es->wbuf + i, (es->lastchar - i) * sizeof(wchar_t));
   es->lastchar -= i - es->curpos;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -183,7 +200,10 @@ int editor_eol(struct EnterState *es)
   if (!es)
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   es->curpos = es->lastchar;
+  enter_dump_buffer(es);
+
   return FR_SUCCESS;
 }
 
@@ -198,11 +218,13 @@ int editor_forward_char(struct EnterState *es)
   if (!es || (es->curpos == es->lastchar))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   es->curpos++;
   while ((es->curpos < es->lastchar) && COMB_CHAR(es->wbuf[es->curpos]))
   {
     es->curpos++;
   }
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -218,6 +240,7 @@ int editor_forward_word(struct EnterState *es)
   if (!es || (es->curpos == es->lastchar))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   while ((es->curpos < es->lastchar) && iswspace(es->wbuf[es->curpos]))
   {
     es->curpos++;
@@ -226,6 +249,7 @@ int editor_forward_word(struct EnterState *es)
   {
     es->curpos++;
   }
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -241,8 +265,11 @@ int editor_kill_eol(struct EnterState *es)
   if (!es)
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   es->lastchar = es->curpos;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
+
   return FR_SUCCESS;
 }
 
@@ -257,6 +284,7 @@ int editor_kill_eow(struct EnterState *es)
   if (!es)
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   /* first skip over whitespace */
   size_t i;
   for (i = es->curpos; (i < es->lastchar) && iswspace(es->wbuf[i]); i++)
@@ -283,6 +311,8 @@ int editor_kill_eow(struct EnterState *es)
   memmove(es->wbuf + es->curpos, es->wbuf + i, (es->lastchar - i) * sizeof(wchar_t));
   es->lastchar += es->curpos - i;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
+
   return FR_SUCCESS;
 }
 
@@ -297,6 +327,7 @@ int editor_kill_line(struct EnterState *es)
   if (!es)
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   size_t len = es->lastchar - es->curpos;
 
   memmove(es->wbuf, es->wbuf + es->curpos, len * sizeof(wchar_t));
@@ -304,6 +335,7 @@ int editor_kill_line(struct EnterState *es)
   es->lastchar = len;
   es->curpos = 0;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -319,9 +351,11 @@ int editor_kill_whole_line(struct EnterState *es)
   if (!es)
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   es->lastchar = 0;
   es->curpos = 0;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -337,6 +371,7 @@ int editor_kill_word(struct EnterState *es)
   if (!es || (es->curpos == 0))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   size_t i = es->curpos;
   while (i && iswspace(es->wbuf[i - 1]))
     i--;
@@ -357,6 +392,7 @@ int editor_kill_word(struct EnterState *es)
   es->lastchar += i - es->curpos;
   es->curpos = i;
   es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
@@ -372,6 +408,7 @@ int editor_transpose_chars(struct EnterState *es)
   if (!es || (es->lastchar < 2))
     return FR_ERROR;
 
+  enter_dump_buffer(es);
   if (es->curpos == 0)
     es->curpos = 2;
   else if (es->curpos < es->lastchar)
@@ -380,6 +417,7 @@ int editor_transpose_chars(struct EnterState *es)
   wchar_t wc = es->wbuf[es->curpos - 2];
   es->wbuf[es->curpos - 2] = es->wbuf[es->curpos - 1];
   es->wbuf[es->curpos - 1] = wc;
+  enter_dump_buffer(es);
 
   return FR_SUCCESS;
 }
