@@ -63,6 +63,7 @@ struct EnterWindowData
   wchar_t *tempbuf;               ///< Buffer used by completion
   size_t templen;                 ///< Length of complete buffer
   int tabs;                       ///< Number of times the user has hit tab
+  size_t begin;                   ///< Position of the start
 
   bool done;                      ///< Is text-entry done?
 

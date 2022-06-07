@@ -34,7 +34,6 @@ struct EnterState
   size_t wbuflen;        ///< Length of buffer
   size_t lastchar;       ///< Position of the last character
   size_t curpos;         ///< Position of the cursor
-  size_t begin;          ///< Position of the start
   mbstate_t mbstate;     ///< Multi-byte state
 };
 
