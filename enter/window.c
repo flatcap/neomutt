@@ -225,7 +225,7 @@ int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complet
     // clang-format off
     struct EnterWindowData wdata = { buf, col, complete,
       multiple, m, files, numfiles, es, ENTER_REDRAW_NONE,
-      (complete & MUTT_COMP_PASS), true, 0, NULL, 0, 0, false, NULL };
+      (complete & MUTT_COMP_PASS), true, 0, NULL, 0, 0, 0, false, NULL };
     // clang-format on
     win->wdata = &wdata;
 
@@ -267,21 +267,22 @@ int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complet
         {
           /* Go to end of line */
           wdata.state->curpos = wdata.state->lastchar;
-          wdata.state->begin = mutt_mb_width_ceiling(
+          wdata.begin = mutt_mb_width_ceiling(
               wdata.state->wbuf, wdata.state->lastchar,
               mutt_mb_wcswidth(wdata.state->wbuf, wdata.state->lastchar) - width + 1);
         }
-        if ((wdata.state->curpos < wdata.state->begin) ||
-            (mutt_mb_wcswidth(wdata.state->wbuf + wdata.state->begin,
-                              wdata.state->curpos - wdata.state->begin) >= width))
+        if ((wdata.state->curpos < wdata.begin) ||
+            (mutt_mb_wcswidth(wdata.state->wbuf + wdata.begin,
+                              wdata.state->curpos - wdata.begin) >= width))
         {
-          wdata.state->begin = mutt_mb_width_ceiling(
-              wdata.state->wbuf, wdata.state->lastchar,
-              mutt_mb_wcswidth(wdata.state->wbuf, wdata.state->curpos) - (width / 2));
+          wdata.begin = mutt_mb_width_ceiling(wdata.state->wbuf, wdata.state->lastchar,
+                                              mutt_mb_wcswidth(wdata.state->wbuf,
+                                                               wdata.state->curpos) -
+                                                  (width / 2));
         }
         mutt_window_move(win, wdata.col, 0);
         int w = 0;
-        for (size_t i = wdata.state->begin; i < wdata.state->lastchar; i++)
+        for (size_t i = wdata.begin; i < wdata.state->lastchar; i++)
         {
           w += mutt_mb_wcwidth(wdata.state->wbuf[i]);
           if (w > width)
@@ -291,8 +292,8 @@ int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complet
         mutt_window_clrtoeol(win);
         mutt_window_move(win,
                          wdata.col +
-                             mutt_mb_wcswidth(wdata.state->wbuf + wdata.state->begin,
-                                              wdata.state->curpos - wdata.state->begin),
+                             mutt_mb_wcswidth(wdata.state->wbuf + wdata.begin,
+                                              wdata.state->curpos - wdata.begin),
                          0);
       }
 
