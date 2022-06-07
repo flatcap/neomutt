@@ -63,6 +63,7 @@ int editor_backspace(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -84,6 +85,7 @@ int editor_backward_char(struct EnterState *es)
     es->curpos--;
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return FR_SUCCESS;
 }
 
@@ -105,6 +107,7 @@ int editor_backward_word(struct EnterState *es)
     es->curpos--;
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return FR_SUCCESS;
 }
 
@@ -123,6 +126,7 @@ int editor_bol(struct EnterState *es)
   es->curpos = 0;
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return FR_SUCCESS;
 }
 
@@ -159,6 +163,7 @@ int editor_case_word(struct EnterState *es, enum EnterCase ec)
   }
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -184,6 +189,7 @@ int editor_delete_char(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -202,6 +208,7 @@ int editor_eol(struct EnterState *es)
   es->curpos = es->lastchar;
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return FR_SUCCESS;
 }
 
@@ -224,6 +231,7 @@ int editor_forward_char(struct EnterState *es)
   }
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return FR_SUCCESS;
 }
 
@@ -249,6 +257,7 @@ int editor_forward_word(struct EnterState *es)
   }
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return FR_SUCCESS;
 }
 
@@ -268,6 +277,7 @@ int editor_kill_eol(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -311,6 +321,7 @@ int editor_kill_eow(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -335,6 +346,7 @@ int editor_kill_line(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -355,6 +367,7 @@ int editor_kill_whole_line(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -392,6 +405,7 @@ int editor_kill_word(struct EnterState *es)
   es->wbuf[es->lastchar] = L'\0';
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -417,6 +431,7 @@ int editor_transpose_chars(struct EnterState *es)
   es->wbuf[es->curpos - 1] = wc;
   enter_dump_buffer(es);
 
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return FR_SUCCESS;
 }
 
@@ -479,6 +494,7 @@ size_t editor_buffer_set_cursor(struct EnterState *es, size_t pos)
     pos = es->lastchar;
 
   es->curpos = pos;
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR, NULL);
   return pos;
 }
 
@@ -497,5 +513,6 @@ int editor_buffer_set(struct EnterState *es, const char *str)
   es->wbuflen = 0;
   es->lastchar = mutt_mb_mbstowcs(&es->wbuf, &es->wbuflen, 0, str);
   es->curpos = es->lastchar;
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return es->lastchar;
 }

@@ -25,6 +25,13 @@
 
 #include <wchar.h>
 
+// Observers of #NT_ENTER will not be passed any Event data.
+typedef uint8_t NotifyEnter;          ///< Flags, e.g. #NT_ENTER_CURSOR
+#define NT_ENTER_NO_FLAGS         0   ///< No flags are set
+#define NT_ENTER_CURSOR     (1 << 0)  ///< Cursor has moved
+#define NT_ENTER_TEXT       (1 << 1)  ///< Text has changed
+#define NT_ENTER_VIEW       (1 << 2)  ///< View has changed
+
 /**
  * struct EnterState - Keep our place when entering a string
  */
@@ -35,9 +42,11 @@ struct EnterState
   size_t lastchar;       ///< Position of the last character
   size_t curpos;         ///< Position of the cursor
   mbstate_t mbstate;     ///< Multi-byte state
+  struct Notify *notify; ///< Notifications: #NotifyEnter
 };
 
 void               enter_state_free(struct EnterState **ptr);
+struct Notify *    enter_state_get_notify(struct EnterState *es);
 struct EnterState *enter_state_new(void);
 void               enter_state_resize(struct EnterState *es, size_t num);
 

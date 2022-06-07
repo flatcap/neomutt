@@ -194,6 +194,8 @@ int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complet
   int col = 0;
 
   struct EnterState *es = enter_state_new();
+  struct Notify *notify = enter_state_get_notify(es);
+  notify_set_parent(notify, NeoMutt->notify);
 
   const struct Mapping *old_help = win->help_data;
   int old_menu = win->help_menu;
