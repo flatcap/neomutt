@@ -34,14 +34,15 @@ void test_mutt_mb_wcstombs(void)
 
   {
     wchar_t src[32] = L"apple";
-    mutt_mb_wcstombs(NULL, 10, src, 5);
+    mutt_mb_wcstombs(src, 5, NULL);
     TEST_CHECK_(1, "mutt_mb_wcstombs(NULL, 10, src, 5)");
   }
 
   {
-    char buf[32] = { 0 };
-    mutt_mb_wcstombs(buf, sizeof(buf), NULL, 3);
+    struct Buffer *buf = buf_pool_get();
+    mutt_mb_wcstombs(NULL, 3, buf);
     TEST_CHECK_(1, "mutt_mb_wcstombs(buf, sizeof(buf), NULL, 3)");
+    buf_pool_release(&buf);
   }
 
   {
@@ -64,15 +65,16 @@ void test_mutt_mb_wcstombs(void)
       // clang-format on
     };
 
-    char buf[256];
+    struct Buffer *buf = buf_pool_get();
     for (size_t i = 0; test[i].src; i++)
     {
-      memset(buf, 0, sizeof(buf));
+      buf_reset(buf);
       TEST_CASE(test[i].name);
       size_t len = wcslen(test[i].src);
-      mutt_mb_wcstombs(buf, sizeof(buf), test[i].src, len);
+      mutt_mb_wcstombs(test[i].src, len, buf);
 
-      TEST_CHECK_STR_EQ(buf, test[i].expected);
+      TEST_CHECK(mutt_str_equal(buf_string(buf), test[i].expected));
     }
+    buf_pool_release(&buf);
   }
 }
