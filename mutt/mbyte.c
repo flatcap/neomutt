@@ -229,58 +229,32 @@ size_t mutt_mb_width_ceiling(const wchar_t *s, size_t n, int w1)
 
 /**
  * mutt_mb_wcstombs - Convert a string from wide to multibyte characters
- * @param dest Buffer for the result
- * @param dlen Length of the result buffer
- * @param src Source string to convert
- * @param slen Length of the source string
+ * @param src    Source string to convert
+ * @param srclen Length of the source string
+ * @param buf    Buffer for the result
  */
-void mutt_mb_wcstombs(char *dest, size_t dlen, const wchar_t *src, size_t slen)
+void mutt_mb_wcstombs(const wchar_t *src, size_t srclen, struct Buffer *buf)
 {
-  if (!dest || !src)
+  if (!src || !buf)
     return;
+
+  // This will be enough for ASCII with some UTF-8 characters
+  buf_alloc(buf, srclen * 2);
 
   mbstate_t mbstate = { 0 };
-  size_t k;
-
-  /* First convert directly into the destination buffer */
-  for (; slen && (dlen >= MB_LEN_MAX); dest += k, dlen -= k, src++, slen--)
+  size_t offset = 0;
+  for (size_t i = 0; i < srclen; i++)
   {
-    k = wcrtomb(dest, *src, &mbstate);
+    // Allocate more space, if necessary
+    buf_alloc(buf, offset + MB_LEN_MAX);
+
+    size_t k = wcrtomb(buf->data + offset, src[i], &mbstate);
     if (k == ICONV_ILLEGAL_SEQ)
       break;
+    offset += k;
   }
 
-  /* If this works, we can stop now */
-  if (dlen >= MB_LEN_MAX)
-  {
-    dest += wcrtomb(dest, 0, &mbstate);
-    return;
-  }
-
-  /* Otherwise convert any remaining data into a local buffer */
-  {
-    char buf[3 * MB_LEN_MAX];
-    char *p = buf;
-
-    for (; slen && p - buf < dlen; p += k, src++, slen--)
-    {
-      k = wcrtomb(p, *src, &mbstate);
-      if (k == ICONV_ILLEGAL_SEQ)
-        break;
-    }
-    p += wcrtomb(p, 0, &mbstate);
-
-    /* If it fits into the destination buffer, we can stop now */
-    if (p - buf <= dlen)
-    {
-      memcpy(dest, buf, p - buf);
-      return;
-    }
-
-    /* Otherwise we truncate the string in an ugly fashion */
-    memcpy(dest, buf, dlen);
-    dest[dlen - 1] = '\0'; /* assume original dlen > 0 */
-  }
+  buf->data[offset] = '\0'; // nul-terminate the string
 }
 
 /**

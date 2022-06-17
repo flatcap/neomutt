@@ -102,15 +102,14 @@ static int complete_file_simple(struct EnterWindowData *wdata)
        (i > 0) && !mutt_mb_is_shell_char(wdata->state->wbuf[i - 1]); i--)
   {
   }
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf + i,
-                   wdata->state->curpos - i);
+  mutt_mb_wcstombs(wdata->state->wbuf + i, wdata->state->curpos - i, wdata->buf);
   if (wdata->tempbuf && (wdata->templen == (wdata->state->lastchar - i)) &&
       (memcmp(wdata->tempbuf, wdata->state->wbuf + i,
               (wdata->state->lastchar - i) * sizeof(wchar_t)) == 0))
   {
-    mutt_select_file(wdata->buf, wdata->buflen, MUTT_SEL_NO_FLAGS, wdata->m, NULL, NULL);
-    if (wdata->buf[0] != '\0')
-      replace_part(wdata->state, i, wdata->buf);
+    buf_select_file(wdata->buf, MUTT_SEL_NO_FLAGS, wdata->m, NULL, NULL);
+    if (!buf_is_empty(wdata->buf))
+      replace_part(wdata->state, i, buf_string(wdata->buf));
     return FR_CONTINUE;
   }
 
@@ -125,7 +124,7 @@ static int complete_file_simple(struct EnterWindowData *wdata)
     rc = FR_ERROR;
   }
 
-  replace_part(wdata->state, i, wdata->buf);
+  replace_part(wdata->state, i, buf_string(wdata->buf));
   return rc;
 }
 
@@ -146,10 +145,9 @@ static int complete_alias_complete(struct EnterWindowData *wdata)
   for (; (i < wdata->state->lastchar) && (wdata->state->wbuf[i] == ' '); i++)
     ; // do nothing
 
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf + i,
-                   wdata->state->curpos - i);
-  int rc = alias_complete(wdata->buf, wdata->buflen, NeoMutt->sub);
-  replace_part(wdata->state, i, wdata->buf);
+  mutt_mb_wcstombs(wdata->state->wbuf + i, wdata->state->curpos - i, wdata->buf);
+  int rc = alias_complete(wdata->buf->data, wdata->buf->dsize, NeoMutt->sub);
+  replace_part(wdata->state, i, buf_string(wdata->buf));
   if (rc != 1)
   {
     return FR_CONTINUE;
@@ -194,8 +192,8 @@ static int complete_pattern(struct EnterWindowData *wdata)
   size_t i = wdata->state->curpos;
   if (i && (wdata->state->wbuf[i - 1] == '~'))
   {
-    if (dlg_select_pattern(wdata->buf, wdata->buflen))
-      replace_part(wdata->state, i - 1, wdata->buf);
+    if (dlg_select_pattern(wdata->buf->data, wdata->buf->dsize))
+      replace_part(wdata->state, i - 1, buf_string(wdata->buf));
     return FR_CONTINUE;
   }
 
@@ -240,14 +238,9 @@ static int complete_alias_query(struct EnterWindowData *wdata)
       ; // do nothing
   }
 
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf + i,
-                   wdata->state->curpos - i);
-  struct Buffer *tmp = buf_pool_get();
-  buf_strcpy(tmp, wdata->buf);
-  query_complete(tmp, NeoMutt->sub);
-  mutt_str_copy(wdata->buf, buf_string(tmp), wdata->buflen);
-  buf_pool_release(&tmp);
-  replace_part(wdata->state, i, wdata->buf);
+  mutt_mb_wcstombs(wdata->state->wbuf + i, wdata->state->curpos - i, wdata->buf);
+  query_complete(wdata->buf, NeoMutt->sub);
+  replace_part(wdata->state, i, buf_string(wdata->buf));
 
   return FR_CONTINUE;
 }
@@ -272,7 +265,7 @@ static int complete_command(struct EnterWindowData *wdata)
     rc = FR_ERROR;
   }
 
-  replace_part(wdata->state, 0, wdata->buf);
+  replace_part(wdata->state, 0, buf_string(wdata->buf));
   return rc;
 }
 
@@ -284,7 +277,7 @@ static int complete_command(struct EnterWindowData *wdata)
 static int complete_file_mbox(struct EnterWindowData *wdata)
 {
   int rc = FR_SUCCESS;
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
+  mutt_mb_wcstombs(wdata->state->wbuf, wdata->state->curpos, wdata->buf);
 
   /* see if the path has changed from the last time */
   if ((!wdata->tempbuf && !wdata->state->lastchar) ||
@@ -292,15 +285,15 @@ static int complete_file_mbox(struct EnterWindowData *wdata)
        (memcmp(wdata->tempbuf, wdata->state->wbuf,
                wdata->state->lastchar * sizeof(wchar_t)) == 0)))
   {
-    mutt_select_file(wdata->buf, wdata->buflen,
+    mutt_select_file(wdata->buf->data, wdata->buf->dsize,
                      ((wdata->flags & MUTT_COMP_FILE_MBOX) ? MUTT_SEL_FOLDER : MUTT_SEL_NO_FLAGS) |
                          (wdata->multiple ? MUTT_SEL_MULTI : MUTT_SEL_NO_FLAGS),
                      wdata->m, wdata->files, wdata->numfiles);
-    if (wdata->buf[0] != '\0')
+    if (!buf_is_empty(wdata->buf))
     {
-      mutt_pretty_mailbox(wdata->buf, wdata->buflen);
+      mutt_pretty_mailbox(wdata->buf->data, wdata->buf->dsize);
       if (!wdata->pass)
-        mutt_hist_add(wdata->hclass, wdata->buf, true);
+        mutt_hist_add(wdata->hclass, buf_string(wdata->buf), true);
       wdata->done = true;
       return FR_SUCCESS;
     }
@@ -319,7 +312,7 @@ static int complete_file_mbox(struct EnterWindowData *wdata)
   {
     return FR_ERROR; // let the user know that nothing matched
   }
-  replace_part(wdata->state, 0, wdata->buf);
+  replace_part(wdata->state, 0, buf_string(wdata->buf));
   return rc;
 }
 
@@ -337,7 +330,7 @@ static int complete_nm_query(struct EnterWindowData *wdata)
   if (!mutt_nm_query_complete(wdata->cd, wdata->buf, wdata->buflen, len, wdata->tabs))
     rc = FR_ERROR;
 
-  replace_part(wdata->state, 0, wdata->buf);
+  replace_part(wdata->state, 0, buf_string(wdata->buf));
   return rc;
 }
 
@@ -349,11 +342,11 @@ static int complete_nm_query(struct EnterWindowData *wdata)
 static int complete_nm_tag(struct EnterWindowData *wdata)
 {
   int rc = FR_SUCCESS;
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
-  if (!mutt_nm_tag_complete(wdata->cd, wdata->buf, wdata->buflen, wdata->tabs))
+  mutt_mb_wcstombs(wdata->state->wbuf, wdata->state->curpos, wdata->buf);
+  if (!mutt_nm_tag_complete(wdata->cd, wdata->buf->data, wdata->buf->dsize, wdata->tabs))
     rc = FR_ERROR;
 
-  replace_part(wdata->state, 0, wdata->buf);
+  replace_part(wdata->state, 0, buf_string(wdata->buf));
   return rc;
 }
 #endif
@@ -426,8 +419,8 @@ static int op_editor_history_down(struct EnterWindowData *wdata, int op)
   wdata->state->curpos = wdata->state->lastchar;
   if (mutt_hist_at_scratch(wdata->hclass))
   {
-    mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
-    mutt_hist_save_scratch(wdata->hclass, wdata->buf);
+    mutt_mb_wcstombs(wdata->state->wbuf, wdata->state->curpos, wdata->buf);
+    mutt_hist_save_scratch(wdata->hclass, buf_string(wdata->buf));
   }
   replace_part(wdata->state, 0, mutt_hist_next(wdata->hclass));
   wdata->redraw = ENTER_REDRAW_INIT;
@@ -440,9 +433,9 @@ static int op_editor_history_down(struct EnterWindowData *wdata, int op)
 static int op_editor_history_search(struct EnterWindowData *wdata, int op)
 {
   wdata->state->curpos = wdata->state->lastchar;
-  mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
-  mutt_hist_complete(wdata->buf, wdata->buflen, wdata->hclass);
-  replace_part(wdata->state, 0, wdata->buf);
+  mutt_mb_wcstombs(wdata->state->wbuf, wdata->state->curpos, wdata->buf);
+  mutt_hist_complete(wdata->buf->data, wdata->buf->dsize, wdata->hclass);
+  replace_part(wdata->state, 0, buf_string(wdata->buf));
   return FR_CONTINUE;
 }
 
@@ -454,8 +447,8 @@ static int op_editor_history_up(struct EnterWindowData *wdata, int op)
   wdata->state->curpos = wdata->state->lastchar;
   if (mutt_hist_at_scratch(wdata->hclass))
   {
-    mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
-    mutt_hist_save_scratch(wdata->hclass, wdata->buf);
+    mutt_mb_wcstombs(wdata->state->wbuf, wdata->state->curpos, wdata->buf);
+    mutt_hist_save_scratch(wdata->hclass, buf_string(wdata->buf));
   }
   replace_part(wdata->state, 0, mutt_hist_prev(wdata->hclass));
   wdata->redraw = ENTER_REDRAW_INIT;
@@ -470,16 +463,10 @@ static int op_editor_mailbox_cycle(struct EnterWindowData *wdata, int op)
   if (wdata->flags & MUTT_COMP_FILE_MBOX)
   {
     wdata->first = true; /* clear input if user types a real key later */
-    mutt_mb_wcstombs(wdata->buf, wdata->buflen, wdata->state->wbuf, wdata->state->curpos);
-
-    struct Buffer *pool = buf_pool_get();
-    buf_addstr(pool, wdata->buf);
-    mutt_mailbox_next(wdata->m, pool);
-    mutt_str_copy(wdata->buf, buf_string(pool), wdata->buflen);
-    buf_pool_release(&pool);
-
-    wdata->state->curpos = wdata->state->lastchar =
-        mutt_mb_mbstowcs(&wdata->state->wbuf, &wdata->state->wbuflen, 0, wdata->buf);
+    mutt_mb_wcstombs(wdata->state->wbuf, wdata->state->curpos, wdata->buf);
+    mutt_mailbox_next(wdata->m, wdata->buf);
+    wdata->state->curpos = wdata->state->lastchar = mutt_mb_mbstowcs(
+        &wdata->state->wbuf, &wdata->state->wbuflen, 0, buf_string(wdata->buf));
     return FR_SUCCESS;
   }
   else if (!(wdata->flags & MUTT_COMP_FILE))
@@ -504,7 +491,7 @@ static int op_editor_backspace(struct EnterWindowData *wdata, int op)
     const bool c_abort_backspace = cs_subset_bool(NeoMutt->sub, "abort_backspace");
     if (c_abort_backspace)
     {
-      wdata->buf[0] = '\0';
+      buf_reset(wdata->buf);
       wdata->done = true;
       rc = FR_SUCCESS;
     }
