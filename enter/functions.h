@@ -24,6 +24,7 @@
 #define MUTT_ENTER_FUNCTIONS_H
 
 #include <stdbool.h>
+#include "state.h"
 
 struct EnterWindowData;
 struct MuttWindow;
@@ -49,6 +50,6 @@ struct EnterFunction
 };
 
 int enter_function_dispatcher(struct MuttWindow *win, int op);
-bool self_insert(struct EnterWindowData *wdata, int ch);
+enum InsertResult self_insert(struct EnterWindowData *wdata, int ch);
 
 #endif /* MUTT_ENTER_FUNCTIONS_H */

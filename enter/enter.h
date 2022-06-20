@@ -25,8 +25,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-
-struct EnterState;
+#include "state.h"
 
 /**
  * enum EnterCase - Change the case of a word
@@ -54,10 +53,14 @@ int editor_kill_whole_line(struct EnterState *es);
 int editor_kill_word      (struct EnterState *es);
 int editor_transpose_chars(struct EnterState *es);
 
-size_t editor_buffer_get_cursor  (struct EnterState *es);
-size_t editor_buffer_get_lastchar(struct EnterState *es);
-bool   editor_buffer_is_empty    (struct EnterState *es);
-int    editor_buffer_set         (struct EnterState *es, const char *str);
-size_t editor_buffer_set_cursor  (struct EnterState *es, size_t pos);
+const wchar_t *editor_buffer_get_buffer  (struct EnterState *es);
+size_t         editor_buffer_get_cursor  (struct EnterState *es);
+size_t         editor_buffer_get_lastchar(struct EnterState *es);
+bool           editor_buffer_is_empty    (struct EnterState *es);
+void           editor_buffer_replace_part(struct EnterState *es, size_t from, const char *buf);
+int            editor_buffer_set         (struct EnterState *es, const char *str);
+size_t         editor_buffer_set_cursor  (struct EnterState *es, size_t pos);
+
+enum InsertResult inner_self_insert(struct EnterState *es, int ch);
 
 #endif /* MUTT_ENTER_ENTER_H */

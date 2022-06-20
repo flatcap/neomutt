@@ -53,6 +53,8 @@ struct EnterWindowData
   char ***files;                  ///< List of files selected
   int *numfiles;                  ///< Number of files selected
   struct EnterState *state;       ///< Current state of text entry
+  const char *field;              ///< Prompt
+  const char *text;               ///< UTF-8 text
 
   // Local variables
   enum EnterRedrawFlags redraw;   ///< What needs redrawing? See #EnterRedrawFlags

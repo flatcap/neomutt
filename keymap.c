@@ -828,7 +828,7 @@ static void create_bindings(const struct MenuOpSeq *map, enum MenuType mtype)
  *
  * @note This returns a pointer to a static buffer.
  */
-static const char *km_keyname(int c)
+const char *km_keyname(int c)
 {
   static char buf[35];
 
@@ -1907,6 +1907,7 @@ void mutt_what_key(void)
   if (!win)
     return;
 
+  mutt_clear_error();
   mutt_curses_set_normal_backed_color_by_id(MT_COLOR_PROMPT);
   mutt_window_mvprintw(win, 0, 0, _("Enter keys (%s to abort): "), km_keyname(AbortKey));
   mutt_curses_set_color_by_id(MT_COLOR_NORMAL);

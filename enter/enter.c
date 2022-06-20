@@ -438,6 +438,42 @@ int editor_transpose_chars(struct EnterState *es)
 // -----------------------------------------------------------------------------
 
 /**
+ * inner_self_insert - Insert a normal character
+ */
+enum InsertResult inner_self_insert(struct EnterState *es, int ch)
+{
+  if (!es)
+    return IR_ERROR;
+
+  // Gather the bytes into a wide character
+  char c = ch;
+  wchar_t wc = 0;
+  size_t k = mbrtowc(&wc, &c, 1, &es->mbstate);
+  if (k == (size_t) (-2))
+    return IR_PARTIAL;
+  else if ((k != 0) && (k != 1))
+  {
+    memset(&es->mbstate, 0, sizeof(es->mbstate));
+    return IR_ERROR;
+  }
+
+  if ((wc == L'\0') || !IsWPrint(wc))
+    return IR_ERROR;
+
+  enter_state_resize(es, es->lastchar);
+
+  memmove(es->wbuf + es->curpos + 1, es->wbuf + es->curpos,
+          (es->lastchar - es->curpos) * sizeof(wchar_t));
+  es->wbuf[es->curpos++] = wc;
+  es->lastchar++;
+  es->wbuf[es->lastchar] = L'\0';
+  enter_dump_buffer(es);
+
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
+  return IR_GOOD;
+}
+
+/**
  * editor_buffer_is_empty - Is the Enter buffer empty?
  * @param es State of the Enter buffer
  * @retval true If buffer is empty
@@ -448,6 +484,17 @@ bool editor_buffer_is_empty(struct EnterState *es)
     return true;
 
   return (es->lastchar == 0);
+}
+
+/**
+ * editor_buffer_get_buffer - XXX
+ */
+const wchar_t *editor_buffer_get_buffer(struct EnterState *es)
+{
+  if (!es)
+    return NULL;
+
+  return es->wbuf;
 }
 
 /**
@@ -499,6 +546,17 @@ size_t editor_buffer_set_cursor(struct EnterState *es, size_t pos)
 }
 
 /**
+ * editor_buffer_get_buflen - XXX
+ */
+int editor_buffer_get_buflen(struct EnterState *es)
+{
+  if (!es)
+    return 0;
+
+  return es->wbuflen;
+}
+
+/**
  * editor_buffer_set - Set the string in the buffer
  * @param es  State of the Enter buffer
  * @param str String to set
@@ -510,9 +568,53 @@ int editor_buffer_set(struct EnterState *es, const char *str)
   if (!es)
     return 0;
 
+  //QWQ range check buffer?
   es->wbuflen = 0;
   es->lastchar = mutt_mb_mbstowcs(&es->wbuf, &es->wbuflen, 0, str);
   es->curpos = es->lastchar;
   notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
   return es->lastchar;
+}
+
+/**
+ * editor_buffer_replace_part - Search and replace on a buffer
+ * @param es   Current state of the input buffer
+ * @param from Starting point for the replacement
+ * @param buf  Replacement string
+ */
+void editor_buffer_replace_part(struct EnterState *es, size_t from, const char *buf)
+{
+  if (!es || !buf) //QWQ || (from >= es->lastchar))
+    return;
+
+  enter_dump_string(es, "before");
+
+  /* Save the suffix */
+  size_t savelen = es->lastchar - es->curpos;
+  wchar_t *savebuf = NULL;
+
+  if (savelen != 0)
+  {
+    savebuf = mutt_mem_calloc(savelen + 1, sizeof(wchar_t));
+    memcpy(savebuf, es->wbuf + es->curpos, savelen * sizeof(wchar_t));
+  }
+
+  /* Convert to wide characters */
+  es->curpos = mutt_mb_mbstowcs(&es->wbuf, &es->wbuflen, from, buf);
+
+  if (savelen != 0)
+  {
+    /* Make space for suffix */
+    enter_state_resize(es, es->curpos + savelen);
+
+    /* Restore suffix */
+    memcpy(es->wbuf + es->curpos, savebuf, savelen * sizeof(wchar_t));
+    FREE(&savebuf);
+  }
+
+  // es->curpos = es->curpos + savelen;
+  es->lastchar = es->curpos + savelen;
+
+  enter_dump_string(es, "after");
+  notify_send(es->notify, NT_ENTER, NT_ENTER_CURSOR | NT_ENTER_TEXT, NULL);
 }

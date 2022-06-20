@@ -237,6 +237,11 @@ void menu_push_current(struct Menu *menu)
 {
 }
 
+const char *km_keyname(int c)
+{
+  return NULL;
+}
+
 int km_expand_key(char *s, size_t len, struct Keymap *map)
 {
   return 0;

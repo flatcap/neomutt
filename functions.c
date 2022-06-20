@@ -275,6 +275,7 @@ const struct MenuFuncOp OpEditor[] = { /* map: editor */
   { "kill-word",                     OP_EDITOR_KILL_WORD },
   { "mailbox-cycle",                 OP_EDITOR_MAILBOX_CYCLE },
   { "quote-char",                    OP_EDITOR_QUOTE_CHAR },
+  { "redraw-screen",                 OP_REDRAW },
   { "transpose-chars",               OP_EDITOR_TRANSPOSE_CHARS },
   { "upcase-word",                   OP_EDITOR_UPCASE_WORD },
   // Deprecated
