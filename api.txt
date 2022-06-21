@@ -1,0 +1,179 @@
+
+needs:
+
+wbuf
+	wbuflen or nul-termination
+	to extract the token
+
+
+buf for result
+	buflen or struct Buffer
+
+
+typing<tab>
+
+rc = api(args)
+
+isolate token
+convert to utf-8
+
+ERROR (or no matches)
+	e.g. no aliases defined
+	no changes to original string
+	remain in editor
+
+SUCCESS (single match)
+	replace with match
+	remain in editor
+
+SUCCESS (multiple matches)
+	replace with partial
+	1) matches diverge at typed character(s)
+		e.g. s<tab> -> sat set sit
+	2) matches diverge after character(s)
+		e.g. si<tab> -> sidebar_a sidebar_b sidebar_c
+	remain in editor
+
+DONE
+	e.g. dialog selection
+
+SIMPLE_NEXT?
+	we've got all the options, just use the next
+	tabs == 0  => generate list
+	tabs > 0   => use next?
+
+<tab>
+	simple: fixed list
+	complex: callback each time
+		e.g. <mailbox-cycle>
+
+--------------------------------------------------------------------------------
+
+<tab>
+
+	error: unforeseen condition
+
+	no matches: beep
+
+	unique match: complete entire match
+
+	unique match: already complete, no visible change
+
+	multiple matches: no advancement, no visible change
+
+	multiple matches: advancement, complete stem of matches
+
+second <tab>, third <tab>, ...
+
+	unique match: already complete, do nothing, or open dialog?
+
+	multiple matches: cycle through options, or open dialog?
+
+n'th <tab>
+	multiple matches: back to original typed string
+
+--------------------------------------------------------------------------------
+
+should complete unique add a space (or a comma-space)?
+
+should alias completion expand the address?
+	ric<tab> -> Richard Russon <rich@flatcap.org>, 
+	including comma-space?
+
+could completion code override
+	for <mail> work at the address level:
+	OP_EDITOR_BACKWARD_WORD, skip over entire address
+	OP_EDITOR_FORWARD_WORD,  skip over entire address
+	OP_EDITOR_KILL_WORD,     kill an   entire address
+	char-granularity functions should work as normal
+		(allowing you to edit the details)
+
+--------------------------------------------------------------------------------
+
+MUTT_COMP_FILE_SIMPLE
+	complete_file_simple()
+	ascii
+	delimited by mutt_mb_is_shell_char()
+		"<>&()$?*;{}| "
+
+MUTT_COMP_FILE
+MUTT_COMP_FILE_MBOX
+	complete_file_mbox()
+	ascii
+	not delimited (entire field is used)
+	mutt_select_file()
+		MUTT_SEL_FOLDER
+		MUTT_SEL_MULTI
+
+-------------------------
+
+MUTT_COMP_ALIAS OP_EDITOR_COMPLETE
+	complete_alias_complete()
+		<mail>, To:, Cc:, etc
+		Compose: <edit-to>, <edit-cc>, etc
+		<bounce-message>
+	ascii
+	delimited by space and/or comma
+		and colon! remove
+	unique match => complete
+	multiple matches => dlg_select_alias()
+
+MUTT_COMP_ALIAS OP_EDITOR_COMPLETE_QUERY
+	complete_alias_query()
+		<mail>, To:, Cc:, etc
+		Compose: <edit-to>, <edit-cc>, etc
+		<bounce-message>
+	ascii
+	delimited by space and/or comma
+	unique match => complete
+	multiple matches => dlg_select_query()
+
+MUTT_COMP_COMMAND
+	complete_command()
+	<enter-command> -> mutt_enter_command()
+	last char is '='
+		mutt_var_value_complete()
+		only works for "^set x=<tab>" (no whitespace around '=')
+	else
+		mutt_command_complete()
+		only works at start of buffer, or with leading whitespace
+		":s<tab>" or ":  s<tab>"
+	special cases after:
+		set/unset/reset/toggle
+			allowing for prefixes "no", "inv", "?", "&"
+		exec
+			completes function names
+
+MUTT_COMP_LABEL OP_EDITOR_COMPLETE
+	complete_label()
+		<edit-label>
+	ascii
+	delimited by space, comma and/or colon
+	labels are stored literally
+		"red blue" vs "red, blue"
+	commas in labels interfere with completion
+	completion doesn't split labels at whitespace/comma
+		leading to "red blue" being a completion match
+
+MUTT_COMP_NM_QUERY
+	complete_nm_query()
+	<vfolder-from-query>
+	ascii
+	prefixed by tag:
+	delimited by space
+
+MUTT_COMP_NM_TAG
+	complete_nm_tag()
+	<modify-labels> -> mx_tags_edit()
+	ascii
+	prefixed by [+-!] (add, remove, toggle)
+	delimited by space and/or comma
+	bug: completion doesn't work after ! prefix (+- ok)
+
+MUTT_COMP_PATTERN OP_EDITOR_COMPLETE
+	complete_pattern()
+	<limit>
+	string prefixed by '~'  -> dlg_select_pattern()
+	string prefixed by '~y' -> mutt_label_complete()
+		'~Y' (notmuch/imap) not supported
+
