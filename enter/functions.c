@@ -71,7 +71,7 @@ static int complete_file_simple(struct EnterWindowData *wdata)
   if (wdata->tempbuf && (wdata->templen == (lastchar - i)) &&
       (memcmp(wdata->tempbuf, wbuf + i, (lastchar - i) * sizeof(wchar_t)) == 0))
   {
-    buf_select_file(wdata->buf, MUTT_SEL_NO_FLAGS, wdata->m, NULL, NULL);
+    buf_select_file(wdata->buf, MUTT_SEL_NO_FLAGS, NULL, NULL, NULL);
     if (!buf_is_empty(wdata->buf))
       editor_buffer_replace_part(wdata->state, i, buf_string(wdata->buf));
     return FR_CONTINUE;
