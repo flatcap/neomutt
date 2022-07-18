@@ -45,9 +45,10 @@
 #include "state.h"
 // IWYU pragma: end_exports
 
+struct AutoComplete;
 struct Buffer;
 struct Mailbox;
 
-int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complete, bool multiple, struct Mailbox *m, char ***files, int *numfiles);
+int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complete, bool multiple, struct Mailbox *m, char ***files, int *numfiles, struct AutoComplete *ac);
 
 #endif /* MUTT_ENTER_LIB_H */

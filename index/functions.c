@@ -683,7 +683,7 @@ static int op_jump(struct IndexSharedData *shared, struct IndexPrivateData *priv
 
   int msg_num = 0;
   if ((buf_get_field(_("Jump to message: "), buf, MUTT_COMP_NO_FLAGS, false,
-                     NULL, NULL, NULL) != 0) ||
+                     NULL, NULL, NULL, NULL) != 0) ||
       buf_is_empty(buf))
   {
     mutt_message(_("Nothing to do"));
@@ -1746,7 +1746,7 @@ static int op_mark_msg(struct IndexSharedData *shared, struct IndexPrivateData *
        enter will be prefixed by $mark_macro_prefix and will become
        a macro hotkey to jump to the currently selected message. */
     if ((buf_get_field(_("Enter macro stroke: "), buf, MUTT_COMP_NO_FLAGS,
-                       false, NULL, NULL, NULL) == 0) &&
+                       false, NULL, NULL, NULL, NULL) == 0) &&
         !buf_is_empty(buf))
     {
       const char *const c_mark_macro_prefix = cs_subset_string(shared->sub, "mark_macro_prefix");
@@ -2453,7 +2453,7 @@ static int op_get_message(struct IndexSharedData *shared,
   if (op == OP_GET_MESSAGE)
   {
     if ((buf_get_field(_("Enter Message-Id: "), buf, MUTT_COMP_NO_FLAGS, false,
-                       NULL, NULL, NULL) != 0) ||
+                       NULL, NULL, NULL, NULL) != 0) ||
         buf_is_empty(buf))
     {
       goto done;
@@ -2716,7 +2716,8 @@ static int op_main_vfolder_from_query(struct IndexSharedData *shared,
   int rc = FR_SUCCESS;
   struct Buffer *buf = buf_pool_get();
 
-  if ((buf_get_field("Query: ", buf, MUTT_COMP_NM_QUERY, false, NULL, NULL, NULL) != 0) ||
+  if ((buf_get_field("Query: ", buf, MUTT_COMP_NM_QUERY, false, NULL,
+                             NULL, NULL, NULL) != 0) ||
       buf_is_empty(buf))
   {
     mutt_message(_("No query, aborting"));

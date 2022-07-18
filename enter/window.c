@@ -248,8 +248,9 @@ enum InsertResult self_insert(struct EnterWindowData *wdata, int ch)
  * @retval 0  Selection made
  * @retval -1 Aborted
  */
-int buf_get_field(const char *field, struct Buffer *buf, CompletionFlags complete,
-                  bool multiple, struct Mailbox *m, char ***files, int *numfiles)
+int buf_get_field(const char *field, struct Buffer *buf,
+                          CompletionFlags complete, bool multiple, struct Mailbox *m,
+                          char ***files, int *numfiles, struct AutoComplete *ac)
 {
   struct MuttWindow *win = mutt_window_new(WT_CUSTOM, MUTT_WIN_ORIENT_VERTICAL, MUTT_WIN_SIZE_FIXED,
                                            MUTT_WIN_SIZE_UNLIMITED, 1);

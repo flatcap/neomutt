@@ -395,7 +395,7 @@ void alias_create(struct AddressList *al, const struct ConfigSubset *sub)
 
 retry_name:
   /* L10N: prompt to add a new alias */
-  if ((buf_get_field(_("Alias as: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
+  if ((buf_get_field(_("Alias as: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL, NULL) != 0) ||
       buf_is_empty(buf))
   {
     goto done;
@@ -435,7 +435,7 @@ retry_name:
 
   do
   {
-    if ((buf_get_field(_("Address: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) != 0) ||
+    if ((buf_get_field(_("Address: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL, NULL) != 0) ||
         buf_is_empty(buf))
     {
       alias_free(&alias);
@@ -459,7 +459,7 @@ retry_name:
     buf_reset(buf);
 
   if (buf_get_field(_("Personal name: "), buf, MUTT_COMP_NO_FLAGS, false, NULL,
-                    NULL, NULL) != 0)
+                    NULL, NULL, NULL) != 0)
   {
     alias_free(&alias);
     goto done;
@@ -467,7 +467,7 @@ retry_name:
   buf_copy(TAILQ_FIRST(&alias->addr)->personal, buf);
 
   buf_reset(buf);
-  if (buf_get_field(_("Comment: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL) == 0)
+  if (buf_get_field(_("Comment: "), buf, MUTT_COMP_NO_FLAGS, false, NULL, NULL, NULL, NULL) == 0)
   {
     mutt_str_replace(&alias->comment, buf_string(buf));
   }
@@ -497,7 +497,7 @@ retry_name:
   buf_strcpy(buf, c_alias_file);
 
   if (buf_get_field(_("Save to file: "), buf, MUTT_COMP_FILE | MUTT_COMP_CLEAR,
-                    false, NULL, NULL, NULL) != 0)
+                    false, NULL, NULL, NULL, NULL) != 0)
   {
     goto done;
   }

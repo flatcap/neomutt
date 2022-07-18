@@ -503,7 +503,7 @@ int buf_enter_fname(const char *prompt, struct Buffer *fname, bool mailbox,
 
     buf_alloc(fname, 1024);
     if (buf_get_field(pc, fname, (mailbox ? MUTT_COMP_FILE_MBOX : MUTT_COMP_FILE) | MUTT_COMP_CLEAR,
-                      multiple, m, files, numfiles) != 0)
+                      multiple, m, files, numfiles, NULL) != 0)
     {
       buf_reset(fname);
     }

@@ -38,6 +38,14 @@ struct CompletionData
   bool free_match_strings;     ///< Should the strings in match_list be freed?
 };
 
+/**
+ * struct AutoComplete
+ */
+struct AutoComplete
+{
+  int dummy;
+};
+
 void                   completion_data_free(struct CompletionData **ptr);
 void                   completion_data_free_match_strings(struct CompletionData *cd);
 struct CompletionData *completion_data_new(void);

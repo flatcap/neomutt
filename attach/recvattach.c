@@ -301,7 +301,7 @@ static int query_save_attachment(FILE *fp, struct Body *body, struct Email *e, c
   while (prompt)
   {
     if ((buf_get_field(prompt, buf, MUTT_COMP_FILE | MUTT_COMP_CLEAR, false,
-                       NULL, NULL, NULL) != 0) ||
+                       NULL, NULL, NULL, NULL) != 0) ||
         buf_is_empty(buf))
     {
       goto cleanup;
@@ -481,7 +481,7 @@ void mutt_save_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
           prepend_savedir(buf);
 
           if ((buf_get_field(_("Save to file: "), buf, MUTT_COMP_FILE | MUTT_COMP_CLEAR,
-                             false, NULL, NULL, NULL) != 0) ||
+                             false, NULL, NULL, NULL, NULL) != 0) ||
               buf_is_empty(buf))
           {
             goto cleanup;
@@ -730,7 +730,7 @@ void mutt_pipe_attachment_list(struct AttachCtx *actx, FILE *fp, bool tag,
   state.flags = STATE_CHARCONV;
 
   if (buf_get_field((filter ? _("Filter through: ") : _("Pipe to: ")), buf,
-                    MUTT_COMP_FILE_SIMPLE, false, NULL, NULL, NULL) != 0)
+                    MUTT_COMP_FILE_SIMPLE, false, NULL, NULL, NULL, NULL) != 0)
   {
     goto cleanup;
   }

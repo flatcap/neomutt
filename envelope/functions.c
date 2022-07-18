@@ -117,7 +117,7 @@ static bool edit_address_list(enum HeaderField field, struct AddressList *al)
   mutt_addrlist_write(al, new_list, false);
   buf_fix_dptr(new_list);
   buf_copy(old_list, new_list);
-  if (buf_get_field(_(Prompts[field]), new_list, MUTT_COMP_ALIAS, false, NULL, NULL, NULL) == 0)
+  if (buf_get_field(_(Prompts[field]), new_list, MUTT_COMP_ALIAS, false, NULL, NULL, NULL, NULL) == 0)
   {
     mutt_addrlist_clear(al);
     mutt_addrlist_parse2(al, buf_string(new_list));
@@ -228,7 +228,7 @@ static int op_envelope_edit_fcc(struct EnvelopeWindowData *wdata, int op)
   buf_copy(fname, wdata->fcc);
 
   if (buf_get_field(Prompts[HDR_FCC], fname, MUTT_COMP_FILE | MUTT_COMP_CLEAR,
-                    false, NULL, NULL, NULL) != 0)
+                    false, NULL, NULL, NULL, NULL) != 0)
   {
     goto done; // aborted
   }
@@ -281,7 +281,7 @@ static int op_envelope_edit_subject(struct EnvelopeWindowData *wdata, int op)
 
   buf_strcpy(buf, wdata->email->env->subject);
   if (buf_get_field(Prompts[HDR_SUBJECT], buf, MUTT_COMP_NO_FLAGS, false, NULL,
-                    NULL, NULL) != 0)
+                    NULL, NULL, NULL) != 0)
   {
     goto done; // aborted
   }
@@ -445,7 +445,7 @@ static int op_envelope_edit_followup_to(struct EnvelopeWindowData *wdata, int op
 
   buf_strcpy(buf, wdata->email->env->followup_to);
   if (buf_get_field(Prompts[HDR_FOLLOWUPTO], buf, MUTT_COMP_NO_FLAGS, false,
-                    NULL, NULL, NULL) == 0)
+                    NULL, NULL, NULL, NULL) == 0)
   {
     mutt_str_replace(&wdata->email->env->followup_to, buf_string(buf));
     mutt_env_notify_send(wdata->email, NT_ENVELOPE_FOLLOWUP_TO);
@@ -469,7 +469,7 @@ static int op_envelope_edit_newsgroups(struct EnvelopeWindowData *wdata, int op)
 
   buf_strcpy(buf, wdata->email->env->newsgroups);
   if (buf_get_field(Prompts[HDR_NEWSGROUPS], buf, MUTT_COMP_NO_FLAGS, false,
-                    NULL, NULL, NULL) == 0)
+                    NULL, NULL, NULL, NULL) == 0)
   {
     mutt_str_replace(&wdata->email->env->newsgroups, buf_string(buf));
     mutt_env_notify_send(wdata->email, NT_ENVELOPE_NEWSGROUPS);
@@ -494,7 +494,7 @@ static int op_envelope_edit_x_comment_to(struct EnvelopeWindowData *wdata, int o
 
   buf_strcpy(buf, wdata->email->env->x_comment_to);
   if (buf_get_field(Prompts[HDR_XCOMMENTTO], buf, MUTT_COMP_NO_FLAGS, false,
-                    NULL, NULL, NULL) == 0)
+                    NULL, NULL, NULL, NULL) == 0)
   {
     mutt_str_replace(&wdata->email->env->x_comment_to, buf_string(buf));
     mutt_env_notify_send(wdata->email, NT_ENVELOPE_X_COMMENT_TO);
