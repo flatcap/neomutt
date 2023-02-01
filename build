@@ -1,0 +1,34 @@
+#!/bin/bash
+
+GCC_OPTIONS="-I. -std=c99 -D_ALL_SOURCE=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__ -D_XOPEN_SOURCE_EXTENDED"
+MAKEDOC_OPTIONS="-D_MAKEDOC -E -C"
+
+[ -f config.h ] || ./configure --full-doc --quiet
+
+FILE="docs/makedoc"
+gcc $GCC_OPTIONS -o "$FILE" "docs/makedoc.c"
+ls -l "$FILE"
+
+FILE="docs/manual.xml"
+(
+	sed -e "s/@VERSION@/2022-04-29/; s!/usr/libexec!/usr/libexec!g" "docs/manual.xml.head"
+	gcc $GCC_OPTIONS $MAKEDOC_OPTIONS "docs/config.c" | docs/makedoc -s
+	gcc $GCC_OPTIONS $MAKEDOC_OPTIONS "functions.c" | perl "docs/gen-map-doc" "docs/manual.xml.tail" "opcodes.h"
+) > "$FILE"
+ls -l "$FILE"
+
+FILE="docs/neomuttrc.5"
+(
+	sed -e "/^\.TH/s|@MAN_DATE@|2022-04-29|" "docs/neomuttrc.man.head"
+	gcc $GCC_OPTIONS $MAKEDOC_OPTIONS "docs/config.c" | docs/makedoc -m
+	sed -e "s|@MAN_DOCDIR@|/usr/share/doc/neomutt|g" "docs/neomuttrc.man.tail"
+) > "$FILE"
+ls -l "$FILE"
+
+FILE="docs/neomuttrc"
+(
+	sed -e 's,@docdir@,/usr/share/doc/neomutt,' "docs/neomuttrc.head"
+	gcc $GCC_OPTIONS $MAKEDOC_OPTIONS "docs/config.c" | docs/makedoc -c
+) > "$FILE"
+ls -l "$FILE"
+
