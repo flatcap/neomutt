@@ -149,6 +149,7 @@ enum DataType
   DT_SORT,
   DT_STRING,
   DT_SYNONYM,
+  DT_DEPRECATED,
 };
 
 struct VariableTypes
@@ -159,23 +160,24 @@ struct VariableTypes
 
 struct VariableTypes types[] = {
   // clang-format off
-  { "DT_NONE",    "-none-"             },
-  { "DT_ADDRESS", "e-mail address"     },
-  { "DT_BOOL",    "boolean"            },
-  { "DT_COMMAND", "command"            },
-  { "DT_ENUM",    "enumeration"        },
-  { "DT_LONG",    "number (long)"      },
-  { "DT_MAILBOX", "mailbox"            },
-  { "DT_MBTABLE", "character string"   },
-  { "DT_NUMBER",  "number"             },
-  { "DT_PATH",    "path"               },
-  { "DT_QUAD",    "quadoption"         },
-  { "DT_REGEX",   "regular expression" },
-  { "DT_SLIST",   "string list"        },
-  { "DT_SORT",    "sort order"         },
-  { "DT_STRING",  "string"             },
-  { "DT_SYNONYM", NULL                 },
-  { NULL,         NULL                 },
+  { "DT_NONE",       "-none-"             },
+  { "DT_ADDRESS",    "e-mail address"     },
+  { "DT_BOOL",       "boolean"            },
+  { "DT_COMMAND",    "command"            },
+  { "DT_ENUM",       "enumeration"        },
+  { "DT_LONG",       "number (long)"      },
+  { "DT_MAILBOX",    "mailbox"            },
+  { "DT_MBTABLE",    "character string"   },
+  { "DT_NUMBER",     "number"             },
+  { "DT_PATH",       "path"               },
+  { "DT_QUAD",       "quadoption"         },
+  { "DT_REGEX",      "regular expression" },
+  { "DT_SLIST",      "string list"        },
+  { "DT_SORT",       "sort order"         },
+  { "DT_STRING",     "string"             },
+  { "DT_SYNONYM",    NULL                 },
+  { "DT_DEPRECATED", NULL                 },
+  { NULL,            NULL                 },
   // clang-format on
 };
 
@@ -1188,7 +1190,7 @@ static void sgml_print_strval(const char *v, FILE *fp_out)
 static void print_confline(enum OutputFormats format, const char *varname,
                            int type, const char *val, FILE *fp_out)
 {
-  if (type == DT_SYNONYM)
+  if ((type == DT_SYNONYM) || (type == DT_DEPRECATED))
     return;
 
   switch (format)
@@ -1327,6 +1329,20 @@ static void handle_confline(enum OutputFormats format, char *s, FILE *fp_out)
   s = get_token(tmp, sizeof(tmp), s);
   if (!s)
     return;
+
+  if ((type == DT_SYNONYM) || (type == DT_DEPRECATED))
+  {
+    /* comma */
+    s = get_token(buf, sizeof(buf), s);
+    if (!s)
+      return;
+
+    /* Rename date */
+    s = get_token(tmp, sizeof(tmp), s);
+    if (!s)
+      return;
+    printf("DATE: %s\n", tmp);
+  }
 
   // Look for unjoined strings (pre-processor artifacts)
   while ((s[0] == ' ') && (s[1] == '"'))

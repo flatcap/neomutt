@@ -26,6 +26,9 @@ while (<STDIN>) {
       if (/^\s*\*\*\s*(.*)/) {
         $DOC{$map} .= "$1\n";
       }
+      elsif (/.* OP_DEPRECATED.*/) {
+        next;
+      }
       elsif (/{\s*"(.+)"\s*,\s*(\w+)\s*}/) {
         my ($function, $op) = ($1, $2);
         die "unknown OP $op" unless $OPS{$op};

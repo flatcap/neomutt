@@ -166,8 +166,8 @@ const struct MenuFuncOp OpBrowser[] = { /* map: browser */
   { "unsubscribe-pattern",           OP_UNSUBSCRIBE_PATTERN },
 #endif
   { "view-file",                     OP_BROWSER_VIEW_FILE },
-  // Deprecated
-  { "buffy-list",                    OP_MAILBOX_LIST },
+
+  { "buffy-list",                    OP_DEPRECATED|OP_MAILBOX_LIST },
   { NULL, 0 },
 };
 
@@ -277,8 +277,8 @@ const struct MenuFuncOp OpEditor[] = { /* map: editor */
   { "quote-char",                    OP_EDITOR_QUOTE_CHAR },
   { "transpose-chars",               OP_EDITOR_TRANSPOSE_CHARS },
   { "upcase-word",                   OP_EDITOR_UPCASE_WORD },
-  // Deprecated
-  { "buffy-cycle",                   OP_EDITOR_MAILBOX_CYCLE },
+
+  { "buffy-cycle",                   OP_DEPRECATED|OP_EDITOR_MAILBOX_CYCLE },
   { NULL, 0 },
 };
 
@@ -337,9 +337,9 @@ const struct MenuFuncOp OpGeneric[] = { /* map: generic */
   { "tag-prefix-cond",               OP_TAG_PREFIX_COND },
   { "top-page",                      OP_TOP_PAGE },
   { "what-key",                      OP_WHAT_KEY },
-  // Deprecated
-  { "error-history",                 OP_SHOW_LOG_MESSAGES },
-  { "refresh",                       OP_REDRAW },
+
+  { "error-history",                 OP_DEPRECATED|OP_SHOW_LOG_MESSAGES },
+  { "refresh",                       OP_DEPRECATED|OP_REDRAW },
   { NULL, 0 },
 };
 
@@ -502,8 +502,8 @@ const struct MenuFuncOp OpIndex[] = { /* map: index */
 #endif
   { "view-attachments",              OP_VIEW_ATTACHMENTS },
   { "view-raw-message",              OP_VIEW_RAW_MESSAGE },
-  // Deprecated
-  { "buffy-list",                    OP_MAILBOX_LIST },
+
+  { "buffy-list",                    OP_DEPRECATED|OP_MAILBOX_LIST },
   { NULL, 0 },
 };
 
@@ -689,9 +689,9 @@ const struct MenuFuncOp OpPager[] = { /* map: pager */
   { "view-attachments",              OP_VIEW_ATTACHMENTS },
   { "view-raw-message",              OP_VIEW_RAW_MESSAGE },
   { "what-key",                      OP_WHAT_KEY },
-  // Deprecated
-  { "buffy-list",                    OP_MAILBOX_LIST },
-  { "error-history",                 OP_SHOW_LOG_MESSAGES },
+
+  { "buffy-list",                    OP_DEPRECATED|OP_MAILBOX_LIST },
+  { "error-history",                 OP_DEPRECATED|OP_SHOW_LOG_MESSAGES },
   { NULL, 0 },
 };
 

@@ -525,7 +525,7 @@ const char *mutt_get_func(const struct MenuFuncOp *funcs, int op)
 {
   for (int i = 0; funcs[i].name; i++)
   {
-    if (funcs[i].op == op)
+    if ((funcs[i].op & OP_CODE_MASK) == op)
       return funcs[i].name;
   }
 
@@ -596,7 +596,7 @@ static void generic_tokenize_push_string(char *s, void (*generic_push)(int, int)
 
         if (op != OP_NULL)
         {
-          generic_push(0, op);
+          generic_push(0, op & OP_CODE_MASK);
           p = pp - 1;
           continue;
         }
@@ -1547,7 +1547,7 @@ enum CommandResult mutt_parse_bind(struct Buffer *buf, struct Buffer *s,
         mutt_debug(LL_NOTIFY, "NT_BINDING_DELETE: %s %s\n", mname, keystr);
 
         int op = get_op(OpGeneric, buf->data, mutt_str_len(buf->data));
-        struct EventBinding ev_b = { mtypes[i], key, op };
+        struct EventBinding ev_b = { mtypes[i], key, op & OP_CODE_MASK };
         notify_send(NeoMutt->notify, NT_BINDING, NT_BINDING_DELETE, &ev_b);
       }
     }
@@ -1569,7 +1569,7 @@ enum CommandResult mutt_parse_bind(struct Buffer *buf, struct Buffer *s,
           mutt_debug(LL_NOTIFY, "NT_BINDING_NEW: %s %s\n", mname, keystr);
 
           int op = get_op(OpGeneric, buf->data, mutt_str_len(buf->data));
-          struct EventBinding ev_b = { mtypes[i], key, op };
+          struct EventBinding ev_b = { mtypes[i], key, op & OP_CODE_MASK };
           notify_send(NeoMutt->notify, NT_BINDING, NT_BINDING_ADD, &ev_b);
           continue;
         }
@@ -1591,7 +1591,7 @@ enum CommandResult mutt_parse_bind(struct Buffer *buf, struct Buffer *s,
           mutt_debug(LL_NOTIFY, "NT_BINDING_NEW: %s %s\n", mname, keystr);
 
           int op = get_op(funcs, buf->data, mutt_str_len(buf->data));
-          struct EventBinding ev_b = { mtypes[i], key, op };
+          struct EventBinding ev_b = { mtypes[i], key, op & OP_CODE_MASK };
           notify_send(NeoMutt->notify, NT_BINDING, NT_BINDING_ADD, &ev_b);
           continue;
         }
