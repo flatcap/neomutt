@@ -1,0 +1,5 @@
+{ "arrow_string", DT_STRING, "->" },
+/*
+** .pp
+** Specifies the string of arrow_cursor when arrow_cursor enabled.
+*/

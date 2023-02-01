@@ -1,0 +1,6 @@
+{ "abort_backspace", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, hitting backspace against an empty prompt aborts the
+** prompt.
+*/

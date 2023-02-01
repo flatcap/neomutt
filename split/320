@@ -1,0 +1,9 @@
+{ "real_name", DT_STRING, 0 },
+/*
+** .pp
+** This variable specifies what "real" or "personal" name should be used
+** when sending messages.
+** .pp
+** If not specified, then the user's "real name" will be read from \fC/etc/passwd\fP.
+** This option will not be used, if "$$from" is set.
+*/

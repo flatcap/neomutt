@@ -1,0 +1,5 @@
+{ "nm_config_file", DT_PATH, "auto" },
+/*
+** .pp
+** Configuration file for notmuch. Use 'auto' to detect configuration.
+*/

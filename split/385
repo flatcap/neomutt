@@ -1,0 +1,12 @@
+{ "smime_encrypt_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to create encrypted S/MIME messages.
+** .pp
+** This is a format string, see the $$smime_decrypt_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (S/MIME only)
+** .pp
+** Encrypt the message to $$smime_default_key too.
+** (S/MIME only)
+*/

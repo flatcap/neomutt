@@ -1,0 +1,10 @@
+{ "pgp_import_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to import a key from a message into
+** the user's public key ring.
+** .pp
+** This is a format string, see the $$pgp_decode_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (PGP only)
+*/

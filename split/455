@@ -1,0 +1,7 @@
+{ "use_ipv6", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will look for IPv6 addresses of hosts it tries to
+** contact.  If this option is \fIunset\fP, NeoMutt will restrict itself to IPv4 addresses.
+** Normally, the default should work.
+*/

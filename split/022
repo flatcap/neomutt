@@ -1,0 +1,5 @@
+{ "attach_save_dir", DT_PATH, "./" },
+/*
+** .pp
+** The directory where attachments are saved.
+*/

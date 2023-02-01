@@ -1,0 +1,16 @@
+{ "newsrc", DT_PATH, "~/.newsrc" },
+/*
+** .pp
+** The file, containing info about subscribed newsgroups - names and
+** indexes of read articles.  The following printf-style sequence
+** is understood:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP .td \fBExample\fP
+** .td %a .td Account url       .td \fCnews:news.gmane.org\fP
+** .td %p .td Port              .td \fC119\fP
+** .td %P .td Port if specified .td \fC10119\fP
+** .td %s .td News server name  .td \fCnews.gmane.org\fP
+** .td %S .td Url schema        .td \fCnews\fP
+** .td %u .td Username          .td \fCusername\fP
+** .te
+*/

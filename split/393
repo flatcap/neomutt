@@ -1,0 +1,10 @@
+{ "smime_pk7out_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to extract PKCS7 structures of S/MIME signatures,
+** in order to extract the public X509 certificate(s).
+** .pp
+** This is a format string, see the $$smime_decrypt_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (S/MIME only)
+*/

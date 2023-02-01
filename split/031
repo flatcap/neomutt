@@ -1,0 +1,8 @@
+{ "autocrypt", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, enables autocrypt, which provides
+** passive encryption protection with keys exchanged via headers.
+** See "$autocryptdoc" for more details.
+** (Autocrypt only)
+*/

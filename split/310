@@ -1,0 +1,14 @@
+{ "print_decode", DT_BOOL, true },
+/*
+** .pp
+** Used in connection with the \fC<print-message>\fP function.  If this
+** option is \fIset\fP, the message is decoded before it is passed to the
+** external command specified by $$print_command.  If this option
+** is \fIunset\fP, no processing will be applied to the message when
+** printing it.  The latter setting may be useful if you are using
+** some advanced printer filter which is able to properly format
+** e-mail messages for printing.
+** .pp
+** Also see $$print_decode_weed, which controls whether headers will
+** be weeded when this is \fIset\fP.
+*/

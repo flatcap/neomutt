@@ -1,0 +1,6 @@
+{ "narrow_tree", DT_BOOL, false },
+/*
+** .pp
+** This variable, when \fIset\fP, makes the thread tree narrower, allowing
+** deeper threads to fit on the screen.
+*/

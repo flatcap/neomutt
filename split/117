@@ -1,0 +1,9 @@
+{ "from", DT_ADDRESS, 0 },
+/*
+** .pp
+** When \fIset\fP, this variable contains a default "from" address.  It
+** can be overridden using "$my_hdr" (including from a "$send-hook") and
+** $$reverse_name.  This variable is ignored if $$use_from is \fIunset\fP.
+** .pp
+** If not specified, then it may be read from the environment variable \fC$$$EMAIL\fP.
+*/

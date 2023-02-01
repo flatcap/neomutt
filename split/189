@@ -1,0 +1,8 @@
+{ "markers", DT_BOOL, true },
+/*
+** .pp
+** Controls the display of wrapped lines in the internal pager. If set, a
+** "+" marker is displayed at the beginning of wrapped lines.
+** .pp
+** Also see the $$smart_wrap variable.
+*/

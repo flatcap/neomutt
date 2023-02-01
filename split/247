@@ -1,0 +1,8 @@
+{ "pager_format", DT_STRING, "-%Z- %C/%m: %-20.20n   %s%*  -- (%P)" },
+/*
+** .pp
+** This variable controls the format of the one-line message "status"
+** displayed before each message in either the internal or an external
+** pager.  The valid sequences are listed in the $$index_format
+** section.
+*/

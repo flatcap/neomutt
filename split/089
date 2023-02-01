@@ -1,0 +1,8 @@
+{ "duplicate_threads", DT_BOOL, true },
+/*
+** .pp
+** This variable controls whether NeoMutt, when $$sort is set to \fIthreads\fP, threads
+** messages with the same Message-Id together.  If it is \fIset\fP, it will indicate
+** that it thinks they are duplicates of each other with an equals sign
+** in the thread tree.
+*/

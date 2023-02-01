@@ -1,0 +1,5 @@
+{ "beep", DT_BOOL, true },
+/*
+** .pp
+** When this variable is \fIset\fP, NeoMutt will beep when an error occurs.
+*/

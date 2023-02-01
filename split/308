@@ -1,0 +1,7 @@
+{ "print", DT_QUAD, MUTT_ASKNO },
+/*
+** .pp
+** Controls whether or not NeoMutt really prints messages.
+** This is set to "ask-no" by default, because some people
+** accidentally hit "p" often.
+*/

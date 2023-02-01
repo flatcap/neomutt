@@ -1,0 +1,18 @@
+{ "smime_default_key", DT_STRING, 0 },
+/*
+** .pp
+** This is the default key-pair to use for S/MIME operations, and must be
+** set to the keyid (the hash-value that OpenSSL generates) to work properly.
+** .pp
+** It will be used for encryption (see $$postpone_encrypt and
+** $$smime_self_encrypt).
+** .pp
+** It will be used for decryption unless $$smime_decrypt_use_default_key
+** is \fIunset\fP.
+** .pp
+** It will also be used for signing unless $$smime_sign_as is set.
+** .pp
+** The (now deprecated) \fIsmime_self_encrypt_as\fP is an alias for this
+** variable, and should no longer be used.
+** (S/MIME only)
+*/

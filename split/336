@@ -1,0 +1,22 @@
+{ "rfc2047_parameters", DT_BOOL, true },
+/*
+** .pp
+** When this variable is \fIset\fP, NeoMutt will decode RFC2047-encoded MIME
+** parameters. You want to set this variable when NeoMutt suggests you
+** to save attachments to files named like:
+** .ex
+** =?iso-8859-1?Q?file=5F=E4=5F991116=2Ezip?=
+** =?utf-8?Q?z=C4=99ta.png?=
+** .ee
+** .pp
+** When this variable is \fIset\fP interactively, the change won't be
+** active until you change folders.
+** .pp
+** Note that this use of RFC2047's encoding is explicitly
+** prohibited by the standard, but nevertheless encountered in the
+** wild and produced by, e.g., Outlook.
+** .pp
+** Also note that setting this parameter will \fInot\fP have the effect
+** that NeoMutt \fIgenerates\fP this kind of encoding.  Instead, NeoMutt will
+** unconditionally use the encoding specified in RFC2231.
+*/

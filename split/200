@@ -1,0 +1,11 @@
+{ "meta_key", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, forces NeoMutt to interpret keystrokes with the high bit (bit 8)
+** set as if the user had pressed the Esc key and whatever key remains
+** after having the high bit removed.  For example, if the key pressed
+** has an ASCII value of \fC0xf8\fP, then this is treated as if the user had
+** pressed Esc then "x".  This is because the result of removing the
+** high bit from \fC0xf8\fP is \fC0x78\fP, which is the ASCII character
+** "x".
+*/

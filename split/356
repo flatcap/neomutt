@@ -1,0 +1,7 @@
+{ "sidebar_divider_char", DT_STRING, 0 },
+/*
+** .pp
+** This specifies the characters to be drawn between the sidebar (when
+** visible) and the other NeoMutt panels. ASCII and Unicode line-drawing
+** characters are supported.
+*/

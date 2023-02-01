@@ -1,0 +1,15 @@
+{ "wait_key", DT_BOOL, true },
+/*
+** .pp
+** Controls whether NeoMutt will ask you to press a key after an external command
+** has been invoked by these functions: \fC<shell-escape>\fP,
+** \fC<pipe-message>\fP, \fC<pipe-entry>\fP, \fC<print-message>\fP,
+** and \fC<print-entry>\fP commands.
+** .pp
+** It is also used when viewing attachments with "$auto_view", provided
+** that the corresponding mailcap entry has a \fIneedsterminal\fP flag,
+** and the external program is interactive.
+** .pp
+** When \fIset\fP, NeoMutt will always ask for a key. When \fIunset\fP, NeoMutt will wait
+** for a key only if the external command returned a non-zero status.
+*/

@@ -1,0 +1,7 @@
+{ "imap_delim_chars", DT_STRING, "/." },
+/*
+** .pp
+** This contains the list of characters that NeoMutt will use as folder
+** separators for IMAP paths, when no separator is provided on the IMAP
+** connection.
+*/

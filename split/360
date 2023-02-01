@@ -1,0 +1,8 @@
+{ "sidebar_new_mail_only", DT_BOOL, false },
+/*
+** .pp
+** When set, the sidebar will only display mailboxes containing new, or
+** flagged, mail.
+** .pp
+** \fBSee also:\fP $sidebar_pin, $$sidebar_non_empty_mailbox_only.
+*/

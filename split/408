@@ -1,0 +1,24 @@
+{ "sort_aux", DT_SORT, SORT_DATE },
+/*
+** .pp
+** This provides a secondary sort for messages in the "index" menu, used
+** when the $$sort value is equal for two messages.
+** .pp
+** When sorting by threads, this variable controls how subthreads are
+** sorted within a single thread (for the order between threads, see
+** $$sort).  This can be set to any value that $$sort can, including
+** with the use of "reverse-" and "last-" prefixes, except for
+** variations using "threads" (in that case, NeoMutt will just use
+** "date").  For instance,
+** .ex
+** set sort_aux=last-date-received
+** .ee
+** .pp
+** would mean that if a new message is received in a thread, that
+** subthread becomes the last one displayed (or the first, if you have
+** "\fCset use_threads=reverse\fP".)  When using $$use_threads, it is
+** more common to use "last-" with $$sort and not with $$sort_aux.
+** .pp
+** See the "Use Threads Feature" section for further explanation and
+** examples, https://neomutt.org/feature/use-threads
+*/

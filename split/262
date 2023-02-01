@@ -1,0 +1,11 @@
+{ "pgp_encrypt_only_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to encrypt a body part without signing it.
+** .pp
+** This is a format string, see the $$pgp_decode_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** Note that in this case, %r expands to the search string, which is a list of
+** one or more quoted values such as email address, name, or keyid.
+** (PGP only)
+*/

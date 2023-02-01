@@ -1,0 +1,6 @@
+{ "copy_decode_weed", DT_BOOL, false },
+/*
+** .pp
+** Controls whether NeoMutt will weed headers when invoking the
+** \fC<decode-copy>\fP or \fC<decode-save>\fP functions.
+*/

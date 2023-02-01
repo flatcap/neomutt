@@ -1,0 +1,39 @@
+<sect2 id="escape">
+  <title>escape</title>
+  <note>Deprecated, since 2021-03-18</note>
+</sect2>
+
+<sect2 id="header-cache-compress">
+  <title>header_cache_compress</title>
+  <note>Deprecated, since 2020-03-25</note>
+</sect2>
+
+<sect2 id="header-cache-pagesize">
+  <title>header_cache_pagesize</title>
+  <note>Deprecated, since 2020-03-25</note>
+</sect2>
+
+<sect2 id="ignore-linear-white-space">
+  <title>ignore_linear_white_space</title>
+  <note>Deprecated, since 2021-03-18</note>
+</sect2>
+
+<sect2 id="mime-subject">
+  <title>mime_subject</title>
+  <note>Deprecated, since 2021-03-24</note>
+</sect2>
+
+<sect2 id="pgp-encrypt-self">
+  <title>pgp_encrypt_self</title>
+  <note>Deprecated, since 2019-09-09</note>
+</sect2>
+
+<sect2 id="smime-encrypt-self">
+  <title>smime_encrypt_self</title>
+  <note>Deprecated, since 2019-09-09</note>
+</sect2>
+
+<sect2 id="visual">
+  <title>visual</title>
+  <note>Deprecated, since 2021-03-18</note>
+</sect2>

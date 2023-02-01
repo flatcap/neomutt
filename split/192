@@ -1,0 +1,8 @@
+{ "mbox_type", DT_ENUM, MUTT_MBOX },
+/*
+** .pp
+** The default mailbox type used when creating new folders. May be any of
+** "mbox", "MMDF", "MH" or "Maildir".
+** .pp
+** This can also be set using the \fC-m\fP command-line option.
+*/

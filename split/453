@@ -1,0 +1,13 @@
+{ "use_envelope_from", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will set the \fIenvelope\fP sender of the message.
+** If $$envelope_from_address is \fIset\fP, it will be used as the sender
+** address. If \fIunset\fP, NeoMutt will attempt to derive the sender from the
+** "From:" header.
+** .pp
+** Note that this information is passed to sendmail command using the
+** \fC-f\fP command line switch. Therefore setting this option is not useful
+** if the $$sendmail variable already contains \fC-f\fP or if the
+** executable pointed to by $$sendmail doesn't support the \fC-f\fP switch.
+*/

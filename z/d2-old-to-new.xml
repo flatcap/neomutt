@@ -1,0 +1,290 @@
+<sect2 id="abort-noattach-regexp">
+  <title>abort_noattach_regexp</title>
+  <note>Renamed to <link linkend="abort-noattach-regex">$abort_noattach_regex</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="askbcc">
+  <title>askbcc</title>
+  <note>Renamed to <link linkend="ask-bcc">$ask_bcc</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="askcc">
+  <title>askcc</title>
+  <note>Renamed to <link linkend="ask-cc">$ask_cc</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="attach-keyword">
+  <title>attach_keyword</title>
+  <note>Renamed to <link linkend="abort-noattach-regex">$abort_noattach_regex</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="autoedit">
+  <title>autoedit</title>
+  <note>Renamed to <link linkend="auto-edit">$auto_edit</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="confirmappend">
+  <title>confirmappend</title>
+  <note>Renamed to <link linkend="confirm-append">$confirm_append</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="confirmcreate">
+  <title>confirmcreate</title>
+  <note>Renamed to <link linkend="confirm-create">$confirm_create</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-autoencrypt">
+  <title>crypt_autoencrypt</title>
+  <note>Renamed to <link linkend="crypt-auto-encrypt">$crypt_auto_encrypt</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-autopgp">
+  <title>crypt_autopgp</title>
+  <note>Renamed to <link linkend="crypt-auto-pgp">$crypt_auto_pgp</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-autosign">
+  <title>crypt_autosign</title>
+  <note>Renamed to <link linkend="crypt-auto-sign">$crypt_auto_sign</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-autosmime">
+  <title>crypt_autosmime</title>
+  <note>Renamed to <link linkend="crypt-auto-smime">$crypt_auto_smime</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-confirmhook">
+  <title>crypt_confirmhook</title>
+  <note>Renamed to <link linkend="crypt-confirm-hook">$crypt_confirm_hook</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="crypt-replyencrypt">
+  <title>crypt_replyencrypt</title>
+  <note>Renamed to <link linkend="crypt-reply-encrypt">$crypt_reply_encrypt</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-replysign">
+  <title>crypt_replysign</title>
+  <note>Renamed to <link linkend="crypt-reply-sign">$crypt_reply_sign</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="crypt-replysignencrypted">
+  <title>crypt_replysignencrypted</title>
+  <note>Renamed to <link linkend="crypt-reply-sign-encrypted">$crypt_reply_sign_encrypted</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="edit-hdrs">
+  <title>edit_hdrs</title>
+  <note>Renamed to <link linkend="edit-headers">$edit_headers</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="envelope-from">
+  <title>envelope_from</title>
+  <note>Renamed to <link linkend="use-envelope-from">$use_envelope_from</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="forw-decode">
+  <title>forw_decode</title>
+  <note>Renamed to <link linkend="forward-decode">$forward_decode</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="forw-decrypt">
+  <title>forw_decrypt</title>
+  <note>Renamed to <link linkend="forward-decrypt">$forward_decrypt</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="forw-format">
+  <title>forw_format</title>
+  <note>Renamed to <link linkend="forward-format">$forward_format</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="forw-quote">
+  <title>forw_quote</title>
+  <note>Renamed to <link linkend="forward-quote">$forward_quote</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="hdr-format">
+  <title>hdr_format</title>
+  <note>Renamed to <link linkend="index-format">$index_format</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="imap-servernoise">
+  <title>imap_servernoise</title>
+  <note>Renamed to <link linkend="imap-server-noise">$imap_server_noise</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="include-onlyfirst">
+  <title>include_onlyfirst</title>
+  <note>Renamed to <link linkend="include-only-first">$include_only_first</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="indent-str">
+  <title>indent_str</title>
+  <note>Renamed to <link linkend="indent-string">$indent_string</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="metoo">
+  <title>metoo</title>
+  <note>Renamed to <link linkend="me-too">$me_too</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="mime-fwd">
+  <title>mime_fwd</title>
+  <note>Renamed to <link linkend="mime-forward">$mime_forward</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="msg-format">
+  <title>msg_format</title>
+  <note>Renamed to <link linkend="message-format">$message_format</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="nm-default-uri">
+  <title>nm_default_uri</title>
+  <note>Renamed to <link linkend="nm-default-url">$nm_default_url</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="pgp-autoencrypt">
+  <title>pgp_autoencrypt</title>
+  <note>Renamed to <link linkend="crypt-auto-encrypt">$crypt_auto_encrypt</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-autoinline">
+  <title>pgp_autoinline</title>
+  <note>Renamed to <link linkend="pgp-auto-inline">$pgp_auto_inline</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="pgp-autosign">
+  <title>pgp_autosign</title>
+  <note>Renamed to <link linkend="crypt-auto-sign">$crypt_auto_sign</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-auto-traditional">
+  <title>pgp_auto_traditional</title>
+  <note>Renamed to <link linkend="pgp-reply-inline">$pgp_reply_inline</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-clearsign-command">
+  <title>pgp_clearsign_command</title>
+  <note>Renamed to <link linkend="pgp-clear-sign-command">$pgp_clear_sign_command</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="pgp-create-traditional">
+  <title>pgp_create_traditional</title>
+  <note>Renamed to <link linkend="pgp-auto-inline">$pgp_auto_inline</link> (2004-04-12)</note>
+</sect2>
+
+<sect2 id="pgp-getkeys-command">
+  <title>pgp_getkeys_command</title>
+  <note>Renamed to <link linkend="pgp-get-keys-command">$pgp_get_keys_command</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="pgp-replyencrypt">
+  <title>pgp_replyencrypt</title>
+  <note>Renamed to <link linkend="crypt-reply-encrypt">$crypt_reply_encrypt</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-replyinline">
+  <title>pgp_replyinline</title>
+  <note>Renamed to <link linkend="pgp-reply-inline">$pgp_reply_inline</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-replysign">
+  <title>pgp_replysign</title>
+  <note>Renamed to <link linkend="crypt-reply-sign">$crypt_reply_sign</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-replysignencrypted">
+  <title>pgp_replysignencrypted</title>
+  <note>Renamed to <link linkend="crypt-reply-sign-encrypted">$crypt_reply_sign_encrypted</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="pgp-self-encrypt-as">
+  <title>pgp_self_encrypt_as</title>
+  <note>Renamed to <link linkend="pgp-default-key">$pgp_default_key</link> (2018-01-11)</note>
+</sect2>
+
+<sect2 id="pgp-verify-sig">
+  <title>pgp_verify_sig</title>
+  <note>Renamed to <link linkend="crypt-verify-sig">$crypt_verify_sig</link> (2002-01-24)</note>
+</sect2>
+
+<sect2 id="pop-checkinterval">
+  <title>pop_checkinterval</title>
+  <note>Renamed to <link linkend="pop-check-interval">$pop_check_interval</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="post-indent-str">
+  <title>post_indent_str</title>
+  <note>Renamed to <link linkend="post-indent-string">$post_indent_string</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="print-cmd">
+  <title>print_cmd</title>
+  <note>Renamed to <link linkend="print-command">$print_command</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="quote-regexp">
+  <title>quote_regexp</title>
+  <note>Renamed to <link linkend="quote-regex">$quote_regex</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="realname">
+  <title>realname</title>
+  <note>Renamed to <link linkend="real-name">$real_name</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="reply-regexp">
+  <title>reply_regexp</title>
+  <note>Renamed to <link linkend="reply-regex">$reply_regex</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="reverse-realname">
+  <title>reverse_realname</title>
+  <note>Renamed to <link linkend="reverse-real-name">$reverse_real_name</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="skip-quoted-offset">
+  <title>skip_quoted_offset</title>
+  <note>Renamed to <link linkend="pager-skip-quoted-context">$pager_skip_quoted_context</link> (2021-06-18)</note>
+</sect2>
+
+<sect2 id="smime-self-encrypt-as">
+  <title>smime_self_encrypt_as</title>
+  <note>Renamed to <link linkend="smime-default-key">$smime_default_key</link> (2018-01-11)</note>
+</sect2>
+
+<sect2 id="spoolfile">
+  <title>spoolfile</title>
+  <note>Renamed to <link linkend="spool-file">$spool_file</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="ssl-usesystemcerts">
+  <title>ssl_usesystemcerts</title>
+  <note>Renamed to <link linkend="ssl-use-system-certs">$ssl_use_system_certs</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="use-8bitmime">
+  <title>use_8bitmime</title>
+  <note>Renamed to <link linkend="use-8bit-mime">$use_8bit_mime</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="virtual-spoolfile">
+  <title>virtual_spoolfile</title>
+  <note>Renamed to <link linkend="virtual-spool-file">$virtual_spool_file</link> (2021-02-11)</note>
+</sect2>
+
+<sect2 id="xterm-icon">
+  <title>xterm_icon</title>
+  <note>Renamed to <link linkend="ts-icon-format">$ts_icon_format</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="xterm-set-titles">
+  <title>xterm_set_titles</title>
+  <note>Renamed to <link linkend="ts-enabled">$ts_enabled</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="xterm-title">
+  <title>xterm_title</title>
+  <note>Renamed to <link linkend="ts-status-format">$ts_status_format</link> (2021-03-21)</note>
+</sect2>
+

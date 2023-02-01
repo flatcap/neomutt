@@ -1,0 +1,7 @@
+{ "ssl_use_sslv3", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP , NeoMutt will use SSLv3 when communicating with servers that
+** request it. \fBN.B. As of 2015, SSLv3 is considered insecure, and using
+** it is inadvisable\fP. See https://tools.ietf.org/html/rfc7525
+*/

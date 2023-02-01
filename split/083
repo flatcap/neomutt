@@ -1,0 +1,8 @@
+{ "delete", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** Controls whether or not messages are really deleted when closing or
+** synchronizing a mailbox.  If set to \fIyes\fP, messages marked for
+** deleting will automatically be purged without prompting.  If set to
+** \fIno\fP, messages marked for deletion will be kept in the mailbox.
+*/

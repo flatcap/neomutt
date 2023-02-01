@@ -1,0 +1,7 @@
+{ "forward_quote", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, forwarded messages included in the main body of the
+** message (when $$mime_forward is \fIunset\fP) will be quoted using
+** $$indent_string.
+*/

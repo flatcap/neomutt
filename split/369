@@ -1,0 +1,8 @@
+{ "sig_on_top", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, the signature will be included before any quoted or forwarded
+** text.  It is \fBstrongly\fP recommended that you do not set this variable
+** unless you really know what you are doing, and are prepared to take
+** some heat from netiquette guardians.
+*/

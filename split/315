@@ -1,0 +1,21 @@
+{ "query_format", DT_STRING, "%3c %t %-25.25n %-25.25a | %e" },
+/*
+** .pp
+** This variable describes the format of the "query" menu. The
+** following \fCprintf(3)\fP-style sequences are understood:
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %a  .td   .td Destination address
+** .td %c  .td   .td Current entry number
+** .td %e  .td * .td Extra information
+** .td %n  .td   .td Destination name
+** .td %t  .td   .td "*" if current entry is tagged, a space otherwise
+** .td %>X .td   .td Right justify the rest of the string and pad with "X"
+** .td %|X .td   .td Pad to the end of the line with "X"
+** .td %*X .td   .td Soft-fill with character "X" as pad
+** .te
+** .pp
+** For an explanation of "soft-fill", see the $$index_format documentation.
+** .pp
+** * = can be optionally printed if nonzero, see the $$status_format documentation.
+*/

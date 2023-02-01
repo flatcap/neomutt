@@ -1,0 +1,7 @@
+{ "history_remove_dups", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, all of the string history will be scanned for duplicates
+** when a new entry is added.  Duplicate entries in the $$history_file will
+** also be removed when it is periodically compacted.
+*/

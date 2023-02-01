@@ -1,0 +1,9 @@
+{ "pgp_long_ids", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, use 64 bit PGP key IDs, if \fIunset\fP use the normal 32 bit key IDs.
+** NOTE: Internally, NeoMutt has transitioned to using fingerprints (or long key IDs
+** as a fallback).  This option now only controls the display of key IDs
+** in the key selection menu and a few other places.
+** (PGP only)
+*/

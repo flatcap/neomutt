@@ -1,0 +1,8 @@
+{ "bounce", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** Controls whether you will be asked to confirm bouncing messages.
+** If set to \fIyes\fP you don't get asked if you want to bounce a
+** message. Setting this variable to \fIno\fP is not generally useful,
+** and thus not recommended, because you are unable to bounce messages.
+*/

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+WATCH="docs/makedoc.c 173"
+STAMP_THIS=$(mktemp)
+STAMP_CODE=$(mktemp)
+WAIT=1
+
+touch "$STAMP_THIS"
+touch -d "1 year ago" "$STAMP_CODE"
+
+while :; do
+	NEWER=0
+	for i in $WATCH; do
+		if [ $i -nt "$STAMP_CODE" ]; then
+			NEWER=1
+			break;
+		fi
+	done
+	if [ $NEWER = 1 ]; then
+		sleep 0.5
+		touch "$STAMP_CODE"
+		clear
+		./build
+		cat 173 | docs/makedoc -m | cat -s | sed 's/^\(%.\)./\1\t/' > neomuttrc.5
+		sed -n '20,$p' neomuttrc.5 | bat --style=plain --file-name neomuttrc.5
+		man -l neomuttrc.5
+	fi
+
+	[ "$0" -nt "$STAMP_THIS" ] && exec "$0"
+
+	ctags docs/makedoc.c
+	sleep $WAIT
+done
+

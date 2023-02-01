@@ -1,0 +1,6 @@
+{ "include_only_first", DT_BOOL, false },
+/*
+** .pp
+** Controls whether or not NeoMutt includes only the first attachment
+** of the message you are replying.
+*/

@@ -1,0 +1,6 @@
+{ "save_unsubscribed", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, info about unsubscribed newsgroups will be saved into
+** "newsrc" file and into cache.
+*/

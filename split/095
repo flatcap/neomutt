@@ -1,0 +1,6 @@
+{ "envelope_from_address", DT_ADDRESS, 0 },
+/*
+** .pp
+** Manually sets the \fIenvelope\fP sender for outgoing messages.
+** This value is ignored if $$use_envelope_from is \fIunset\fP.
+*/

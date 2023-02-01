@@ -1,0 +1,8 @@
+{ "pop_oauth_refresh_command", DT_COMMAND, 0 },
+/*
+** .pp
+** The command to run to generate an OAUTH refresh token for
+** authorizing your connection to your POP server.  This command will be
+** run on every connection attempt that uses the OAUTHBEARER authentication
+** mechanism.  See "$oauth" for details.
+*/

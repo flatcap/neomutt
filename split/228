@@ -1,0 +1,5 @@
+{ "nm_query_window_current_position", DT_NUMBER, 0 },
+/*
+** .pp
+** This variable contains the position of the current search for window based vfolder.
+*/

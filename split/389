@@ -1,0 +1,11 @@
+{ "smime_get_signer_cert_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to extract only the signers X509 certificate from a S/MIME
+** signature, so that the certificate's owner may get compared to the
+** email's "From:" field.
+** .pp
+** This is a format string, see the $$smime_decrypt_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (S/MIME only)
+*/

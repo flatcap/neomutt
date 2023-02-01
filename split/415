@@ -1,0 +1,6 @@
+{ "ssl_client_cert", DT_PATH, 0 },
+/*
+** .pp
+** The file containing a client certificate and its associated private
+** key.
+*/

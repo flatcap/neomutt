@@ -1,0 +1,8 @@
+{ "maildir_trash", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, messages marked as deleted will be saved with the maildir
+** trashed flag instead of unlinked.  \fBNote:\fP this only applies
+** to maildir-style mailboxes.  Setting it will have no effect on other
+** mailbox types.
+*/

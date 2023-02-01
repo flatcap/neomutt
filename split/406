@@ -1,0 +1,50 @@
+{ "sort", DT_SORT, SORT_DATE },
+/*
+** .pp
+** Specifies how to sort messages in the "index" menu.  Valid values
+** are:
+** .ts
+** .td \fBSort\fP    .td \fBDescription\fP
+** .td date          .td Sort by the date the email was sent
+** .td date-sent     .td Sort by the date the email was sent
+** .td date-received .td Sort by when the message were delivered locally
+** .td from          .td Sort by the email's From field
+** .td label         .td Sort by the emails label
+** .td unsorted      .td Sort by the order the messages appear in the mailbox
+** .td score         .td Sort by the email's score
+** .td size          .td Sort by the size of the email
+** .td spam          .td Sort by the email's spam score
+** .td subject       .td Sort by the email's subject
+** .td threads       .td Sort by email threads
+** .td to            .td Sort by the email's To field
+** .te
+** .pp
+** You may optionally use the "reverse-" prefix to specify reverse
+** sorting order, or the "last-" prefix to sort threads based on the
+** corresponding attribute of the last descendant rather than the
+** thread root.  If both prefixes are in use, "reverse-" must come
+** before "last-".  The "last-" prefix has no effect on a flat view.
+** .pp
+** Any ties in the primary sort are broken by $$sort_aux.  When
+** $$use_threads is "threads" or "reverse", $$sort controls the
+** sorting between threads, and $$sort_aux controls the sorting within
+** a thread.
+** .pp
+** The "date-sent" value is a synonym for "date". The "mailbox-order" value is
+** a synonym for "unsorted".
+** .pp
+** The values of "threads" and "reverse-threads" are legacy options,
+** which cause the value of \fC$$sort_aux\fP to also contol sorting
+** between threads, and they may not be used with the "last-" prefix.
+** The preferred way to enable a threaded view is via
+** \fC$$use_threads\fP.  This variable can also be set via the
+** \fC<sort-mailbox>\fP and \fC<sort-reverse>\fP functions.
+** .pp
+** Note: When $$use_threads is "threads", the last thread sorts to the
+** bottom; when it is "reversed", the last thread sorts to the top.
+** The use of "reverse-" in $$sort swaps which end the last thread
+** will sort to.
+** .pp
+** See the "Use Threads Feature" section for further explanation and
+** examples, https://neomutt.org/feature/use-threads
+*/

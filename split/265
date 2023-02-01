@@ -1,0 +1,10 @@
+{ "pgp_export_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to export a public key from the user's
+** key ring.
+** .pp
+** This is a format string, see the $$pgp_decode_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (PGP only)
+*/

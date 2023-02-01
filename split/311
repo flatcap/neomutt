@@ -1,0 +1,6 @@
+{ "print_decode_weed", DT_BOOL, true },
+/*
+** .pp
+** For \fC<print-message>\fP, when $$print_decode is set, this
+** further controls whether NeoMutt will weed headers.
+*/

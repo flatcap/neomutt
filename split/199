@@ -1,0 +1,7 @@
+{ "message_format", DT_STRING, "%s" },
+/*
+** .pp
+** This is the string displayed in the "attachment" menu for
+** attachments of type \fCmessage/rfc822\fP.  For a full listing of defined
+** \fCprintf(3)\fP-like sequences see the section on $$index_format.
+*/

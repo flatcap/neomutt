@@ -1,0 +1,7 @@
+{ "pager_stop", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, the internal-pager will \fBnot\fP move to the next message
+** when you are at the end of a message and invoke the \fC<next-page>\fP
+** function.
+*/

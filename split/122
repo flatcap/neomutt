@@ -1,0 +1,8 @@
+{ "hdrs", DT_BOOL, true },
+/*
+** .pp
+** When \fIunset\fP, the header fields normally added by the "$my_hdr"
+** command are not created.  This variable \fImust\fP be unset before
+** composing a new message or replying in order to take effect.  If \fIset\fP,
+** the user defined header fields are added to every new message.
+*/

@@ -1,0 +1,9 @@
+{ "attach_split", DT_BOOL, true },
+/*
+** .pp
+** If this variable is \fIunset\fP, when operating (saving, printing, piping,
+** etc) on a list of tagged attachments, NeoMutt will concatenate the
+** attachments and will operate on them as a single attachment. The
+** $$attach_sep separator is added after each attachment. When \fIset\fP,
+** NeoMutt will operate on the attachments one by one.
+*/

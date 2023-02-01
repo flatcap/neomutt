@@ -1,0 +1,7 @@
+{ "nm_unread_tag", DT_STRING, "unread" },
+/*
+** .pp
+** This variable specifies notmuch tag which is used for unread messages. The
+** variable is used to count unread messages in DB and set the unread flag when
+** modifiying tags. All other NeoMutt commands use standard (e.g. maildir) flags.
+*/

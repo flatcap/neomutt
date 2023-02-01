@@ -1,0 +1,8 @@
+{ "auto_tag", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, functions in the \fIindex\fP menu which affect a message
+** will be applied to all tagged messages (if there are any).  When
+** unset, you must first use the \fC<tag-prefix>\fP function (bound to ";"
+** by default) to make the next function apply to all tagged messages.
+*/

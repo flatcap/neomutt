@@ -1,0 +1,8 @@
+{ "wrap_search", DT_BOOL, true },
+/*
+** .pp
+** Controls whether searches wrap around the end.
+** .pp
+** When \fIset\fP, searches will wrap around the first (or last) item. When
+** \fIunset\fP, incremental searches will not wrap.
+*/

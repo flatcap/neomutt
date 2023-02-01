@@ -1,0 +1,7 @@
+{ "history_file", DT_PATH, "~/.mutthistory" },
+/*
+** .pp
+** The file in which NeoMutt will save its history.
+** .pp
+** Also see $$save_history.
+*/

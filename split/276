@@ -1,0 +1,7 @@
+{ "pgp_self_encrypt", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, PGP encrypted messages will also be encrypted
+** using the key in $$pgp_default_key.
+** (PGP only)
+*/

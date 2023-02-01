@@ -1,0 +1,6 @@
+{ "forward_format", DT_STRING, "[%a: %s]" },
+/*
+** .pp
+** This variable controls the default subject when forwarding a message.
+** It uses the same format sequences as the $$index_format variable.
+*/

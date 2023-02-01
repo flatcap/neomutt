@@ -1,0 +1,6 @@
+{ "empty_subject", DT_STRING, "Re: your mail" },
+/*
+** .pp
+** This variable specifies the subject to be used when replying to an email
+** with an empty subject.  It defaults to "Re: your mail".
+*/

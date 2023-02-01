@@ -1,0 +1,11 @@
+{ "include_encrypted", DT_BOOL, false },
+/*
+** .pp
+** Controls whether or not NeoMutt includes separately encrypted attachment
+** contents when replying.
+** .pp
+** This variable was added to prevent accidental exposure of encrypted
+** contents when replying to an attacker.  If a previously encrypted message
+** were attached by the attacker, they could trick an unwary recipient into
+** decrypting and including the message in their reply.
+*/

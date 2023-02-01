@@ -1,0 +1,8 @@
+{ "abort_nosubject", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** If set to \fIyes\fP, when composing messages and no subject is given
+** at the subject prompt, composition will be aborted.  If set to
+** \fIno\fP, composing messages with no subject given at the subject
+** prompt will never be aborted.
+*/

@@ -1,0 +1,6 @@
+{ "nm_default_url", DT_STRING, 0 },
+/*
+** .pp
+** This variable specifies the default Notmuch database in format
+** notmuch://<absolute path>.
+*/

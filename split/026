@@ -1,0 +1,7 @@
+{ "attribution", DT_STRING, "On %d, %n wrote:" },
+/*
+** .pp
+** This is the string that will precede a message which has been included
+** in a reply.  For a full listing of defined \fCprintf(3)\fP-like sequences see
+** the section on $$index_format.
+*/

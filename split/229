@@ -1,0 +1,5 @@
+{ "nm_query_window_current_search", DT_STRING, 0 },
+/*
+** .pp
+** This variable contains the currently setup notmuch search for window based vfolder.
+*/

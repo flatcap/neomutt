@@ -1,0 +1,5 @@
+{ "nm_query_type", DT_STRING, "messages" },
+/*
+** .pp
+** This variable specifies the default query type (threads or messages) used in notmuch queries.
+*/

@@ -1,0 +1,8 @@
+{ "ssl_verify_dates", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP (the default), NeoMutt will not automatically accept a server
+** certificate that is either not yet valid or already expired. You should
+** only unset this for particular known hosts, using the
+** \fC$<account-hook>\fP function.
+*/

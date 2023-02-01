@@ -1,0 +1,10 @@
+{ "save_empty", DT_BOOL, true },
+/*
+** .pp
+** When \fIunset\fP, mailboxes which contain no saved messages will be removed
+** when closed (the exception is $$spool_file which is never removed).
+** If \fIset\fP, mailboxes are never removed.
+** .pp
+** \fBNote:\fP This only applies to mbox and MMDF folders, NeoMutt does not
+** delete MH and Maildir directories.
+*/

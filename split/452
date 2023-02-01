@@ -1,0 +1,7 @@
+{ "use_domain", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will qualify all local addresses (ones without the
+** "@host" portion) with the value of $$hostname.  If \fIunset\fP, no
+** addresses will be qualified.
+*/

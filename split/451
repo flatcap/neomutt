@@ -1,0 +1,10 @@
+{ "use_8bit_mime", DT_BOOL, false },
+/*
+** .pp
+** \fBWarning:\fP do not set this variable unless you are using a version
+** of sendmail which supports the \fC-B8BITMIME\fP flag (such as sendmail
+** 8.8.x) or you may not be able to send mail.
+** .pp
+** When \fIset\fP, NeoMutt will invoke $$sendmail with the \fC-B8BITMIME\fP
+** flag when sending 8-bit messages to enable ESMTP negotiation.
+*/

@@ -1,0 +1,6 @@
+{ "hide_missing", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will not show the presence of missing messages in the
+** thread tree.
+*/

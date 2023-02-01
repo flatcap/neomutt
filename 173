@@ -1,0 +1,23 @@
+{ "inews", DT_COMMAND, 0 },
+/*
+** .ts
+** .th \fBExpando\fP .th \fBDescription\fP
+** .td %a .td account url
+** .td %p .td port
+** .td %P .td port if specified
+** .td %s .td news server name
+** .td %S .td url schema
+** .td %u .td username
+** .te
+*/
+/*--*/
+
+** .pp
+** If set, specifies the program and arguments used to deliver news posted
+** by NeoMutt.  Otherwise, NeoMutt posts article using current connection to
+** news server.  The following printf-style sequence is understood:
+** .pp
+
+** .ex
+** set inews="/usr/local/bin/inews -hS"
+** .ee

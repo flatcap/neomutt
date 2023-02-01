@@ -1,0 +1,7 @@
+{ "news_cache_dir", DT_PATH, "~/.neomutt" },
+/*
+** .pp
+** This variable pointing to directory where NeoMutt will save cached news
+** articles and headers in. If \fIunset\fP, articles and headers will not be
+** saved at all and will be reloaded from the server each time.
+*/

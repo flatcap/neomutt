@@ -1,0 +1,7 @@
+{ "crypt_reply_encrypt", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, automatically PGP or OpenSSL encrypt replies to messages which are
+** encrypted.
+** (Crypto only)
+*/

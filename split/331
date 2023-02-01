@@ -1,0 +1,9 @@
+{ "resume_draft_files", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, draft files (specified by \fC-H\fP on the command
+** line) are processed similarly to when resuming a postponed
+** message.  Recipients are not prompted for; send-hooks are not
+** evaluated; no alias expansion takes place; user-defined headers
+** and signatures are not added to the message.
+*/

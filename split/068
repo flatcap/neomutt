@@ -1,0 +1,20 @@
+{ "crypt_protected_headers_read", DT_BOOL, true },
+/*
+** .pp
+** When set, NeoMutt will display protected headers ("Memory Hole") in the pager,
+** When set, NeoMutt will display protected headers in the pager,
+** and will update the index and header cache with revised headers.
+** .pp
+** Protected headers are stored inside the encrypted or signed part of an
+** an email, to prevent disclosure or tampering.
+** For more information see https://github.com/autocrypt/protected-headers
+** Currently NeoMutt only supports the Subject header.
+** .pp
+** Encrypted messages using protected headers often substitute the exposed
+** Subject header with a dummy value (see $$crypt_protected_headers_subject).
+** NeoMutt will update its concept of the correct subject \fBafter\fP the
+** message is opened, i.e. via the \fC<display-message>\fP function.
+** If you reply to a message before opening it, NeoMutt will end up using
+** the dummy Subject header, so be sure to open such a message first.
+** (Crypto only)
+*/

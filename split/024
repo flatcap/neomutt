@@ -1,0 +1,6 @@
+{ "attach_sep", DT_STRING, "\n" },
+/*
+** .pp
+** The separator to add between attachments when operating (saving,
+** printing, piping, etc) on a list of tagged attachments.
+*/

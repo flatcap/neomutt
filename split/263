@@ -1,0 +1,9 @@
+{ "pgp_encrypt_sign_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to both sign and encrypt a body part.
+** .pp
+** This is a format string, see the $$pgp_decode_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (PGP only)
+*/

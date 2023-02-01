@@ -1,0 +1,7 @@
+{ "autocrypt_dir", DT_PATH, "~/.mutt/autocrypt" },
+/*
+** .pp
+** This variable sets where autocrypt files are stored, including the GPG
+** keyring and SQLite database.  See "$autocryptdoc" for more details.
+** (Autocrypt only)
+*/

@@ -1,0 +1,8 @@
+{ "sidebar_visible", DT_BOOL, false },
+/*
+** .pp
+** This specifies whether or not to show sidebar. The sidebar shows a list of
+** all your mailboxes.
+** .pp
+** \fBSee also:\fP $$sidebar_format, $$sidebar_width
+*/

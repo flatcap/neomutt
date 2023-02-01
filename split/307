@@ -1,0 +1,10 @@
+{ "preferred_languages", DT_SLIST, 0 },
+/*
+** .pp
+** This variable specifies a list of comma-separated languages.
+** RFC8255 : user preferred languages to be searched in parts and display.
+** Example:
+** .ex
+** set preferred_languages="en,fr,de"
+** .ee
+*/

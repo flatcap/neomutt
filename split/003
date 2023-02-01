@@ -1,0 +1,13 @@
+{ "abort_noattach", DT_QUAD, MUTT_NO },
+/*
+** .pp
+** If set to \fIyes\fP, when composing messages containing the regular
+** expression specified by $$abort_noattach_regex and no attachments are
+** given, composition will be aborted. If set to \fIno\fP, composing messages
+** as such will never be aborted.
+** .pp
+** Example:
+** .ex
+** set abort_noattach_regex = "\\<attach(|ed|ments?)\\>"
+** .ee
+*/

@@ -1,0 +1,7 @@
+{ "ssl_use_tlsv1_1", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP , NeoMutt will use TLSv1.1 when communicating with servers that
+** request it. \fBN.B. As of 2015, TLSv1.1 is considered insecure, and using
+** it is inadvisable\fP. See https://tools.ietf.org/html/rfc7525
+*/

@@ -1,0 +1,6 @@
+{ "tilde", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, the internal-pager will pad blank lines to the bottom of the
+** screen with a tilde ("~").
+*/

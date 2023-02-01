@@ -1,0 +1,7 @@
+{ "mark_macro_prefix", DT_STRING, "'" },
+/*
+** .pp
+** Prefix for macros created using mark-message.  A new macro
+** automatically generated with \fI<mark-message>a\fP will be composed
+** from this prefix and the letter \fIa\fP.
+*/

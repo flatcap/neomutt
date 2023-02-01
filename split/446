@@ -1,0 +1,7 @@
+{ "ts_status_format", DT_STRING, "NeoMutt with %?m?%m messages&no messages?%?n? [%n NEW]?" },
+/*
+** .pp
+** Controls the format of the terminal status line (or window title),
+** provided that "$$ts_enabled" has been set. This string is identical in
+** formatting to the one used by "$$status_format".
+*/

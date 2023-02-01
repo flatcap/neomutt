@@ -1,0 +1,6 @@
+{ "ask_cc", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will prompt you for carbon-copy (Cc) recipients before
+** editing the body of an outgoing message.
+*/

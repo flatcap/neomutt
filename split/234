@@ -1,0 +1,9 @@
+{ "nm_record", DT_BOOL, false },
+/*
+** .pp
+** This variable specifies whether, when writing a just-sent message to the
+** $$record, the message should also be added to the notmuch DB. Replies inherit
+** the notmuch tags from the original message. See $$nm_record_tags for how to
+** modify the set of notmuch tags assigned to sent messages written to the
+** record.
+*/

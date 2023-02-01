@@ -1,0 +1,6 @@
+{ "shell", DT_COMMAND, "/bin/sh" },
+/*
+** .pp
+** Command to use when spawning a subshell.
+** If not specified, then the user's login shell from \fC/etc/passwd\fP is used.
+*/

@@ -1,0 +1,7 @@
+{ "pop_user", DT_STRING, 0 },
+/*
+** .pp
+** Your login name on the POP server.
+** .pp
+** This variable defaults to your user name on the local machine.
+*/

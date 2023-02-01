@@ -1,0 +1,9 @@
+{ "keep_flagged", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, read messages marked as flagged will not be moved
+** from your spool mailbox to your $$mbox mailbox or to the "mbox"
+** specified by a $mbox-hook command.
+** .pp
+** Note that $$keep_flagged only has an effect if $$move is set.
+*/

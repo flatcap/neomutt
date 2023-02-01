@@ -1,0 +1,9 @@
+{ "spam_separator", DT_STRING, "," },
+/*
+** .pp
+** This variable controls what happens when multiple spam headers
+** are matched: if \fIunset\fP, each successive header will overwrite any
+** previous matches value for the spam label. If \fIset\fP, each successive
+** match will append to the previous, using this variable's value as a
+** separator.
+*/

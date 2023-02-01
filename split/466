@@ -1,0 +1,6 @@
+{ "x_comment_to", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will add "X-Comment-To:" field (that contains full
+** name of original article author) to article that followuped to newsgroup.
+*/

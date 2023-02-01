@@ -1,0 +1,6 @@
+{ "uncollapse_jump", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will jump to the next unread message, if any,
+** when the current thread is \fIun\fPcollapsed.
+*/

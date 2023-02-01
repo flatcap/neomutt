@@ -1,0 +1,12 @@
+{ "mime_forward", DT_QUAD, MUTT_NO },
+/*
+** .pp
+** When \fIset\fP, the message you are forwarding will be attached as a
+** separate \fCmessage/rfc822\fP MIME part instead of included in the main body of the
+** message.  This is useful for forwarding MIME messages so the receiver
+** can properly view the message as it was delivered to you. If you like
+** to switch between MIME and not MIME from mail to mail, set this
+** variable to "ask-no" or "ask-yes".
+** .pp
+** Also see $$forward_decode and $$mime_forward_decode.
+*/

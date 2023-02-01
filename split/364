@@ -1,0 +1,17 @@
+{ "sidebar_short_path", DT_BOOL, false },
+/*
+** .pp
+** By default the sidebar will show the mailbox's path, relative to the
+** $$folder variable. Setting \fCsidebar_shortpath=yes\fP will shorten the
+** names relative to the previous name. Here's an example:
+** .ts
+** .td \fBshortpath=no\fP .td \fBshortpath=yes\fP .td \fBshortpath=yes, folderindent=yes, indentstr=".."\fP
+** .td \fCfruit\fP        .td \fCfruit\fP         .td \fCfruit\fP
+** .td \fCfruit.apple\fP  .td \fCapple\fP         .td \fC..apple\fP
+** .td \fCfruit.banana\fP .td \fCbanana\fP        .td \fC..banana\fP
+** .td \fCfruit.cherry\fP .td \fCcherry\fP        .td \fC..cherry\fP
+** .te
+** .pp
+** \fBSee also:\fP $$sidebar_delim_chars, $$sidebar_folder_indent,
+** $$sidebar_indent_string, $$sidebar_component_depth.
+*/

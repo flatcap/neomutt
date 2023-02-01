@@ -1,0 +1,9 @@
+{ "imap_idle", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will attempt to use the IMAP IDLE extension
+** to check for new mail in the current mailbox. Some servers
+** (dovecot was the inspiration for this option) react badly
+** to NeoMutt's implementation. If your connection seems to freeze
+** up periodically, try unsetting this.
+*/

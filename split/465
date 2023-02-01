@@ -1,0 +1,10 @@
+{ "write_inc", DT_NUMBER, 10 },
+/*
+** .pp
+** When writing a mailbox, a message will be printed every
+** $$write_inc messages to indicate progress.  If set to 0, only a
+** single message will be displayed before writing a mailbox.
+** .pp
+** Also see the $$read_inc, $$net_inc and $$time_inc variables and the
+** "$tuning" section of the manual for performance considerations.
+*/

@@ -1,0 +1,6 @@
+{ "size_show_mb", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, message sizes will display megabytes for values greater than
+** or equal to 1 megabyte.  See $formatstrings-size.
+*/

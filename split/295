@@ -1,0 +1,7 @@
+{ "pop_last", DT_BOOL, false },
+/*
+** .pp
+** If this variable is \fIset\fP, NeoMutt will try to use the "\fCLAST\fP" POP command
+** for retrieving only unread messages from the POP server when using
+** the \fC$<fetch-mail>\fP function.
+*/

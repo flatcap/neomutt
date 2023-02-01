@@ -1,0 +1,11 @@
+{ "mh_purge", DT_BOOL, false },
+/*
+** .pp
+** When \fIunset\fP, NeoMutt will mimic mh's behavior and rename deleted messages
+** to \fI,<old file name>\fP in mh folders instead of really deleting
+** them. This leaves the message on disk but makes programs reading the folder
+** ignore it. If the variable is \fIset\fP, the message files will simply be
+** deleted.
+** .pp
+** This option is similar to $$maildir_trash for Maildir folders.
+*/

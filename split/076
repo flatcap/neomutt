@@ -1,0 +1,12 @@
+{ "crypt_use_gpgme", DT_BOOL, true },
+/*
+** .pp
+** This variable controls the use of the GPGME-enabled crypto backends.
+** If it is \fIset\fP and NeoMutt was built with GPGME support, the gpgme code for
+** S/MIME and PGP will be used instead of the classic code.  Note that
+** you need to set this option in .neomuttrc; it won't have any effect when
+** used interactively.
+** .pp
+** Note that the GPGME backend does not support creating old-style inline
+** (traditional) PGP encrypted or signed messages (see $$pgp_auto_inline).
+*/

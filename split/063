@@ -1,0 +1,8 @@
+{ "crypt_auto_smime", DT_BOOL, true },
+/*
+** .pp
+** This variable controls whether or not NeoMutt may automatically enable
+** S/MIME encryption/signing for messages. See also $$crypt_auto_encrypt,
+** $$crypt_reply_encrypt,
+** $$crypt_auto_sign, $$crypt_reply_sign and $$smime_is_default.
+*/

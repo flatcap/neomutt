@@ -1,0 +1,7 @@
+{ "ssl_min_dh_prime_bits", DT_NUMBER, 0 },
+/*
+** .pp
+** This variable specifies the minimum acceptable prime size (in bits)
+** for use in any Diffie-Hellman key exchange. A value of 0 will use
+** the default from the GNUTLS library. (GnuTLS only)
+*/

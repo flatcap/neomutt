@@ -1,0 +1,6 @@
+{ "pipe_decode_weed", DT_BOOL, true },
+/*
+** .pp
+** For \fC<pipe-message>\fP, when $$pipe_decode is set, this further
+** controls whether NeoMutt will weed headers.
+*/

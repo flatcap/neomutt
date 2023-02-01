@@ -1,0 +1,13 @@
+{ "indent_string", DT_STRING, "> " },
+/*
+** .pp
+** Specifies the string to prepend to each line of text quoted in a
+** message to which you are replying.  You are strongly encouraged not to
+** change this value, as it tends to agitate the more fanatical netizens.
+** .pp
+** The value of this option is ignored if $$text_flowed is set, because
+** the quoting mechanism is strictly defined for format=flowed.
+** .pp
+** This option is a format string, please see the description of
+** $$index_format for supported \fCprintf(3)\fP-style sequences.
+*/

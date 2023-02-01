@@ -1,0 +1,5 @@
+{ "mh_seq_replied", DT_STRING, "replied" },
+/*
+** .pp
+** The name of the MH sequence used to tag replied messages.
+*/

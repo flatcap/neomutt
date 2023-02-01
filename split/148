@@ -1,0 +1,12 @@
+{ "imap_condstore", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will use the CONDSTORE extension (RFC7162)
+** if advertised by the server.  NeoMutt's current implementation is basic,
+** used only for initial message fetching and flag updates.
+** .pp
+** For some IMAP servers, enabling this will slightly speed up
+** downloading initial messages.  Unfortunately, Gmail is not one
+** those, and displays worse performance when enabled.  Your
+** mileage may vary.
+*/

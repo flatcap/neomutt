@@ -1,0 +1,6 @@
+{ "nm_query_window_timebase", DT_STRING, "week" },
+/*
+** .pp
+** This variable sets the time base of a windowed notmuch query.
+** Accepted values are 'minute', 'hour', 'day', 'week', 'month', 'year'
+*/

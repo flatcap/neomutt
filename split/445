@@ -1,0 +1,7 @@
+{ "ts_icon_format", DT_STRING, "M%?n?AIL&ail?" },
+/*
+** .pp
+** Controls the format of the icon title, as long as "$$ts_enabled" is set.
+** This string is identical in formatting to the one used by
+** "$$status_format".
+*/

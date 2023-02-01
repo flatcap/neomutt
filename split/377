@@ -1,0 +1,8 @@
+{ "smart_wrap", DT_BOOL, true },
+/*
+** .pp
+** Controls the display of lines longer than the screen width in the
+** internal pager. If \fIset\fP, long lines are wrapped at a word boundary.  If
+** \fIunset\fP, lines are simply wrapped at the screen edge. Also see the
+** $$markers variable.
+*/

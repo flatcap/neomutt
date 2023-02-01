@@ -1,0 +1,22 @@
+{ "sidebar_sort_method", DT_SORT, SORT_ORDER },
+/*
+** .pp
+** Specifies how to sort mailbox entries in the sidebar.
+** By default, the entries are \fBunsorted\fP.
+** Valid values:
+** .pp
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td \fBpath\fP     .td Alphabetically
+** .td \fBcount\fP    .td All message count
+** .td \fBflagged\fP  .td Flagged message count
+** .td \fBunread\fP   .td Unread message count
+** .td \fBunsorted\fP .td
+** .te
+** .pp
+** You may optionally use the "reverse-" prefix to specify reverse sorting
+** order (example: "\fCset sidebar_sort_method=reverse-path\fP").
+** .pp
+** The \fBalpha\fP and \fBname\fP values are synonyms for \fBpath\fP. The
+** \fBnew\fP value is a synonym for \fBunread\fP.
+*/

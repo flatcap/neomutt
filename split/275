@@ -1,0 +1,11 @@
+{ "pgp_retainable_sigs", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, signed and encrypted messages will consist of nested
+** \fCmultipart/signed\fP and \fCmultipart/encrypted\fP body parts.
+** .pp
+** This is useful for applications like encrypted and signed mailing
+** lists, where the outer layer (\fCmultipart/encrypted\fP) can be easily
+** removed, while the inner \fCmultipart/signed\fP part is retained.
+** (PGP only)
+*/

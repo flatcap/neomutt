@@ -1,0 +1,9 @@
+{ "postponed", DT_MAILBOX, "~/postponed" },
+/*
+** .pp
+** NeoMutt allows you to indefinitely "$postpone sending a message" which
+** you are editing.  When you choose to postpone a message, NeoMutt saves it
+** in the mailbox specified by this variable.
+** .pp
+** Also see the $$postpone variable.
+*/

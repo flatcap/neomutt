@@ -1,0 +1,19 @@
+{ "group_index_format", DT_STRING, "%4C %M%N %5s  %-45.45f %d" },
+/*
+** .pp
+** This variable allows you to customize the newsgroup browser display to
+** your personal taste.  This string is similar to "$index_format", but
+** has its own set of printf()-like sequences:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %C  .td Current newsgroup number
+** .td %d  .td Description of newsgroup (becomes from server)
+** .td %f  .td Newsgroup name
+** .td %M  .td - if newsgroup not allowed for direct post (moderated for example)
+** .td %N  .td N if newsgroup is new, u if unsubscribed, blank otherwise
+** .td %n  .td Number of new articles in newsgroup
+** .td %s  .td Number of unread articles in newsgroup
+** .td %>X .td Right justify the rest of the string and pad with character "X"
+** .td %|X .td Pad to the end of the line with character "X"
+** .te
+*/

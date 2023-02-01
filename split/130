@@ -1,0 +1,8 @@
+{ "hidden_host", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will skip the host name part of $$hostname variable
+** when adding the domain part to addresses.  This variable does not
+** affect the generation of Message-IDs, and it will not lead to the
+** cut-off of first-level domains.
+*/

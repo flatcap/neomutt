@@ -1,0 +1,11 @@
+{ "reflow_space_quotes", DT_BOOL, true },
+/*
+** .pp
+** This option controls how quotes from format=flowed messages are displayed
+** in the pager and when replying (with $$text_flowed \fIunset\fP).
+** When set, this option adds spaces after each level of quote marks, turning
+** ">>>foo" into "> > > foo".
+** .pp
+** \fBNote:\fP If $$reflow_text is \fIunset\fP, this option has no effect.
+** Also, this option does not affect replies when $$text_flowed is \fIset\fP.
+*/

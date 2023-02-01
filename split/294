@@ -1,0 +1,11 @@
+{ "pop_host", DT_STRING, 0 },
+/*
+** .pp
+** The name of your POP server for the \fC$<fetch-mail>\fP function.  You
+** can also specify an alternative port, username and password, i.e.:
+** .ex
+** [pop[s]://][username[:password]@]popserver[:port]
+** .ee
+** .pp
+** where "[...]" denotes an optional part.
+*/

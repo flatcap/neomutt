@@ -1,0 +1,13 @@
+{ "crypt_chars", DT_MBTABLE, "SPsK " },
+/*
+** .pp
+** Controls the characters used in cryptography flags.
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td S .td The mail is signed, and the signature is successfully verified.
+** .td 2 .td P .td The mail is PGP encrypted.
+** .td 3 .td s .td The mail is signed.
+** .td 4 .td K .td The mail contains a PGP public key.
+** .td 5 .td <space> .td The mail has no crypto info.
+** .te
+*/

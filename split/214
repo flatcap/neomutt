@@ -1,0 +1,9 @@
+{ "net_inc", DT_NUMBER, 10 },
+/*
+** .pp
+** Operations that expect to transfer a large amount of data over the
+** network will update their progress every $$net_inc kilobytes.
+** If set to 0, no progress messages will be displayed.
+** .pp
+** See also $$read_inc, $$write_inc and $$net_inc.
+*/

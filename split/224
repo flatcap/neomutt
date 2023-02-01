@@ -1,0 +1,6 @@
+{ "nm_exclude_tags", DT_STRING, 0 },
+/*
+** .pp
+** The messages tagged with these tags are excluded and not loaded
+** from notmuch DB to NeoMutt unless specified explicitly.
+*/

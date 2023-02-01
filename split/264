@@ -1,0 +1,23 @@
+{ "pgp_entry_format", DT_STRING, "%4n %t%f %4l/0x%k %-4a %2c %u" },
+/*
+** .pp
+** This variable allows you to customize the PGP key selection menu to
+** your personal taste. If $$crypt_use_gpgme is \fIset\fP, then it applies
+** to S/MIME key selection menu also. This string is similar to $$index_format,
+** but has its own set of \fCprintf(3)\fP-like sequences:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a     .td Algorithm
+** .td %c     .td Capabilities
+** .td %f     .td Flags
+** .td %k     .td Key id
+** .td %l     .td Key length
+** .td %n     .td Number
+** .td %p     .td Protocol
+** .td %t     .td Trust/validity of the key-uid association
+** .td %u     .td User id
+** .td %[<s>] .td Date of the key where <s> is an \fCstrftime(3)\fP expression
+** .te
+** .pp
+** (Crypto only) or (PGP only when GPGME disabled)
+*/

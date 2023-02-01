@@ -1,0 +1,6 @@
+{ "include", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** Controls whether or not a copy of the message(s) you are replying to
+** is included in your reply.
+*/

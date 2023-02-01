@@ -1,0 +1,17 @@
+{ "pgp_sort_keys", DT_SORT, SORT_ADDRESS },
+/*
+** .pp
+** Specifies how the entries in the pgp menu are sorted. The
+** following are legal values:
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td address .td sort alphabetically by user id
+** .td keyid   .td sort alphabetically by key id
+** .td date    .td sort by key creation date
+** .td trust   .td sort by the trust of the key
+** .te
+** .pp
+** If you prefer reverse order of the above values, prefix it with
+** "reverse-".
+** (PGP only)
+*/

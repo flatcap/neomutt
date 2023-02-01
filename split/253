@@ -1,0 +1,10 @@
+{ "pgp_auto_decode", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will automatically attempt to decrypt traditional PGP
+** messages whenever the user performs an operation which ordinarily would
+** result in the contents of the message being operated on.  For example,
+** if the user displays a pgp-traditional message which has not been manually
+** checked with the \fC$<check-traditional-pgp>\fP function, NeoMutt will automatically
+** check the message for traditional pgp.
+*/

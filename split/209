@@ -1,0 +1,6 @@
+{ "mime_type_query_first", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, the $$mime_type_query_command will be run before the
+** mime.types lookup.
+*/

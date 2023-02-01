@@ -1,0 +1,8 @@
+{ "menu_scroll", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, menus will be scrolled up or down one line when you
+** attempt to move across a screen boundary.  If \fIunset\fP, the screen
+** is cleared and the next or previous page of the menu is displayed
+** (useful for slow links to avoid many redraws).
+*/

@@ -1,0 +1,14 @@
+{ "thorough_search", DT_BOOL, true },
+/*
+** .pp
+** Affects the \fC~b\fP, \fC~B\fP, and \fC~h\fP search operations described in
+** section "$patterns".  If \fIset\fP, the headers and body/attachments of
+** messages to be searched are decoded before searching. If \fIunset\fP,
+** messages are searched as they appear in the folder.
+** .pp
+** Users searching attachments or for non-ASCII characters should \fIset\fP
+** this value because decoding also includes MIME parsing/decoding and possible
+** character set conversions. Otherwise NeoMutt will attempt to match against the
+** raw message received (for example quoted-printable encoded or with encoded
+** headers) which may lead to incorrect search results.
+*/

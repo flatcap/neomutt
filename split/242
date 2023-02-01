@@ -1,0 +1,5 @@
+{ "nntp_pass", DT_STRING, 0 },
+/*
+** .pp
+** Your password for NNTP account.
+*/

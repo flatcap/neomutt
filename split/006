@@ -1,0 +1,8 @@
+{ "abort_unmodified", DT_QUAD, MUTT_YES },
+/*
+** .pp
+** If set to \fIyes\fP, composition will automatically abort after
+** editing the message body if no changes are made to the file (this
+** check only happens after the \fIfirst\fP edit of the file).  When set
+** to \fIno\fP, composition will never be aborted.
+*/

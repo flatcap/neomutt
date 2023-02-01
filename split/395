@@ -1,0 +1,7 @@
+{ "smime_sign_as", DT_STRING, 0 },
+/*
+** .pp
+** If you have a separate key to use for signing, you should set this
+** to the signing key. Most people will only need to set $$smime_default_key.
+** (S/MIME only)
+*/

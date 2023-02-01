@@ -1,0 +1,12 @@
+{ "sendmail", DT_COMMAND, SENDMAIL " -oem -oi" },
+/*
+** .pp
+** Specifies the program and arguments used to deliver mail sent by NeoMutt.
+** NeoMutt expects that the specified program interprets additional
+** arguments as recipient addresses.  NeoMutt appends all recipients after
+** adding a \fC--\fP delimiter (if not already present).  Additional
+** flags, such as for $$use_8bit_mime, $$use_envelope_from,
+** $$dsn_notify, or $$dsn_return will be added before the delimiter.
+** .pp
+** \fBSee also:\fP $$write_bcc.
+*/

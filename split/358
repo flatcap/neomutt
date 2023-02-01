@@ -1,0 +1,37 @@
+{ "sidebar_format", DT_STRING, "%D%*  %n" },
+/*
+** .pp
+** This variable allows you to customize the sidebar display. This string is
+** similar to $$index_format, but has its own set of \fCprintf(3)\fP-like
+** sequences:
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %B .td     .td Name of the mailbox
+** .td %d .td * @ .td Number of deleted messages in the mailbox
+** .td %D .td     .td Descriptive name of the mailbox
+** .td %F .td *   .td Number of flagged messages in the mailbox
+** .td %L .td * @ .td Number of messages after limiting
+** .td %n .td     .td "N" if mailbox has new mail, " " (space) otherwise
+** .td %N .td *   .td Number of unread messages in the mailbox (seen or unseen)
+** .td %o .td *   .td Number of old messages in the mailbox (unread, seen)
+** .td %r .td *   .td Number of read messages in the mailbox (read, seen)
+** .td %S .td *   .td Size of mailbox (total number of messages)
+** .td %t .td * @ .td Number of tagged messages in the mailbox
+** .td %Z .td *   .td Number of new messages in the mailbox (unread, unseen)
+** .td %! .td     .td "!" : one flagged message;
+**                    "!!" : two flagged messages;
+**                    "n!" : n flagged messages (for n > 2).
+**                    Otherwise prints nothing.
+** .td %>X .td .td Right justify the rest of the string and pad with "X"
+** .td %|X .td .td Pad to the end of the line with "X"
+** .td %*X .td .td Soft-fill with character "X" as pad
+** .te
+** .pp
+** * = Can be optionally printed if nonzero
+** .pp
+** @ = Only applicable to the current folder
+** .pp
+** In order to use %S, %N, %F, and %!, $$mail_check_stats must
+** be \fIset\fP.  When thus set, a suggested value for this option is
+** "%B%?F? [%F]?%* %?N?%N/?%S".
+*/

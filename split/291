@@ -1,0 +1,16 @@
+{ "pop_authenticators", DT_SLIST, 0 },
+/*
+** .pp
+** This is a colon-separated list of authentication methods NeoMutt may
+** attempt to use to log in to an POP server, in the order NeoMutt should
+** try them.  Authentication methods are either "user", "apop" or any
+** SASL mechanism, e.g. "digest-md5", "gssapi" or "cram-md5".
+** This option is case-insensitive. If this option is \fIunset\fP
+** (the default) NeoMutt will try all available methods, in order from
+** most-secure to least-secure.
+** .pp
+** Example:
+** .ex
+** set pop_authenticators="digest-md5:apop:user"
+** .ee
+*/

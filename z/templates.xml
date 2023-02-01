@@ -1,0 +1,12 @@
+<sect2 id="\2">
+  <title>\3</title>
+  <note>Renamed to 
+  <link linkend="\4">$\5</link>(\1).</note>
+</sect2>
+
+\2<note>Before \1, this was called $\3</note>
+
+<sect2 id="\2">
+  <title>\3</title>
+  <note>Deprecated, since \1</note>
+</sect2>

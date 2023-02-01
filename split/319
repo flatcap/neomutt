@@ -1,0 +1,5 @@
+{ "read_only", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, all folders are opened in read-only mode.
+*/

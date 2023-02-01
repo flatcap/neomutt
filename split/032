@@ -1,0 +1,16 @@
+{ "autocrypt_acct_format", DT_STRING, "%4n %-30a %20p %10s" },
+/*
+** .pp
+** This variable describes the format of the "autocrypt account" menu.
+** The following \fCprintf(3)\fP-style sequences are understood
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td Email address
+** .td %k  .td GPG keyid
+** .td %n  .td Current entry number
+** .td %p  .td Prefer-encrypt flag
+** .td %s  .td Status flag (active/inactive)
+** .te
+** .pp
+** (Autocrypt only)
+*/

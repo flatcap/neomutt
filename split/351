@@ -1,0 +1,7 @@
+{ "show_multipart_alternative", DT_STRING, 0 },
+/*
+** .pp
+** When \fIset\fP to \fCinfo\fP, the multipart/alternative information is shown.
+** When \fIset\fP to \fCinline\fP, all of the alternatives are displayed.
+** When not set, the default behavior is to show only the chosen alternative.
+*/

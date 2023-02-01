@@ -1,0 +1,8 @@
+{ "forward_decode", DT_BOOL, true },
+/*
+** .pp
+** Controls the decoding of complex MIME messages into \fCtext/plain\fP when
+** forwarding a message.  The message header is also RFC2047 decoded.
+** This variable is only used, if $$mime_forward is \fIunset\fP,
+** otherwise $$mime_forward_decode is used instead.
+*/

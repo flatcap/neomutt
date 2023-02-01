@@ -1,0 +1,7 @@
+{ "ssl_use_system_certs", DT_BOOL, true },
+/*
+** .pp
+** If set to \fIyes\fP, NeoMutt will use CA certificates in the
+** system-wide certificate store when checking if a server certificate
+** is signed by a trusted CA. (OpenSSL only)
+*/

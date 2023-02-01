@@ -1,0 +1,5 @@
+{ "nm_query_window_enable", DT_BOOL, false },
+/*
+** .pp
+** This variable enables windowed notmuch queries even if window duration is 0.
+*/

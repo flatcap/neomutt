@@ -1,0 +1,7 @@
+{ "score", DT_BOOL, true },
+/*
+** .pp
+** When this variable is \fIunset\fP, scoring is turned off.  This can
+** be useful to selectively disable scoring for certain folders when the
+** $$score_threshold_delete variable and related are used.
+*/

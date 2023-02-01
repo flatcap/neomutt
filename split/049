@@ -1,0 +1,6 @@
+{ "collapse_unread", DT_BOOL, true },
+/*
+** .pp
+** When \fIunset\fP, NeoMutt will not collapse a thread if it contains any
+** unread messages.
+*/

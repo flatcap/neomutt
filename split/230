@@ -1,0 +1,6 @@
+{ "nm_query_window_duration", DT_NUMBER, 0 },
+/*
+** .pp
+** This variable sets the time duration of a windowed notmuch query.
+** Accepted values all non negative integers. A value of 0 disables the feature.
+*/

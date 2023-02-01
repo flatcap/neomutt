@@ -1,0 +1,6 @@
+{ "digest_collapse", DT_BOOL, true },
+/*
+** .pp
+** If this option is \fIset\fP, NeoMutt's received-attachments menu will not show the subparts of
+** individual messages in a multipart/digest.  To see these subparts, press "v" on that menu.
+*/

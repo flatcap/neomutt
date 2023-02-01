@@ -1,0 +1,7 @@
+{ "new_mail_command", DT_COMMAND, 0 },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will call this command after a new message is received.
+** See the $$status_format documentation for the values that can be formatted
+** into this command.
+*/

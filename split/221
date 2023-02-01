@@ -1,0 +1,5 @@
+{ "nm_config_profile", DT_STRING, 0 },
+/*
+** .pp
+** Configuration profile for notmuch.
+*/

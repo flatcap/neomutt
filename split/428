@@ -1,0 +1,14 @@
+{ "ssl_verify_partial_chains", DT_BOOL, false },
+/*
+** .pp
+** This option should not be changed from the default unless you understand
+** what you are doing.
+** .pp
+** Setting this variable to \fIyes\fP will permit verifying partial
+** certification chains, i. e. a certificate chain where not the root,
+** but an intermediate certificate CA, or the host certificate, are
+** marked trusted (in $$certificate_file), without marking the root
+** signing CA as trusted.
+** .pp
+** (OpenSSL 1.0.2b and newer only).
+*/

@@ -1,0 +1,8 @@
+{ "use_from", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will generate the "From:" header field when
+** sending messages.  If \fIunset\fP, no "From:" header field will be
+** generated unless the user explicitly sets one using the "$my_hdr"
+** command.
+*/

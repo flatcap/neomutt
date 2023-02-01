@@ -1,0 +1,13 @@
+{ "message_cache_dir", DT_PATH, 0 },
+/*
+** .pp
+** Set this to a directory and NeoMutt will cache copies of messages from
+** your IMAP and POP servers here. You are free to remove entries at any
+** time.
+** .pp
+** When setting this variable to a directory, NeoMutt needs to fetch every
+** remote message only once and can perform regular expression searches
+** as fast as for local folders.
+** .pp
+** Also see the $$message_cache_clean variable.
+*/

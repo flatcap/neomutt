@@ -1,0 +1,7 @@
+{ "imap_login", DT_STRING, 0 },
+/*
+** .pp
+** Your login name on the IMAP server.
+** .pp
+** This variable defaults to the value of $$imap_user.
+*/

@@ -1,0 +1,11 @@
+{ "header_color_partial", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, color header regexes behave like color body regexes:
+** color is applied to the exact text matched by the regex.  When
+** \fIunset\fP, color is applied to the entire header.
+** .pp
+** One use of this option might be to apply color to just the header labels.
+** .pp
+** See "$color" for more details.
+*/

@@ -1,0 +1,9 @@
+{ "move", DT_QUAD, MUTT_NO },
+/*
+** .pp
+** If this variable is \fIset\fP, then NeoMutt will move read messages
+** from your spool mailbox to your $$mbox mailbox or to the "mbox"
+** specified by a $mbox-hook command.
+** .pp
+** See also $$keep_flagged.
+*/

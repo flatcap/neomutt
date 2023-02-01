@@ -1,0 +1,6 @@
+{ "score_threshold_flag", DT_NUMBER, 9999 },
+/*
+** .pp
+** Messages which have been assigned a score greater than or equal to this
+** variable's value are automatically marked "flagged".
+*/

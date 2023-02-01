@@ -1,0 +1,7 @@
+{ "mime_forward_decode", DT_BOOL, false },
+/*
+** .pp
+** Controls the decoding of complex MIME messages into \fCtext/plain\fP when
+** forwarding a message while $$mime_forward is \fIset\fP. Otherwise
+** $$forward_decode is used instead.
+*/

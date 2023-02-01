@@ -1,0 +1,8 @@
+{ "post_moderated", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** If set to \fIyes\fP, NeoMutt will post article to newsgroup that have
+** not permissions to posting (e.g. moderated).  \fBNote:\fP if news server
+** does not support posting to that newsgroup or totally read-only, that
+** posting will not have an effect.
+*/

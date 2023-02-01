@@ -1,0 +1,13 @@
+{ "save_name", DT_BOOL, false },
+/*
+** .pp
+** This variable controls how copies of outgoing messages are saved.
+** When \fIset\fP, a check is made to see if a mailbox specified by the
+** recipient address exists (this is done by searching for a mailbox in
+** the $$folder directory with the \fIusername\fP part of the
+** recipient address).  If the mailbox exists, the outgoing message will
+** be saved to that mailbox, otherwise the message is saved to the
+** $$record mailbox.
+** .pp
+** Also see the $$force_name variable.
+*/

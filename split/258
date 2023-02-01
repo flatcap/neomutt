@@ -1,0 +1,21 @@
+{ "pgp_decode_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This format strings specifies a command which is used to decode
+** application/pgp attachments.
+** .pp
+** The PGP command formats have their own set of \fCprintf(3)\fP-like sequences:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a .td The value of $$pgp_sign_as if set, otherwise the value
+**            of $$pgp_default_key.
+** .td %f .td Expands to the name of a file containing a message.
+** .td %p .td Expands to PGPPASSFD=0 when a pass phrase is needed, to an empty
+**            string otherwise. Note: This may be used with a %? construct.
+** .td %r .td One or more key IDs (or fingerprints if available).
+** .td %s .td Expands to the name of a file containing the signature part
+**            of a \fCmultipart/signed\fP attachment when verifying it.
+** .te
+** .pp
+** (PGP only)
+*/

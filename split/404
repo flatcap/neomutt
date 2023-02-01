@@ -1,0 +1,15 @@
+{ "smtp_url", DT_STRING, 0 },
+/*
+** .pp
+** Defines the SMTP smarthost where sent messages should relayed for
+** delivery. This should take the form of an SMTP URL, e.g.:
+** .ex
+** smtp[s]://[user[:pass]@]host[:port]
+** .ee
+** .pp
+** where "[...]" denotes an optional part.
+** Setting this variable overrides the value of the $$sendmail
+** variable.
+** .pp
+** Also see $$write_bcc.
+*/

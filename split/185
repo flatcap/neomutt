@@ -1,0 +1,8 @@
+{ "maildir_header_cache_verify", DT_BOOL, true },
+/*
+** .pp
+** Check for Maildir unaware programs other than NeoMutt having modified maildir
+** files when the header cache is in use.  This incurs one \fCstat(2)\fP per
+** message every time the folder is opened (which can be very slow for NFS
+** folders).
+*/

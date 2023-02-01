@@ -1,0 +1,6 @@
+{ "post_indent_string", DT_STRING, 0 },
+/*
+** .pp
+** Similar to the $$attribution variable, NeoMutt will append this
+** string after the inclusion of a message which is being replied to.
+*/

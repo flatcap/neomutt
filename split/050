@@ -1,0 +1,20 @@
+{ "compose_format", DT_STRING, "-- NeoMutt: Compose  [Approx. msg size: %l   Atts: %a]%>-" },
+/*
+** .pp
+** Controls the format of the status line displayed in the "compose"
+** menu.  This string is similar to $$status_format, but has its own
+** set of \fCprintf(3)\fP-like sequences:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td Total number of attachments
+** .td %h  .td Local hostname
+** .td %l  .td Approximate size (in bytes) of the current message (see $formatstrings-size)
+** .td %v  .td NeoMutt version string
+** .td %>X .td right justify the rest of the string and pad with character "X"
+** .td %|X .td pad to the end of the line with character "X"
+** .td %*X .td soft-fill with character "X" as pad
+** .te
+** .pp
+** See the text describing the $$status_format option for more
+** information on how to set $$compose_format.
+*/

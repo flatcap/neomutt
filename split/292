@@ -1,0 +1,6 @@
+{ "pop_check_interval", DT_NUMBER, 60 },
+/*
+** .pp
+** This variable configures how often (in seconds) NeoMutt should look for
+** new mail in the currently selected mailbox if it is a POP mailbox.
+*/

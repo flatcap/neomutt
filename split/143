@@ -1,0 +1,7 @@
+{ "idn_decode", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will show you international domain names decoded.
+** Note: You can use IDNs for addresses even if this is \fIunset\fP.
+** This variable only affects decoding. (IDN only)
+*/

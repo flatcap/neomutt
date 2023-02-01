@@ -1,0 +1,11 @@
+{ "mail_check_recent", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will only notify you about new mail that has been received
+** since the last time you opened the mailbox.  When \fIunset\fP, NeoMutt will notify you
+** if any new mail exists in the mailbox, regardless of whether you have visited it
+** recently.
+** .pp
+** When \fI$$mark_old\fP is set, NeoMutt does not consider the mailbox to contain new
+** mail if only old messages exist.
+*/

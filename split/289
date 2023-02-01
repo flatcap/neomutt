@@ -1,0 +1,10 @@
+{ "pipe_split", DT_BOOL, false },
+/*
+** .pp
+** Used in connection with the \fC<pipe-message>\fP function following
+** \fC<tag-prefix>\fP.  If this variable is \fIunset\fP, when piping a list of
+** tagged messages NeoMutt will concatenate the messages and will pipe them
+** all concatenated.  When \fIset\fP, NeoMutt will pipe the messages one by one.
+** In both cases the messages are piped in the current sorted order,
+** and the $$pipe_sep separator is added after each message.
+*/

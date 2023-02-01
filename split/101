@@ -1,0 +1,19 @@
+{ "flag_chars", DT_MBTABLE, "*!DdrONon- " },
+/*
+** .pp
+** Controls the characters used in several flags.
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td * .td The mail is tagged.
+** .td 2 .td ! .td The mail is flagged as important.
+** .td 3 .td D .td The mail is marked for deletion.
+** .td 4 .td d .td The mail has attachments marked for deletion.
+** .td 5 .td r .td The mail has been replied to.
+** .td 6 .td O .td The mail is Old (Unread but seen).
+** .td 7 .td N .td The mail is New (Unread but not seen).
+** .td 8 .td o .td The mail thread is Old (Unread but seen).
+** .td 9 .td n .td The mail thread is New (Unread but not seen).
+** .td 10 .td - .td The mail is read - %S expando.
+** .td 11 .td <space> .td The mail is read - %Z expando.
+** .te
+*/

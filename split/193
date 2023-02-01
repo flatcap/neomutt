@@ -1,0 +1,6 @@
+{ "me_too", DT_BOOL, false },
+/*
+** .pp
+** If \fIunset\fP, NeoMutt will remove your address (see the "$alternates"
+** command) from the list of recipients when replying to a message.
+*/

@@ -1,0 +1,5 @@
+{ "ispell", DT_COMMAND, ISPELL },
+/*
+** .pp
+** How to invoke ispell (GNU's spell-checking software).
+*/

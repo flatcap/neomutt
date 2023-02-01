@@ -1,0 +1,15 @@
+{ "auto_edit", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP along with $$edit_headers, NeoMutt will skip the initial
+** send-menu (prompting for subject and recipients) and allow you to
+** immediately begin editing the body of your
+** message.  The send-menu may still be accessed once you have finished
+** editing the body of your message.
+** .pp
+** \fBNote:\fP when this option is \fIset\fP, you can't use send-hooks that depend
+** on the recipients when composing a new (non-reply) message, as the initial
+** list of recipients is empty.
+** .pp
+** Also see $$fast_reply.
+*/

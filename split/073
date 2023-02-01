@@ -1,0 +1,10 @@
+{ "crypt_reply_sign", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, automatically PGP or OpenSSL sign replies to messages which are
+** signed.
+** .pp
+** \fBNote:\fP this does not work on messages that are encrypted
+** \fIand\fP signed!
+** (Crypto only)
+*/

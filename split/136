@@ -1,0 +1,7 @@
+{ "hide_top_missing", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will not show the presence of missing messages at the
+** top of threads in the thread tree.  Note that when $$hide_missing is
+** \fIset\fP, this option will have no effect.
+*/

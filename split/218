@@ -1,0 +1,5 @@
+{ "newsgroups_charset", DT_STRING, "utf-8" },
+/*
+** .pp
+** Character set of newsgroups descriptions.
+*/

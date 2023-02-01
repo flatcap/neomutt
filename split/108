@@ -1,0 +1,9 @@
+{ "forward_attachments", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** When forwarding inline (i.e. $$mime_forward \fIunset\fP or
+** answered with "no" and $$forward_decode \fIset\fP), attachments
+** which cannot be decoded in a reasonable manner will be attached
+** to the newly composed message if this quadoption is \fIset\fP or
+** answered with "yes".
+*/

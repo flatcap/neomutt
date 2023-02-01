@@ -1,0 +1,6 @@
+{ "nntp_listgroup", DT_BOOL, true },
+/*
+** .pp
+** This variable controls whether or not existence of each article is
+** checked when newsgroup is entered.
+*/

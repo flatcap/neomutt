@@ -1,0 +1,115 @@
+{ "index_format", DT_STRING, "%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s" },
+/*
+** .pp
+** This variable allows you to customize the message index display to
+** your personal taste.
+** .pp
+** "Format strings" are similar to the strings used in the C
+** function \fCprintf(3)\fP to format output (see the man page for more details).
+** For an explanation of the %? construct, see the $status_format description.
+** The following sequences are defined in NeoMutt:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a .td Address of the author
+** .td %A .td Reply-to address (if present; otherwise: address of author)
+** .td %b .td Filename of the original message folder (think mailbox)
+** .td %B .td Same as %K
+** .td %C .td Current message number
+** .td %c .td Number of characters (bytes) in the body of the message (see $formatstrings-size)
+** .td %cr .td Number of characters (bytes) in the raw message, including the header (see $formatstrings-size)
+** .td %D .td Date and time of message using $date_format and local timezone
+** .td %d .td Date and time of message using $date_format and sender's timezone
+** .td %e .td Current message number in thread
+** .td %E .td Number of messages in current thread
+** .td %F .td Author name, or recipient name if the message is from you
+** .td %Fp .td Like %F, but plain. No contextual formatting is applied to recipient name
+** .td %f .td Sender (address + real name), either From: or Return-Path:
+** .td %g .td Newsgroup name (if compiled with NNTP support)
+** .td %g .td Message tags (e.g. notmuch tags/imap flags)
+** .td %Gx .td Individual message tag (e.g. notmuch tags/imap flags)
+** .td %H .td Spam attribute(s) of this message
+** .td %I .td Initials of author
+** .td %i .td Message-id of the current message
+** .td %J .td Message tags (if present, tree unfolded, and != parent's tags)
+** .td %K .td The list to which the letter was sent (if any; otherwise: empty)
+** .td %L .td If an address in the "To:" or "Cc:" header field matches an address
+**            Defined by the user's "$subscribe" command, this displays
+**            "To <list-name>", otherwise the same as %F
+** .td %l .td number of lines in the unprocessed message (may not work with
+**            maildir, mh, and IMAP folders)
+** .td %M .td Number of hidden messages if the thread is collapsed
+** .td %m .td Total number of message in the mailbox
+** .td %N .td Message score
+** .td %n .td Author's real name (or address if missing)
+** .td %O .td Original save folder where NeoMutt would formerly have
+**            Stashed the message: list name or recipient name
+**            If not sent to a list
+** .td %P .td Progress indicator for the built-in pager (how much of the file has been displayed)
+** .td %q .td Newsgroup name (if compiled with NNTP support)
+** .td %R .td Comma separated list of "Cc:" recipients
+** .td %r .td Comma separated list of "To:" recipients
+** .td %S .td Single character status of the message ("N"/"O"/"D"/"d"/"!"/"r"/"\(as")
+** .td %s .td Subject of the message
+** .td %T .td The appropriate character from the $$to_chars string
+** .td %t .td "To:" field (recipients)
+** .td %u .td User (login) name of the author
+** .td %v .td First name of the author, or the recipient if the message is from you
+** .td %W .td Name of organization of author ("Organization:" field)
+** .td %x .td "X-Comment-To:" field (if present and compiled with NNTP support)
+** .td %X .td Number of MIME attachments
+**            (please see the "$attachments" section for possible speed effects)
+** .td %Y .td "X-Label:" field, if present, and \fI(1)\fP not at part of a thread tree,
+**            \fI(2)\fP at the top of a thread, or \fI(3)\fP "X-Label:" is different from
+**            Preceding message's "X-Label:"
+** .td %y .td "X-Label:" field, if present
+** .td %Z .td A three character set of message status flags.
+**            The first character is new/read/replied flags ("n"/"o"/"r"/"O"/"N").
+**            The second is deleted or encryption flags ("D"/"d"/"S"/"P"/"s"/"K").
+**            The third is either tagged/flagged ("\(as"/"!"), or one of the characters
+**            Listed in $$to_chars.
+** .td %zc .td Message crypto flags
+** .td %zs .td Message status flags
+** .td %zt .td Message tag flags
+** .td %@name@ .td insert and evaluate format-string from the matching
+**                 "$index-format-hook" command
+** .td %{fmt} .td the date and time of the message is converted to sender's
+**                time zone, and "fmt" is expanded by the library function
+**                \fCstrftime(3)\fP; if the first character inside the braces
+**                is a bang ("!"), the date is formatted ignoring any locale
+**                settings.  Note that the sender's time zone might only be
+**                available as a numerical offset, so "%Z" behaves like "%z".
+** .td %[fmt] .td the date and time of the message is converted to the local
+**                time zone, and "fmt" is expanded by the library function
+**                \fCstrftime(3)\fP; if the first character inside the brackets
+**                is a bang ("!"), the date is formatted ignoring any locale settings.
+** .td %(fmt) .td the local date and time when the message was received, and
+**                "fmt" is expanded by the library function \fCstrftime(3)\fP;
+**                if the first character inside the parentheses is a bang ("!"),
+**                the date is formatted ignoring any locale settings.
+** .td %>X    .td right justify the rest of the string and pad with character "X"
+** .td %|X    .td pad to the end of the line with character "X"
+** .td %*X    .td soft-fill with character "X" as pad
+** .te
+** .pp
+** Date format expressions can be constructed based on relative dates. Using
+** the date formatting operators along with nested conditionals, the date
+** format can be modified based on how old a message is.  See the section on
+** "Conditional Dates" for an explanation and examples
+** .pp
+** Note that for mbox/mmdf, "%l" applies to the unprocessed message, and
+** for maildir/mh, the value comes from the "Lines:" header field when
+** present (the meaning is normally the same). Thus the value depends on
+** the encodings used in the different parts of the message and has little
+** meaning in practice.
+** .pp
+** "Soft-fill" deserves some explanation: Normal right-justification
+** will print everything to the left of the "%>", displaying padding and
+** whatever lies to the right only if there's room. By contrast,
+** soft-fill gives priority to the right-hand side, guaranteeing space
+** to display it and showing padding only if there's still room. If
+** necessary, soft-fill will eat text leftwards to make room for
+** rightward text.
+** .pp
+** Note that these expandos are supported in
+** "$save-hook", "$fcc-hook" and "$fcc-save-hook", too.
+*/

@@ -1,0 +1,6 @@
+{ "size_show_bytes", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, message sizes will display bytes for values less than
+** 1 kilobyte.  See $formatstrings-size.
+*/

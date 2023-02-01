@@ -1,0 +1,13 @@
+{ "check_new", DT_BOOL, true },
+/*
+** .pp
+** \fBNote:\fP this option only affects \fImaildir\fP and \fIMH\fP style
+** mailboxes.
+** .pp
+** When \fIset\fP, NeoMutt will check for new mail delivered while the
+** mailbox is open.  Especially with MH mailboxes, this operation can
+** take quite some time since it involves scanning the directory and
+** checking each file to see if it has already been looked at.  If
+** this variable is \fIunset\fP, no check for new mail is performed
+** while the mailbox is open.
+*/

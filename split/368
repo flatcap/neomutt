@@ -1,0 +1,10 @@
+{ "sig_dashes", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, a line containing "-- " (note the trailing space) will be inserted before your
+** $$signature.  It is \fBstrongly\fP recommended that you not \fIunset\fP
+** this variable unless your signature contains just your name.  The
+** reason for this is because many software packages use "-- \n" to
+** detect your signature.  For example, NeoMutt has the ability to highlight
+** the signature in a different color in the built-in pager.
+*/

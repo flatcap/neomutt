@@ -1,0 +1,5 @@
+{ "print_command", DT_COMMAND, "lpr" },
+/*
+** .pp
+** This specifies the command pipe that should be used to print messages.
+*/

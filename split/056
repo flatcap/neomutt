@@ -1,0 +1,5 @@
+{ "content_type", DT_STRING, "text/plain" },
+/*
+** .pp
+** Sets the default Content-Type for the body of newly composed messages.
+*/

@@ -1,0 +1,6 @@
+{ "pipe_sep", DT_STRING, "\n" },
+/*
+** .pp
+** The separator to add between messages when piping a list of tagged
+** messages to an external Unix command.
+*/

@@ -1,0 +1,8 @@
+{ "crypt_verify_sig", DT_QUAD, MUTT_YES },
+/*
+** .pp
+** If \fI"yes"\fP, always attempt to verify PGP or S/MIME signatures.
+** If \fI"ask-*"\fP, ask whether or not to verify the signature.
+** If \fI"no"\fP, never attempt to verify cryptographic signatures.
+** (Crypto only)
+*/

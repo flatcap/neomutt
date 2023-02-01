@@ -1,0 +1,7 @@
+{ "pgp_timeout", DT_LONG, 300 },
+/*
+** .pp
+** The number of seconds after which a cached passphrase will expire if
+** not used.
+** (PGP only)
+*/

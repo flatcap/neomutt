@@ -1,0 +1,5 @@
+{ "nm_open_timeout", DT_NUMBER, 5 },
+/*
+** .pp
+** This variable specifies the timeout for database open in seconds.
+*/

@@ -1,0 +1,56 @@
+.TH Config
+
+.TP
+.B sidebar_format
+\fBType:\fP string
+.br
+\fBDefault:\fP "%D%*  %n"
+.IP
+This variable allows you to customize the sidebar display. This string is
+similar to $index_format, but has its own set of \fCprintf(3)\fP\-like
+sequences:
+.
+.TS
+box;
+lb|lb|lb
+l|l|l .
+Expando	Flags	Description
+_
+%B		Name of the mailbox
+%d	* @	Number of deleted messages in the mailbox
+%D		Descriptive name of the mailbox
+%F	*	Number of flagged messages in the mailbox
+%L	* @	Number of messages after limiting
+%n		"N" if mailbox has new mail, " " (space) otherwise
+%N	*	Number of unread messages in the mailbox (seen or unseen)
+%o	*	Number of old messages in the mailbox (unread, seen)
+%r	*	Number of read messages in the mailbox (read, seen)
+%S	*	Size of mailbox (total number of messages)
+%t	* @	Number of tagged messages in the mailbox
+%Z	*	Number of new messages in the mailbox (unread, unseen)
+%!		T{
+"!" : one flagged message
+.br
+"!!" : two flagged messages
+.br
+"n!" : n flagged messages (for n > 2)
+.br
+Otherwise prints nothing
+T}
+%>X		Right justify the rest of the string and pad with "X"
+%|X		Pad to the end of the line with "X"
+%*X		Soft\-fill with character "X" as pad
+.TE
+.
+.IP
+* = Can be optionally printed if nonzero
+.br
+@ = Only applicable to the current folder
+.IP
+In order to use %S, %N, %F, and %!, $mail_check_stats must
+be \fIset\fP.  e.g.
+.
+.EX
+set mail_check_stats = yes
+set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%S"
+.EE

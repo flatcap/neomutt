@@ -1,0 +1,7 @@
+{ "delete_untag", DT_BOOL, true },
+/*
+** .pp
+** If this option is \fIset\fP, NeoMutt will untag messages when marking them
+** for deletion.  This applies when you either explicitly delete a message,
+** or when you save it to another folder.
+*/

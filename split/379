@@ -1,0 +1,8 @@
+{ "smime_ask_cert_label", DT_BOOL, true },
+/*
+** .pp
+** This flag controls whether you want to be asked to enter a label
+** for a certificate about to be added to the database or not. It is
+** \fIset\fP by default.
+** (S/MIME only)
+*/

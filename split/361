@@ -1,0 +1,8 @@
+{ "sidebar_next_new_wrap", DT_BOOL, false },
+/*
+** .pp
+** When set, the \fC<sidebar-next-new>\fP command will not stop and the end of
+** the list of mailboxes, but wrap around to the beginning. The
+** \fC<sidebar-prev-new>\fP command is similarly affected, wrapping around to
+** the end of the list.
+*/

@@ -1,0 +1,7 @@
+{ "beep_new", DT_BOOL, false },
+/*
+** .pp
+** When this variable is \fIset\fP, NeoMutt will beep whenever it prints a message
+** notifying you of new mail.  This is independent of the setting of the
+** $$beep variable.
+*/

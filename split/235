@@ -1,0 +1,8 @@
+{ "nm_record_tags", DT_STRING, 0 },
+/*
+** .pp
+** This variable specifies the notmuch tag modifications (addition, removal,
+** toggling) applied to messages added to the Neomutt record when $$nm_record is
+** true. See the description of the \fC<modify-labels>\fP function for the
+** syntax.
+*/

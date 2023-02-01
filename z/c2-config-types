@@ -1,0 +1,46 @@
+DT_ADDRESS (2) - string, (empty)
+
+DT_BOOL (209) - yes, no
+
+DT_DEPRECATED (8) - old, date
+
+DT_ENUM (2) - domain specific
+	MUTT_MBOX
+	UT_UNSET
+
+DT_LONG (3) - number
+	DT_NOT_NEGATIVE
+
+DT_MBTABLE (5) - string, (empty)
+
+DT_NUMBER (40) - number
+	DT_NOT_NEGATIVE
+
+DT_PATH (19) - string
+	DT_NOT_EMPTY
+	DT_PATH_DIR
+	DT_PATH_FILE
+
+DT_QUAD (27) - yes, no, ask-yes, ask-no
+
+DT_REGEX (8) - string, (empty)
+	DT_REGEX_MATCH_CASE
+	DT_REGEX_ALLOW_NOT
+
+DT_SLIST (9) - string, (empty)
+	SLIST_ALLOW_EMPTY
+	SLIST_SEP_COLON
+	SLIST_SEP_COMMA
+
+DT_SORT (6) - domain specific
+	DT_SORT_REVERSE
+	DT_SORT_LAST
+
+DT_STRING (137) - string, empty
+	DT_COMMAND
+	DT_MAILBOX
+	DT_NOT_EMPTY
+	DT_SENSITIVE
+
+DT_SYNONYM (62) - old, new, date
+

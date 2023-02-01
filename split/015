@@ -1,0 +1,6 @@
+{ "ask_bcc", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will prompt you for blind-carbon-copy (Bcc) recipients
+** before editing an outgoing message.
+*/

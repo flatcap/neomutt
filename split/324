@@ -1,0 +1,10 @@
+{ "reflow_text", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will reformat paragraphs in text/plain
+** parts marked format=flowed.  If \fIunset\fP, NeoMutt will display paragraphs
+** unaltered from how they appear in the message body.  See RFC3676 for
+** details on the \fIformat=flowed\fP format.
+** .pp
+** Also see $$reflow_wrap, and $$wrap.
+*/

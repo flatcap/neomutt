@@ -1,0 +1,6 @@
+{ "mail_check", DT_NUMBER, 5 },
+/*
+** .pp
+** This variable configures how often (in seconds) NeoMutt should look for
+** new mail. Also see the $$timeout variable.
+*/

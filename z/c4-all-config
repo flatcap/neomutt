@@ -1,0 +1,1084 @@
+All Config (467)
+
+AliasVars
+	{ "alias_file", DT_PATH|DT_PATH_FILE, IP "~/.neomuttrc", 0, NULL,
+	"Save new aliases to this file"
+	{ "alias_format", DT_STRING|DT_NOT_EMPTY, IP "%3n %f%t %-15a %-56r | %c", 0, NULL,
+	"printf-like format string for the alias menu"
+	{ "sort_alias", DT_SORT|DT_SORT_REVERSE, SORT_ALIAS, IP SortAliasMethods, NULL,
+	"Sort method for the alias menu"
+	{ "query_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"External command to query and external address book"
+	{ "query_format", DT_STRING|DT_NOT_EMPTY, IP "%3c %t %-25.25n %-25.25a | %e", 0, NULL,
+	"printf-like format string for the query menu (address book)"
+
+AutocryptVars
+	{ "autocrypt", DT_BOOL, false, 0, NULL,
+	"Enables the Autocrypt feature"
+	{ "autocrypt_acct_format", DT_STRING|R_MENU, IP "%4n %-30a %20p %10s", 0, NULL,
+	"Format of the autocrypt account menu"
+	{ "autocrypt_dir", DT_PATH|DT_PATH_DIR, IP "~/.mutt/autocrypt", 0, NULL,
+	"Location of autocrypt files, including the GPG keyring and SQLite database"
+	{ "autocrypt_reply", DT_BOOL, true, 0, NULL,
+	"Replying to an autocrypt email automatically enables autocrypt in the reply"
+
+BrowserVars
+	{ "browser_abbreviate_mailboxes", DT_BOOL, true, 0, NULL,
+	"Abbreviate mailboxes using '~' and '=' in the browser"
+	{ "folder_format", DT_STRING|DT_NOT_EMPTY|R_MENU, IP "%2C %t %N %F %2l %-8.8u %-8.8g %8s %d %i", 0, NULL,
+	"printf-like format string for the browser's display of folders"
+	{ "group_index_format", DT_STRING|DT_NOT_EMPTY|R_INDEX|R_PAGER, IP "%4C %M%N %5s  %-45.45f %d", 0, NULL,
+	"(nntp) printf-like format string for the browser's display of newsgroups"
+	{ "mailbox_folder_format", DT_STRING|DT_NOT_EMPTY|R_MENU, IP "%2C %?n?%6n&%6 ? %6m %i", 0, NULL,
+	"printf-like format string for the browser's display of mailbox folders"
+	{ "mask", DT_REGEX|DT_REGEX_MATCH_CASE|DT_REGEX_ALLOW_NOT|DT_REGEX_NOSUB, IP "!^\\.[^.]", 0, NULL,
+	"Only display files/dirs matching this regex in the browser"
+	{ "show_only_unread", DT_BOOL, false, 0, NULL,
+	"(nntp) Only show subscribed newsgroups with unread articles"
+	{ "sort_browser", DT_SORT|DT_SORT_REVERSE, SORT_ALPHA, IP SortBrowserMethods, NULL,
+	"Sort method for the browser"
+
+ComposeVars
+	{ "compose_format", DT_STRING|R_MENU, IP "-- NeoMutt: Compose  [Approx. msg size: %l   Atts: %a]%>-", 0, NULL,
+	"printf-like format string for the Compose panel's status bar"
+	{ "compose_show_user_headers", DT_BOOL, true, 0, NULL,
+	"Controls whether or not custom headers are shown in the compose envelope"
+	{ "copy", DT_QUAD, MUTT_YES, 0, NULL,
+	"Save outgoing emails to $record"
+	{ "edit_headers", DT_BOOL, false, 0, NULL,
+	"Let the user edit the email headers whilst editing an email"
+	{ "ispell", DT_STRING|DT_COMMAND, IP ISPELL, 0, NULL,
+	"External command to perform spell-checking"
+	{ "postpone", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Save messages to the `$postponed` folder"
+
+ConnVars
+	{ "account_command", DT_STRING | DT_COMMAND, 0, 0, NULL,
+	"Shell command to retrieve account credentials"
+	{ "connect_timeout", DT_NUMBER, 30, 0, NULL,
+	"Timeout for making network connections (-1 to wait indefinitely)"
+	{ "preconnect", DT_STRING, 0, 0, NULL,
+	"(socket) External command to run prior to opening a socket"
+	{ "tunnel", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"Shell command to establish a tunnel"
+	{ "tunnel_is_secure", DT_BOOL, true, 0, NULL,
+	"Assume a tunneled connection is secure"
+
+ConnVarsSsl
+	{ "certificate_file", DT_PATH|DT_PATH_FILE, IP "~/.mutt_certificates", 0, NULL,
+	"File containing trusted certificates"
+	{ "ssl_ciphers", DT_STRING, 0, 0, NULL,
+	"Ciphers to use when using SSL"
+	{ "ssl_client_cert", DT_PATH|DT_PATH_FILE, 0, 0, NULL,
+	"File containing client certificates"
+	{ "ssl_force_tls", DT_BOOL, true, 0, NULL,
+	"(ssl) Require TLS encryption for all connections"
+	{ "ssl_starttls", DT_QUAD, MUTT_YES, 0, NULL,
+	"(ssl) Use STARTTLS on servers advertising the capability"
+	{ "ssl_use_sslv3", DT_BOOL, false, 0, NULL,
+	"(ssl) INSECURE: Use SSLv3 for authentication"
+	{ "ssl_use_tlsv1", DT_BOOL, false, 0, NULL,
+	"(ssl) Use TLSv1 for authentication"
+	{ "ssl_use_tlsv1_1", DT_BOOL, false, 0, NULL,
+	"(ssl) Use TLSv1.1 for authentication"
+	{ "ssl_use_tlsv1_2", DT_BOOL, true, 0, NULL,
+	"(ssl) Use TLSv1.2 for authentication"
+	{ "ssl_use_tlsv1_3", DT_BOOL, true, 0, NULL,
+	"(ssl) Use TLSv1.3 for authentication"
+	{ "ssl_verify_dates", DT_BOOL, true, 0, NULL,
+	"(ssl) Verify the dates on the server certificate"
+	{ "ssl_verify_host", DT_BOOL, true, 0, NULL,
+	"(ssl) Verify the server's hostname against the certificate"
+
+ConnVarsGnutls
+	{ "ssl_ca_certificates_file", DT_PATH|DT_PATH_FILE, 0, 0, NULL,
+	"File containing trusted CA certificates"
+	{ "ssl_min_dh_prime_bits", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Minimum keysize for Diffie-Hellman key exchange"
+
+ConnVarsOpenssl
+	{ "entropy_file", DT_PATH|DT_PATH_FILE, 0, 0, NULL,
+	"(ssl) File/device containing random data to initialise SSL"
+	{ "ssl_use_sslv2", DT_BOOL, false, 0, NULL,
+	"(ssl) INSECURE: Use SSLv2 for authentication"
+	{ "ssl_use_system_certs", DT_BOOL, true, 0, NULL,
+	"(ssl) Use CA certificates in the system-wide store"
+
+ConnVarsPartial
+	{ "ssl_verify_partial_chains", DT_BOOL, false, 0, NULL,
+	"(ssl) Allow verification using partial certificate chains"
+
+ConnVarsGetaddr
+	{ "use_ipv6", DT_BOOL, true, 0, NULL,
+	"Lookup IPv6 addresses when making connections"
+
+HcacheVars
+	{ "header_cache", DT_PATH, 0, 0, NULL,
+	"(hcache) Directory/file for the header cache database"
+	{ "header_cache_backend", DT_STRING, 0, 0, hcache_validator,
+	"(hcache) Header cache backend to use"
+
+HcacheVarsComp
+	{ "header_cache_compress_method", DT_STRING, 0, 0, compress_method_validator,
+	"(hcache) Enable generic hcache database compression"
+	{ "header_cache_compress_level", DT_NUMBER|DT_NOT_NEGATIVE, 1, 0, compress_level_validator,
+	"(hcache) Level of compression for method"
+
+HelpbarVars
+	{ "help", DT_BOOL, true, 0, NULL,
+	"Display a help line with common key bindings"
+
+HistoryVars
+	{ "history", DT_NUMBER|DT_NOT_NEGATIVE, 10, 0, NULL,
+	"Number of history entries to keep in memory per category"
+	{ "history_file", DT_PATH|DT_PATH_FILE, IP "~/.mutthistory", 0, NULL,
+	"File to save history in"
+	{ "history_remove_dups", DT_BOOL, false, 0, NULL,
+	"Remove duplicate entries from the history"
+	{ "save_history", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Number of history entries to save per category"
+
+ImapVars
+	{ "imap_check_subscribed", DT_BOOL, false, 0, NULL,
+	"(imap) When opening a mailbox, ask the server for a list of subscribed folders"
+	{ "imap_condstore", DT_BOOL, false, 0, NULL,
+	"(imap) Enable the CONDSTORE extension"
+	{ "imap_authenticators", DT_SLIST|SLIST_SEP_COLON, 0, 0, imap_auth_validator,
+	"(imap) List of allowed IMAP authentication methods (colon-separated)"
+	{ "imap_delim_chars", DT_STRING, IP "/.", 0, NULL,
+	"(imap) Characters that denote separators in IMAP folders"
+	{ "imap_fetch_chunk_size", DT_LONG|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"(imap) Download headers in blocks of this size"
+	{ "imap_headers", DT_STRING|R_INDEX, 0, 0, NULL,
+	"(imap) Additional email headers to download when getting index"
+	{ "imap_idle", DT_BOOL, false, 0, NULL,
+	"(imap) Use the IMAP IDLE extension to check for new mail"
+	{ "imap_login", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(imap) Login name for the IMAP server (defaults to `$imap_user`)"
+	{ "imap_oauth_refresh_command", DT_STRING|DT_COMMAND|DT_SENSITIVE, 0, 0, NULL,
+	"(imap) External command to generate OAUTH refresh token"
+	{ "imap_pass", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(imap) Password for the IMAP server"
+	{ "imap_pipeline_depth", DT_NUMBER|DT_NOT_NEGATIVE, 15, 0, NULL,
+	"(imap) Number of IMAP commands that may be queued up"
+	{ "imap_rfc5161", DT_BOOL, true, 0, NULL,
+	"(imap) Use the IMAP ENABLE extension to select capabilities"
+	{ "imap_server_noise", DT_BOOL, true, 0, NULL,
+	"(imap) Display server warnings as error messages"
+	{ "imap_keepalive", DT_NUMBER|DT_NOT_NEGATIVE, 300, 0, NULL,
+	"(imap) Time to wait before polling an open IMAP connection"
+	{ "imap_list_subscribed", DT_BOOL, false, 0, NULL,
+	"(imap) When browsing a mailbox, only display subscribed folders"
+	{ "imap_passive", DT_BOOL, true, 0, NULL,
+	"(imap) Reuse an existing IMAP connection to check for new mail"
+	{ "imap_peek", DT_BOOL, true, 0, NULL,
+	"(imap) Don't mark messages as read when fetching them from the server"
+	{ "imap_poll_timeout", DT_NUMBER|DT_NOT_NEGATIVE, 15, 0, NULL,
+	"(imap) Maximum time to wait for a server response"
+	{ "imap_qresync", DT_BOOL, false, 0, NULL,
+	"(imap) Enable the QRESYNC extension"
+	{ "imap_user", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(imap) Username for the IMAP server"
+
+ImapVarsZlib
+	{ "imap_deflate", DT_BOOL, true, 0, NULL,
+	"(imap) Compress network traffic"
+
+IndexVars
+	{ "change_folder_next", DT_BOOL, false, 0, NULL,
+	"Suggest the next folder, rather than the first when using '<change-folder>'"
+	{ "collapse_all", DT_BOOL, false, 0, NULL,
+	"Collapse all threads when entering a folder"
+	{ "mark_macro_prefix", DT_STRING, IP "'", 0, NULL,
+	"Prefix for macros using '<mark-message>'"
+	{ "uncollapse_jump", DT_BOOL, false, 0, NULL,
+	"When opening a thread, jump to the next unread message"
+	{ "uncollapse_new", DT_BOOL, true, 0, NULL,
+	"Open collapsed threads when new mail arrives"
+
+MaildirVars
+	{ "check_new", DT_BOOL, true, 0, NULL,
+	"(maildir,mh) Check for new mail while the mailbox is open"
+	{ "maildir_check_cur", DT_BOOL, false, 0, NULL,
+	"Check both 'new' and 'cur' directories for new mail"
+	{ "maildir_trash", DT_BOOL, false, 0, NULL,
+	"Use the maildir 'trashed' flag, rather than deleting"
+	{ "mh_purge", DT_BOOL, false, 0, NULL,
+	"Really delete files in MH mailboxes"
+	{ "mh_seq_flagged", DT_STRING, IP "flagged", 0, NULL,
+	"MH sequence for flagged message"
+	{ "mh_seq_replied", DT_STRING, IP "replied", 0, NULL,
+	"MH sequence to tag replied messages"
+	{ "mh_seq_unseen", DT_STRING, IP "unseen", 0, NULL,
+	"MH sequence for unseen messages"
+
+MaildirVarsHcache
+	{ "maildir_header_cache_verify", DT_BOOL, true, 0, NULL,
+	"Check for maildir changes when opening mailbox"
+
+MboxVars
+	{ "check_mbox_size", DT_BOOL, false, 0, NULL,
+	"(mbox,mmdf) Use mailbox size as an indicator of new mail"
+
+MenuVars
+	{ "menu_context", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Number of lines of overlap when changing pages in the index"
+	{ "menu_move_off", DT_BOOL, true, 0, NULL,
+	"Allow the last menu item to move off the bottom of the screen"
+	{ "menu_scroll", DT_BOOL, false, 0, NULL,
+	"Scroll the menu/index by one line, rather than a page"
+
+MainVars
+	{ "abort_backspace", DT_BOOL, true, 0, NULL,
+	"Hitting backspace against an empty prompt aborts the prompt"
+	{ "abort_key", DT_STRING|DT_NOT_EMPTY, IP "\007", 0, NULL,
+	"String representation of key to abort prompts"
+	{ "arrow_cursor", DT_BOOL|R_MENU, false, 0, NULL,
+	"Use an arrow '->' instead of highlighting in the index"
+	{ "arrow_string", DT_STRING|DT_NOT_EMPTY, IP "->", 0, NULL,
+	"Use an custom string for arrow_cursor"
+	{ "ascii_chars", DT_BOOL|R_INDEX|R_PAGER, false, 0, NULL,
+	"Use plain ASCII characters, when drawing email threads"
+	{ "ask_bcc", DT_BOOL, false, 0, NULL,
+	"Ask the user for the blind-carbon-copy recipients"
+	{ "ask_cc", DT_BOOL, false, 0, NULL,
+	"Ask the user for the carbon-copy recipients"
+	{ "assumed_charset", DT_SLIST|SLIST_SEP_COLON|SLIST_ALLOW_EMPTY, 0, 0, charset_slist_validator,
+	"If a message is missing a character set, assume this character set"
+	{ "attach_format", DT_STRING|DT_NOT_EMPTY, IP "%u%D%I %t%4n %T%.40d%> [%.7m/%.10M, %.6e%?C?, %C?, %s] ", 0, NULL,
+	"printf-like format string for the attachment menu"
+	{ "attach_save_dir", DT_PATH|DT_PATH_DIR, IP "./", 0, NULL,
+	"Default directory where attachments are saved"
+	{ "attach_save_without_prompting", DT_BOOL, false, 0, NULL,
+	"If true, then don't prompt to save"
+	{ "attach_sep", DT_STRING, IP "\n", 0, NULL,
+	"Separator to add between saved/printed/piped attachments"
+	{ "attach_split", DT_BOOL, true, 0, NULL,
+	"Save/print/pipe tagged messages individually"
+	{ "attribution", DT_STRING, IP "On %d, %n wrote:", 0, NULL,
+	"Message to start a reply, 'On DATE, PERSON wrote:'"
+	{ "attribution_locale", DT_STRING, 0, 0, NULL,
+	"Locale for dates in the attribution message"
+	{ "auto_edit", DT_BOOL, false, 0, NULL,
+	"Skip the initial compose menu and edit the email"
+	{ "auto_subscribe", DT_BOOL, false, 0, NULL,
+	"Automatically check if the user is subscribed to a mailing list"
+	{ "auto_tag", DT_BOOL, false, 0, NULL,
+	"Automatically apply actions to all tagged messages"
+	{ "beep", DT_BOOL, true, 0, NULL,
+	"Make a noise when an error occurs"
+	{ "beep_new", DT_BOOL, false, 0, NULL,
+	"Make a noise when new mail arrives"
+	{ "bounce", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Confirm before bouncing a message"
+	{ "braille_friendly", DT_BOOL, false, 0, NULL,
+	"Move the cursor to the beginning of the line"
+	{ "charset", DT_STRING|DT_NOT_EMPTY|DT_CHARSET_SINGLE, 0, 0, charset_validator,
+	"Default character set for displaying text on screen"
+	{ "collapse_flagged", DT_BOOL, true, 0, NULL,
+	"Prevent the collapse of threads with flagged emails"
+	{ "collapse_unread", DT_BOOL, true, 0, NULL,
+	"Prevent the collapse of threads with unread emails"
+	{ "config_charset", DT_STRING, 0, 0, charset_validator,
+	"Character set that the config files are in"
+	{ "confirm_append", DT_BOOL, true, 0, NULL,
+	"Confirm before appending emails to a mailbox"
+	{ "confirm_create", DT_BOOL, true, 0, NULL,
+	"Confirm before creating a new mailbox"
+	{ "copy_decode_weed", DT_BOOL, false, 0, NULL,
+	"Controls whether to weed headers when copying or saving emails"
+	{ "count_alternatives", DT_BOOL, false, 0, NULL,
+	"Recurse inside multipart/alternatives while counting attachments"
+	{ "crypt_chars", DT_MBTABLE|R_INDEX|R_PAGER, IP "SPsK ", 0, NULL,
+	"User-configurable crypto flags: signed, encrypted etc."
+	{ "date_format", DT_STRING|DT_NOT_EMPTY|R_MENU, IP "!%a, %b %d, %Y at %I:%M:%S%p %Z", 0, NULL,
+	"strftime format string for the `%d` expando"
+	{ "debug_file", DT_PATH|DT_PATH_FILE, IP "~/.neomuttdebug", 0, NULL,
+	"File to save debug logs"
+	{ "debug_level", DT_NUMBER, 0, 0, level_validator,
+	"Logging level for debug logs"
+	{ "default_hook", DT_STRING, IP "~f %s !~P | (~P ~C %s)", 0, NULL,
+	"Pattern to use for hooks that only have a simple regex"
+	{ "delete", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Really delete messages, when the mailbox is closed"
+	{ "delete_untag", DT_BOOL, true, 0, NULL,
+	"Untag messages when they are marked for deletion"
+	{ "digest_collapse", DT_BOOL, true, 0, NULL,
+	"Hide the subparts of a multipart/digest"
+	{ "display_filter", DT_STRING|DT_COMMAND|R_PAGER, 0, 0, NULL,
+	"External command to pre-process an email before display"
+	{ "duplicate_threads", DT_BOOL|R_RESORT|R_RESORT_INIT|R_INDEX, true, 0, NULL,
+	"Highlight messages with duplicated message IDs"
+	{ "editor", DT_STRING|DT_NOT_EMPTY|DT_COMMAND, 0, 0, NULL,
+	"External command to use as an email editor"
+	{ "flag_chars", DT_MBTABLE|R_INDEX|R_PAGER, IP "*!DdrONon- ", 0, NULL,
+	"User-configurable index flags: tagged, new, etc"
+	{ "flag_safe", DT_BOOL, false, 0, NULL,
+	"Protect flagged messages from deletion"
+	{ "folder", DT_STRING|DT_MAILBOX, IP "~/Mail", 0, NULL,
+	"Base folder for a set of mailboxes"
+	{ "force_name", DT_BOOL, false, 0, NULL,
+	"Save outgoing mail in a folder of their name"
+	{ "forward_attachments", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Forward attachments when forwarding a message"
+	{ "forward_decode", DT_BOOL, true, 0, NULL,
+	"Decode the message when forwarding it"
+	{ "forward_quote", DT_BOOL, false, 0, NULL,
+	"Automatically quote a forwarded message using `$indent_string`"
+	{ "from", DT_ADDRESS, 0, 0, NULL,
+	"Default 'From' address to use, if isn't otherwise set"
+	{ "from_chars", DT_MBTABLE|R_INDEX|R_PAGER, 0, 0, NULL,
+	"User-configurable index flags: to address, cc address, etc"
+	{ "gecos_mask", DT_REGEX, IP "^[^,]*", 0, NULL,
+	"Regex for parsing GECOS field of /etc/passwd"
+	{ "greeting", DT_STRING, 0, 0, NULL,
+	"Greeting string added to the top of all messages"
+	{ "header", DT_BOOL, false, 0, NULL,
+	"Include the message headers in the reply email (Weed applies)"
+	{ "hidden_tags", DT_SLIST|SLIST_SEP_COMMA, IP "unread,draft,flagged,passed,replied,attachment,signed,encrypted", 0, NULL,
+	"List of tags that shouldn't be displayed on screen (comma-separated)"
+	{ "hide_limited", DT_BOOL|R_TREE|R_INDEX, false, 0, NULL,
+	"Don't indicate hidden messages, in the thread tree"
+	{ "hide_missing", DT_BOOL|R_TREE|R_INDEX, true, 0, NULL,
+	"Don't indicate missing messages, in the thread tree"
+	{ "hide_thread_subject", DT_BOOL|R_TREE|R_INDEX, true, 0, NULL,
+	"Hide subjects that are similar to that of the parent message"
+	{ "hide_top_limited", DT_BOOL|R_TREE|R_INDEX, false, 0, NULL,
+	"Don't indicate hidden top message, in the thread tree"
+	{ "hide_top_missing", DT_BOOL|R_TREE|R_INDEX, true, 0, NULL,
+	"Don't indicate missing top message, in the thread tree"
+	{ "honor_disposition", DT_BOOL, false, 0, NULL,
+	"Don't display MIME parts inline if they have a disposition of 'attachment'"
+	{ "hostname", DT_STRING, 0, 0, NULL,
+	"Fully-qualified domain name of this machine"
+	{ "implicit_auto_view", DT_BOOL, false, 0, NULL,
+	"Display MIME attachments inline if a 'copiousoutput' mailcap entry exists"
+	{ "include_encrypted", DT_BOOL, false, 0, NULL,
+	"Whether to include encrypted content when replying"
+	{ "include_only_first", DT_BOOL, false, 0, NULL,
+	"Only include the first attachment when replying"
+	{ "indent_string", DT_STRING, IP "> ", 0, NULL,
+	"String used to indent 'reply' text"
+	{ "index_format", DT_STRING|DT_NOT_EMPTY|R_INDEX|R_PAGER, IP "%4C %Z %{%b %d} %-15.15L (%?l?%4l&%4c?) %s", 0, NULL,
+	"printf-like format string for the index menu (emails)"
+	{ "keep_flagged", DT_BOOL, false, 0, NULL,
+	"Don't move flagged messages from `$spool_file` to `$mbox`"
+	{ "local_date_header", DT_BOOL, true, 0, NULL,
+	"Convert the date in the Date header of sent emails into local timezone, UTC otherwise"
+	{ "mail_check", DT_NUMBER|DT_NOT_NEGATIVE, 5, 0, NULL,
+	"Number of seconds before NeoMutt checks for new mail"
+	{ "mail_check_recent", DT_BOOL, true, 0, NULL,
+	"Notify the user about new mail since the last time the mailbox was opened"
+	{ "mail_check_stats", DT_BOOL, false, 0, NULL,
+	"Periodically check for new mail"
+	{ "mail_check_stats_interval", DT_NUMBER|DT_NOT_NEGATIVE, 60, 0, NULL,
+	"How often to check for new mail"
+	{ "mailcap_path", DT_SLIST|SLIST_SEP_COLON, IP "~/.mailcap:" PKGDATADIR "/mailcap:" SYSCONFDIR "/mailcap:/etc/mailcap:/usr/etc/mailcap:/usr/local/etc/mailcap", 0, NULL,
+	"List of mailcap files (colon-separated)"
+	{ "mailcap_sanitize", DT_BOOL, true, 0, NULL,
+	"Restrict the possible characters in mailcap expandos"
+	{ "mark_old", DT_BOOL|R_INDEX|R_PAGER, true, 0, NULL,
+	"Mark new emails as old when leaving the mailbox"
+	{ "markers", DT_BOOL|R_PAGER_FLOW, true, 0, NULL,
+	"Display a '+' at the beginning of wrapped lines in the pager"
+	{ "mbox", DT_STRING|DT_MAILBOX|R_INDEX|R_PAGER, IP "~/mbox", 0, NULL,
+	"Folder that receives read emails (see Move)"
+	{ "mbox_type", DT_ENUM, MUTT_MBOX, IP &MboxTypeDef, NULL,
+	"Default type for creating new mailboxes"
+	{ "message_cache_clean", DT_BOOL, false, 0, NULL,
+	"(imap/pop) Clean out obsolete entries from the message cache"
+	{ "message_cache_dir", DT_PATH|DT_PATH_DIR, 0, 0, NULL,
+	"(imap/pop) Directory for the message cache"
+	{ "message_format", DT_STRING|DT_NOT_EMPTY, IP "%s", 0, NULL,
+	"printf-like format string for listing attached messages"
+	{ "meta_key", DT_BOOL, false, 0, NULL,
+	"Interpret 'ALT-x' as 'ESC-x'"
+	{ "mime_forward", DT_QUAD, MUTT_NO, 0, NULL,
+	"Forward a message as a 'message/RFC822' MIME part"
+	{ "mime_forward_rest", DT_QUAD, MUTT_YES, 0, NULL,
+	"Forward all attachments, even if they can't be decoded"
+	{ "move", DT_QUAD, MUTT_NO, 0, NULL,
+	"Move emails from `$spool_file` to `$mbox` when read"
+	{ "narrow_tree", DT_BOOL|R_TREE|R_INDEX, false, 0, NULL,
+	"Draw a narrower thread tree in the index"
+	{ "net_inc", DT_NUMBER|DT_NOT_NEGATIVE, 10, 0, NULL,
+	"(socket) Update the progress bar after this many KB sent/received (0 to disable)"
+	{ "new_mail_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"External command to run when new mail arrives"
+	{ "pager", DT_STRING|DT_COMMAND, IP "builtin", 0, NULL,
+	"External command for viewing messages, or 'builtin' to use NeoMutt's"
+	{ "pager_format", DT_STRING|R_PAGER, IP "-%Z- %C/%m: %-20.20n   %s%*  -- (%P)", 0, NULL,
+	"printf-like format string for the pager's status bar"
+	{ "pipe_decode", DT_BOOL, false, 0, NULL,
+	"Decode the message when piping it"
+	{ "pipe_decode_weed", DT_BOOL, true, 0, NULL,
+	"Control whether to weed headers when piping an email"
+	{ "pipe_sep", DT_STRING, IP "\n", 0, NULL,
+	"Separator to add between multiple piped messages"
+	{ "pipe_split", DT_BOOL, false, 0, NULL,
+	"Run the pipe command on each message separately"
+	{ "postponed", DT_STRING|DT_MAILBOX|R_INDEX, IP "~/postponed", 0, NULL,
+	"Folder to store postponed messages"
+	{ "preferred_languages", DT_SLIST|SLIST_SEP_COMMA, 0, 0, NULL,
+	"List of Preferred Languages for multilingual MIME (comma-separated)"
+	{ "print", DT_QUAD, MUTT_ASKNO, 0, NULL,
+	"Confirm before printing a message"
+	{ "print_command", DT_STRING|DT_COMMAND, IP "lpr", 0, NULL,
+	"External command to print a message"
+	{ "print_decode", DT_BOOL, true, 0, NULL,
+	"Decode message before printing it"
+	{ "print_decode_weed", DT_BOOL, true, 0, NULL,
+	"Control whether to weed headers when printing an email"
+	{ "print_split", DT_BOOL, false, 0, NULL,
+	"Print multiple messages separately"
+	{ "prompt_after", DT_BOOL, true, 0, NULL,
+	"Pause after running an external pager"
+	{ "quit", DT_QUAD, MUTT_YES, 0, NULL,
+	"Prompt before exiting NeoMutt"
+	{ "quote_regex", DT_REGEX|R_PAGER, IP "^([ \t]*[|>:}#])+", 0, NULL,
+	"Regex to match quoted text in a reply"
+	{ "read_inc", DT_NUMBER|DT_NOT_NEGATIVE, 10, 0, NULL,
+	"Update the progress bar after this many records read (0 to disable)"
+	{ "read_only", DT_BOOL, false, 0, NULL,
+	"Open folders in read-only mode"
+	{ "real_name", DT_STRING|R_INDEX|R_PAGER, 0, 0, NULL,
+	"Real name of the user"
+	{ "record", DT_STRING|DT_MAILBOX, IP "~/sent", 0, NULL,
+	"Folder to save 'sent' messages"
+	{ "reflow_space_quotes", DT_BOOL, true, 0, NULL,
+	"Insert spaces into reply quotes for 'format=flowed' messages"
+	{ "reflow_text", DT_BOOL, true, 0, NULL,
+	"Reformat paragraphs of 'format=flowed' text"
+	{ "reflow_wrap", DT_NUMBER, 78, 0, NULL,
+	"Maximum paragraph width for reformatting 'format=flowed' text"
+	{ "reply_regex", DT_REGEX|R_INDEX|R_RESORT, IP "^((re|aw|sv)(\\[[0-9]+\\])*:[ \t]*)*", 0, reply_validator,
+	"Regex to match message reply subjects like 're: '"
+	{ "resolve", DT_BOOL, true, 0, NULL,
+	"Move to the next email whenever a command modifies an email"
+	{ "resume_draft_files", DT_BOOL, false, 0, NULL,
+	"Process draft files like postponed messages"
+	{ "resume_edited_draft_files", DT_BOOL, true, 0, NULL,
+	"Resume editing previously saved draft files"
+	{ "reverse_alias", DT_BOOL|R_INDEX|R_PAGER, false, 0, NULL,
+	"Display the alias in the index, rather than the message's sender"
+	{ "rfc2047_parameters", DT_BOOL, true, 0, NULL,
+	"Decode RFC2047-encoded MIME parameters"
+	{ "save_address", DT_BOOL, false, 0, NULL,
+	"Use sender's full address as a default save folder"
+	{ "save_empty", DT_BOOL, true, 0, NULL,
+	"(mbox,mmdf) Preserve empty mailboxes"
+	{ "save_name", DT_BOOL, false, 0, NULL,
+	"Save outgoing message to mailbox of recipient's name if it exists"
+	{ "score", DT_BOOL, true, 0, NULL,
+	"Use message scoring"
+	{ "score_threshold_delete", DT_NUMBER, -1, 0, NULL,
+	"Messages with a lower score will be automatically deleted"
+	{ "score_threshold_flag", DT_NUMBER, 9999, 0, NULL,
+	"Messages with a greater score will be automatically flagged"
+	{ "score_threshold_read", DT_NUMBER, -1, 0, NULL,
+	"Messages with a lower score will be automatically marked read"
+	{ "send_charset", DT_SLIST|SLIST_SEP_COLON|SLIST_ALLOW_EMPTY|DT_CHARSET_STRICT, IP "us-ascii:iso-8859-1:utf-8", 0, charset_slist_validator,
+	"Character sets for outgoing mail"
+	{ "shell", DT_STRING|DT_COMMAND, IP "/bin/sh", 0, NULL,
+	"External command to run subshells in"
+	{ "show_multipart_alternative", DT_STRING, 0, 0, multipart_validator,
+	"How to display 'multipart/alternative' MIME parts"
+	{ "simple_search", DT_STRING, IP "~f %s | ~s %s", 0, NULL,
+	"Pattern to search for when search doesn't contain ~'s"
+	{ "size_show_bytes", DT_BOOL|R_MENU, false, 0, NULL,
+	"Show smaller sizes in bytes"
+	{ "size_show_fractions", DT_BOOL|R_MENU, true, 0, NULL,
+	"Show size fractions with a single decimal place"
+	{ "size_show_mb", DT_BOOL|R_MENU, true, 0, NULL,
+	"Show sizes in megabytes for sizes greater than 1 megabyte"
+	{ "size_units_on_left", DT_BOOL|R_MENU, false, 0, NULL,
+	"Show the units as a prefix to the size"
+	{ "sleep_time", DT_NUMBER|DT_NOT_NEGATIVE, 1, 0, NULL,
+	"Time to pause after certain info messages"
+	{ "sort", DT_SORT|DT_SORT_REVERSE|DT_SORT_LAST|R_INDEX|R_RESORT, SORT_DATE, IP SortMethods, sort_validator,
+	"Sort method for the index"
+	{ "sort_aux", DT_SORT|DT_SORT_REVERSE|DT_SORT_LAST|R_INDEX|R_RESORT|R_RESORT_SUB, SORT_DATE, IP SortAuxMethods, NULL,
+	"Secondary sort method for the index"
+	{ "sort_re", DT_BOOL|R_INDEX|R_RESORT|R_RESORT_INIT, true, 0, NULL,
+	"Whether $reply_regex must be matched when not $strict_threads"
+	{ "spam_separator", DT_STRING, IP ",", 0, NULL,
+	"Separator for multiple spam headers"
+	{ "spool_file", DT_STRING|DT_MAILBOX, 0, 0, NULL,
+	"Inbox"
+	{ "status_chars", DT_MBTABLE|R_INDEX|R_PAGER, IP "-*%A", 0, NULL,
+	"Indicator characters for the status bar"
+	{ "status_format", DT_STRING|R_INDEX|R_PAGER, IP "-%r-NeoMutt: %D [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%?T?%T/?%s/%S)-%>-(%P)---", 0, NULL,
+	"printf-like format string for the index's status line"
+	{ "status_on_top", DT_BOOL, false, 0, NULL,
+	"Display the status bar at the top"
+	{ "strict_threads", DT_BOOL|R_RESORT|R_RESORT_INIT|R_INDEX, false, 0, NULL,
+	"Thread messages using 'In-Reply-To' and 'References' headers"
+	{ "suspend", DT_BOOL, true, 0, NULL,
+	"Allow the user to suspend NeoMutt using '^Z'"
+	{ "text_flowed", DT_BOOL, false, 0, NULL,
+	"Generate 'format=flowed' messages"
+	{ "thread_received", DT_BOOL|R_RESORT|R_RESORT_INIT|R_INDEX, false, 0, NULL,
+	"Sort threaded messages by their received date"
+	{ "time_inc", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Frequency of progress bar updates (milliseconds)"
+	{ "timeout", DT_NUMBER|DT_NOT_NEGATIVE, 600, 0, NULL,
+	"Time to wait for user input in menus"
+	{ "tmp_dir", DT_PATH|DT_PATH_DIR|DT_NOT_EMPTY, IP TMPDIR, 0, NULL,
+	"Directory for temporary files"
+	{ "to_chars", DT_MBTABLE|R_INDEX|R_PAGER, IP " +TCFLR", 0, NULL,
+	"Indicator characters for the 'To' field in the index"
+	{ "toggle_quoted_show_levels", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Number of quote levels to show with toggle-quoted"
+	{ "trash", DT_STRING|DT_MAILBOX, 0, 0, NULL,
+	"Folder to put deleted emails"
+	{ "ts_enabled", DT_BOOL|R_INDEX|R_PAGER, false, 0, NULL,
+	"Allow NeoMutt to set the terminal status line and icon"
+	{ "ts_icon_format", DT_STRING|R_INDEX|R_PAGER, IP "M%?n?AIL&ail?", 0, NULL,
+	"printf-like format string for the terminal's icon title"
+	{ "ts_status_format", DT_STRING|R_INDEX|R_PAGER, IP "NeoMutt with %?m?%m messages&no messages?%?n? [%n NEW]?", 0, NULL,
+	"printf-like format string for the terminal's status (window title)"
+	{ "use_domain", DT_BOOL, true, 0, NULL,
+	"Qualify local addresses using this domain"
+	{ "use_threads", DT_ENUM|R_INDEX|R_RESORT, UT_UNSET, IP &UseThreadsTypeDef, NULL,
+	"Whether to use threads for the index"
+	{ "wait_key", DT_BOOL, true, 0, NULL,
+	"Prompt to press a key after running external commands"
+	{ "weed", DT_BOOL, true, 0, NULL,
+	"Filter headers when displaying/forwarding/printing/replying"
+	{ "wrap", DT_NUMBER|R_PAGER_FLOW, 0, 0, NULL,
+	"Width to wrap text in the pager"
+	{ "wrap_search", DT_BOOL, true, 0, NULL,
+	"Wrap around when the search hits the end"
+	{ "write_bcc", DT_BOOL, false, 0, NULL,
+	"Write out the 'Bcc' field when preparing to send a mail"
+	{ "write_inc", DT_NUMBER|DT_NOT_NEGATIVE, 10, 0, NULL,
+	"Update the progress bar after this many records written (0 to disable)"
+
+MainVarsMixmaster
+	{ "mix_entry_format", DT_STRING|DT_NOT_EMPTY, IP "%4n %c %-16s %a", 0, NULL,
+	"(mixmaster) printf-like format string for the mixmaster chain"
+	{ "mixmaster", DT_STRING|DT_COMMAND, IP MIXMASTER_DEFAULT, 0, NULL,
+	"(mixmaster) External command to route a mixmaster message"
+
+MainVarsIdn
+	{ "idn_decode", DT_BOOL|R_MENU, true, 0, NULL,
+	"(idn) Decode international domain names"
+	{ "idn_encode", DT_BOOL|R_MENU, true, 0, NULL,
+	"(idn) Encode international domain names"
+
+NcryptVars
+	{ "crypt_confirm_hook", DT_BOOL, true, 0, NULL,
+	"Prompt the user to confirm keys before use"
+	{ "crypt_opportunistic_encrypt", DT_BOOL, false, 0, NULL,
+	"Enable encryption when the recipient's key is available"
+	{ "crypt_opportunistic_encrypt_strong_keys", DT_BOOL, false, 0, NULL,
+	"Enable encryption only when strong a key is available"
+	{ "crypt_protected_headers_read", DT_BOOL, true, 0, NULL,
+	"Display protected headers (Memory Hole) in the pager"
+	{ "crypt_protected_headers_subject", DT_STRING, IP "...", 0, NULL,
+	"Use this as the subject for encrypted emails"
+	{ "crypt_protected_headers_write", DT_BOOL, false, 0, NULL,
+	"Generate protected header (Memory Hole) for signed and encrypted emails"
+	{ "crypt_timestamp", DT_BOOL, true, 0, NULL,
+	"Add a timestamp to PGP or SMIME output to prevent spoofing"
+	{ "envelope_from_address", DT_ADDRESS, 0, 0, NULL,
+	"Manually set the sender for outgoing messages"
+	{ "pgp_auto_inline", DT_BOOL, false, 0, NULL,
+	"Use old-style inline PGP messages (not recommended)"
+	{ "pgp_default_key", DT_STRING, 0, 0, NULL,
+	"Default key to use for PGP operations"
+	{ "pgp_entry_format", DT_STRING|DT_NOT_EMPTY, IP "%4n %t%f %4l/0x%k %-4a %2c %u", 0, NULL,
+	"printf-like format string for the PGP key selection menu"
+	{ "pgp_ignore_subkeys", DT_BOOL, true, 0, NULL,
+	"Only use the principal PGP key"
+	{ "pgp_long_ids", DT_BOOL, true, 0, NULL,
+	"Display long PGP key IDs to the user"
+	{ "pgp_mime_auto", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Prompt the user to use MIME if inline PGP fails"
+	{ "pgp_retainable_sigs", DT_BOOL, false, 0, NULL,
+	"Create nested multipart/signed or encrypted messages"
+	{ "pgp_self_encrypt", DT_BOOL, true, 0, NULL,
+	"Encrypted messages will also be encrypted to $pgp_default_key too"
+	{ "pgp_show_unusable", DT_BOOL, true, 0, NULL,
+	"Show non-usable keys in the key selection"
+	{ "pgp_sign_as", DT_STRING, 0, 0, NULL,
+	"Use this alternative key for signing messages"
+	{ "pgp_sort_keys", DT_SORT|DT_SORT_REVERSE, SORT_ADDRESS, IP SortKeyMethods, NULL,
+	"Sort order for PGP keys"
+	{ "pgp_strict_enc", DT_BOOL, true, 0, NULL,
+	"Encode PGP signed messages with quoted-printable (don't unset)"
+	{ "smime_default_key", DT_STRING, 0, 0, NULL,
+	"Default key for SMIME operations"
+	{ "smime_encrypt_with", DT_STRING, IP "aes256", 0, NULL,
+	"Algorithm for encryption"
+	{ "smime_self_encrypt", DT_BOOL, true, 0, NULL,
+	"Encrypted messages will also be encrypt to $smime_default_key too"
+	{ "smime_sign_as", DT_STRING, 0, 0, NULL,
+	"Use this alternative key for signing messages"
+	{ "smime_is_default", DT_BOOL, false, 0, NULL,
+	"Use SMIME rather than PGP by default"
+	{ "pgp_auto_decode", DT_BOOL, false, 0, NULL,
+	"Automatically decrypt PGP messages"
+	{ "crypt_verify_sig", DT_QUAD, MUTT_YES, 0, NULL,
+	"Verify PGP or SMIME signatures"
+	{ "crypt_protected_headers_save", DT_BOOL, false, 0, NULL,
+	"Save the cleartext Subject with the headers"
+
+NcryptVarsGpgme
+	{ "crypt_use_gpgme", DT_BOOL, true, 0, NULL,
+	"Use GPGME crypto backend"
+	{ "crypt_use_pka", DT_BOOL, false, 0, NULL,
+	"Use GPGME to use PKA (lookup PGP keys using DNS)"
+
+NcryptVarsPgp
+	{ "pgp_check_exit", DT_BOOL, true, 0, NULL,
+	"Check the exit code of PGP subprocess"
+	{ "pgp_check_gpg_decrypt_status_fd", DT_BOOL, true, 0, NULL,
+	"File descriptor used for status info"
+	{ "pgp_clear_sign_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to inline-sign a message"
+	{ "pgp_decode_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to decode a PGP attachment"
+	{ "pgp_decrypt_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to decrypt a PGP message"
+	{ "pgp_decryption_okay", DT_REGEX, 0, 0, NULL,
+	"Text indicating a successful decryption"
+	{ "pgp_encrypt_only_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to encrypt, but not sign a message"
+	{ "pgp_encrypt_sign_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to encrypt and sign a message"
+	{ "pgp_export_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to export a public key from the user's keyring"
+	{ "pgp_get_keys_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to download a key for an email address"
+	{ "pgp_good_sign", DT_REGEX, 0, 0, NULL,
+	"Text indicating a good signature"
+	{ "pgp_import_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to import a key into the user's keyring"
+	{ "pgp_list_pubring_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to list the public keys in a user's keyring"
+	{ "pgp_list_secring_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to list the private keys in a user's keyring"
+	{ "pgp_sign_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to create a detached PGP signature"
+	{ "pgp_timeout", DT_LONG|DT_NOT_NEGATIVE, 300, 0, NULL,
+	"Time in seconds to cache a passphrase"
+	{ "pgp_use_gpg_agent", DT_BOOL, true, 0, NULL,
+	"Use a PGP agent for caching passwords"
+	{ "pgp_verify_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to verify PGP signatures"
+	{ "pgp_verify_key_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(pgp) External command to verify key information"
+
+NcryptVarsSmime
+	{ "smime_ask_cert_label", DT_BOOL, true, 0, NULL,
+	"Prompt the user for a label for SMIME certificates"
+	{ "smime_ca_location", DT_PATH|DT_PATH_FILE, 0, 0, NULL,
+	"File containing trusted certificates"
+	{ "smime_certificates", DT_PATH|DT_PATH_DIR, 0, 0, NULL,
+	"File containing user's public certificates"
+	{ "smime_decrypt_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to decrypt an SMIME message"
+	{ "smime_decrypt_use_default_key", DT_BOOL, true, 0, NULL,
+	"Use the default key for decryption"
+	{ "smime_encrypt_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to encrypt a message"
+	{ "smime_get_cert_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to extract a certificate from a message"
+	{ "smime_get_cert_email_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to get a certificate for an email"
+	{ "smime_get_signer_cert_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to extract a certificate from an email"
+	{ "smime_import_cert_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to import a certificate"
+	{ "smime_keys", DT_PATH|DT_PATH_DIR, 0, 0, NULL,
+	"File containing user's private certificates"
+	{ "smime_pk7out_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to extract a public certificate"
+	{ "smime_sign_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to sign a message"
+	{ "smime_sign_digest_alg", DT_STRING, IP "sha256", 0, NULL,
+	"Digest algorithm"
+	{ "smime_timeout", DT_NUMBER|DT_NOT_NEGATIVE, 300, 0, NULL,
+	"Time in seconds to cache a passphrase"
+	{ "smime_verify_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to verify a signed message"
+	{ "smime_verify_opaque_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"(smime) External command to verify a signature"
+
+NntpVars
+	{ "catchup_newsgroup", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"(nntp) Mark all articles as read when leaving a newsgroup"
+	{ "followup_to_poster", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"(nntp) Reply to the poster if 'poster' is in the 'Followup-To' header"
+	{ "newsgroups_charset", DT_STRING, IP "utf-8", 0, charset_validator,
+	"(nntp) Character set of newsgroups' descriptions"
+	{ "newsrc", DT_PATH|DT_PATH_FILE, IP "~/.newsrc", 0, NULL,
+	"(nntp) File containing list of subscribed newsgroups"
+	{ "news_cache_dir", DT_PATH|DT_PATH_DIR, IP "~/.neomutt", 0, NULL,
+	"(nntp) Directory for cached news articles"
+	{ "news_server", DT_STRING, 0, 0, NULL,
+	"(nntp) Url of the news server"
+	{ "nntp_authenticators", DT_STRING, 0, 0, NULL,
+	"(nntp) Allowed authentication methods"
+	{ "nntp_context", DT_LONG|DT_NOT_NEGATIVE, 1000, 0, NULL,
+	"(nntp) Maximum number of articles to list (0 for all articles)"
+	{ "nntp_listgroup", DT_BOOL, true, 0, NULL,
+	"(nntp) Check all articles when opening a newsgroup"
+	{ "nntp_load_description", DT_BOOL, true, 0, NULL,
+	"(nntp) Load descriptions for newsgroups when adding to the list"
+	{ "nntp_pass", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(nntp) Password for the news server"
+	{ "nntp_poll", DT_NUMBER|DT_NOT_NEGATIVE, 60, 0, NULL,
+	"(nntp) Interval between checks for new posts"
+	{ "nntp_user", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(nntp) Username for the news server"
+	{ "post_moderated", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"(nntp) Allow posting to moderated newsgroups"
+	{ "save_unsubscribed", DT_BOOL, false, 0, NULL,
+	"(nntp) Save a list of unsubscribed newsgroups to the 'newsrc'"
+	{ "show_new_news", DT_BOOL, true, 0, NULL,
+	"(nntp) Check for new newsgroups when entering the browser"
+	{ "x_comment_to", DT_BOOL, false, 0, NULL,
+	"(nntp) Add 'X-Comment-To' header that contains article author"
+
+NotmuchVars
+	{ "nm_config_file", DT_PATH|DT_PATH_FILE, IP "auto", 0, NULL,
+	"(notmuch) Configuration file for notmuch. Use 'auto' to detect configuration."
+	{ "nm_config_profile", DT_STRING, 0, 0, NULL,
+	"(notmuch) Configuration profile for notmuch."
+	{ "nm_db_limit", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"(notmuch) Default limit for Notmuch queries"
+	{ "nm_default_url", DT_STRING, 0, 0, nm_default_url_validator,
+	"(notmuch) Path to the Notmuch database"
+	{ "nm_exclude_tags", DT_STRING, 0, 0, NULL,
+	"(notmuch) Exclude messages with these tags"
+	{ "nm_flagged_tag", DT_STRING, IP "flagged", 0, NULL,
+	"(notmuch) Tag to use for flagged messages"
+	{ "nm_open_timeout", DT_NUMBER|DT_NOT_NEGATIVE, 5, 0, NULL,
+	"(notmuch) Database timeout"
+	{ "nm_query_type", DT_STRING, IP "messages", 0, NULL,
+	"(notmuch) Default query type: 'threads' or 'messages'"
+	{ "nm_query_window_current_position", DT_NUMBER, 0, 0, NULL,
+	"(notmuch) Position of current search window"
+	{ "nm_query_window_current_search", DT_STRING, 0, 0, NULL,
+	"(notmuch) Current search parameters"
+	{ "nm_query_window_duration", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"(notmuch) Time duration of the current search window"
+	{ "nm_query_window_enable", DT_BOOL, false, 0, NULL,
+	"(notmuch) Enable query windows"
+	{ "nm_query_window_or_terms", DT_STRING, 0, 0, NULL,
+	"(notmuch) Additional notmuch search terms for messages to be shown regardless of date"
+	{ "nm_query_window_timebase", DT_STRING, IP "week", 0, nm_query_window_timebase_validator,
+	"(notmuch) Units for the time duration"
+	{ "nm_record_tags", DT_STRING, 0, 0, NULL,
+	"(notmuch) Tags to apply to the 'record' mailbox (sent mail)"
+	{ "nm_replied_tag", DT_STRING, IP "replied", 0, NULL,
+	"(notmuch) Tag to use for replied messages"
+	{ "nm_unread_tag", DT_STRING, IP "unread", 0, NULL,
+	"(notmuch) Tag to use for unread messages"
+	{ "vfolder_format", DT_STRING|DT_NOT_EMPTY|R_INDEX, IP "%2C %?n?%4n/&     ?%4m %f", 0, NULL,
+	"(notmuch) printf-like format string for the browser's display of virtual folders"
+	{ "virtual_spool_file", DT_BOOL, false, 0, NULL,
+	"(notmuch) Use the first virtual mailbox as a spool file"
+
+PagerVars
+	{ "allow_ansi", DT_BOOL, false, 0, NULL,
+	"Allow ANSI colour codes in rich text messages"
+	{ "header_color_partial", DT_BOOL|R_PAGER_FLOW, false, 0, NULL,
+	"Only colour the part of the header matching the regex"
+	{ "pager_context", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Number of lines of overlap when changing pages in the pager"
+	{ "pager_index_lines", DT_NUMBER|DT_NOT_NEGATIVE|R_PAGER, 0, 0, NULL,
+	"Number of index lines to display above the pager"
+	{ "pager_read_delay", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Number of seconds to wait before marking a message read"
+	{ "pager_skip_quoted_context", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Lines of context to show when skipping quoted text"
+	{ "pager_stop", DT_BOOL, false, 0, NULL,
+	"Don't automatically open the next message when at the end of a message"
+	{ "search_context", DT_NUMBER|DT_NOT_NEGATIVE, 0, 0, NULL,
+	"Context to display around search matches"
+	{ "smart_wrap", DT_BOOL|R_PAGER_FLOW, true, 0, NULL,
+	"Wrap text at word boundaries"
+	{ "smileys", DT_REGEX|R_PAGER, IP "(>From )|(:[-^]?[][)(><}{|/DP])", 0, NULL,
+	"Regex to match smileys to prevent mistakes when quoting text"
+	{ "tilde", DT_BOOL|R_PAGER, false, 0, NULL,
+	"Display '~' in the pager after the end of the email"
+
+PatternVars
+	{ "external_search_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"External search command"
+	{ "pattern_format", DT_STRING, IP "%2n %-15e  %d", 0, NULL,
+	"printf-like format string for the pattern completion menu"
+	{ "thorough_search", DT_BOOL, true, 0, NULL,
+	"Decode headers and messages before searching them"
+
+PopVars
+	{ "pop_auth_try_all", DT_BOOL, true, 0, NULL,
+	"(pop) Try all available authentication methods"
+	{ "pop_authenticators", DT_SLIST|SLIST_SEP_COLON, 0, 0, pop_auth_validator,
+	"(pop) List of allowed authentication methods (colon-separated)"
+	{ "pop_check_interval", DT_NUMBER|DT_NOT_NEGATIVE, 60, 0, NULL,
+	"(pop) Interval between checks for new mail"
+	{ "pop_delete", DT_QUAD, MUTT_ASKNO, 0, NULL,
+	"(pop) After downloading POP messages, delete them on the server"
+	{ "pop_host", DT_STRING, 0, 0, NULL,
+	"(pop) Url of the POP server"
+	{ "pop_last", DT_BOOL, false, 0, NULL,
+	"(pop) Use the 'LAST' command to fetch new mail"
+	{ "pop_oauth_refresh_command", DT_STRING|DT_COMMAND|DT_SENSITIVE, 0, 0, NULL,
+	"(pop) External command to generate OAUTH refresh token"
+	{ "pop_pass", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(pop) Password of the POP server"
+	{ "pop_reconnect", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"(pop) Reconnect to the server is the connection is lost"
+	{ "pop_user", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(pop) Username of the POP server"
+
+SendVars
+	{ "abort_noattach", DT_QUAD, MUTT_NO, 0, NULL,
+	"Abort sending the email if attachments are missing"
+	{ "abort_noattach_regex", DT_REGEX, IP "\\<(attach|attached|attachments?)\\>", 0, NULL,
+	"Regex to match text indicating attachments are expected"
+	{ "abort_nosubject", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Abort creating the email if subject is missing"
+	{ "abort_unmodified", DT_QUAD, MUTT_YES, 0, NULL,
+	"Abort the sending if the message hasn't been edited"
+	{ "allow_8bit", DT_BOOL, true, 0, NULL,
+	"Allow 8-bit messages, don't use quoted-printable or base64"
+	{ "attach_charset", DT_SLIST|SLIST_SEP_COLON|SLIST_ALLOW_EMPTY, 0, 0, charset_slist_validator,
+	"When attaching files, use one of these character sets"
+	{ "bounce_delivered", DT_BOOL, true, 0, NULL,
+	"Add 'Delivered-To' to bounced messages"
+	{ "content_type", DT_STRING, IP "text/plain", 0, NULL,
+	"Default 'Content-Type' for newly composed messages"
+	{ "crypt_auto_encrypt", DT_BOOL, false, 0, NULL,
+	"Automatically PGP encrypt all outgoing mail"
+	{ "crypt_auto_pgp", DT_BOOL, true, 0, NULL,
+	"Allow automatic PGP functions"
+	{ "crypt_auto_sign", DT_BOOL, false, 0, NULL,
+	"Automatically PGP sign all outgoing mail"
+	{ "crypt_auto_smime", DT_BOOL, true, 0, NULL,
+	"Allow automatic SMIME functions"
+	{ "crypt_reply_encrypt", DT_BOOL, true, 0, NULL,
+	"Encrypt replies to encrypted messages"
+	{ "crypt_reply_sign", DT_BOOL, false, 0, NULL,
+	"Sign replies to signed messages"
+	{ "crypt_reply_sign_encrypted", DT_BOOL, false, 0, NULL,
+	"Sign replies to encrypted messages"
+	{ "dsn_notify", DT_STRING, 0, 0, NULL,
+	"Request notification for message delivery or delay"
+	{ "dsn_return", DT_STRING, 0, 0, NULL,
+	"What to send as a notification of message delivery or delay"
+	{ "empty_subject", DT_STRING, IP "Re: your mail", 0, NULL,
+	"Subject to use when replying to an email with none"
+	{ "encode_from", DT_BOOL, false, 0, NULL,
+	"Encode 'From ' as 'quote-printable' at the beginning of lines"
+	{ "fast_reply", DT_BOOL, false, 0, NULL,
+	"Don't prompt for the recipients and subject when replying/forwarding"
+	{ "fcc_attach", DT_QUAD, MUTT_YES, 0, NULL,
+	"Save sent message with all their attachments"
+	{ "fcc_before_send", DT_BOOL, false, 0, NULL,
+	"Save FCCs before sending the message"
+	{ "fcc_clear", DT_BOOL, false, 0, NULL,
+	"Save sent messages unencrypted and unsigned"
+	{ "followup_to", DT_BOOL, true, 0, NULL,
+	"Add the 'Mail-Followup-To' header is generated when sending mail"
+	{ "forward_attribution_intro", DT_STRING, IP "----- Forwarded message from %f -----", 0, NULL,
+	"Prefix message for forwarded messages"
+	{ "forward_attribution_trailer", DT_STRING, IP "----- End forwarded message -----", 0, NULL,
+	"Suffix message for forwarded messages"
+	{ "forward_decrypt", DT_BOOL, true, 0, NULL,
+	"Decrypt the message when forwarding it"
+	{ "forward_edit", DT_QUAD, MUTT_YES, 0, NULL,
+	"Automatically start the editor when forwarding a message"
+	{ "forward_format", DT_STRING|DT_NOT_EMPTY, IP "[%a: %s]", 0, NULL,
+	"printf-like format string to control the subject when forwarding a message"
+	{ "forward_references", DT_BOOL, false, 0, NULL,
+	"Set the 'In-Reply-To' and 'References' headers when forwarding a message"
+	{ "hdrs", DT_BOOL, true, 0, NULL,
+	"Add custom headers to outgoing mail"
+	{ "hidden_host", DT_BOOL, false, 0, NULL,
+	"Don't use the hostname, just the domain, when generating the message id"
+	{ "honor_followup_to", DT_QUAD, MUTT_YES, 0, NULL,
+	"Honour the 'Mail-Followup-To' header when group replying"
+	{ "ignore_list_reply_to", DT_BOOL, false, 0, NULL,
+	"Ignore the 'Reply-To' header when using `<reply>` on a mailing list"
+	{ "include", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Include a copy of the email that's being replied to"
+	{ "me_too", DT_BOOL, false, 0, NULL,
+	"Remove the user's address from the list of recipients"
+	{ "mime_forward_decode", DT_BOOL, false, 0, NULL,
+	"Decode the forwarded message before attaching it"
+	{ "mime_type_query_command", DT_STRING|DT_COMMAND, 0, 0, NULL,
+	"External command to determine the MIME type of an attachment"
+	{ "mime_type_query_first", DT_BOOL, false, 0, NULL,
+	"Run the `$mime_type_query_command` before the mime.types lookup"
+	{ "nm_record", DT_BOOL, false, 0, NULL,
+	"(notmuch) If the 'record' mailbox (sent mail) should be indexed"
+	{ "pgp_reply_inline", DT_BOOL, false, 0, NULL,
+	"Reply using old-style inline PGP messages (not recommended)"
+	{ "post_indent_string", DT_STRING, 0, 0, NULL,
+	"Suffix message to add after reply text"
+	{ "postpone_encrypt", DT_BOOL, false, 0, NULL,
+	"Self-encrypt postponed messages"
+	{ "postpone_encrypt_as", DT_STRING, 0, 0, NULL,
+	"Fallback encryption key for postponed messages"
+	{ "recall", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Recall postponed mesaages when asked to compose a message"
+	{ "reply_self", DT_BOOL, false, 0, NULL,
+	"Really reply to yourself, when replying to your own email"
+	{ "reply_to", DT_QUAD, MUTT_ASKYES, 0, NULL,
+	"Address to use as a 'Reply-To' header"
+	{ "reply_with_xorig", DT_BOOL, false, 0, NULL,
+	"Create 'From' header from 'X-Original-To' header"
+	{ "reverse_name", DT_BOOL|R_INDEX|R_PAGER, false, 0, NULL,
+	"Set the 'From' from the address the email was sent to"
+	{ "reverse_real_name", DT_BOOL|R_INDEX|R_PAGER, true, 0, NULL,
+	"Set the 'From' from the full 'To' address the email was sent to"
+	{ "sendmail", DT_STRING|DT_COMMAND, IP SENDMAIL " -oem -oi", 0, simple_command_validator,
+	"External command to send email"
+	{ "sendmail_wait", DT_NUMBER, 0, 0, NULL,
+	"Time to wait for sendmail to finish"
+	{ "sig_dashes", DT_BOOL, true, 0, NULL,
+	"Insert '-- ' before the signature"
+	{ "sig_on_top", DT_BOOL, false, 0, NULL,
+	"Insert the signature before the quoted text"
+	{ "signature", DT_PATH|DT_PATH_FILE, IP "~/.signature", 0, NULL,
+	"File containing a signature to append to all mail"
+	{ "use_8bit_mime", DT_BOOL, false, 0, NULL,
+	"Use 8-bit messages and ESMTP to send messages"
+	{ "use_envelope_from", DT_BOOL, false, 0, NULL,
+	"Set the envelope sender of the message"
+	{ "use_from", DT_BOOL, true, 0, NULL,
+	"Set the 'From' header for outgoing mail"
+	{ "user_agent", DT_BOOL, false, 0, NULL,
+	"Add a 'User-Agent' header to outgoing mail"
+	{ "wrap_headers", DT_NUMBER|DT_NOT_NEGATIVE|R_PAGER, 78, 0, wrapheaders_validator,
+	"Width to wrap headers in outgoing messages"
+
+SendVarsNntp
+	{ "ask_followup_to", DT_BOOL, false, 0, NULL,
+	"(nntp) Ask the user for follow-up groups before editing"
+	{ "ask_x_comment_to", DT_BOOL, false, 0, NULL,
+	"(nntp) Ask the user for the 'X-Comment-To' field before editing"
+	{ "inews", DT_STRING|DT_COMMAND, 0, 0, simple_command_validator,
+	"(nntp) External command to post news articles"
+
+SendVarsSmtp
+	{ "smtp_authenticators", DT_SLIST|SLIST_SEP_COLON, 0, 0, smtp_auth_validator,
+	"(smtp) List of allowed authentication methods (colon-separated)"
+	{ "smtp_oauth_refresh_command", DT_STRING|DT_COMMAND|DT_SENSITIVE, 0, 0, NULL,
+	"(smtp) External command to generate OAUTH refresh token"
+	{ "smtp_pass", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(smtp) Password for the SMTP server"
+	{ "smtp_url", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(smtp) Url of the SMTP server"
+	{ "smtp_user", DT_STRING|DT_SENSITIVE, 0, 0, NULL,
+	"(smtp) Username for the SMTP server"
+
+SidebarVars
+	{ "sidebar_component_depth", DT_NUMBER, 0, 0, NULL,
+	"(sidebar) Strip leading path components from sidebar folders"
+	{ "sidebar_delim_chars", DT_STRING, IP "/.", 0, NULL,
+	"(sidebar) Characters that separate nested folders"
+	{ "sidebar_divider_char", DT_STRING, 0, 0, NULL,
+	"(sidebar) Character to draw between the sidebar and index"
+	{ "sidebar_folder_indent", DT_BOOL, false, 0, NULL,
+	"(sidebar) Indent nested folders"
+	{ "sidebar_format", DT_STRING|DT_NOT_EMPTY, IP "%D%*  %n", 0, NULL,
+	"(sidebar) printf-like format string for the sidebar panel"
+	{ "sidebar_indent_string", DT_STRING, IP "  ", 0, NULL,
+	"(sidebar) Indent nested folders using this string"
+	{ "sidebar_new_mail_only", DT_BOOL, false, 0, NULL,
+	"(sidebar) Only show folders with new/flagged mail"
+	{ "sidebar_next_new_wrap", DT_BOOL, false, 0, NULL,
+	"(sidebar) Wrap around when searching for the next mailbox with new mail"
+	{ "sidebar_non_empty_mailbox_only", DT_BOOL, false, 0, NULL,
+	"(sidebar) Only show folders with a non-zero number of mail"
+	{ "sidebar_on_right", DT_BOOL, false, 0, NULL,
+	"(sidebar) Display the sidebar on the right"
+	{ "sidebar_short_path", DT_BOOL, false, 0, NULL,
+	"(sidebar) Abbreviate the paths using the `$folder` variable"
+	{ "sidebar_sort_method", DT_SORT, SORT_ORDER, IP SortSidebarMethods, NULL,
+	"(sidebar) Method to sort the sidebar"
+	{ "sidebar_visible", DT_BOOL, false, 0, NULL,
+	"(sidebar) Show the sidebar"
+	{ "sidebar_width", DT_NUMBER|DT_NOT_NEGATIVE, 30, 0, NULL,
+	"(sidebar) Width of the sidebar"
+
+All Synonyms (62)
+	abort_noattach_regexp    abort_noattach_regex       2021-03-21
+	askbcc                   ask_bcc                    2021-03-21
+	askcc                    ask_cc                     2021-03-21
+	ask_follow_up            ask_followup_to            2023-01-20
+	attach_keyword           abort_noattach_regex       2021-03-21
+	autoedit                 auto_edit                  2021-03-21
+	confirmappend            confirm_append             2021-03-21
+	confirmcreate            confirm_create             2021-03-21
+	crypt_autoencrypt        crypt_auto_encrypt         2021-03-21
+	crypt_autopgp            crypt_auto_pgp             2021-03-21
+	crypt_autosign           crypt_auto_sign            2021-03-21
+	crypt_autosmime          crypt_auto_smime           2021-03-21
+	crypt_confirmhook        crypt_confirm_hook         2021-02-11
+	crypt_replyencrypt       crypt_reply_encrypt        2021-03-21
+	crypt_replysign          crypt_reply_sign           2021-03-21
+	crypt_replysignencrypted crypt_reply_sign_encrypted 2021-03-21
+	edit_hdrs                edit_headers               2021-03-21
+	envelope_from            use_envelope_from          2021-03-21
+	forw_decode              forward_decode             2021-03-21
+	forw_decrypt             forward_decrypt            2021-03-21
+	forw_format              forward_format             2021-03-21
+	forw_quote               forward_quote              2021-03-21
+	hdr_format               index_format               2021-03-21
+	imap_servernoise         imap_server_noise          2021-02-11
+	implicit_autoview        implicit_auto_view         2023-01-25
+	include_onlyfirst        include_only_first         2021-03-21
+	indent_str               indent_string              2021-03-21
+	message_cachedir         message_cache_dir          2023-01-25
+	metoo                    me_too                     2021-03-21
+	mime_fwd                 mime_forward               2021-03-21
+	msg_format               message_format             2021-03-21
+	nm_default_uri           nm_default_url             2021-02-11
+	pgp_autoencrypt          crypt_auto_encrypt         2021-03-21
+	pgp_autoinline           pgp_auto_inline            2021-02-11
+	pgp_autosign             crypt_auto_sign            2021-03-21
+	pgp_auto_traditional     pgp_reply_inline           2021-03-21
+	pgp_clearsign_command    pgp_clear_sign_command     2021-02-11
+	pgp_create_traditional   pgp_auto_inline            2004-04-12
+	pgp_getkeys_command      pgp_get_keys_command       2021-02-11
+	pgp_replyencrypt         crypt_reply_encrypt        2021-03-21
+	pgp_replyinline          pgp_reply_inline           2021-03-21
+	pgp_replysign            crypt_reply_sign           2021-03-21
+	pgp_replysignencrypted   crypt_reply_sign_encrypted 2021-03-21
+	pgp_self_encrypt_as      pgp_default_key            2018-01-11
+	pgp_verify_sig           crypt_verify_sig           2002-01-24
+	pop_checkinterval        pop_check_interval         2021-02-11
+	post_indent_str          post_indent_string         2021-03-21
+	print_cmd                print_command              2021-03-21
+	quote_regexp             quote_regex                2021-03-21
+	realname                 real_name                  2021-03-21
+	reply_regexp             reply_regex                2021-03-21
+	reverse_realname         reverse_real_name          2021-03-21
+	skip_quoted_offset       pager_skip_quoted_context  2021-06-18
+	smime_self_encrypt_as    smime_default_key          2018-01-11
+	spoolfile                spool_file                 2021-03-21
+	ssl_usesystemcerts       ssl_use_system_certs       2021-02-11
+	tmpdir                   tmp_dir                    2023-01-25
+	use_8bitmime             use_8bit_mime              2021-03-21
+	virtual_spoolfile        virtual_spool_file         2021-02-11
+	xterm_icon               ts_icon_format             2021-03-21
+	xterm_set_titles         ts_enabled                 2021-03-21
+	xterm_title              ts_status_format           2021-03-21
+
+All Deprecated (8)
+	escape                    2021-03-18
+	header_cache_compress     2020-03-25
+	header_cache_pagesize     2020-03-25
+	ignore_linear_white_space 2021-03-18
+	mime_subject              2021-03-24
+	pgp_encrypt_self          2019-09-09
+	smime_encrypt_self        2019-09-09
+	visual                    2021-03-18
+

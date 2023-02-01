@@ -1,0 +1,9 @@
+{ "mark_old", DT_BOOL, true },
+/*
+** .pp
+** Controls whether or not NeoMutt marks \fInew\fP \fBunread\fP
+** messages as \fIold\fP if you exit a mailbox without reading them.
+** With this option \fIset\fP, the next time you start NeoMutt, the messages
+** will show up with an "O" next to them in the index menu,
+** indicating that they are old.
+*/

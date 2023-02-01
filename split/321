@@ -1,0 +1,12 @@
+{ "recall", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** Controls whether or not NeoMutt recalls postponed messages
+** when composing a new message.
+** .pp
+** Setting this variable to \fIyes\fP is not generally useful, and thus not
+** recommended.  Note that the \fC<recall-message>\fP function can be used
+** to manually recall postponed messages.
+** .pp
+** Also see $$postponed variable.
+*/

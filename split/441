@@ -1,0 +1,15 @@
+{ "to_chars", DT_MBTABLE, " +TCFLR" },
+/*
+** .pp
+** Controls the character used to indicate mail addressed to you.
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td <space> .td The mail is \fInot\fP addressed to your address.
+** .td 2 .td + .td You are the only recipient of the message.
+** .td 3 .td T .td Your address appears in the "To:" header field, but you are not the only recipient of the message.
+** .td 4 .td C .td Your address is specified in the "Cc:" header field, but you are not the only recipient.
+** .td 5 .td F .td Indicates the mail that was sent by \fIyou\fP.
+** .td 6 .td L .td Indicates the mail was sent to a mailing-list you subscribe to.
+** .td 7 .td R .td Your address appears in the "Reply-To:" header field but none of the above applies.
+** .te
+*/

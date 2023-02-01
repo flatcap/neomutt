@@ -1,0 +1,9 @@
+{ "implicit_auto_view", DT_BOOL, false },
+/*
+** .pp
+** If set to "yes", NeoMutt will look for a mailcap entry with the
+** "\fCcopiousoutput\fP" flag set for \fIevery\fP MIME attachment it doesn't have
+** an internal viewer defined for.  If such an entry is found, NeoMutt will
+** use the viewer defined in that entry to convert the body part to text
+** form.
+*/

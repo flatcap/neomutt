@@ -1,0 +1,9 @@
+{ "smime_get_cert_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to extract X509 certificates from a PKCS7 structure.
+** .pp
+** This is a format string, see the $$smime_decrypt_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (S/MIME only)
+*/

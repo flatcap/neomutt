@@ -1,0 +1,8 @@
+{ "prompt_after", DT_BOOL, true },
+/*
+** .pp
+** If you use an \fIexternal\fP $$pager, setting this variable will
+** cause NeoMutt to prompt you for a command when the pager exits rather
+** than returning to the index menu.  If \fIunset\fP, NeoMutt will return to the
+** index menu when the external pager exits.
+*/

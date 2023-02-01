@@ -1,0 +1,8 @@
+{ "pgp_show_unusable", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will display non-usable keys on the PGP key selection
+** menu.  This includes keys which have been revoked, have expired, or
+** have been marked as "disabled" by the user.
+** (PGP only)
+*/

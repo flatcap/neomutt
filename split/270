@@ -1,0 +1,17 @@
+{ "pgp_list_pubring_command", DT_COMMAND, 0 },
+/*
+** .pp
+** This command is used to list the public key ring's contents.  The
+** output format must be analogous to the one used by
+** .ex
+** gpg --list-keys --with-colons --with-fingerprint
+** .ee
+** .pp
+** Note: gpg's \fCfixed-list-mode\fP option should not be used.  It
+** produces a different date format which may result in NeoMutt showing
+** incorrect key generation dates.
+** .pp
+** This is a format string, see the $$pgp_decode_command command for
+** possible \fCprintf(3)\fP-like sequences.
+** (PGP only)
+*/

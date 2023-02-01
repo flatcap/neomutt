@@ -1,0 +1,8 @@
+{ "imap_peek", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will avoid implicitly marking your mail as read whenever
+** you fetch a message from the server. This is generally a good thing,
+** but can make closing an IMAP folder somewhat slower. This option
+** exists to appease speed freaks.
+*/

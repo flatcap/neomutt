@@ -1,0 +1,15 @@
+{ "text_flowed", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will generate "format=flowed" bodies with a content type
+** of "\fCtext/plain; format=flowed\fP".
+** This format is easier to handle for some mailing software, and generally
+** just looks like ordinary text.  To actually make use of this format's
+** features, you'll need support in your editor.
+** .pp
+** The option only controls newly composed messages.  Postponed messages,
+** resent messages, and draft messages (via -H on the command line) will
+** use the content-type of the source message.
+** .pp
+** Note that $$indent_string is ignored when this option is \fIset\fP.
+*/

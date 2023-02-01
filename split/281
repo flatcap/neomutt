@@ -1,0 +1,9 @@
+{ "pgp_strict_enc", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will automatically encode PGP/MIME signed messages as
+** quoted-printable.  Please note that unsetting this variable may
+** lead to problems with non-verifyable PGP signatures, so only change
+** this if you know what you are doing.
+** (PGP only)
+*/

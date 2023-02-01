@@ -1,0 +1,5 @@
+{ "sidebar_on_right", DT_BOOL, false },
+/*
+** .pp
+** When set, the sidebar will appear on the right-hand side of the screen.
+*/

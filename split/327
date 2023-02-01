@@ -1,0 +1,9 @@
+{ "reply_self", DT_BOOL, false },
+/*
+** .pp
+** If \fIunset\fP and you are replying to a message sent by you, NeoMutt will
+** assume that you want to reply to the recipients of that message rather
+** than to yourself.
+** .pp
+** Also see the "$alternates" command.
+*/

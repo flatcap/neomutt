@@ -1,0 +1,6 @@
+{ "honor_followup_to", DT_QUAD, MUTT_YES },
+/*
+** .pp
+** This variable controls whether or not a Mail-Followup-To header is
+** honored when group-replying to a message.
+*/

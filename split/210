@@ -1,0 +1,17 @@
+{ "mix_entry_format", DT_STRING, "%4n %c %-16s %a" },
+/*
+** .pp
+** This variable describes the format of a remailer line on the mixmaster
+** chain selection screen.  The following \fCprintf(3)\fP-like sequences are
+** supported:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td The remailer's e-mail address
+** .td %c  .td Remailer capabilities
+** .td %n  .td The running number on the menu
+** .td %s  .td The remailer's short name
+** .td %>X .td right justify the rest of the string and pad with character "X"
+** .td %|X .td pad to the end of the line with character "X"
+** .td %*X .td soft-fill with character "X" as pad
+** .te
+*/

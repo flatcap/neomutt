@@ -1,0 +1,8 @@
+{ "weed", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will weed headers when displaying, forwarding,
+** or replying to messages.
+** .pp
+** Also see $$copy_decode_weed, $$pipe_decode_weed, $$print_decode_weed.
+*/

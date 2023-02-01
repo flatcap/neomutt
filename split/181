@@ -1,0 +1,36 @@
+{ "mailbox_folder_format", DT_STRING, "%2C %?n?%6n&%6 ? %6m %i" },
+/*
+** .pp
+** This variable allows you to customize the file browser display to your
+** personal taste. It's only used to customize network mailboxes (e.g. imap).
+** This string is similar to $$index_format, but has its own set of
+** \fCprintf(3)\fP-like sequences:
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %C  .td   .td Current file number
+** .td %d  .td   .td Date/time folder was last modified
+** .td %D  .td   .td Date/time folder was last modified using $$date_format.
+** .td %f  .td   .td Filename ("/" is appended to directory names,
+**                   "@" to symbolic links and "*" to executable files)
+** .td %F  .td   .td File permissions
+** .td %g  .td   .td Group name (or numeric gid, if missing)
+** .td %i  .td   .td Description of the folder
+** .td %l  .td   .td Number of hard links
+** .td %m  .td * .td Number of messages in the mailbox
+** .td %n  .td * .td Number of unread messages in the mailbox
+** .td %N  .td   .td "N" if mailbox has new mail, " " (space) otherwise
+** .td %s  .td   .td Size in bytes (see $formatstrings-size)
+** .td %u  .td   .td Owner name (or numeric uid, if missing)
+** .td %>X .td   .td Right justify the rest of the string and pad with character "X"
+** .td %|X .td   .td Pad to the end of the line with character "X"
+** .td %*X .td   .td Soft-fill with character "X" as pad
+** .te
+** .pp
+** For an explanation of "soft-fill", see the $$index_format documentation.
+** .pp
+** * = can be optionally printed if nonzero
+** .pp
+** %m, %n, and %N only work for monitored mailboxes.
+** %m requires $$mail_check_stats to be set.
+** %n requires $$mail_check_stats to be set (except for IMAP mailboxes).
+*/

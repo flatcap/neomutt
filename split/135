@@ -1,0 +1,7 @@
+{ "hide_top_limited", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will not show the presence of messages that are hidden
+** by limiting, at the top of threads in the thread tree.  Note that when
+** $$hide_limited is \fIset\fP, this option will have no effect.
+*/

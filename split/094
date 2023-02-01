@@ -1,0 +1,6 @@
+{ "entropy_file", DT_PATH, 0 },
+/*
+** .pp
+** The file which includes random data that is used to initialize SSL
+** library functions.
+*/

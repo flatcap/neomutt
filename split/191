@@ -1,0 +1,8 @@
+{ "mbox", DT_MAILBOX, "~/mbox" },
+/*
+** .pp
+** This specifies the folder into which read mail in your $$spool_file
+** folder will be appended.
+** .pp
+** Also see the $$move variable.
+*/

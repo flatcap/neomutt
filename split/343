@@ -1,0 +1,8 @@
+{ "score_threshold_delete", DT_NUMBER, -1 },
+/*
+** .pp
+** Messages which have been assigned a score equal to or lower than the value
+** of this variable are automatically marked for deletion by NeoMutt.  Since
+** NeoMutt scores are always greater than or equal to zero, the default setting
+** of this variable will never mark a message for deletion.
+*/

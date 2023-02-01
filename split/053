@@ -1,0 +1,6 @@
+{ "confirm_append", DT_BOOL, true },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will prompt for confirmation when appending messages to
+** an existing mailbox.
+*/

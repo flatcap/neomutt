@@ -1,0 +1,7 @@
+{ "imap_list_subscribed", DT_BOOL, false },
+/*
+** .pp
+** This variable configures whether IMAP folder browsing will look for
+** only subscribed folders or all folders.  This can be toggled in the
+** IMAP browser with the \fC<toggle-subscribed>\fP function.
+*/

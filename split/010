@@ -1,0 +1,6 @@
+{ "allow_8bit", DT_BOOL, true },
+/*
+** .pp
+** Controls whether 8-bit data is converted to 7-bit using either Quoted-
+** Printable or Base64 encoding when sending mail.
+*/

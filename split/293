@@ -1,0 +1,7 @@
+{ "pop_delete", DT_QUAD, MUTT_ASKNO },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will delete successfully downloaded messages from the POP
+** server when using the \fC$<fetch-mail>\fP function.  When \fIunset\fP, NeoMutt will
+** download messages but also leave them on the POP server.
+*/

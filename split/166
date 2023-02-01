@@ -1,0 +1,8 @@
+{ "imap_user", DT_STRING, 0 },
+/*
+** .pp
+** The name of the user whose mail you intend to access on the IMAP
+** server.
+** .pp
+** This variable defaults to your user name on the local machine.
+*/

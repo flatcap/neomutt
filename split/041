@@ -1,0 +1,6 @@
+{ "catchup_newsgroup", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** If this variable is \fIset\fP, NeoMutt will mark all articles in newsgroup
+** as read when you quit the newsgroup (catchup newsgroup).
+*/

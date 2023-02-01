@@ -1,0 +1,9 @@
+{ "crypt_timestamp", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will include a time stamp in the lines surrounding
+** PGP or S/MIME output, so spoofing such lines is more difficult.
+** If you are using colors to mark these lines, and rely on these,
+** you may \fIunset\fP this setting.
+** (Crypto only)
+*/

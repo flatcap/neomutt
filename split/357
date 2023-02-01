@@ -1,0 +1,7 @@
+{ "sidebar_folder_indent", DT_BOOL, false },
+/*
+** .pp
+** Set this to indent mailboxes in the sidebar.
+** .pp
+** \fBSee also:\fP $$sidebar_short_path, $$sidebar_indent_string, $$sidebar_delim_chars.
+*/

@@ -1,0 +1,21 @@
+{ "dsn_notify", DT_STRING, 0 },
+/*
+** .pp
+** This variable sets the request for when notification is returned.  The
+** string consists of a comma separated list (no spaces!) of one or more
+** of the following: \fInever\fP, to never request notification,
+** \fIfailure\fP, to request notification on transmission failure,
+** \fIdelay\fP, to be notified of message delays, \fIsuccess\fP, to be
+** notified of successful transmission.
+** .pp
+** Example:
+** .ex
+** set dsn_notify="failure,delay"
+** .ee
+** .pp
+** \fBNote:\fP when using $$sendmail for delivery, you should not enable
+** this unless you are either using Sendmail 8.8.x or greater or a MTA
+** providing a \fCsendmail(1)\fP-compatible interface supporting the \fC-N\fP option
+** for DSN. For SMTP delivery, DSN support is auto-detected so that it
+** depends on the server whether DSN will be used or not.
+*/

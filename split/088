@@ -1,0 +1,18 @@
+{ "dsn_return", DT_STRING, 0 },
+/*
+** .pp
+** This variable controls how much of your message is returned in DSN
+** messages.  It may be set to either \fIhdrs\fP to return just the
+** message header, or \fIfull\fP to return the full message.
+** .pp
+** Example:
+** .ex
+** set dsn_return=hdrs
+** .ee
+** .pp
+** \fBNote:\fP when using $$sendmail for delivery, you should not enable
+** this unless you are either using Sendmail 8.8.x or greater or a MTA
+** providing a \fCsendmail(1)\fP-compatible interface supporting the \fC-R\fP option
+** for DSN. For SMTP delivery, DSN support is auto-detected so that it
+** depends on the server whether DSN will be used or not.
+*/

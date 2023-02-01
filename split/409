@@ -1,0 +1,21 @@
+{ "sort_browser", DT_SORT, SORT_ALPHA },
+/*
+** .pp
+** Specifies how to sort entries in the file browser.  By default, the
+** entries are sorted alphabetically.  Valid values:
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td alpha    .td Alphabetically
+** .td count    .td All message count
+** .td date     .td
+** .td desc     .td Description
+** .td new      .td New message count
+** .td size     .td
+** .td unsorted .td
+** .te
+** .pp
+** You may optionally use the "reverse-" prefix to specify reverse sorting
+** order (example: "\fCset sort_browser=reverse-date\fP").
+** .pp
+** The "unread" value is a synonym for "new".
+*/

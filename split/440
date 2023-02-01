@@ -1,0 +1,9 @@
+{ "tmp_dir", DT_PATH, TMPDIR },
+/*
+** .pp
+** This variable allows you to specify where NeoMutt will place its
+** temporary files needed for displaying and composing messages.
+** .pp
+** If this variable is not set, the environment variable \fC$$$TMPDIR\fP is
+** used.  Failing that, then "\fC/tmp\fP" is used.
+*/

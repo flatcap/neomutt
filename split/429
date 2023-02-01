@@ -1,0 +1,17 @@
+{ "status_chars", DT_MBTABLE, "-*%A" },
+/*
+** .pp
+** Controls the characters used by the "%r" indicator in $$status_format.
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td - .td Mailbox is unchanged
+** .td 2 .td * .td Mailbox has been changed and needs to be resynchronized
+** .td 3 .td % .td Mailbox is read-only, or will not be written when exiting.
+**                 (You can toggle whether to write changes to a mailbox
+**                 with the \fC<toggle-write>\fP operation, bound by default
+**                 to "%")
+** .td 4 .td A .td Folder opened in attach-message mode.
+**                 (Certain operations like composing a new mail, replying,
+**                 forwarding, etc. are not permitted in this mode)
+** .te
+*/

@@ -1,0 +1,14 @@
+{ "date_format", DT_STRING, "!%a, %b %d, %Y at %I:%M:%S%p %Z" },
+/*
+** .pp
+** This variable controls the format of the date printed by the "%d"
+** sequence in $$index_format.  This is passed to the \fCstrftime(3)\fP
+** function to process the date, see the man page for the proper syntax.
+** .pp
+** Unless the first character in the string is a bang ("!"), the month
+** and week day names are expanded according to the locale.
+** If the first character in the string is a
+** bang, the bang is discarded, and the month and week day names in the
+** rest of the string are expanded in the \fIC\fP locale (that is in US
+** English).
+*/

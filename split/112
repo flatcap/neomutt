@@ -1,0 +1,8 @@
+{ "forward_decrypt", DT_BOOL, true },
+/*
+** .pp
+** Controls the handling of encrypted messages when forwarding a message.
+** When \fIset\fP, the outer layer of encryption is stripped off.  This
+** variable is only used if $$mime_forward is \fIset\fP and
+** $$mime_forward_decode is \fIunset\fP.
+*/

@@ -1,0 +1,6 @@
+{ "bounce_delivered", DT_BOOL, true },
+/*
+** .pp
+** When this variable is \fIset\fP, NeoMutt will include Delivered-To headers when
+** bouncing messages.  Postfix users may wish to \fIunset\fP this variable.
+*/

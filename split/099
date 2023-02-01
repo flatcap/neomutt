@@ -1,0 +1,14 @@
+{ "fcc_before_send", DT_BOOL, false },
+/*
+** .pp
+** When this variable is \fIset\fP, FCCs will occur before sending
+** the message.  Before sending, the message cannot be manipulated,
+** so it will be stored the exact same as sent:
+** $$fcc_attach and $$fcc_clear will be ignored (using their default
+** values).
+** .pp
+** When \fIunset\fP, the default, FCCs will occur after sending.
+** Variables $$fcc_attach and $$fcc_clear will be respected, allowing
+** it to be stored without attachments or encryption/signing if
+** desired.
+*/

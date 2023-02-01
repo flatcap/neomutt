@@ -1,0 +1,34 @@
+
+.de Vb \" Begin verbatim text
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve \" End verbatim text
+.ft R
+.fi
+..
+
+
+.\" define .EX/.EE (for multiline user-command examples; normal Courier font)
+.de EX
+.in +4n
+.nf
+.ft CW
+..
+.de EE
+.ft R
+.fi
+.in -4n
+..
+
+.\" NeoMutt macros
+.de EX
+.nf
+.ft CW
+..
+.de EE
+.ft
+.fi
+..
+

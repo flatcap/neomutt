@@ -1,0 +1,5 @@
+{ "flag_safe", DT_BOOL, false },
+/*
+** .pp
+** If set, flagged messages can't be deleted.
+*/

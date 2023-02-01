@@ -1,0 +1,7 @@
+{ "local_date_header", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, the date in the Date header of emails that you send will be in
+** your local timezone. If unset a UTC date will be used instead to avoid
+** leaking information about your current location.
+*/

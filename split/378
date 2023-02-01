@@ -1,0 +1,8 @@
+{ "smileys", DT_REGEX, "(>From )|(:[-^]?[][)(><}{|/DP])" },
+/*
+** .pp
+** The \fIpager\fP uses this variable to catch some common false
+** positives of $$quote_regex, most notably smileys and not consider
+** a line quoted text if it also matches $$smileys. This mostly
+** happens at the beginning of a line.
+*/

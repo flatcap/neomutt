@@ -1,0 +1,6 @@
+{ "collapse_flagged", DT_BOOL, true },
+/*
+** .pp
+** When \fIunset\fP, NeoMutt will not collapse a thread if it contains any
+** flagged messages.
+*/

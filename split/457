@@ -1,0 +1,7 @@
+{ "user_agent", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will add a "User-Agent:" header to outgoing
+** messages, indicating which version of NeoMutt was used for composing
+** them.
+*/

@@ -1,0 +1,18 @@
+{ "sendmail_wait", DT_NUMBER, 0 },
+/*
+** .pp
+** Specifies the number of seconds to wait for the $$sendmail process
+** to finish before giving up and putting delivery in the background.
+** .pp
+** NeoMutt interprets the value of this variable as follows:
+** .ts
+** .td \fBValue\fP .td \fBDescription\fP
+** .td >0 .td number of seconds to wait for sendmail to finish before continuing
+** .td 0  .td wait forever for sendmail to finish
+** .td <0 .td always put sendmail in the background without waiting
+** .te
+** .pp
+** Note that if you specify a value other than 0, the output of the child
+** process will be put in a temporary file.  If there is some error, you
+** will be informed as to where to find the output.
+*/

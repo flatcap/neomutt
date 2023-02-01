@@ -1,0 +1,5 @@
+{ "collapse_all", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, NeoMutt will collapse all threads when entering a folder.
+*/

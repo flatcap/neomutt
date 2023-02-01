@@ -1,0 +1,8 @@
+{ "pop_auth_try_all", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will try all available authentication methods.
+** When \fIunset\fP, NeoMutt will only fall back to other authentication
+** methods if the previous methods are unavailable. If a method is
+** available but authentication fails, NeoMutt will not connect to the POP server.
+*/

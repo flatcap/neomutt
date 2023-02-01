@@ -1,0 +1,69 @@
+DT_SYNONYM
+	2021-03-21 abort_noattach_regexp     abort_noattach_regex
+	2021-03-21 askbcc                    ask_bcc
+	2021-03-21 askcc                     ask_cc
+	2021-03-21 attach_keyword            abort_noattach_regex
+	2021-03-21 autoedit                  auto_edit
+	2021-03-21 confirmappend             confirm_append
+	2021-03-21 confirmcreate             confirm_create
+	2021-03-21 crypt_autoencrypt         crypt_auto_encrypt
+	2021-03-21 crypt_autopgp             crypt_auto_pgp
+	2021-03-21 crypt_autosign            crypt_auto_sign
+	2021-03-21 crypt_autosmime           crypt_auto_smime
+	2021-02-11 crypt_confirmhook         crypt_confirm_hook
+	2021-03-21 crypt_replyencrypt        crypt_reply_encrypt
+	2021-03-21 crypt_replysign           crypt_reply_sign
+	2021-03-21 crypt_replysignencrypted  crypt_reply_sign_encrypted
+	2021-03-21 edit_hdrs                 edit_headers
+	2021-03-21 envelope_from             use_envelope_from
+	2021-03-21 forw_decode               forward_decode
+	2021-03-21 forw_decrypt              forward_decrypt
+	2021-03-21 forw_format               forward_format
+	2021-03-21 forw_quote                forward_quote
+	2021-03-21 hdr_format                index_format
+	2021-02-11 imap_servernoise          imap_server_noise
+	2021-03-21 include_onlyfirst         include_only_first
+	2021-03-21 indent_str                indent_string
+	2021-03-21 metoo                     me_too
+	2021-03-21 mime_fwd                  mime_forward
+	2021-03-21 msg_format                message_format
+	2021-02-11 nm_default_uri            nm_default_url
+	2021-03-21 pgp_autoencrypt           crypt_auto_encrypt
+	2021-02-11 pgp_autoinline            pgp_auto_inline
+	2021-03-21 pgp_autosign              crypt_auto_sign
+	2021-03-21 pgp_auto_traditional      pgp_reply_inline
+	2021-02-11 pgp_clearsign_command     pgp_clear_sign_command
+	2004-04-12 pgp_create_traditional    pgp_auto_inline
+	2021-02-11 pgp_getkeys_command       pgp_get_keys_command
+	2021-03-21 pgp_replyencrypt          crypt_reply_encrypt
+	2021-03-21 pgp_replyinline           pgp_reply_inline
+	2021-03-21 pgp_replysign             crypt_reply_sign
+	2021-03-21 pgp_replysignencrypted    crypt_reply_sign_encrypted
+	2018-01-11 pgp_self_encrypt_as       pgp_default_key
+	2002-01-24 pgp_verify_sig            crypt_verify_sig
+	2021-02-11 pop_checkinterval         pop_check_interval
+	2021-03-21 post_indent_str           post_indent_string
+	2021-03-21 print_cmd                 print_command
+	2021-03-21 quote_regexp              quote_regex
+	2021-03-21 realname                  real_name
+	2021-03-21 reply_regexp              reply_regex
+	2021-03-21 reverse_realname          reverse_real_name
+	2021-06-18 skip_quoted_offset        pager_skip_quoted_context
+	2018-01-11 smime_self_encrypt_as     smime_default_key
+	2021-03-21 spoolfile                 spool_file
+	2021-02-11 ssl_usesystemcerts        ssl_use_system_certs
+	2021-03-21 use_8bitmime              use_8bit_mime
+	2021-02-11 virtual_spoolfile         virtual_spool_file
+	2021-03-21 xterm_icon                ts_icon_format
+	2021-03-21 xterm_set_titles          ts_enabled
+	2021-03-21 xterm_title               ts_status_format
+
+DT_DEPRECATED
+	2021-03-18 escape
+	2020-03-25 header_cache_compress
+	2020-03-25 header_cache_pagesize
+	2021-03-18 ignore_linear_white_space
+	2021-03-24 mime_subject
+	2019-09-09 pgp_encrypt_self
+	2019-09-09 smime_encrypt_self
+	2021-03-18 visual

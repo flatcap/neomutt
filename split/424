@@ -1,0 +1,6 @@
+{ "ssl_use_tlsv1_2", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP , NeoMutt will use TLSv1.2 when communicating with servers that
+** request it.
+*/

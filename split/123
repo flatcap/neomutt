@@ -1,0 +1,7 @@
+{ "header", DT_BOOL, false },
+/*
+** .pp
+** When \fIset\fP, this variable causes NeoMutt to include the header
+** of the message you are replying to into the edit buffer.
+** The $$weed setting applies.
+*/

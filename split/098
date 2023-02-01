@@ -1,0 +1,8 @@
+{ "fcc_attach", DT_QUAD, MUTT_YES },
+/*
+** .pp
+** This variable controls whether or not attachments on outgoing messages
+** are saved along with the main body of your message.
+** .pp
+** Note: $$fcc_before_send forces the default (set) behavior of this option.
+*/

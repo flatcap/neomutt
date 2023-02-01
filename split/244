@@ -1,0 +1,7 @@
+{ "nntp_user", DT_STRING, 0 },
+/*
+** .pp
+** Your login name on the NNTP server.  If \fIunset\fP and NNTP server requires
+** authentication, NeoMutt will prompt you for your account name when you
+** connect to news server.
+*/

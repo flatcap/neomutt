@@ -1,0 +1,7 @@
+{ "header_cache_compress_method", DT_STRING, 0 },
+/*
+** .pp
+** When NeoMutt is compiled with lz4, zstd or zlib, the header cache backend
+** can use these compression methods for compressing the cache files.
+** This results in much smaller cache file sizes and may even improve speed.
+*/

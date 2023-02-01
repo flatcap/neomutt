@@ -1,0 +1,83 @@
+{ "status_format", DT_STRING, "-%r-NeoMutt: %D [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%?T?%T/?%s/%S)-%>-(%P)---" },
+/*
+** .pp
+** Controls the format of the status line displayed in the "index"
+** menu.  This string is similar to $$index_format, but has its own
+** set of \fCprintf(3)\fP-like sequences:
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %b  .td * .td Number of mailboxes with new mail
+** .td %d  .td * .td Number of deleted messages
+** .td %D  .td   .td Description of the mailbox
+** .td %f  .td   .td The full pathname of the current mailbox
+** .td %F  .td * .td Number of flagged messages
+** .td %h  .td   .td Local hostname
+** .td %l  .td * .td Size (in bytes) of the current mailbox (see $formatstrings-size)
+** .td %L  .td * .td Size (in bytes) of the messages shown
+**                   (i.e., which match the current limit) (see $formatstrings-size)
+** .td %m  .td * .td The number of messages in the mailbox
+** .td %M  .td * .td The number of messages shown (i.e., which match the current limit)
+** .td %n  .td * .td Number of new messages in the mailbox (unread, unseen)
+** .td %o  .td * .td Number of old messages in the mailbox (unread, seen)
+** .td %p  .td * .td Number of postponed messages
+** .td %P  .td   .td Percentage of the way through the index
+** .td %r  .td   .td Modified/read-only/won't-write/attach-message indicator,
+**                   According to $$status_chars
+** .td %R  .td * .td Number of read messages in the mailbox (read, seen)
+** .td %s  .td   .td Current sorting mode ($$sort)
+** .td %S  .td   .td Current aux sorting method ($$sort_aux)
+** .td %t  .td * .td Number of tagged messages in the mailbox
+** .td %T  .td * .td Current threading mode ($$use_threads)
+** .td %u  .td * .td Number of unread messages in the mailbox (seen or unseen)
+** .td %v  .td   .td NeoMutt version string
+** .td %V  .td * .td Currently active limit pattern, if any
+** .td %>X .td   .td Right justify the rest of the string and pad with "X"
+** .td %|X .td   .td Pad to the end of the line with "X"
+** .td %*X .td   .td Soft-fill with character "X" as pad
+** .te
+** .pp
+** For an explanation of "soft-fill", see the $$index_format documentation.
+** .pp
+** * = can be optionally printed if nonzero
+** .pp
+** Some of the above sequences can be used to optionally print a string
+** if their value is nonzero.  For example, you may only want to see the
+** number of flagged messages if such messages exist, since zero is not
+** particularly meaningful.  To optionally print a string based upon one
+** of the above sequences, the following construct is used:
+** .pp
+**  \fC%?<sequence_char>?<optional_string>?\fP
+** .pp
+** where \fIsequence_char\fP is a character from the table above, and
+** \fIoptional_string\fP is the string you would like printed if
+** \fIsequence_char\fP is nonzero.  \fIoptional_string\fP \fBmay\fP contain
+** other sequences as well as normal text, but you may \fBnot\fP nest
+** optional strings.
+** .pp
+** Here is an example illustrating how to optionally print the number of
+** new messages in a mailbox:
+** .pp
+** \fC%?n?%n new messages.?\fP
+** .pp
+** You can also switch between two strings using the following construct:
+** .pp
+** \fC%?<sequence_char>?<if_string>&<else_string>?\fP
+** .pp
+** If the value of \fIsequence_char\fP is non-zero, \fIif_string\fP will
+** be expanded, otherwise \fIelse_string\fP will be expanded.
+** .pp
+** As another example, here is how to show either $$sort and
+** $$sort_aux or $$use_threads and $$sort, based on whether threads
+** are enabled with $$use_threads:
+** .pp
+** \fC%?T?%s/%S&%T/%s?\fP
+** .pp
+** You can force the result of any \fCprintf(3)\fP-like sequence to be lowercase
+** by prefixing the sequence character with an underscore ("_") sign.
+** For example, if you want to display the local hostname in lowercase,
+** you would use: "\fC%_h\fP".
+** .pp
+** If you prefix the sequence character with a colon (":") character, NeoMutt
+** will replace any dots in the expansion by underscores. This might be helpful
+** with IMAP folders that don't like dots in folder names.
+*/

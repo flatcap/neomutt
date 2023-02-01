@@ -1,0 +1,8 @@
+{ "followup_to_poster", DT_QUAD, MUTT_ASKYES },
+/*
+** .pp
+** If this variable is \fIset\fP and the keyword "poster" is present in
+** \fIFollowup-To\fP header, follow-up to newsgroup function is not
+** permitted.  The message will be mailed to the submitter of the
+** message via mail.
+*/

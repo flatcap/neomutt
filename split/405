@@ -1,0 +1,7 @@
+{ "smtp_user", DT_STRING, 0 },
+/*
+** .pp
+** The username for the SMTP server.
+** .pp
+** This variable defaults to your user name on the local machine.
+*/

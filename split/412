@@ -1,0 +1,10 @@
+{ "spool_file", DT_MAILBOX, 0 },
+/*
+** .pp
+** If your spool mailbox is in a non-default place where NeoMutt can't find
+** it, you can specify its location with this variable. The description from
+** "named-mailboxes" or "virtual-mailboxes" may be used for the spool_file.
+** .pp
+** If not specified, then the environment variables \fC$$$MAIL\fP and
+** \fC$$$MAILDIR\fP will be checked.
+*/

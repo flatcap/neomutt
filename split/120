@@ -1,0 +1,17 @@
+{ "greeting", DT_STRING, 0 },
+/*
+** .pp
+** When set, this is the string that will precede every message as a
+** greeting phrase to the recipients.
+** .pp
+** "Format strings" are similar to the strings used in the "C"
+** function printf to format output (see the man page for more detail).
+** The following sequences are defined in NeoMutt:
+** .pp
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %n .td Recipient's real name
+** .td %u .td User (login) name of recipient
+** .td %v .td First name of recipient
+** .te
+*/

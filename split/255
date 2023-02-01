@@ -1,0 +1,8 @@
+{ "pgp_check_exit", DT_BOOL, true },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will check the exit code of the PGP subprocess when
+** signing or encrypting.  A non-zero exit code means that the
+** subprocess failed.
+** (PGP only)
+*/

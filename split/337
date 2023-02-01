@@ -1,0 +1,7 @@
+{ "save_address", DT_BOOL, false },
+/*
+** .pp
+** If \fIset\fP, NeoMutt will take the sender's full address when choosing a
+** default folder for saving a mail. If $$save_name or $$force_name
+** is \fIset\fP too, the selection of the Fcc folder will be changed as well.
+*/

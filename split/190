@@ -1,0 +1,7 @@
+{ "mask", DT_REGEX, "!^\\.[^.]" },
+/*
+** .pp
+** A regular expression used in the file browser, optionally preceded by
+** the \fInot\fP operator "!".  Only files whose names match this mask
+** will be shown. The match is always case-sensitive.
+*/

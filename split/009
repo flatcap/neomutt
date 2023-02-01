@@ -1,0 +1,18 @@
+{ "alias_format", DT_STRING, "%3n %f%t %-15a %-56r | %c" },
+/*
+** .pp
+** Specifies the format of the data displayed for the "$alias" menu.  The
+** following \fCprintf(3)\fP-style sequences are available:
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td Alias name
+** .td %c  .td Comment
+** .td %f  .td Flags - currently, a "d" for an alias marked for deletion
+** .td %n  .td Index number
+** .td %r  .td Address which alias expands to
+** .td %t  .td Character which indicates if the alias is tagged for inclusion
+** .td %>X .td right justify the rest of the string and pad with character "X"
+** .td %|X .td pad to the end of the line with character "X"
+** .td %*X .td soft-fill with character "X" as pad
+** .te
+*/

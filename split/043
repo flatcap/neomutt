@@ -1,0 +1,7 @@
+{ "change_folder_next", DT_BOOL, false },
+/*
+** .pp
+** When this variable is \fIset\fP, the \fC<change-folder>\fP function
+** mailbox suggestion will start at the next folder in your "$mailboxes"
+** list, instead of starting at the first folder in the list.
+*/

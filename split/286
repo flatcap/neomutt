@@ -1,0 +1,10 @@
+{ "pipe_decode", DT_BOOL, false },
+/*
+** .pp
+** Used in connection with the \fC<pipe-message>\fP function.  When \fIunset\fP,
+** NeoMutt will pipe the messages without any preprocessing. When \fIset\fP, NeoMutt
+** will attempt to decode the messages first.
+** .pp
+** Also see $$pipe_decode_weed, which controls whether headers will
+** be weeded when this is \fIset\fP.
+*/
