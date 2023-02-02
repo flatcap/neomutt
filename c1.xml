@@ -1,0 +1,22 @@
+<sect2 id="ask-bcc">
+<title>ask_bcc</title>
+<literallayout>Type: boolean
+Default: no</literallayout>
+
+<para>
+If <emphasis>set</emphasis>, NeoMutt will prompt you for blind-carbon-copy (Bcc) recipients
+before editing an outgoing message.
+</para>
+<note>Before 2021-03-21, this was called $askbcc</note>
+</sect2>
+
+<sect2 id="askbcc">
+  <title>askbcc</title>
+  <note>Renamed to <link linkend="ask-bcc">$ask_bcc</link> (2021-03-21)</note>
+</sect2>
+
+<sect2 id="escape">
+  <title>escape</title>
+  <note>Deprecated, since 2021-03-18</note>
+</sect2>
+
