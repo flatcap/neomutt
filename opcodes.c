@@ -47,6 +47,7 @@ static const char *OpStrings[][2] = {
  */
 const char *opcodes_get_name(int op)
 {
+  op = op & OP_CODE_MASK;
   if ((op < OP_TIMEOUT) || (op >= OP_MAX))
     return "[UNKNOWN]";
 

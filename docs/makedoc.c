@@ -73,22 +73,24 @@
 char *Progname = NULL;
 short Debug = 0;
 int fd_recurse = 0;
+int table_columns = 0;
 
 #define BUFSIZE 2048
 
 // clang-format off
-#define D_NL    (1 <<  0)
-#define D_EM    (1 <<  1)
-#define D_BF    (1 <<  2)
-#define D_TAB   (1 <<  3)
-#define D_NP    (1 <<  4)
-#define D_INIT  (1 <<  5)
-#define D_DL    (1 <<  6)
-#define D_DT    (1 <<  7)
-#define D_DD    (1 <<  8)
-#define D_PA    (1 <<  9)
-#define D_IL    (1 << 10)
-#define D_TT    (1 << 11)
+#define D_NL    (1 <<  0)   ///< XXX
+#define D_EM    (1 <<  1)   ///< XXX
+#define D_BF    (1 <<  2)   ///< XXX
+#define D_TAB   (1 <<  3)   ///< XXX
+#define D_NP    (1 <<  4)   ///< XXX
+#define D_INIT  (1 <<  5)   ///< XXX
+#define D_DL    (1 <<  6)   ///< XXX
+#define D_DT    (1 <<  7)   ///< XXX
+#define D_DD    (1 <<  8)   ///< XXX
+#define D_PA    (1 <<  9)   ///< XXX
+#define D_IL    (1 << 10)   ///< XXX
+#define D_TT    (1 << 11)   ///< XXX
+#define D_EX    (1 << 12)   ///< XXX
 // clang-format on
 
 /**
@@ -107,25 +109,28 @@ enum OutputFormats
  */
 enum SpecialChars
 {
-  SP_START_EM,
-  SP_START_BF,
-  SP_START_TT,
-  SP_END_FT,
-  SP_NEWLINE,
-  SP_NEWPAR,
-  SP_END_PAR,
-  SP_STR,
-  SP_START_TAB,
-  SP_END_TAB,
-  SP_START_DL,
-  SP_DT,
-  SP_DD,
-  SP_END_DD,
-  SP_END_DL,
-  SP_START_IL,
-  SP_END_IL,
-  SP_END_SECT,
-  SP_REFER
+  SP_START_EM,      ///< Start emphasis font (italics)
+  SP_START_BF,      ///< Start bold font
+  SP_START_TT,      ///< Start teletype font (code snippets)
+  SP_END_FT,        ///< End font
+  SP_NEWLINE,       ///< XXX
+  SP_NEWPAR,        ///< XXX
+  SP_END_PAR,       ///< XXX
+  SP_STR,           ///< XXX
+  SP_START_TAB,     ///< XXX
+  SP_TAB_HEADER,    ///< XXX
+  SP_END_TAB,       ///< XXX
+  SP_START_EXAMPLE, ///< XXX
+  SP_END_EXAMPLE,   ///< XXX
+  SP_START_DL,      ///< XXX
+  SP_DT,            ///< XXX
+  SP_DD,            ///< XXX
+  SP_END_DD,        ///< XXX
+  SP_END_DL,        ///< XXX
+  SP_START_IL,      ///< XXX
+  SP_END_IL,        ///< XXX
+  SP_END_SECT,      ///< XXX
+  SP_REFER          ///< XXX
 };
 
 /**
@@ -133,54 +138,66 @@ enum SpecialChars
  */
 enum DataType
 {
-  DT_NONE = 0,
-  DT_ADDRESS,
-  DT_BOOL,
-  DT_COMMAND,
-  DT_ENUM,
-  DT_LONG,
-  DT_MAILBOX,
-  DT_MBTABLE,
-  DT_NUMBER,
-  DT_PATH,
-  DT_QUAD,
-  DT_REGEX,
-  DT_SLIST,
-  DT_SORT,
-  DT_STRING,
-  DT_SYNONYM,
+  DT_NONE = 0,   ///< Error, unknown type
+  DT_ADDRESS,    ///< E-mail address
+  DT_BOOL,       ///< Boolean option
+  DT_COMMAND,    ///< A command
+  DT_ENUM,       ///< An enumeration
+  DT_LONG,       ///< A number (long)
+  DT_MAILBOX,    ///< Don't perform path expansions
+  DT_MBTABLE,    ///< Multibyte char table
+  DT_NUMBER,     ///< A number
+  DT_PATH,       ///< A path to a file/directory
+  DT_QUAD,       ///< Quad-option (no/yes/ask-no/ask-yes)
+  DT_REGEX,      ///< Regular expressions
+  DT_SLIST,      ///< A list of strings
+  DT_SORT,       ///< Sorting methods
+  DT_STRING,     ///< A string
+  DT_SYNONYM,    ///< Synonym for another variable
+  DT_DEPRECATED, ///< Config item shouldn't be used any more
 };
 
+/**
+ * struct VariableTypes - Lookup variable types
+ */
 struct VariableTypes
 {
-  char *machine;
-  char *human;
+  char *machine; ///< Code type, e.g. DT_ENUM
+  char *human;   ///< User type, e.g. enumeration
 };
 
+/**
+ * types - Lookup table for variable types
+ */
 struct VariableTypes types[] = {
   // clang-format off
-  { "DT_NONE",    "-none-"             },
-  { "DT_ADDRESS", "e-mail address"     },
-  { "DT_BOOL",    "boolean"            },
-  { "DT_COMMAND", "command"            },
-  { "DT_ENUM",    "enumeration"        },
-  { "DT_LONG",    "number (long)"      },
-  { "DT_MAILBOX", "mailbox"            },
-  { "DT_MBTABLE", "character string"   },
-  { "DT_NUMBER",  "number"             },
-  { "DT_PATH",    "path"               },
-  { "DT_QUAD",    "quadoption"         },
-  { "DT_REGEX",   "regular expression" },
-  { "DT_SLIST",   "string list"        },
-  { "DT_SORT",    "sort order"         },
-  { "DT_STRING",  "string"             },
-  { "DT_SYNONYM", NULL                 },
-  { NULL,         NULL                 },
+  { "DT_NONE",       "-none-"             },
+  { "DT_ADDRESS",    "e-mail address"     },
+  { "DT_BOOL",       "boolean"            },
+  { "DT_COMMAND",    "command"            },
+  { "DT_ENUM",       "enumeration"        },
+  { "DT_LONG",       "number (long)"      },
+  { "DT_MAILBOX",    "mailbox"            },
+  { "DT_MBTABLE",    "character string"   },
+  { "DT_NUMBER",     "number"             },
+  { "DT_PATH",       "path"               },
+  { "DT_QUAD",       "quadoption"         },
+  { "DT_REGEX",      "regular expression" },
+  { "DT_SLIST",      "string list"        },
+  { "DT_SORT",       "sort order"         },
+  { "DT_STRING",     "string"             },
+  { "DT_SYNONYM",    NULL                 },
+  { "DT_DEPRECATED", NULL                 },
+  { NULL,            NULL                 },
   // clang-format on
 };
 
-/* skip whitespace */
-
+/**
+ * skip_ws - Skip leading whitespace in a string
+ * @param s String
+ * @retval ptr Success, first non-whitespace character
+ * @retval ptr Error, terminating NUL
+ */
 static char *skip_ws(char *s)
 {
   while (*s && isspace((unsigned char) *s))
@@ -189,7 +206,13 @@ static char *skip_ws(char *s)
   return s;
 }
 
-/* isolate a token */
+/**
+ * get_token - Isolate a token from a string
+ * @param d XXX
+ * @param l XXX
+ * @param s XXX
+ * @retval ptr XXX
+ */
 static char *get_token(char *d, size_t l, char *s)
 {
   static char single_char_tokens[] = "[]{},;|";
@@ -288,6 +311,12 @@ static char *get_token(char *d, size_t l, char *s)
   return t;
 }
 
+/**
+ * sgml_fputc - Output an XML character
+ * @param c      XXX
+ * @param fp_out XXX
+ * @retval num XXX
+ */
 static int sgml_fputc(int c, FILE *fp_out)
 {
   switch (c)
@@ -304,6 +333,12 @@ static int sgml_fputc(int c, FILE *fp_out)
   }
 }
 
+/**
+ * sgml_fputs - Output an XML string
+ * @param s      XXX
+ * @param fp_out XXX
+ * @retval num XXX
+ */
 static int sgml_fputs(const char *s, FILE *fp_out)
 {
   for (; *s; s++)
@@ -313,8 +348,15 @@ static int sgml_fputs(const char *s, FILE *fp_out)
   return 0;
 }
 
-/* print something. */
-
+/**
+ * print_it - Print something
+ * @param format  XXX
+ * @param special XXX
+ * @param str     XXX
+ * @param fp_out  XXX
+ * @param docstat XXX
+ * @retval num XXX
+ */
 static int print_it(enum OutputFormats format, int special, char *str, FILE *fp_out, int docstat)
 {
   int onl = docstat & (D_NL | D_NP);
@@ -381,6 +423,19 @@ static int print_it(enum OutputFormats format, int special, char *str, FILE *fp_
         case SP_END_TAB:
         {
           docstat &= ~D_TAB;
+          docstat |= D_NL;
+          break;
+        }
+        case SP_START_EXAMPLE:
+        {
+          if (!onl)
+            fputs("\n# ", fp_out);
+          docstat |= D_EX;
+          break;
+        }
+        case SP_END_EXAMPLE:
+        {
+          docstat &= ~D_EX;
           docstat |= D_NL;
           break;
         }
@@ -500,14 +555,37 @@ static int print_it(enum OutputFormats format, int special, char *str, FILE *fp_
         }
         case SP_START_TAB:
         {
-          fputs("\n.IP\n.EX\n", fp_out);
+          fputs("\n.TS\nbox;\n", fp_out);
           docstat |= D_TAB | D_NL;
+          break;
+        }
+        case SP_TAB_HEADER:
+        {
+          fputs("lb|lb\n", fp_out);
+          fputs("l|l.\n", fp_out);
+          fputs("Expando\tDescription\n", fp_out);
+          fputs("_\n", fp_out);
+          docstat &= ~D_TAB;
+          docstat |= D_NL;
           break;
         }
         case SP_END_TAB:
         {
-          fputs("\n.EE\n", fp_out);
+          fputs(".TE\n", fp_out);
           docstat &= ~D_TAB;
+          docstat |= D_NL;
+          break;
+        }
+        case SP_START_EXAMPLE:
+        {
+          fputs("\n.IP\n.EX\n", fp_out);
+          docstat |= D_EX | D_NL;
+          break;
+        }
+        case SP_END_EXAMPLE:
+        {
+          fputs(".EE\n", fp_out);
+          docstat &= ~D_EX;
           docstat |= D_NL;
           break;
         }
@@ -519,13 +597,13 @@ static int print_it(enum OutputFormats format, int special, char *str, FILE *fp_
         }
         case SP_DT:
         {
-          fputs(".TP\n", fp_out);
+          // fputs(".TP\n", fp_out);
           break;
         }
         case SP_DD:
         {
           if (docstat & D_IL)
-            fputs(".TP\n\\(hy ", fp_out);
+            fputs(".TP\n\\(bu ", fp_out);
           else
             fputs("\n", fp_out);
           break;
@@ -681,6 +759,24 @@ static int print_it(enum OutputFormats format, int special, char *str, FILE *fp_
           docstat |= D_NL;
           break;
         }
+        case SP_START_EXAMPLE:
+        {
+          if (docstat & D_PA)
+          {
+            fputs("\n</para>\n", fp_out);
+            docstat &= ~D_PA;
+          }
+          fputs("\n<screen>\n", fp_out);
+          docstat |= D_EX | D_NL;
+          break;
+        }
+        case SP_END_EXAMPLE:
+        {
+          fputs("</screen>", fp_out);
+          docstat &= ~D_EX;
+          docstat |= D_NL;
+          break;
+        }
         case SP_START_DL:
         {
           if (docstat & D_PA)
@@ -785,8 +881,15 @@ static int print_it(enum OutputFormats format, int special, char *str, FILE *fp_
   return docstat;
 }
 
-/* close eventually-open environments. */
-
+/**
+ * flush_doc - XXX
+ * @param format  XXX
+ * @param docstat XXX
+ * @param fp_out  XXX
+ * @retval num XXX
+ *
+ * close eventually-open environments
+ */
 static int flush_doc(enum OutputFormats format, int docstat, FILE *fp_out)
 {
   if (docstat & D_INIT)
@@ -817,6 +920,15 @@ static int flush_doc(enum OutputFormats format, int docstat, FILE *fp_out)
   return D_INIT;
 }
 
+/**
+ * commit_buf - XXX
+ * @param format  XXX
+ * @param buf     XXX
+ * @param d       XXX
+ * @param fp_out  XXX
+ * @param docstat XXX
+ * @retval num XXX
+ */
 static int commit_buf(enum OutputFormats format, char *buf, char **d, FILE *fp_out, int docstat)
 {
   if (*d > buf)
@@ -831,6 +943,9 @@ static int commit_buf(enum OutputFormats format, char *buf, char **d, FILE *fp_o
 
 /**
  * sgml_id_fputs - reduce CDATA to ID
+ * @param s      XXX
+ * @param fp_out XXX
+ * @retval num XXX
  */
 static int sgml_id_fputs(const char *s, FILE *fp_out)
 {
@@ -856,6 +971,14 @@ static int sgml_id_fputs(const char *s, FILE *fp_out)
   return 0;
 }
 
+/**
+ * print_ref - XXX
+ * @param format        XXX
+ * @param fp_out        XXX
+ * @param output_dollar XXX
+ * @param ref           XXX
+ * @retval num XXX
+ */
 static void print_ref(enum OutputFormats format, FILE *fp_out,
                       bool output_dollar, const char *ref)
 {
@@ -883,6 +1006,14 @@ static void print_ref(enum OutputFormats format, FILE *fp_out,
   }
 }
 
+/**
+ * handle_docline - XXX
+ * @param format  XXX
+ * @param l       XXX
+ * @param fp_out  XXX
+ * @param docstat XXX
+ * @retval num XXX
+ */
 static int handle_docline(enum OutputFormats format, char *l, FILE *fp_out, int docstat)
 {
   char buf[BUFSIZE];
@@ -896,8 +1027,14 @@ static int handle_docline(enum OutputFormats format, char *l, FILE *fp_out, int 
     return print_it(format, SP_NEWPAR, NULL, fp_out, docstat);
   if (strncmp(l, ".ts", 3) == 0)
     return print_it(format, SP_START_TAB, NULL, fp_out, docstat);
+  if (strncmp(l, ".th", 3) == 0)
+    return print_it(format, SP_TAB_HEADER, NULL, fp_out, docstat);
   if (strncmp(l, ".te", 3) == 0)
     return print_it(format, SP_END_TAB, NULL, fp_out, docstat);
+  if (strncmp(l, ".ex", 3) == 0)
+    return print_it(format, SP_START_EXAMPLE, NULL, fp_out, docstat);
+  if (strncmp(l, ".ee", 3) == 0)
+    return print_it(format, SP_END_EXAMPLE, NULL, fp_out, docstat);
   if (strncmp(l, ".dl", 3) == 0)
     return print_it(format, SP_START_DL, NULL, fp_out, docstat);
   if (strncmp(l, ".de", 3) == 0)
@@ -944,6 +1081,17 @@ static int handle_docline(enum OutputFormats format, char *l, FILE *fp_out, int 
       docstat = commit_buf(format, buf, &d, fp_out, docstat);
       docstat = print_it(format, SP_END_FT, NULL, fp_out, docstat);
       s += 2;
+    }
+    else if (strncmp(s, ".td", 3) == 0)
+    {
+      if (docstat & D_DD)
+      {
+        docstat = commit_buf(format, buf, &d, fp_out, docstat);
+        docstat = print_it(format, SP_END_DD, NULL, fp_out, docstat);
+      }
+      docstat = commit_buf(format, buf, &d, fp_out, docstat);
+      docstat = print_it(format, SP_DT, NULL, fp_out, docstat);
+      s += 3;
     }
     else if (strncmp(s, ".dt", 3) == 0)
     {
@@ -1006,6 +1154,11 @@ static int handle_docline(enum OutputFormats format, char *l, FILE *fp_out, int 
   return print_it(format, SP_NEWLINE, NULL, fp_out, docstat);
 }
 
+/**
+ * buf_to_type - XXX
+ * @param s XXX
+ * @retval num XXX
+ */
 static int buf_to_type(const char *s)
 {
   for (int type = DT_NONE; types[type].machine; type++)
@@ -1015,6 +1168,13 @@ static int buf_to_type(const char *s)
   return DT_NONE;
 }
 
+/**
+ * pretty_default - XXX
+ * @param t    XXX
+ * @param l    XXX
+ * @param s    XXX
+ * @param type XXX
+ */
 static void pretty_default(char *t, size_t l, const char *s, int type)
 {
   memset(t, 0, l);
@@ -1091,6 +1251,11 @@ static void pretty_default(char *t, size_t l, const char *s, int type)
   }
 }
 
+/**
+ * char_to_escape - XXX
+ * @param dest XXX
+ * @param c    XXX
+ */
 static void char_to_escape(char *dest, unsigned int c)
 {
   switch (c)
@@ -1113,6 +1278,11 @@ static void char_to_escape(char *dest, unsigned int c)
   }
 }
 
+/**
+ * conf_char_to_escape - XXX
+ * @param c      XXX
+ * @param fp_out XXX
+ */
 static void conf_char_to_escape(unsigned int c, FILE *fp_out)
 {
   char buf[16];
@@ -1120,6 +1290,11 @@ static void conf_char_to_escape(unsigned int c, FILE *fp_out)
   fputs(buf, fp_out);
 }
 
+/**
+ * conf_print_strval - XXX
+ * @param v      XXX
+ * @param fp_out XXX
+ */
 static void conf_print_strval(const char *v, FILE *fp_out)
 {
   for (; *v; v++)
@@ -1136,6 +1311,11 @@ static void conf_print_strval(const char *v, FILE *fp_out)
   }
 }
 
+/**
+ * type2human - XXX
+ * @param type
+ * @retval ptr XXX
+ */
 static const char *type2human(int type)
 {
   return types[type].human;
@@ -1148,6 +1328,11 @@ static const char *type2human(int type)
  * a configuration variable.
  */
 
+/**
+ * man_print_strval - XXX
+ * @param v      XXX
+ * @param fp_out XXX
+ */
 static void man_print_strval(const char *v, FILE *fp_out)
 {
   for (; *v; v++)
@@ -1170,6 +1355,11 @@ static void man_print_strval(const char *v, FILE *fp_out)
   }
 }
 
+/**
+ * sgml_print_strval - XXX
+ * @param v      XXX
+ * @param fp_out XXX
+ */
 static void sgml_print_strval(const char *v, FILE *fp_out)
 {
   char buf[16];
@@ -1185,10 +1375,18 @@ static void sgml_print_strval(const char *v, FILE *fp_out)
   }
 }
 
+/**
+ * print_confline - XXX
+ * @param format  XXX
+ * @param varname XXX
+ * @param type    XXX
+ * @param val     XXX
+ * @param fp_out  XXX
+ */
 static void print_confline(enum OutputFormats format, const char *varname,
                            int type, const char *val, FILE *fp_out)
 {
-  if (type == DT_SYNONYM)
+  if ((type == DT_SYNONYM) || (type == DT_DEPRECATED))
     return;
 
   switch (format)
@@ -1291,6 +1489,12 @@ static void print_confline(enum OutputFormats format, const char *varname,
   }
 }
 
+/**
+ * handle_confline - XXX
+ * @param format XXX
+ * @param s      XXX
+ * @param fp_out XXX
+ */
 static void handle_confline(enum OutputFormats format, char *s, FILE *fp_out)
 {
   char varname[BUFSIZE];
@@ -1328,6 +1532,20 @@ static void handle_confline(enum OutputFormats format, char *s, FILE *fp_out)
   if (!s)
     return;
 
+  if ((type == DT_SYNONYM) || (type == DT_DEPRECATED))
+  {
+    /* comma */
+    s = get_token(buf, sizeof(buf), s);
+    if (!s)
+      return;
+
+    /* Rename date */
+    s = get_token(tmp, sizeof(tmp), s);
+    if (!s)
+      return;
+    printf("DATE: %s\n", tmp);
+  }
+
   // Look for unjoined strings (pre-processor artifacts)
   while ((s[0] == ' ') && (s[1] == '"'))
   {
@@ -1339,12 +1557,18 @@ static void handle_confline(enum OutputFormats format, char *s, FILE *fp_out)
   print_confline(format, varname, type, val, fp_out);
 }
 
+/**
+ * makedoc - XXX
+ * @param format XXX
+ * @param fp_in  XXX
+ * @param fp_out XXX
+ */
 static void makedoc(enum OutputFormats format, FILE *fp_in, FILE *fp_out)
 {
   char buffer[BUFSIZE];
   char token[BUFSIZE];
   char *p = NULL;
-  bool active = false;
+  bool active = true;
   int line = 0;
   int docstat = D_INIT;
 
@@ -1392,6 +1616,13 @@ static void makedoc(enum OutputFormats format, FILE *fp_in, FILE *fp_out)
   fputs("\n", fp_out);
 }
 
+/**
+ * main - XXX
+ * @param argc Number of command line arguments
+ * @param argv List of command line arguments
+ * @retval 0 Success
+ * @retval 1 Error
+ */
 int main(int argc, char *argv[])
 {
   int c;
@@ -1447,6 +1678,19 @@ int main(int argc, char *argv[])
     fprintf(stderr, "%s: No output format specified.\n", Progname);
     exit(1);
   }
+
+  printf(".TH Config\n");
+  printf(".de EX\n");
+  printf(".BR Example:\n");
+  printf(".in +4n\n");
+  printf(".nf\n");
+  printf(".ft CW\n");
+  printf("..\n");
+  printf(".de EE\n");
+  printf(".ft R\n");
+  printf(".fi\n");
+  printf(".in -4n\n");
+  printf("..\n");
 
   makedoc(format, fp, stdout);
 

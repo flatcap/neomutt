@@ -320,25 +320,25 @@ static void dump_menu(FILE *fp, enum MenuType menu, int wraplen)
 
   STAILQ_FOREACH(map, &Keymaps[menu], entries)
   {
-    if (map->op != OP_NULL)
-    {
-      km_expand_key(buf, sizeof(buf), map);
+    if ((map->op & OP_DEPRECATED) || (map->op == OP_NULL))
+      continue;
 
-      if (map->op == OP_MACRO)
-      {
-        if (map->desc)
-          format_line(fp, 1, buf, map->macro, map->desc, wraplen);
-        else
-          format_line(fp, -1, buf, "macro", map->macro, wraplen);
-      }
+    km_expand_key(buf, sizeof(buf), map);
+
+    if (map->op == OP_MACRO)
+    {
+      if (map->desc)
+        format_line(fp, 1, buf, map->macro, map->desc, wraplen);
       else
-      {
-        const struct MenuFuncOp *funcs = help_lookup_function(map->op, menu);
-        format_line(fp, 0, buf, funcs ? funcs->name : "UNKNOWN",
-                    funcs ? _(opcodes_get_description(funcs->op)) :
-                            _("ERROR: please report this bug"),
-                    wraplen);
-      }
+        format_line(fp, -1, buf, "macro", map->macro, wraplen);
+    }
+    else
+    {
+      const struct MenuFuncOp *funcs = help_lookup_function(map->op, menu);
+      format_line(fp, 0, buf, funcs ? funcs->name : "UNKNOWN",
+                  funcs ? _(opcodes_get_description(funcs->op)) :
+                          _("ERROR: please report this bug"),
+                  wraplen);
     }
   }
 }
@@ -373,6 +373,8 @@ static void dump_unbound(FILE *fp, const struct MenuFuncOp *funcs,
 {
   for (int i = 0; funcs[i].name; i++)
   {
+    if (funcs[i].op & OP_DEPRECATED)
+      continue;
     if (!is_bound(km_list, funcs[i].op) && (!aux || !is_bound(aux, funcs[i].op)))
       format_line(fp, 0, funcs[i].name, "", _(opcodes_get_description(funcs[i].op)), wraplen);
   }

@@ -24,9 +24,9 @@
 ** desired effect.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set abort_key = "<Esc>"
-** .te
+** .ee
 ** .pp
 ** Please note that when using <Esc> as the abort key, you may also want to
 ** set the environment variable ESCDELAY to a low value or even 0 which will
@@ -44,9 +44,9 @@
 ** as such will never be aborted.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set abort_noattach_regex = "\\<attach(|ed|ments?)\\>"
-** .te
+** .ee
 */
 
 { "abort_noattach_regex", DT_REGEX, "\\<(attach|attached|attachments?)\\>" },
@@ -114,17 +114,18 @@
 ** .pp
 ** Specifies the format of the data displayed for the "$alias" menu.  The
 ** following \fCprintf(3)\fP-style sequences are available:
-** .dl
-** .dt %a  .dd Alias name
-** .dt %c  .dd Comment
-** .dt %f  .dd Flags - currently, a "d" for an alias marked for deletion
-** .dt %n  .dd Index number
-** .dt %r  .dd Address which alias expands to
-** .dt %t  .dd Character which indicates if the alias is tagged for inclusion
-** .dt %>X .dd right justify the rest of the string and pad with character "X"
-** .dt %|X .dd pad to the end of the line with character "X"
-** .dt %*X .dd soft-fill with character "X" as pad
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td Alias name
+** .td %c  .td Comment
+** .td %f  .td Flags - currently, a "d" for an alias marked for deletion
+** .td %n  .td Index number
+** .td %r  .td Address which alias expands to
+** .td %t  .td Character which indicates if the alias is tagged for inclusion
+** .td %>X .td right justify the rest of the string and pad with character "X"
+** .td %|X .td pad to the end of the line with character "X"
+** .td %*X .td soft-fill with character "X" as pad
+** .te
 */
 
 { "allow_8bit", DT_BOOL, true },
@@ -143,9 +144,9 @@
 ** their text will be colored accordingly. Note that this may override
 ** your color choices, and even present a security problem, since a
 ** message could include a line like
-** .ts
+** .ex
 ** [-- PGP output follows ...
-** .te
+** .ee
 ** .pp
 ** and give it the same color as your attachment color (see also
 ** $$crypt_timestamp).
@@ -215,9 +216,9 @@
 ** indication are assumed to be in "us-ascii".
 ** .pp
 ** For example, Japanese users might prefer this:
-** .ts
+** .ex
 ** set assumed_charset="iso-2022-jp:euc-jp:shift_jis:utf-8"
-** .te
+** .ee
 ** .pp
 ** However, only the first content is valid for the message body.
 */
@@ -233,9 +234,9 @@
 ** If \fIunset\fP, the value of $$charset will be used instead.
 ** For example, the following configuration would work for Japanese
 ** text handling:
-** .ts
+** .ex
 ** set attach_charset="iso-2022-jp:euc-jp:shift_jis:utf-8"
-** .te
+** .ee
 ** .pp
 ** Note: for Japanese users, "iso-2022-*" must be put at the head
 ** of the value as shown above if included.
@@ -246,29 +247,30 @@
 ** .pp
 ** This variable describes the format of the "attachment" menu.  The
 ** following \fCprintf(3)\fP-style sequences are understood:
-** .dl
-** .dt %C  .dd Charset
-** .dt %c  .dd Requires charset conversion ("n" or "c")
-** .dt %D  .dd Deleted flag
-** .dt %d  .dd Description (if none, falls back to %F)
-** .dt %e  .dd MIME content-transfer-encoding
-** .dt %f  .dd Filename
-** .dt %F  .dd Filename in content-disposition header (if none, falls back to %f)
-** .dt %I  .dd Disposition ("I" for inline, "A" for attachment)
-** .dt %m  .dd Major MIME type
-** .dt %M  .dd MIME subtype
-** .dt %n  .dd Attachment number
-** .dt %Q  .dd "Q", if MIME part qualifies for attachment counting
-** .dt %s  .dd Size (see $formatstrings-size)
-** .dt %T  .dd Graphic tree characters
-** .dt %t  .dd Tagged flag
-** .dt %u  .dd Unlink (=to delete) flag
-** .dt %X  .dd Number of qualifying MIME parts in this part and its children
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %C  .td Charset
+** .td %c  .td Requires charset conversion ("n" or "c")
+** .td %D  .td Deleted flag
+** .td %d  .td Description (if none, falls back to %F)
+** .td %e  .td MIME content-transfer-encoding
+** .td %f  .td Filename
+** .td %F  .td Filename in content-disposition header (if none, falls back to %f)
+** .td %I  .td Disposition ("I" for inline, "A" for attachment)
+** .td %m  .td Major MIME type
+** .td %M  .td MIME subtype
+** .td %n  .td Attachment number
+** .td %Q  .td "Q", if MIME part qualifies for attachment counting
+** .td %s  .td Size (see $formatstrings-size)
+** .td %T  .td Graphic tree characters
+** .td %t  .td Tagged flag
+** .td %u  .td Unlink (=to delete) flag
+** .td %X  .td Number of qualifying MIME parts in this part and its children
 **             (please see the "$attachments" section for possible speed effects)
-** .dt %>X .dd Right justify the rest of the string and pad with character "X"
-** .dt %|X .dd Pad to the end of the line with character "X"
-** .dt %*X .dd Soft-fill with character "X" as pad
-** .de
+** .td %>X .td Right justify the rest of the string and pad with character "X"
+** .td %|X .td Pad to the end of the line with character "X"
+** .td %*X .td Soft-fill with character "X" as pad
+** .te
 ** .pp
 ** For an explanation of "soft-fill", see the $$index_format documentation.
 */
@@ -392,13 +394,14 @@
 ** .pp
 ** This variable describes the format of the "autocrypt account" menu.
 ** The following \fCprintf(3)\fP-style sequences are understood
-** .dl
-** .dt %a  .dd email address
-** .dt %k  .dd gpg keyid
-** .dt %n  .dd current entry number
-** .dt %p  .dd prefer-encrypt flag
-** .dt %s  .dd status flag (active/inactive)
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td Email address
+** .td %k  .td GPG keyid
+** .td %n  .td Current entry number
+** .td %p  .td Prefer-encrypt flag
+** .td %s  .td Status flag (active/inactive)
+** .te
 ** .pp
 ** (Autocrypt only)
 */
@@ -500,9 +503,9 @@
 ** also automatically accepted.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set certificate_file=~/.neomutt/certificates
-** .te
+** .ee
 */
 #endif
 
@@ -605,15 +608,16 @@
 ** Controls the format of the status line displayed in the "compose"
 ** menu.  This string is similar to $$status_format, but has its own
 ** set of \fCprintf(3)\fP-like sequences:
-** .dl
-** .dt %a  .dd Total number of attachments
-** .dt %h  .dd Local hostname
-** .dt %l  .dd Approximate size (in bytes) of the current message (see $formatstrings-size)
-** .dt %v  .dd NeoMutt version string
-** .dt %>X .dd right justify the rest of the string and pad with character "X"
-** .dt %|X .dd pad to the end of the line with character "X"
-** .dt %*X .dd soft-fill with character "X" as pad
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td Total number of attachments
+** .td %h  .td Local hostname
+** .td %l  .td Approximate size (in bytes) of the current message (see $formatstrings-size)
+** .td %v  .td NeoMutt version string
+** .td %>X .td right justify the rest of the string and pad with character "X"
+** .td %|X .td pad to the end of the line with character "X"
+** .td %*X .td soft-fill with character "X" as pad
+** .te
 ** .pp
 ** See the text describing the $$status_format option for more
 ** information on how to set $$compose_format.
@@ -737,14 +741,14 @@
 /*
 ** .pp
 ** Controls the characters used in cryptography flags.
-** .dl
-** .dt \fBCharacter\fP .dd \fBDefault\fP .dd \fBDescription\fP
-** .dt 1 .dd S .dd The mail is signed, and the signature is successfully verified.
-** .dt 2 .dd P .dd The mail is PGP encrypted.
-** .dt 3 .dd s .dd The mail is signed.
-** .dt 4 .dd K .dd The mail contains a PGP public key.
-** .dt 5 .dd <space> .dd The mail has no crypto info.
-** .de
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td S .td The mail is signed, and the signature is successfully verified.
+** .td 2 .td P .td The mail is PGP encrypted.
+** .td 3 .td s .td The mail is signed.
+** .td 4 .td K .td The mail contains a PGP public key.
+** .td 5 .td <space> .td The mail has no crypto info.
+** .te
 */
 
 { "crypt_confirm_hook", DT_BOOL, true },
@@ -1069,9 +1073,9 @@
 ** notified of successful transmission.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set dsn_notify="failure,delay"
-** .te
+** .ee
 ** .pp
 ** \fBNote:\fP when using $$sendmail for delivery, you should not enable
 ** this unless you are either using Sendmail 8.8.x or greater or a MTA
@@ -1088,9 +1092,9 @@
 ** message header, or \fIfull\fP to return the full message.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set dsn_return=hdrs
-** .te
+** .ee
 ** .pp
 ** \fBNote:\fP when using $$sendmail for delivery, you should not enable
 ** this unless you are either using Sendmail 8.8.x or greater or a MTA
@@ -1137,9 +1141,9 @@
 ** space and the name to be edited are appended.
 ** .pp
 ** The resulting string is then executed by running
-** .ts
+** .ex
 ** sh -c 'string'
-** .te
+** .ee
 ** .pp
 ** where \fIstring\fP is the expansion of \fC$$editor\fP described above.
 */
@@ -1268,20 +1272,20 @@
 /*
 ** .pp
 ** Controls the characters used in several flags.
-** .dl
-** .dt \fBCharacter\fP .dd \fBDefault\fP .dd \fBDescription\fP
-** .dt 1 .dd * .dd The mail is tagged.
-** .dt 2 .dd ! .dd The mail is flagged as important.
-** .dt 3 .dd D .dd The mail is marked for deletion.
-** .dt 4 .dd d .dd The mail has attachments marked for deletion.
-** .dt 5 .dd r .dd The mail has been replied to.
-** .dt 6 .dd O .dd The mail is Old (Unread but seen).
-** .dt 7 .dd N .dd The mail is New (Unread but not seen).
-** .dt 8 .dd o .dd The mail thread is Old (Unread but seen).
-** .dt 9 .dd n .dd The mail thread is New (Unread but not seen).
-** .dt 10 .dd - .dd The mail is read - %S expando.
-** .dt 11 .dd <space> .dd The mail is read - %Z expando.
-** .de
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td * .td The mail is tagged.
+** .td 2 .td ! .td The mail is flagged as important.
+** .td 3 .td D .td The mail is marked for deletion.
+** .td 4 .td d .td The mail has attachments marked for deletion.
+** .td 5 .td r .td The mail has been replied to.
+** .td 6 .td O .td The mail is Old (Unread but seen).
+** .td 7 .td N .td The mail is New (Unread but not seen).
+** .td 8 .td o .td The mail thread is Old (Unread but seen).
+** .td 9 .td n .td The mail thread is New (Unread but not seen).
+** .td 10 .td - .td The mail is read - %S expando.
+** .td 11 .td <space> .td The mail is read - %Z expando.
+** .te
 */
 
 { "flag_safe", DT_BOOL, false },
@@ -1307,29 +1311,27 @@
 ** This variable allows you to customize the file browser display to your
 ** personal taste.  This string is similar to $$index_format, but has
 ** its own set of \fCprintf(3)\fP-like sequences:
-** .dl
-** .dt %C  .dd   .dd Current file number
-** .dt %d  .dd   .dd Date/time folder was last modified
-** .dt %D  .dd   .dd Date/time folder was last modified using $$date_format.
-**                   It is encouraged to use "%[fmt]" instead, where "fmt" is
-**                   the value of $$date_format.
-** .dt %f  .dd   .dd Filename ("/" is appended to directory names,
-**                   "@" to symbolic links and "*" to executable files)
-** .dt %F  .dd   .dd File permissions
-** .dt %g  .dd   .dd Group name (or numeric gid, if missing)
-** .dt %i  .dd   .dd Description of the folder
-** .dt %l  .dd   .dd Number of hard links
-** .dt %m  .dd * .dd Number of messages in the mailbox
-** .dt %n  .dd * .dd Number of unread messages in the mailbox
-** .dt %N  .dd   .dd "N" if mailbox has new mail, " " (space) otherwise
-** .dt %s  .dd   .dd Size in bytes (see $formatstrings-size)
-** .dt %t  .dd   .dd "*" if the file is tagged, blank otherwise
-** .dt %u  .dd   .dd Owner name (or numeric uid, if missing)
-** .dt %[fmt] .dd   .dd Date/time folder was last modified using an \fCstrftime(3)\fP expression
-** .dt %>X .dd   .dd Right justify the rest of the string and pad with character "X"
-** .dt %|X .dd   .dd Pad to the end of the line with character "X"
-** .dt %*X .dd   .dd Soft-fill with character "X" as pad
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %C  .td   .td Current file number
+** .td %d  .td   .td Date/time folder was last modified
+** .td %D  .td   .td Date/time folder was last modified using $$date_format.
+** .td %f  .td   .td Filename ("/" is appended to directory names,
+** .td %F  .td   .td File permissions
+** .td %g  .td   .td Group name (or numeric gid, if missing)
+** .td %i  .td   .td Description of the folder
+** .td %l  .td   .td Number of hard links
+** .td %m  .td * .td Number of messages in the mailbox
+** .td %n  .td * .td Number of unread messages in the mailbox
+** .td %N  .td   .td "N" if mailbox has new mail, " " (space) otherwise
+** .td %s  .td   .td Size in bytes (see $formatstrings-size)
+** .td %t  .td   .td "*" if the file is tagged, blank otherwise
+** .td %u  .td   .td Owner name (or numeric uid, if missing)
+** .td %[fmt] .td .td Date/time folder was last modified using an \fCstrftime(3)\fP expression
+** .td %>X .td   .td Right justify the rest of the string and pad with character "X"
+** .td %|X .td   .td Pad to the end of the line with character "X"
+** .td %*X .td   .td Soft-fill with character "X" as pad
+** .te
 ** .pp
 ** For an explanation of "soft-fill", see the $$index_format documentation.
 ** .pp
@@ -1476,13 +1478,13 @@
 ** .pp
 ** Controls the character used to prefix the %F and %L fields in the
 ** index.
-** .dl
-** .dt \fBCharacter\fP .dd \fBDescription\fP
-** .dt 1 .dd Mail is written by you and has a To address, or has a known mailing list in the To address.
-** .dt 2 .dd Mail is written by you and has a Cc address, or has a known mailing list in the Cc address.
-** .dt 3 .dd Mail is written by you and has a Bcc address.
-** .dt 4 .dd All remaining cases.
-** .de
+** .ts
+** .td \fBCharacter\fP .td \fBDescription\fP
+** .td 1 .td Mail is written by you and has a To address, or has a known mailing list in the To address.
+** .td 2 .td Mail is written by you and has a Cc address, or has a known mailing list in the Cc address.
+** .td 3 .td Mail is written by you and has a Bcc address.
+** .td 4 .td All remaining cases.
+** .te
 ** .pp
 ** If this is empty or unset (default), the traditional long "To ",
 ** "Cc " and "Bcc " prefixes are used.  If set but too short to
@@ -1522,11 +1524,12 @@
 ** function printf to format output (see the man page for more detail).
 ** The following sequences are defined in NeoMutt:
 ** .pp
-** .dl
-** .dt %n .dd Recipient's real name
-** .dt %u .dd User (login) name of recipient
-** .dt %v .dd First name of recipient
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %n .td Recipient's real name
+** .td %u .td User (login) name of recipient
+** .td %v .td First name of recipient
+** .te
 */
 
 #ifdef USE_NNTP
@@ -1536,17 +1539,18 @@
 ** This variable allows you to customize the newsgroup browser display to
 ** your personal taste.  This string is similar to "$index_format", but
 ** has its own set of printf()-like sequences:
-** .dl
-** .dt %C  .dd Current newsgroup number
-** .dt %d  .dd Description of newsgroup (becomes from server)
-** .dt %f  .dd Newsgroup name
-** .dt %M  .dd - if newsgroup not allowed for direct post (moderated for example)
-** .dt %N  .dd N if newsgroup is new, u if unsubscribed, blank otherwise
-** .dt %n  .dd Number of new articles in newsgroup
-** .dt %s  .dd Number of unread articles in newsgroup
-** .dt %>X .dd Right justify the rest of the string and pad with character "X"
-** .dt %|X .dd Pad to the end of the line with character "X"
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %C  .td Current newsgroup number
+** .td %d  .td Description of newsgroup (becomes from server)
+** .td %f  .td Newsgroup name
+** .td %M  .td - if newsgroup not allowed for direct post (moderated for example)
+** .td %N  .td N if newsgroup is new, u if unsubscribed, blank otherwise
+** .td %n  .td Number of new articles in newsgroup
+** .td %s  .td Number of unread articles in newsgroup
+** .td %>X .td Right justify the rest of the string and pad with character "X"
+** .td %|X .td Pad to the end of the line with character "X"
+** .te
 */
 #endif
 
@@ -1796,9 +1800,9 @@
 ** in order from most-secure to least-secure.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set imap_authenticators="gssapi:cram-md5:login"
-** .te
+** .ee
 ** .pp
 ** \fBNote:\fP NeoMutt will only fall back to other authentication methods if
 ** the previous methods are unavailable. If a method is available but
@@ -2082,89 +2086,88 @@
 ** function \fCprintf(3)\fP to format output (see the man page for more details).
 ** For an explanation of the %? construct, see the $status_format description.
 ** The following sequences are defined in NeoMutt:
-** .dl
-** .dt %a .dd Address of the author
-** .dt %A .dd Reply-to address (if present; otherwise: address of author)
-** .dt %b .dd Filename of the original message folder (think mailbox)
-** .dt %B .dd Same as %K
-** .dt %C .dd Current message number
-** .dt %c .dd Number of characters (bytes) in the body of the message (see $formatstrings-size)
-** .dt %cr .dd Number of characters (bytes) in the raw message, including the header (see $formatstrings-size)
-** .dt %D .dd Date and time of message using $date_format and local timezone
-**            It is encouraged to use "%[fmt]" instead, where "fmt" is the value of $$date_format.
-** .dt %d .dd Date and time of message using $date_format and sender's timezone
-**            It is encouraged to use "%{fmt}" instead, where "fmt" is the value of $$date_format.
-** .dt %e .dd Current message number in thread
-** .dt %E .dd Number of messages in current thread
-** .dt %F .dd Author name, or recipient name if the message is from you
-** .dt %Fp .dd Like %F, but plain. No contextual formatting is applied to recipient name
-** .dt %f .dd Sender (address + real name), either From: or Return-Path:
-** .dt %g .dd Newsgroup name (if compiled with NNTP support)
-** .dt %g .dd Message tags (e.g. notmuch tags/imap flags)
-** .dt %Gx .dd Individual message tag (e.g. notmuch tags/imap flags)
-** .dt %H .dd Spam attribute(s) of this message
-** .dt %I .dd Initials of author
-** .dt %i .dd Message-id of the current message
-** .dt %J .dd Message tags (if present, tree unfolded, and != parent's tags)
-** .dt %K .dd The list to which the letter was sent (if any; otherwise: empty)
-** .dt %L .dd If an address in the "To:" or "Cc:" header field matches an address
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a .td Address of the author
+** .td %A .td Reply-to address (if present; otherwise: address of author)
+** .td %b .td Filename of the original message folder (think mailbox)
+** .td %B .td Same as %K
+** .td %C .td Current message number
+** .td %c .td Number of characters (bytes) in the body of the message (see $formatstrings-size)
+** .td %cr .td Number of characters (bytes) in the raw message, including the header (see $formatstrings-size)
+** .td %D .td Date and time of message using $date_format and local timezone
+** .td %d .td Date and time of message using $date_format and sender's timezone
+** .td %e .td Current message number in thread
+** .td %E .td Number of messages in current thread
+** .td %F .td Author name, or recipient name if the message is from you
+** .td %Fp .td Like %F, but plain. No contextual formatting is applied to recipient name
+** .td %f .td Sender (address + real name), either From: or Return-Path:
+** .td %g .td Newsgroup name (if compiled with NNTP support)
+** .td %g .td Message tags (e.g. notmuch tags/imap flags)
+** .td %Gx .td Individual message tag (e.g. notmuch tags/imap flags)
+** .td %H .td Spam attribute(s) of this message
+** .td %I .td Initials of author
+** .td %i .td Message-id of the current message
+** .td %J .td Message tags (if present, tree unfolded, and != parent's tags)
+** .td %K .td The list to which the letter was sent (if any; otherwise: empty)
+** .td %L .td If an address in the "To:" or "Cc:" header field matches an address
 **            Defined by the user's "$subscribe" command, this displays
 **            "To <list-name>", otherwise the same as %F
-** .dt %l .dd number of lines in the unprocessed message (may not work with
+** .td %l .td number of lines in the unprocessed message (may not work with
 **            maildir, mh, and IMAP folders)
-** .dt %M .dd Number of hidden messages if the thread is collapsed
-** .dt %m .dd Total number of message in the mailbox
-** .dt %N .dd Message score
-** .dt %n .dd Author's real name (or address if missing)
-** .dt %O .dd Original save folder where NeoMutt would formerly have
+** .td %M .td Number of hidden messages if the thread is collapsed
+** .td %m .td Total number of message in the mailbox
+** .td %N .td Message score
+** .td %n .td Author's real name (or address if missing)
+** .td %O .td Original save folder where NeoMutt would formerly have
 **            Stashed the message: list name or recipient name
 **            If not sent to a list
-** .dt %P .dd Progress indicator for the built-in pager (how much of the file has been displayed)
-** .dt %q .dd Newsgroup name (if compiled with NNTP support)
-** .dt %R .dd Comma separated list of "Cc:" recipients
-** .dt %r .dd Comma separated list of "To:" recipients
-** .dt %S .dd Single character status of the message ("N"/"O"/"D"/"d"/"!"/"r"/"\(as")
-** .dt %s .dd Subject of the message
-** .dt %T .dd The appropriate character from the $$to_chars string
-** .dt %t .dd "To:" field (recipients)
-** .dt %u .dd User (login) name of the author
-** .dt %v .dd First name of the author, or the recipient if the message is from you
-** .dt %W .dd Name of organization of author ("Organization:" field)
-** .dt %x .dd "X-Comment-To:" field (if present and compiled with NNTP support)
-** .dt %X .dd Number of MIME attachments
+** .td %P .td Progress indicator for the built-in pager (how much of the file has been displayed)
+** .td %q .td Newsgroup name (if compiled with NNTP support)
+** .td %R .td Comma separated list of "Cc:" recipients
+** .td %r .td Comma separated list of "To:" recipients
+** .td %S .td Single character status of the message ("N"/"O"/"D"/"d"/"!"/"r"/"\(as")
+** .td %s .td Subject of the message
+** .td %T .td The appropriate character from the $$to_chars string
+** .td %t .td "To:" field (recipients)
+** .td %u .td User (login) name of the author
+** .td %v .td First name of the author, or the recipient if the message is from you
+** .td %W .td Name of organization of author ("Organization:" field)
+** .td %x .td "X-Comment-To:" field (if present and compiled with NNTP support)
+** .td %X .td Number of MIME attachments
 **            (please see the "$attachments" section for possible speed effects)
-** .dt %Y .dd "X-Label:" field, if present, and \fI(1)\fP not at part of a thread tree,
+** .td %Y .td "X-Label:" field, if present, and \fI(1)\fP not at part of a thread tree,
 **            \fI(2)\fP at the top of a thread, or \fI(3)\fP "X-Label:" is different from
 **            Preceding message's "X-Label:"
-** .dt %y .dd "X-Label:" field, if present
-** .dt %Z .dd A three character set of message status flags.
+** .td %y .td "X-Label:" field, if present
+** .td %Z .td A three character set of message status flags.
 **            The first character is new/read/replied flags ("n"/"o"/"r"/"O"/"N").
 **            The second is deleted or encryption flags ("D"/"d"/"S"/"P"/"s"/"K").
 **            The third is either tagged/flagged ("\(as"/"!"), or one of the characters
 **            Listed in $$to_chars.
-** .dt %zc .dd Message crypto flags
-** .dt %zs .dd Message status flags
-** .dt %zt .dd Message tag flags
-** .dt %@name@ .dd insert and evaluate format-string from the matching
+** .td %zc .td Message crypto flags
+** .td %zs .td Message status flags
+** .td %zt .td Message tag flags
+** .td %@name@ .td insert and evaluate format-string from the matching
 **                 "$index-format-hook" command
-** .dt %{fmt} .dd the date and time of the message is converted to sender's
+** .td %{fmt} .td the date and time of the message is converted to sender's
 **                time zone, and "fmt" is expanded by the library function
 **                \fCstrftime(3)\fP; if the first character inside the braces
 **                is a bang ("!"), the date is formatted ignoring any locale
 **                settings.  Note that the sender's time zone might only be
 **                available as a numerical offset, so "%Z" behaves like "%z".
-** .dt %[fmt] .dd the date and time of the message is converted to the local
+** .td %[fmt] .td the date and time of the message is converted to the local
 **                time zone, and "fmt" is expanded by the library function
 **                \fCstrftime(3)\fP; if the first character inside the brackets
 **                is a bang ("!"), the date is formatted ignoring any locale settings.
-** .dt %(fmt) .dd the local date and time when the message was received, and
+** .td %(fmt) .td the local date and time when the message was received, and
 **                "fmt" is expanded by the library function \fCstrftime(3)\fP;
 **                if the first character inside the parentheses is a bang ("!"),
 **                the date is formatted ignoring any locale settings.
-** .dt %>X    .dd right justify the rest of the string and pad with character "X"
-** .dt %|X    .dd pad to the end of the line with character "X"
-** .dt %*X    .dd soft-fill with character "X" as pad
-** .de
+** .td %>X    .td right justify the rest of the string and pad with character "X"
+** .td %|X    .td pad to the end of the line with character "X"
+** .td %*X    .td soft-fill with character "X" as pad
+** .te
 ** .pp
 ** Date format expressions can be constructed based on relative dates. Using
 ** the date formatting operators along with nested conditionals, the date
@@ -2196,19 +2199,21 @@
 ** If set, specifies the program and arguments used to deliver news posted
 ** by NeoMutt.  Otherwise, NeoMutt posts article using current connection to
 ** news server.  The following printf-style sequence is understood:
-** .dl
-** .dt %a .dd account url
-** .dt %p .dd port
-** .dt %P .dd port if specified
-** .dt %s .dd news server name
-** .dt %S .dd url schema
-** .dt %u .dd username
-** .de
+** .pp
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a .td account url
+** .td %p .td port
+** .td %P .td port if specified
+** .td %s .td news server name
+** .td %S .td url schema
+** .td %u .td username
+** .te
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set inews="/usr/local/bin/inews -hS"
-** .te
+** .ee
 */
 #endif
 
@@ -2563,15 +2568,16 @@
 ** This variable describes the format of a remailer line on the mixmaster
 ** chain selection screen.  The following \fCprintf(3)\fP-like sequences are
 ** supported:
-** .dl
-** .dt %a  .dd The remailer's e-mail address
-** .dt %c  .dd Remailer capabilities
-** .dt %n  .dd The running number on the menu
-** .dt %s  .dd The remailer's short name
-** .dt %>X .dd right justify the rest of the string and pad with character "X"
-** .dt %|X .dd pad to the end of the line with character "X"
-** .dt %*X .dd soft-fill with character "X" as pad
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a  .td The remailer's e-mail address
+** .td %c  .td Remailer capabilities
+** .td %n  .td The running number on the menu
+** .td %s  .td The remailer's short name
+** .td %>X .td right justify the rest of the string and pad with character "X"
+** .td %|X .td pad to the end of the line with character "X"
+** .td %*X .td soft-fill with character "X" as pad
+** .te
 */
 
 { "mixmaster", DT_COMMAND, MIXMASTER },
@@ -2655,15 +2661,15 @@
 ** The file, containing info about subscribed newsgroups - names and
 ** indexes of read articles.  The following printf-style sequence
 ** is understood:
-** .dl
-** .dt \fBExpando\fP .dd \fBDescription\fP .dd \fBExample\fP
-** .dt %a .dd Account url       .dd \fCnews:news.gmane.org\fP
-** .dt %p .dd Port              .dd \fC119\fP
-** .dt %P .dd Port if specified .dd \fC10119\fP
-** .dt %s .dd News server name  .dd \fCnews.gmane.org\fP
-** .dt %S .dd Url schema        .dd \fCnews\fP
-** .dt %u .dd Username          .dd \fCusername\fP
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP .td \fBExample\fP
+** .td %a .td Account url       .td \fCnews:news.gmane.org\fP
+** .td %p .td Port              .td \fC119\fP
+** .td %P .td Port if specified .td \fC10119\fP
+** .td %s .td News server name  .td \fCnews.gmane.org\fP
+** .td %S .td Url schema        .td \fCnews\fP
+** .td %u .td Username          .td \fCusername\fP
+** .te
 */
 #endif
 
@@ -2815,9 +2821,9 @@
 ** least-secure.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set nntp_authenticators="digest-md5:user"
-** .te
+** .ee
 ** .pp
 ** \fBNote:\fP NeoMutt will only fall back to other authentication methods if
 ** the previous methods are unavailable. If a method is available but
@@ -2958,11 +2964,12 @@
 ** .pp
 ** This variable describes the format of the "pattern completion" menu. The
 ** following \fCprintf(3)\fP-style sequences are understood:
-** .dl
-** .dt %d  .dd pattern description
-** .dt %e  .dd pattern expression
-** .dt %n  .dd index number
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %d  .td pattern description
+** .td %e  .td pattern expression
+** .td %n  .td index number
+** .te
 ** .pp
 */
 
@@ -3044,16 +3051,17 @@
 ** application/pgp attachments.
 ** .pp
 ** The PGP command formats have their own set of \fCprintf(3)\fP-like sequences:
-** .dl
-** .dt %a .dd The value of $$pgp_sign_as if set, otherwise the value
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a .td The value of $$pgp_sign_as if set, otherwise the value
 **            of $$pgp_default_key.
-** .dt %f .dd Expands to the name of a file containing a message.
-** .dt %p .dd Expands to PGPPASSFD=0 when a pass phrase is needed, to an empty
+** .td %f .td Expands to the name of a file containing a message.
+** .td %p .td Expands to PGPPASSFD=0 when a pass phrase is needed, to an empty
 **            string otherwise. Note: This may be used with a %? construct.
-** .dt %r .dd One or more key IDs (or fingerprints if available).
-** .dt %s .dd Expands to the name of a file containing the signature part
+** .td %r .td One or more key IDs (or fingerprints if available).
+** .td %s .td Expands to the name of a file containing the signature part
 **            of a \fCmultipart/signed\fP attachment when verifying it.
-** .de
+** .te
 ** .pp
 ** (PGP only)
 */
@@ -3137,19 +3145,20 @@
 ** your personal taste. If $$crypt_use_gpgme is \fIset\fP, then it applies
 ** to S/MIME key selection menu also. This string is similar to $$index_format,
 ** but has its own set of \fCprintf(3)\fP-like sequences:
-** .dl
-** .dt %a     .dd Algorithm
-** .dt %c     .dd Capabilities
-** .dt %f     .dd Flags
-** .dt %i     .dd Key fingerprint (or long key id if non-existent)
-** .dt %k     .dd Key id
-** .dt %l     .dd Key length
-** .dt %n     .dd Number
-** .dt %p     .dd Protocol
-** .dt %t     .dd Trust/validity of the key-uid association
-** .dt %u     .dd User id
-** .dt %[<s>] .dd Date of the key where <s> is an \fCstrftime(3)\fP expression
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %a     .td Algorithm
+** .td %c     .td Capabilities
+** .td %f     .td Flags
+** .td %i     .td Key fingerprint (or long key id if non-existent)
+** .td %k     .td Key id
+** .td %l     .td Key length
+** .td %n     .td Number
+** .td %p     .td Protocol
+** .td %t     .td Trust/validity of the key-uid association
+** .td %u     .td User id
+** .td %[<s>] .td Date of the key where <s> is an \fCstrftime(3)\fP expression
+** .te
 ** .pp
 ** See the section "Sending Cryptographically Signed/Encrypted Messages" of the
 ** user manual for the meaning of the letters some of these sequences expand
@@ -3218,9 +3227,9 @@
 ** .pp
 ** This command is used to list the public key ring's contents.  The
 ** output format must be analogous to the one used by
-** .ts
+** .ex
 ** gpg --list-keys --with-colons --with-fingerprint
-** .te
+** .ee
 ** .pp
 ** Note: gpg's \fCfixed-list-mode\fP option should not be used.  It
 ** produces a different date format which may result in NeoMutt showing
@@ -3236,9 +3245,9 @@
 ** .pp
 ** This command is used to list the secret key ring's contents.  The
 ** output format must be analogous to the one used by:
-** .ts
+** .ex
 ** gpg --list-keys --with-colons --with-fingerprint
-** .te
+** .ee
 ** .pp
 ** Note: gpg's \fCfixed-list-mode\fP option should not be used.  It
 ** produces a different date format which may result in NeoMutt showing
@@ -3352,12 +3361,13 @@
 ** .pp
 ** Specifies how the entries in the pgp menu are sorted. The
 ** following are legal values:
-** .dl
-** .dt address .dd sort alphabetically by user id
-** .dt keyid   .dd sort alphabetically by key id
-** .dt date    .dd sort by key creation date
-** .dt trust   .dd sort by the trust of the key
-** .de
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td address .td sort alphabetically by user id
+** .td keyid   .td sort alphabetically by key id
+** .td date    .td sort by key creation date
+** .td trust   .td sort by the trust of the key
+** .te
 ** .pp
 ** If you prefer reverse order of the above values, prefix it with
 ** "reverse-".
@@ -3484,9 +3494,9 @@
 ** most-secure to least-secure.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set pop_authenticators="digest-md5:apop:user"
-** .te
+** .ee
 */
 
 { "pop_check_interval", DT_NUMBER, 60 },
@@ -3509,9 +3519,9 @@
 ** .pp
 ** The name of your POP server for the \fC$<fetch-mail>\fP function.  You
 ** can also specify an alternative port, username and password, i.e.:
-** .ts
+** .ex
 ** [pop[s]://][username[:password]@]popserver[:port]
-** .te
+** .ee
 ** .pp
 ** where "[...]" denotes an optional part.
 */
@@ -3619,10 +3629,9 @@
 ** a connection to the server. This is useful for setting up secure
 ** connections, e.g. with \fCssh(1)\fP. If the command returns a  nonzero
 ** status, NeoMutt gives up opening the server. Example:
-** .ts
-** set preconnect="ssh -f -q -L 1234:mailhost.net:143 mailhost.net \(rs
-** sleep 20 < /dev/null > /dev/null"
-** .te
+** .ex
+** set preconnect="ssh -f -q -L 1234:mailhost.net:143 mailhost.net sleep 20 < /dev/null > /dev/null"
+** .ee
 ** .pp
 ** Mailbox "foo" on "mailhost.net" can now be reached
 ** as "{localhost:1234}foo".
@@ -3638,9 +3647,9 @@
 ** This variable specifies a list of comma-separated languages.
 ** RFC8255 : user preferred languages to be searched in parts and display.
 ** Example:
-** .ts
+** .ex
 ** set preferred_languages="en,fr,de"
-** .te
+** .ee
 */
 
 { "print", DT_QUAD, MUTT_ASKNO },
@@ -3720,16 +3729,17 @@
 ** .pp
 ** This variable describes the format of the "query" menu. The
 ** following \fCprintf(3)\fP-style sequences are understood:
-** .dl
-** .dt %a  .dd   .dd Destination address
-** .dt %c  .dd   .dd Current entry number
-** .dt %e  .dd * .dd Extra information
-** .dt %n  .dd   .dd Destination name
-** .dt %t  .dd   .dd "*" if current entry is tagged, a space otherwise
-** .dt %>X .dd   .dd Right justify the rest of the string and pad with "X"
-** .dt %|X .dd   .dd Pad to the end of the line with "X"
-** .dt %*X .dd   .dd Soft-fill with character "X" as pad
-** .de
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %a  .td   .td Destination address
+** .td %c  .td   .td Current entry number
+** .td %e  .td * .td Extra information
+** .td %n  .td   .td Destination name
+** .td %t  .td   .td "*" if current entry is tagged, a space otherwise
+** .td %>X .td   .td Right justify the rest of the string and pad with "X"
+** .td %|X .td   .td Pad to the end of the line with "X"
+** .td %*X .td   .td Soft-fill with character "X" as pad
+** .te
 ** .pp
 ** For an explanation of "soft-fill", see the $$index_format documentation.
 ** .pp
@@ -3950,14 +3960,14 @@
 ** name from your aliases in the index menu if it finds an alias that
 ** matches the message's sender.  For example, if you have the following
 ** alias:
-** .ts
+** .ex
 ** alias juser abd30425@somewhere.net (Joe User)
-** .te
+** .ee
 ** .pp
 ** and then you receive mail which contains the following header:
-** .ts
+** .ex
 ** From: abd30425@somewhere.net
-** .te
+** .ee
 ** .pp
 ** It would be displayed in the index menu as "Joe User" instead of
 ** "abd30425@somewhere.net."  This is useful when the person's e-mail
@@ -4001,10 +4011,10 @@
 ** When this variable is \fIset\fP, NeoMutt will decode RFC2047-encoded MIME
 ** parameters. You want to set this variable when NeoMutt suggests you
 ** to save attachments to files named like:
-** .ts
+** .ex
 ** =?iso-8859-1?Q?file=5F=E4=5F991116=2Ezip?=
 ** =?utf-8?Q?z=C4=99ta.png?=
-** .te
+** .ee
 ** .pp
 ** When this variable is \fIset\fP interactively, the change won't be
 ** active until you change folders.
@@ -4146,11 +4156,12 @@
 ** to finish before giving up and putting delivery in the background.
 ** .pp
 ** NeoMutt interprets the value of this variable as follows:
-** .dl
-** .dt >0 .dd number of seconds to wait for sendmail to finish before continuing
-** .dt 0  .dd wait forever for sendmail to finish
-** .dt <0 .dd always put sendmail in the background without waiting
-** .de
+** .ts
+** .td \fBValue\fP .td \fBDescription\fP
+** .td >0 .td number of seconds to wait for sendmail to finish before continuing
+** .td 0  .td wait forever for sendmail to finish
+** .td <0 .td always put sendmail in the background without waiting
+** .te
 ** .pp
 ** Note that if you specify a value other than 0, the output of the child
 ** process will be put in a temporary file.  If there is some error, you
@@ -4211,14 +4222,14 @@
 ** as folder separators for displaying paths in the sidebar.
 ** .pp
 ** Local mail is often arranged in directories: 'dir1/dir2/mailbox'.
-** .ts
+** .ex
 ** set sidebar_delim_chars='/'
-** .te
+** .ee
 ** .pp
 ** IMAP mailboxes are often named: 'folder1.folder2.mailbox'.
-** .ts
+** .ex
 ** set sidebar_delim_chars='.'
-** .te
+** .ee
 ** .pp
 ** \fBSee also:\fP $$sidebar_short_path, $$sidebar_folder_indent, $$sidebar_indent_string.
 */
@@ -4251,27 +4262,28 @@
 ** This variable allows you to customize the sidebar display. This string is
 ** similar to $$index_format, but has its own set of \fCprintf(3)\fP-like
 ** sequences:
-** .dl
-** .dt %B .dd     .dd Name of the mailbox
-** .dt %d .dd * @ .dd Number of deleted messages in the mailbox
-** .dt %D .dd     .dd Descriptive name of the mailbox
-** .dt %F .dd *   .dd Number of flagged messages in the mailbox
-** .dt %L .dd * @ .dd Number of messages after limiting
-** .dt %n .dd     .dd "N" if mailbox has new mail, " " (space) otherwise
-** .dt %N .dd *   .dd Number of unread messages in the mailbox (seen or unseen)
-** .dt %o .dd *   .dd Number of old messages in the mailbox (unread, seen)
-** .dt %r .dd *   .dd Number of read messages in the mailbox (read, seen)
-** .dt %S .dd *   .dd Size of mailbox (total number of messages)
-** .dt %t .dd * @ .dd Number of tagged messages in the mailbox
-** .dt %Z .dd *   .dd Number of new messages in the mailbox (unread, unseen)
-** .dt %! .dd     .dd "!" : one flagged message;
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %B .td     .td Name of the mailbox
+** .td %d .td * @ .td Number of deleted messages in the mailbox
+** .td %D .td     .td Descriptive name of the mailbox
+** .td %F .td *   .td Number of flagged messages in the mailbox
+** .td %L .td * @ .td Number of messages after limiting
+** .td %n .td     .td "N" if mailbox has new mail, " " (space) otherwise
+** .td %N .td *   .td Number of unread messages in the mailbox (seen or unseen)
+** .td %o .td *   .td Number of old messages in the mailbox (unread, seen)
+** .td %r .td *   .td Number of read messages in the mailbox (read, seen)
+** .td %S .td *   .td Size of mailbox (total number of messages)
+** .td %t .td * @ .td Number of tagged messages in the mailbox
+** .td %Z .td *   .td Number of new messages in the mailbox (unread, unseen)
+** .td %! .td     .td "!" : one flagged message;
 **                    "!!" : two flagged messages;
 **                    "n!" : n flagged messages (for n > 2).
 **                    Otherwise prints nothing.
-** .dt %>X .dd .dd Right justify the rest of the string and pad with "X"
-** .dt %|X .dd .dd Pad to the end of the line with "X"
-** .dt %*X .dd .dd Soft-fill with character "X" as pad
-** .de
+** .td %>X .td .td Right justify the rest of the string and pad with "X"
+** .td %|X .td .td Pad to the end of the line with "X"
+** .td %*X .td .td Soft-fill with character "X" as pad
+** .te
 ** .pp
 ** * = Can be optionally printed if nonzero
 ** .pp
@@ -4329,13 +4341,13 @@
 ** By default the sidebar will show the mailbox's path, relative to the
 ** $$folder variable. Setting \fCsidebar_shortpath=yes\fP will shorten the
 ** names relative to the previous name. Here's an example:
-** .dl
-** .dt \fBshortpath=no\fP .dd \fBshortpath=yes\fP .dd \fBshortpath=yes, folderindent=yes, indentstr=".."\fP
-** .dt \fCfruit\fP        .dd \fCfruit\fP         .dd \fCfruit\fP
-** .dt \fCfruit.apple\fP  .dd \fCapple\fP         .dd \fC..apple\fP
-** .dt \fCfruit.banana\fP .dd \fCbanana\fP        .dd \fC..banana\fP
-** .dt \fCfruit.cherry\fP .dd \fCcherry\fP        .dd \fC..cherry\fP
-** .de
+** .ts
+** .td \fBshortpath=no\fP .td \fBshortpath=yes\fP .td \fBshortpath=yes, folderindent=yes, indentstr=".."\fP
+** .td \fCfruit\fP        .td \fCfruit\fP         .td \fCfruit\fP
+** .td \fCfruit.apple\fP  .td \fCapple\fP         .td \fC..apple\fP
+** .td \fCfruit.banana\fP .td \fCbanana\fP        .td \fC..banana\fP
+** .td \fCfruit.cherry\fP .td \fCcherry\fP        .td \fC..cherry\fP
+** .te
 ** .pp
 ** \fBSee also:\fP $$sidebar_delim_chars, $$sidebar_folder_indent,
 ** $$sidebar_indent_string, $$sidebar_component_depth.
@@ -4344,15 +4356,18 @@
 { "sidebar_sort_method", DT_SORT, SORT_ORDER },
 /*
 ** .pp
-** Specifies how to sort mailbox entries in the sidebar.  By default, the
-** entries are \fBunsorted\fP.  Valid values:
-** .il
-** .dd \fBpath\fP (alphabetically)
-** .dd \fBcount\fP (all message count)
-** .dd \fBflagged\fP (flagged message count)
-** .dd \fBunread\fP (unread message count)
-** .dd \fBunsorted\fP
-** .ie
+** Specifies how to sort mailbox entries in the sidebar.
+** By default, the entries are \fBunsorted\fP.
+** Valid values:
+** .pp
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td \fBpath\fP     .td Alphabetically
+** .td \fBcount\fP    .td All message count
+** .td \fBflagged\fP  .td Flagged message count
+** .td \fBunread\fP   .td Unread message count
+** .td \fBunsorted\fP .td
+** .te
 ** .pp
 ** You may optionally use the "reverse-" prefix to specify reverse sorting
 ** order (example: "\fCset sidebar_sort_method=reverse-path\fP").
@@ -4519,19 +4534,20 @@
 ** .pp
 ** The OpenSSL command formats have their own set of \fCprintf(3)\fP-like sequences
 ** similar to PGP's:
-** .dl
-** .dt %f .dd Expands to the name of a file containing a message.
-** .dt %s .dd Expands to the name of a file containing the signature part
+** .ts
+** .td \fBExpando\fP .td \fBDescription\fP
+** .td %f .td Expands to the name of a file containing a message.
+** .td %s .td Expands to the name of a file containing the signature part
 **            of a \fCmultipart/signed\fP attachment when verifying it.
-** .dt %k .dd The key-pair specified with $$smime_default_key
-** .dt %i .dd Intermediate certificates
-** .dt %c .dd One or more certificate IDs.
-** .dt %a .dd The algorithm used for encryption.
-** .dt %d .dd The message digest algorithm specified with $$smime_sign_digest_alg.
-** .dt %C .dd CA location:  Depending on whether $$smime_ca_location
+** .td %k .td The key-pair specified with $$smime_default_key
+** .td %i .td Intermediate certificates
+** .td %c .td One or more certificate IDs.
+** .td %a .td The algorithm used for encryption.
+** .td %d .td The message digest algorithm specified with $$smime_sign_digest_alg.
+** .td %C .td CA location:  Depending on whether $$smime_ca_location
 **            points to a directory or file, this expands to
 **            "-CApath $$smime_ca_location" or "-CAfile $$smime_ca_location".
-** .de
+** .te
 ** .pp
 ** For examples on how to configure these formats, see the \fCsmime.rc\fP in
 ** the \fCsamples/\fP subdirectory which has been installed on your system
@@ -4755,9 +4771,9 @@
 ** for '+sasl' in the output of neomutt -v).
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set smtp_authenticators="digest-md5:cram-md5"
-** .te
+** .ee
 */
 
 { "smtp_oauth_refresh_command", DT_COMMAND, 0 },
@@ -4786,9 +4802,9 @@
 ** .pp
 ** Defines the SMTP smarthost where sent messages should relayed for
 ** delivery. This should take the form of an SMTP URL, e.g.:
-** .ts
+** .ex
 ** smtp[s]://[user[:pass]@]host[:port]
-** .te
+** .ee
 ** .pp
 ** where "[...]" denotes an optional part.
 ** Setting this variable overrides the value of the $$sendmail
@@ -4819,18 +4835,21 @@
 ** .pp
 ** Specifies how to sort messages in the "index" menu.  Valid values
 ** are:
-** .il
-** .dd date
-** .dd date-received
-** .dd from
-** .dd score
-** .dd size
-** .dd spam
-** .dd subject
-** .dd threads
-** .dd to
-** .dd unsorted
-** .ie
+** .ts
+** .td \fBSort\fP    .td \fBDescription\fP
+** .td date          .td Sort by the date the email was sent
+** .td date-sent     .td Sort by the date the email was sent
+** .td date-received .td Sort by when the message were delivered locally
+** .td from          .td Sort by the email's From field
+** .td label         .td Sort by the emails label
+** .td unsorted      .td Sort by the order the messages appear in the mailbox
+** .td score         .td Sort by the email's score
+** .td size          .td Sort by the size of the email
+** .td spam          .td Sort by the email's spam score
+** .td subject       .td Sort by the email's subject
+** .td threads       .td Sort by email threads
+** .td to            .td Sort by the email's To field
+** .te
 ** .pp
 ** You may optionally use the "reverse-" prefix to specify reverse
 ** sorting order, or the "last-" prefix to sort threads based on the
@@ -4867,11 +4886,12 @@
 ** .pp
 ** Specifies how the entries in the "alias" menu are sorted.  The
 ** following are legal values:
-** .il
-** .dd address (sort alphabetically by email address)
-** .dd alias (sort alphabetically by alias name)
-** .dd unsorted (leave in order specified in .neomuttrc)
-** .ie
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td address  .td Sort alphabetically by email address
+** .td alias    .td Sort alphabetically by alias name
+** .td unsorted .td Leave in order specified in .neomuttrc
+** .te
 ** .pp
 ** Note: This also affects the entries of the address query menu, thus
 ** potentially overruling the order of entries as generated by $$query_command.
@@ -4889,9 +4909,9 @@
 ** with the use of "reverse-" and "last-" prefixes, except for
 ** variations using "threads" (in that case, NeoMutt will just use
 ** "date").  For instance,
-** .ts
+** .ex
 ** set sort_aux=last-date-received
-** .te
+** .ee
 ** .pp
 ** would mean that if a new message is received in a thread, that
 ** subthread becomes the last one displayed (or the first, if you have
@@ -4907,15 +4927,16 @@
 ** .pp
 ** Specifies how to sort entries in the file browser.  By default, the
 ** entries are sorted alphabetically.  Valid values:
-** .il
-** .dd alpha (alphabetically)
-** .dd count (all message count)
-** .dd date
-** .dd desc (description)
-** .dd new (new message count)
-** .dd size
-** .dd unsorted
-** .ie
+** .ts
+** .td \fBSort\fP .td \fBDescription\fP
+** .td alpha    .td Alphabetically
+** .td count    .td All message count
+** .td date     .td
+** .td desc     .td Description
+** .td new      .td New message count
+** .td size     .td
+** .td unsorted .td
+** .te
 ** .pp
 ** You may optionally use the "reverse-" prefix to specify reverse sorting
 ** order (example: "\fCset sort_browser=reverse-date\fP").
@@ -4966,9 +4987,9 @@
 ** certificates is also automatically accepted. (GnuTLS only)
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set ssl_ca_certificates_file=/etc/ssl/certs/ca-certificates.crt
-** .te
+** .ee
 */
 #endif
 
@@ -5130,18 +5151,18 @@
 /*
 ** .pp
 ** Controls the characters used by the "%r" indicator in $$status_format.
-** .dl
-** .dt \fBCharacter\fP .dd \fBDefault\fP .dd \fBDescription\fP
-** .dt 1 .dd - .dd Mailbox is unchanged
-** .dt 2 .dd * .dd Mailbox has been changed and needs to be resynchronized
-** .dt 3 .dd % .dd Mailbox is read-only, or will not be written when exiting.
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td - .td Mailbox is unchanged
+** .td 2 .td * .td Mailbox has been changed and needs to be resynchronized
+** .td 3 .td % .td Mailbox is read-only, or will not be written when exiting.
 **                 (You can toggle whether to write changes to a mailbox
 **                 with the \fC<toggle-write>\fP operation, bound by default
 **                 to "%")
-** .dt 4 .dd A .dd Folder opened in attach-message mode.
+** .td 4 .td A .td Folder opened in attach-message mode.
 **                 (Certain operations like composing a new mail, replying,
 **                 forwarding, etc. are not permitted in this mode)
-** .de
+** .te
 */
 
 { "status_format", DT_STRING, "-%r-NeoMutt: %D [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%?T?%T/?%s/%S)-%>-(%P)---" },
@@ -5150,36 +5171,37 @@
 ** Controls the format of the status line displayed in the "index"
 ** menu.  This string is similar to $$index_format, but has its own
 ** set of \fCprintf(3)\fP-like sequences:
-** .dl
-** .dt %b  .dd * .dd Number of mailboxes with new mail
-** .dt %d  .dd * .dd Number of deleted messages
-** .dt %D  .dd   .dd Description of the mailbox
-** .dt %f  .dd   .dd The full pathname of the current mailbox
-** .dt %F  .dd * .dd Number of flagged messages
-** .dt %h  .dd   .dd Local hostname
-** .dt %l  .dd * .dd Size (in bytes) of the current mailbox (see $formatstrings-size)
-** .dt %L  .dd * .dd Size (in bytes) of the messages shown
+** .ts
+** .td \fBExpando\fP .td \fBFlags\fP .td \fBDescription\fP
+** .td %b  .td * .td Number of mailboxes with new mail
+** .td %d  .td * .td Number of deleted messages
+** .td %D  .td   .td Description of the mailbox
+** .td %f  .td   .td The full pathname of the current mailbox
+** .td %F  .td * .td Number of flagged messages
+** .td %h  .td   .td Local hostname
+** .td %l  .td * .td Size (in bytes) of the current mailbox (see $formatstrings-size)
+** .td %L  .td * .td Size (in bytes) of the messages shown
 **                   (i.e., which match the current limit) (see $formatstrings-size)
-** .dt %m  .dd * .dd The number of messages in the mailbox
-** .dt %M  .dd * .dd The number of messages shown (i.e., which match the current limit)
-** .dt %n  .dd * .dd Number of new messages in the mailbox (unread, unseen)
-** .dt %o  .dd * .dd Number of old messages in the mailbox (unread, seen)
-** .dt %p  .dd * .dd Number of postponed messages
-** .dt %P  .dd   .dd Percentage of the way through the index
-** .dt %r  .dd   .dd Modified/read-only/won't-write/attach-message indicator,
+** .td %m  .td * .td The number of messages in the mailbox
+** .td %M  .td * .td The number of messages shown (i.e., which match the current limit)
+** .td %n  .td * .td Number of new messages in the mailbox (unread, unseen)
+** .td %o  .td * .td Number of old messages in the mailbox (unread, seen)
+** .td %p  .td * .td Number of postponed messages
+** .td %P  .td   .td Percentage of the way through the index
+** .td %r  .td   .td Modified/read-only/won't-write/attach-message indicator,
 **                   According to $$status_chars
-** .dt %R  .dd * .dd Number of read messages in the mailbox (read, seen)
-** .dt %s  .dd   .dd Current sorting mode ($$sort)
-** .dt %S  .dd   .dd Current aux sorting method ($$sort_aux)
-** .dt %t  .dd * .dd Number of tagged messages in the mailbox
-** .dt %T  .dd * .dd Current threading mode ($$use_threads)
-** .dt %u  .dd * .dd Number of unread messages in the mailbox (seen or unseen)
-** .dt %v  .dd   .dd NeoMutt version string
-** .dt %V  .dd * .dd Currently active limit pattern, if any
-** .dt %>X .dd   .dd Right justify the rest of the string and pad with "X"
-** .dt %|X .dd   .dd Pad to the end of the line with "X"
-** .dt %*X .dd   .dd Soft-fill with character "X" as pad
-** .de
+** .td %R  .td * .td Number of read messages in the mailbox (read, seen)
+** .td %s  .td   .td Current sorting mode ($$sort)
+** .td %S  .td   .td Current aux sorting method ($$sort_aux)
+** .td %t  .td * .td Number of tagged messages in the mailbox
+** .td %T  .td * .td Current threading mode ($$use_threads)
+** .td %u  .td * .td Number of unread messages in the mailbox (seen or unseen)
+** .td %v  .td   .td NeoMutt version string
+** .td %V  .td * .td Currently active limit pattern, if any
+** .td %>X .td   .td Right justify the rest of the string and pad with "X"
+** .td %|X .td   .td Pad to the end of the line with "X"
+** .td %*X .td   .td Soft-fill with character "X" as pad
+** .te
 ** .pp
 ** For an explanation of "soft-fill", see the $$index_format documentation.
 ** .pp
@@ -5357,16 +5379,16 @@
 /*
 ** .pp
 ** Controls the character used to indicate mail addressed to you.
-** .dl
-** .dt \fBCharacter\fP .dd \fBDefault\fP .dd \fBDescription\fP
-** .dt 1 .dd <space> .dd The mail is \fInot\fP addressed to your address.
-** .dt 2 .dd + .dd You are the only recipient of the message.
-** .dt 3 .dd T .dd Your address appears in the "To:" header field, but you are not the only recipient of the message.
-** .dt 4 .dd C .dd Your address is specified in the "Cc:" header field, but you are not the only recipient.
-** .dt 5 .dd F .dd Indicates the mail that was sent by \fIyou\fP.
-** .dt 6 .dd L .dd Indicates the mail was sent to a mailing-list you subscribe to.
-** .dt 7 .dd R .dd Your address appears in the "Reply-To:" header field but none of the above applies.
-** .de
+** .ts
+** .td \fBCharacter\fP .td \fBDefault\fP .td \fBDescription\fP
+** .td 1 .td <space> .td The mail is \fInot\fP addressed to your address.
+** .td 2 .td + .td You are the only recipient of the message.
+** .td 3 .td T .td Your address appears in the "To:" header field, but you are not the only recipient of the message.
+** .td 4 .td C .td Your address is specified in the "Cc:" header field, but you are not the only recipient.
+** .td 5 .td F .td Indicates the mail that was sent by \fIyou\fP.
+** .td 6 .td L .td Indicates the mail was sent to a mailing-list you subscribe to.
+** .td 7 .td R .td Your address appears in the "Reply-To:" header field but none of the above applies.
+** .te
 */
 
 { "toggle_quoted_show_levels", DT_NUMBER, 0 },
@@ -5418,9 +5440,9 @@
 ** Setting this variable will cause NeoMutt to open a pipe to a command
 ** instead of a raw socket. You may be able to use this to set up
 ** preauthenticated connections to your IMAP/POP3/SMTP server. Example:
-** .ts
+** .ex
 ** set tunnel="ssh -q mailhost.net /usr/local/libexec/imapd"
-** .te
+** .ee
 ** .pp
 ** Note: For this example to work you must be able to log in to the remote
 ** machine without having to enter a password.
@@ -5533,9 +5555,9 @@
 ** and \fC<sort-mailbox>\fP toggles \fC$$use_threads\fP.
 ** .pp
 ** Example:
-** .ts
+** .ex
 ** set use_threads=yes
-** .te
+** .ee
 ** .pp
 ** See the "Use Threads Feature" section for further explanation and
 ** examples.

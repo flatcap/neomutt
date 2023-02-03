@@ -29,8 +29,10 @@
 const char *opcodes_get_description(int op);
 const char *opcodes_get_name       (int op);
 
-#define OP_TIMEOUT -2
-#define OP_ABORT   -1
+#define OP_TIMEOUT    -2
+#define OP_ABORT      -1
+#define OP_DEPRECATED (1 << 15)
+#define OP_CODE_MASK  ((1 << 15) - 1)
 
 // clang-format off
 #define OPS_ATTACHMENT(_fmt) \
