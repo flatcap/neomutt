@@ -134,6 +134,7 @@
 #define GNULIB_defined_setlocale
 
 #include "config.h"
+#include <langinfo.h>
 #include <errno.h>
 #include <limits.h>
 #include <locale.h>
@@ -911,6 +912,9 @@ main
     buf_pool_release(&fpath);
   }
 
+  printf("%s\n", nl_langinfo(YESEXPR));
+  printf("%s\n", nl_langinfo(NOEXPR));
+  mutt_endwin();
   if (batch_mode)
   {
     goto main_ok; // TEST22: neomutt -B
