@@ -1901,7 +1901,10 @@ void mutt_what_key(void)
   enum MuttCursorState cursor = mutt_curses_set_cursor(MUTT_CURSOR_VISIBLE);
   do
   {
-    ch = getch();
+    // ch = getch();
+    unsigned int test = 0;
+    int result = get_wch(&test);
+    ch = test;
     if ((ch != ERR) && (ch != AbortKey))
     {
       mutt_message(_("Char = %s, Octal = %o, Decimal = %d"), km_keyname(ch), ch, ch);
