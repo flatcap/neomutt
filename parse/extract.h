@@ -23,6 +23,7 @@
 #ifndef MUTT_PARSE_EXTRACT_H
 #define MUTT_PARSE_EXTRACT_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 struct Buffer;
@@ -56,5 +57,6 @@ typedef uint16_t TokenFlags;          ///< Flags for parse_extract_token(), e.g.
 #define TOKEN_MINUS         (1 << 11) ///< Treat '-' as a special
 
 int parse_extract_token(struct Buffer *dest, struct Buffer *tok, TokenFlags flags);
+bool parse_more_args(struct Buffer *buf, TokenFlags flags);
 
 #endif /* MUTT_PARSE_EXTRACT_H */

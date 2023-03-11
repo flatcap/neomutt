@@ -47,7 +47,7 @@ enum CommandResult sb_parse_sidebar_pin(struct Buffer *buf, struct Buffer *s,
     parse_extract_token(path, s, TOKEN_BACKTICK_VARS);
     buf_expand_path(path);
     add_to_stailq(&SidebarPinned, buf_string(path));
-  } while (MoreArgs(s));
+  } while (parse_more_args(s, TOKEN_NO_FLAGS));
   buf_pool_release(&path);
 
   return MUTT_CMD_SUCCESS;
@@ -72,7 +72,7 @@ enum CommandResult sb_parse_sidebar_unpin(struct Buffer *buf, struct Buffer *s,
     }
     buf_expand_path(path);
     remove_from_stailq(&SidebarPinned, buf_string(path));
-  } while (MoreArgs(s));
+  } while (parse_more_args(s, TOKEN_NO_FLAGS));
   buf_pool_release(&path);
 
   return MUTT_CMD_SUCCESS;

@@ -436,7 +436,7 @@ static enum CommandResult parse_attr_spec(struct Buffer *buf, struct Buffer *s,
   if (bg)
     *bg = COLOR_UNSET;
 
-  if (!MoreArgs(s))
+  if (!parse_more_args(s, TOKEN_NO_FLAGS))
   {
     buf_printf(err, _("%s: too few arguments"), "mono");
     return MUTT_CMD_WARNING;
@@ -478,7 +478,7 @@ static enum CommandResult parse_color_pair(struct Buffer *buf, struct Buffer *s,
 {
   while (true)
   {
-    if (!MoreArgsF(s, TOKEN_COMMENT))
+    if (!parse_more_args(s, TOKEN_COMMENT))
     {
       buf_printf(err, _("%s: too few arguments"), "color");
       return MUTT_CMD_WARNING;
@@ -530,7 +530,7 @@ static enum CommandResult parse_color_pair(struct Buffer *buf, struct Buffer *s,
     }
   }
 
-  if (!MoreArgsF(s, TOKEN_COMMENT))
+  if (!parse_more_args(s, TOKEN_COMMENT))
   {
     buf_printf(err, _("%s: too few arguments"), "color");
     return MUTT_CMD_WARNING;
@@ -602,7 +602,7 @@ static enum CommandResult parse_object(struct Buffer *buf, struct Buffer *s,
 
   if (mutt_istr_equal(buf->data, "compose"))
   {
-    if (!MoreArgs(s))
+    if (!parse_more_args(s, TOKEN_NO_FLAGS))
     {
       buf_printf(err, _("%s: too few arguments"), "color");
       return MUTT_CMD_WARNING;
@@ -678,7 +678,7 @@ static enum CommandResult parse_uncolor(struct Buffer *buf, struct Buffer *s,
     return quoted_colors_parse_uncolor(cid, ql, err);
   }
 
-  if ((cid == MT_COLOR_STATUS) && !MoreArgs(s))
+  if ((cid == MT_COLOR_STATUS) && !parse_more_args(s, TOKEN_NO_FLAGS))
   {
     color_debug(LL_DEBUG5, "simple\n");
     simple_color_reset(cid); // default colour for the status bar
@@ -699,13 +699,13 @@ static enum CommandResult parse_uncolor(struct Buffer *buf, struct Buffer *s,
       color_debug(LL_DEBUG5, "do nothing\n");
       /* just eat the command, but don't do anything real about it */
       parse_extract_token(buf, s, TOKEN_NO_FLAGS);
-    } while (MoreArgs(s));
+    } while (parse_more_args(s, TOKEN_NO_FLAGS));
 
     return MUTT_CMD_SUCCESS;
   }
 
   bool changes = false;
-  if (!MoreArgs(s))
+  if (!parse_more_args(s, TOKEN_NO_FLAGS))
   {
     if (regex_colors_parse_uncolor(cid, NULL, uncolor))
       return MUTT_CMD_SUCCESS;
@@ -726,7 +726,7 @@ static enum CommandResult parse_uncolor(struct Buffer *buf, struct Buffer *s,
 
     changes |= regex_colors_parse_uncolor(cid, buf->data, uncolor);
 
-  } while (MoreArgs(s));
+  } while (parse_more_args(s, TOKEN_NO_FLAGS));
 
   if (changes)
     regex_colors_dump_all();
@@ -741,7 +741,7 @@ static enum CommandResult parse_uncolor(struct Buffer *buf, struct Buffer *s,
 static enum CommandResult color_dump(struct Buffer *buf, struct Buffer *s,
                                      intptr_t data, struct Buffer *err)
 {
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
     return MUTT_CMD_ERROR;
 
   FILE *fp_out = NULL;
@@ -939,7 +939,7 @@ static enum CommandResult parse_color(struct Buffer *buf, struct Buffer *s,
   enum ColorId cid = MT_COLOR_NONE;
   enum CommandResult rc;
 
-  if (!MoreArgs(s))
+  if (!parse_more_args(s, TOKEN_NO_FLAGS))
   {
 #ifdef USE_DEBUG_COLOR
     if (StartupComplete)
@@ -966,7 +966,7 @@ static enum CommandResult parse_color(struct Buffer *buf, struct Buffer *s,
   if (mutt_color_has_pattern(cid) && cid != MT_COLOR_STATUS)
   {
     color_debug(LL_DEBUG5, "regex needed\n");
-    if (MoreArgs(s))
+    if (parse_more_args(s, TOKEN_NO_FLAGS))
     {
       parse_extract_token(buf, s, TOKEN_NO_FLAGS);
     }
@@ -976,7 +976,7 @@ static enum CommandResult parse_color(struct Buffer *buf, struct Buffer *s,
     }
   }
 
-  if (MoreArgs(s) && (cid != MT_COLOR_STATUS))
+  if (parse_more_args(s, TOKEN_NO_FLAGS) && (cid != MT_COLOR_STATUS))
   {
     buf_printf(err, _("%s: too many arguments"), color ? "color" : "mono");
     return MUTT_CMD_WARNING;
@@ -1012,7 +1012,7 @@ static enum CommandResult parse_color(struct Buffer *buf, struct Buffer *s,
     return rc;
     // do nothing
   }
-  else if ((cid == MT_COLOR_STATUS) && MoreArgs(s))
+  else if ((cid == MT_COLOR_STATUS) && parse_more_args(s, TOKEN_NO_FLAGS))
   {
     color_debug(LL_DEBUG5, "status\n");
     /* 'color status fg bg' can have up to 2 arguments:
@@ -1021,7 +1021,7 @@ static enum CommandResult parse_color(struct Buffer *buf, struct Buffer *s,
      * 2 arguments: colorize nth submatch of pattern */
     parse_extract_token(buf, s, TOKEN_NO_FLAGS);
 
-    if (MoreArgs(s))
+    if (parse_more_args(s, TOKEN_NO_FLAGS))
     {
       struct Buffer tmp = buf_make(0);
       parse_extract_token(&tmp, s, TOKEN_NO_FLAGS);
@@ -1034,7 +1034,7 @@ static enum CommandResult parse_color(struct Buffer *buf, struct Buffer *s,
       buf_dealloc(&tmp);
     }
 
-    if (MoreArgs(s))
+    if (parse_more_args(s, TOKEN_NO_FLAGS))
     {
       buf_printf(err, _("%s: too many arguments"), color ? "color" : "mono");
       return MUTT_CMD_WARNING;

@@ -1128,7 +1128,7 @@ enum CommandResult mutt_parse_push(struct Buffer *buf, struct Buffer *s,
                                    intptr_t data, struct Buffer *err)
 {
   parse_extract_token(buf, s, TOKEN_CONDENSE);
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
   {
     buf_printf(err, _("%s: too many arguments"), "push");
     return MUTT_CMD_ERROR;
@@ -1164,7 +1164,7 @@ static char *parse_keymap(enum MenuType *mtypes, struct Buffer *s, int max_menus
   /* menu name */
   parse_extract_token(&buf, s, TOKEN_NO_FLAGS);
   char *p = buf.data;
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
   {
     while (i < max_menus)
     {
@@ -1193,7 +1193,7 @@ static char *parse_keymap(enum MenuType *mtypes, struct Buffer *s, int max_menus
     {
       buf_printf(err, _("%s: null key sequence"), bind ? "bind" : "macro");
     }
-    else if (MoreArgs(s))
+    else if (parse_more_args(s, TOKEN_NO_FLAGS))
       return buf.data;
   }
   else
@@ -1423,12 +1423,12 @@ static enum CommandResult dump_bind_macro(struct Buffer *buf, struct Buffer *s,
   char tempfile[PATH_MAX] = { 0 };
   bool dump_all = false, bind = (data == 0);
 
-  if (!MoreArgs(s))
+  if (!parse_more_args(s, TOKEN_NO_FLAGS))
     dump_all = true;
   else
     parse_extract_token(buf, s, TOKEN_NO_FLAGS);
 
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
   {
     /* More arguments potentially means the user is using the
      * ::command_t :bind command thus we delegate the task. */
@@ -1528,7 +1528,7 @@ enum CommandResult mutt_parse_bind(struct Buffer *buf, struct Buffer *s,
 
   /* function to execute */
   parse_extract_token(buf, s, TOKEN_NO_FLAGS);
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
   {
     buf_printf(err, _("%s: too many arguments"), "bind");
     rc = MUTT_CMD_ERROR;
@@ -1684,7 +1684,7 @@ enum CommandResult mutt_parse_unbind(struct Buffer *buf, struct Buffer *s,
     parse_menu(menu_matches, buf->data, err);
   }
 
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
   {
     parse_extract_token(buf, s, TOKEN_NO_FLAGS);
     key = buf->data;
@@ -1694,7 +1694,7 @@ enum CommandResult mutt_parse_unbind(struct Buffer *buf, struct Buffer *s,
     all_keys = true;
   }
 
-  if (MoreArgs(s))
+  if (parse_more_args(s, TOKEN_NO_FLAGS))
   {
     const char *cmd = (data & MUTT_UNMACRO) ? "unmacro" : "unbind";
 
@@ -1783,12 +1783,12 @@ enum CommandResult mutt_parse_macro(struct Buffer *buf, struct Buffer *s,
   }
   else
   {
-    if (MoreArgs(s))
+    if (parse_more_args(s, TOKEN_NO_FLAGS))
     {
       char *seq = mutt_str_dup(buf->data);
       parse_extract_token(buf, s, TOKEN_CONDENSE);
 
-      if (MoreArgs(s))
+      if (parse_more_args(s, TOKEN_NO_FLAGS))
       {
         buf_printf(err, _("%s: too many arguments"), "macro");
       }
@@ -1847,7 +1847,7 @@ enum CommandResult mutt_parse_exec(struct Buffer *buf, struct Buffer *s,
   const struct MenuFuncOp *funcs = NULL;
   char *function = NULL;
 
-  if (!MoreArgs(s))
+  if (!parse_more_args(s, TOKEN_NO_FLAGS))
   {
     buf_strcpy(err, _("exec: no arguments"));
     return MUTT_CMD_ERROR;
@@ -1876,7 +1876,7 @@ enum CommandResult mutt_parse_exec(struct Buffer *buf, struct Buffer *s,
       return MUTT_CMD_ERROR;
     }
     nops++;
-  } while (MoreArgs(s) && nops < mutt_array_size(ops));
+  } while (parse_more_args(s, TOKEN_NO_FLAGS) && nops < mutt_array_size(ops));
 
   while (nops)
     mutt_push_macro_event(0, ops[--nops]);

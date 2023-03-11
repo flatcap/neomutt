@@ -291,3 +291,36 @@ int parse_extract_token(struct Buffer *dest, struct Buffer *tok, TokenFlags flag
   SKIPWS(tok->dptr);
   return 0;
 }
+
+/**
+ * parse_more_args - Does a Buffer have more arguments to be parsed?
+ * @param buf   Buffer to check
+ * @param flags Flags for special behaviour, e.g. #TOKEN_COMMENT
+ * @retval true There are more arguments to be parsed
+ */
+bool parse_more_args(struct Buffer *buf, TokenFlags flags)
+{
+  if (!buf || !buf->dptr || (buf->dptr[0] == '\0'))
+    return false;
+
+  const char ch = buf->dptr[0];
+
+  return
+    (ch != ';') && (ch != '#');
+}
+
+#ifdef QWQ
+
+  ((ch != '#') || (flags & TOKEN_COMMENT))
+  ((ch != ';') || (flags & TOKEN_SEMICOLON))
+
+  (!IS_SPACE(ch) || (flags & TOKEN_SPACE))
+
+
+  ((ch != '+') || !(flags & TOKEN_PLUS))
+  ((ch != '-') || !(flags & TOKEN_MINUS))
+  ((ch != '=') || !(flags & TOKEN_EQUAL))
+  ((ch != '?') || !(flags & TOKEN_QUESTION))
+  (!(flags & TOKEN_PATTERN) || strchr("~%=!|", ch))
+
+#endif

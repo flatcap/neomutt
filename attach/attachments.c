@@ -371,7 +371,7 @@ static enum CommandResult parse_attach_list(struct Buffer *buf, struct Buffer *s
     mutt_debug(LL_DEBUG3, "added %s/%s [%d]\n", a->major, a->minor, a->major_int);
 
     mutt_list_insert_tail(head, (char *) a);
-  } while (MoreArgs(s));
+  } while (parse_more_args(s, TOKEN_NO_FLAGS));
 
   if (!a)
     return MUTT_CMD_ERROR;
@@ -440,7 +440,7 @@ static enum CommandResult parse_unattach_list(struct Buffer *buf, struct Buffer 
       }
     }
 
-  } while (MoreArgs(s));
+  } while (parse_more_args(s, TOKEN_NO_FLAGS));
 
   FREE(&tmp);
 
