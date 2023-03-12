@@ -1,0 +1,88 @@
+alias/commands.c:70:3:      TOKEN_QUOTE | TOKEN_SPACE | TOKEN_SEMICOLON
+commands.c:532:3:           TOKEN_SPACE
+commands.c:698:3:           TOKEN_SPACE | TOKEN_QUOTE
+commands.c:831:5:           TOKEN_EQUAL | TOKEN_QUESTION | TOKEN_PLUS | TOKEN_MINUS
+commands.c:1013:9:          TOKEN_BACKTICK_VARS
+commands.c:1185:3:          TOKEN_EQUAL | TOKEN_QUESTION
+hook.c:170:3:               TOKEN_SPACE ? TOKEN_NO_FLAGS
+init.c:393:9:               TOKEN_QUOTE | TOKEN_SPACE | TOKEN_COMMENT | TOKEN_SEMICOLON | TOKEN_NOSHELL
+keymap.c:1122:3:            TOKEN_CONDENSE
+keymap.c:1758:3:            TOKEN_CONDENSE
+keymap.c:1769:7:            TOKEN_CONDENSE
+pattern/compile.c:85:8:     TOKEN_PATTERN | TOKEN_COMMENT
+pattern/compile.c:171:8:    TOKEN_PATTERN | TOKEN_COMMENT
+pattern/compile.c:983:7:    TOKEN_COMMENT | TOKEN_PATTERN
+sidebar/commands.c:47:5:    TOKEN_BACKTICK_VARS
+sidebar/commands.c:66:5:    TOKEN_BACKTICK_VARS
+
+alias/commands.c:61:3:      TOKEN_NO_FLAGS
+alias/commands.c:165:5:     TOKEN_NO_FLAGS
+alternates.c:95:5:          TOKEN_NO_FLAGS
+alternates.c:129:5:         TOKEN_NO_FLAGS
+attach/attachments.c:318:5: TOKEN_NO_FLAGS
+attach/attachments.c:396:5: TOKEN_NO_FLAGS
+attach/attachments.c:472:3: TOKEN_NO_FLAGS
+attach/attachments.c:535:3: TOKEN_NO_FLAGS
+color/command.c:233:3:      TOKEN_NO_FLAGS
+color/command.c:275:5:      TOKEN_NO_FLAGS
+color/command.c:327:3:      TOKEN_NO_FLAGS
+color/command.c:399:5:      TOKEN_NO_FLAGS
+color/command.c:442:3:      TOKEN_NO_FLAGS
+color/command.c:489:7:      TOKEN_NO_FLAGS
+color/command.c:506:5:      TOKEN_NO_FLAGS
+color/command.c:744:3:      TOKEN_NO_FLAGS
+color/command.c:762:7:      TOKEN_NO_FLAGS
+color/command.c:813:5:      TOKEN_NO_FLAGS
+color/command.c:818:7:      TOKEN_NO_FLAGS
+commands.c:129:5:           TOKEN_NO_FLAGS
+commands.c:139:5:           TOKEN_NO_FLAGS
+commands.c:345:3:           TOKEN_NO_FLAGS
+commands.c:378:3:           TOKEN_NO_FLAGS
+commands.c:417:5:           TOKEN_NO_FLAGS
+commands.c:508:3:           TOKEN_NO_FLAGS
+commands.c:556:5:           TOKEN_NO_FLAGS
+commands.c:574:5:           TOKEN_NO_FLAGS
+commands.c:611:7:           TOKEN_NO_FLAGS
+commands.c:615:5:           TOKEN_NO_FLAGS
+commands.c:1258:3:          TOKEN_NO_FLAGS
+commands.c:1275:9:          TOKEN_NO_FLAGS
+commands.c:1315:3:          TOKEN_NO_FLAGS
+commands.c:1323:7:          TOKEN_NO_FLAGS
+commands.c:1380:5:          TOKEN_NO_FLAGS
+commands.c:1397:5:          TOKEN_NO_FLAGS
+commands.c:1439:5:          TOKEN_NO_FLAGS
+commands.c:1487:5:          TOKEN_NO_FLAGS
+commands.c:1492:5:          TOKEN_NO_FLAGS
+commands.c:1529:5:          TOKEN_NO_FLAGS
+commands.c:1534:5:          TOKEN_NO_FLAGS
+commands.c:1561:5:          TOKEN_NO_FLAGS
+commands.c:1582:5:          TOKEN_NO_FLAGS
+commands.c:1646:5:          TOKEN_NO_FLAGS
+commands.c:1681:5:          TOKEN_NO_FLAGS
+commands.c:1724:5:          TOKEN_NO_FLAGS
+commands.c:1746:5:          TOKEN_NO_FLAGS
+commands.c:1775:5:          TOKEN_NO_FLAGS
+hook.c:90:13:               TOKEN_NO_FLAGS
+hook.c:91:13:               TOKEN_NO_FLAGS
+hook.c:149:5:               TOKEN_NO_FLAGS
+hook.c:159:7:               TOKEN_NO_FLAGS
+hook.c:430:3:               TOKEN_NO_FLAGS
+hook.c:439:3:               TOKEN_NO_FLAGS
+hook.c:446:3:               TOKEN_NO_FLAGS
+hook.c:541:5:               TOKEN_NO_FLAGS
+init.c:865:5:               TOKEN_NO_FLAGS
+keymap.c:1157:3:            TOKEN_NO_FLAGS
+keymap.c:1182:5:            TOKEN_NO_FLAGS
+keymap.c:1421:5:            TOKEN_NO_FLAGS
+keymap.c:1519:3:            TOKEN_NO_FLAGS
+keymap.c:1663:3:            TOKEN_NO_FLAGS
+keymap.c:1674:5:            TOKEN_NO_FLAGS
+keymap.c:1838:5:            TOKEN_NO_FLAGS
+mutt_lua.c:510:7:           TOKEN_NO_FLAGS
+muttlib.c:845:9:            TOKEN_NO_FLAGS
+score.c:92:3:               TOKEN_NO_FLAGS
+score.c:99:3:               TOKEN_NO_FLAGS
+score.c:202:5:              TOKEN_NO_FLAGS
+subjectrx.c:75:3:           TOKEN_NO_FLAGS
+subjectrx.c:102:3:          TOKEN_NO_FLAGS
+subjectrx.c:110:3:          TOKEN_NO_FLAGS
